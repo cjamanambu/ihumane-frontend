@@ -1,36 +1,24 @@
 <script>
-import { required, email } from "vuelidate/lib/validators";
-
-import {
-  authMethods,
-  authFackMethods,
-  notificationMethods,
-} from "@/state/helpers";
+import { required } from "vuelidate/lib/validators";
+import authService from "@/services/auth.service";
 
 export default {
+  mixins: [authService],
   data() {
     return {
-      email: "admin@themesdesign.in",
-      password: "123456",
+      username: "",
+      password: "",
       submitted: false,
     };
-  },
-  computed: {
-    notification() {
-      return this.$store ? this.$store.state.notification : null;
-    },
   },
   created() {
     document.body.classList.add("auth-body-bg");
   },
   validations: {
-    email: { required, email },
+    username: { required },
     password: { required },
   },
   methods: {
-    ...authMethods,
-    ...authFackMethods,
-    ...notificationMethods,
     // Try to log the user in with the username
     // and password they provided.
     tryToLogIn() {
@@ -39,38 +27,15 @@ export default {
       this.$v.$touch();
 
       if (this.$v.$invalid) {
-        return;
+        this.$bvToast.toast(`Please fill in all required fields`, {
+          title: "Invalid Login",
+          toaster: "b-toaster-top-right",
+          appendToast: true,
+          variant: "warning",
+        });
       } else {
-        if (process.env.VUE_APP_DEFAULT_AUTH === "firebase") {
-          this.tryingToLogIn = true;
-          // Reset the authError if it existed.
-          this.authError = null;
-          return (
-            this.logIn({
-              email: this.email,
-              password: this.password,
-            })
-              // eslint-disable-next-line no-unused-vars
-              .then((token) => {
-                this.tryingToLogIn = false;
-                this.isAuthError = false;
-                // Redirect to the originally requested page, or to the home page
-                this.$router.push(
-                  this.$route.query.redirectFrom || { name: "home" }
-                );
-              })
-              .catch((error) => {
-                this.tryingToLogIn = false;
-                this.authError = error ? error : "";
-                this.isAuthError = true;
-              })
-          );
-        } else {
-          const { email, password } = this;
-          if (email && password) {
-            this.login({ email, password });
-          }
-        }
+        const { username, password } = this;
+        this.login(username, password);
       }
     },
   },
@@ -110,52 +75,37 @@ export default {
                           To get started, please login with your credentials
                         </p>
                       </div>
-
-                      <b-alert
-                        variant="danger"
-                        class="mt-3"
-                        v-if="notification.message"
-                        show
-                        dismissible
-                        >{{ notification.message }}</b-alert
-                      >
-
                       <div class="p-2 mt-5">
                         <form
                           class="form-horizontal"
                           @submit.prevent="tryToLogIn"
                         >
                           <div class="form-group auth-form-group-custom mb-4">
-                            <i class="ri-mail-line auti-custom-input-icon"></i>
-                            <label for="email">Email</label>
+                            <i class="ri-user-3-line auti-custom-input-icon" />
+                            <label for="username">Username</label>
                             <input
-                              type="email"
-                              v-model="email"
+                              type="text"
+                              v-model="username"
                               class="form-control"
-                              id="email"
-                              placeholder="Enter email"
+                              id="username"
+                              placeholder="Enter username"
                               :class="{
-                                'is-invalid': submitted && $v.email.$error,
+                                'is-invalid': submitted && $v.username.$error,
                               }"
                               style="border-radius: 10px"
                             />
                             <div
-                              v-if="submitted && $v.email.$error"
+                              v-if="submitted && $v.username.$error"
                               class="invalid-feedback"
                             >
-                              <span v-if="!$v.email.required"
-                                >Email is required.</span
-                              >
-                              <span v-if="!$v.email.email"
-                                >Please enter valid email.</span
-                              >
+                              <span v-if="!$v.username.required">
+                                Your username is required.
+                              </span>
                             </div>
                           </div>
 
                           <div class="form-group auth-form-group-custom mb-4">
-                            <i
-                              class="ri-lock-2-line auti-custom-input-icon"
-                            ></i>
+                            <i class="ri-lock-2-line auti-custom-input-icon" />
                             <label for="userpassword">Password</label>
                             <input
                               v-model="password"
@@ -185,13 +135,23 @@ export default {
                             <label
                               class="custom-control-label"
                               for="customControlInline"
-                              >Remember me</label
                             >
+                              Remember me
+                            </label>
                           </div>
 
                           <div class="mt-4 text-center">
                             <button
-                              class="btn btn-primary w-md waves-effect waves-light"
+                              v-if="this.loading"
+                              class="btn btn-success w-md waves-effect waves-light"
+                              type="submit"
+                              disabled
+                            >
+                              Logging in...
+                            </button>
+                            <button
+                              v-else
+                              class="btn btn-success w-md waves-effect waves-light"
                               type="submit"
                             >
                               Log In

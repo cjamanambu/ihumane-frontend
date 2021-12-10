@@ -14,7 +14,7 @@ export default {
     titleTemplate(title) {
       title = typeof title === "function" ? title(this.$store) : title;
       return title ? `${title} | ${appConfig.title}` : appConfig.title;
-    }
-  }
+    },
+  },
 };
 </script>
