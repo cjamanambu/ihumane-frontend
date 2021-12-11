@@ -9,24 +9,18 @@ export default {
     login(username, password) {
       this.logIn({ username, password })
         .then(() => {
+          // check user type here first before routing
           this.$router
             .push(this.$route.query.redirectFrom || { name: "home" })
-            .then(() => {
-              this.$bvToast.toast(`You have logged in successfully!`, {
-                title: "Welcome",
-                toaster: "b-toaster-top-right",
-                appendToast: true,
-                variant: "success",
-              });
-            });
+            .then(() =>
+              this.apiResponseHandler(
+                "You have logged in successfully",
+                "Welcome Back"
+              )
+            );
         })
         .catch((err) => {
-          this.$bvToast.toast(`${err}`, {
-            title: "Login Error",
-            toaster: "b-toaster-top-right",
-            appendToast: true,
-            variant: "danger",
-          });
+          this.apiErrorHandler(err, "Login Error");
         });
     },
   },

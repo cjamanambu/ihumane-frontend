@@ -58,4 +58,12 @@ export default [
     },
     component: () => import("../views/pages/dashboard/index"),
   },
+  {
+    path: "/users",
+    name: "users",
+    meta: {
+      authRequired: true,
+    },
+    component: () => import("@/views/pages/users/index"),
+  },
 ];

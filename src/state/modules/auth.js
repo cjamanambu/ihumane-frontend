@@ -1,4 +1,4 @@
-import { API } from "@/services/api.service";
+import API from "@/api";
 
 export const state = {
   currentUser: sessionStorage.getItem("authUser"),
@@ -17,6 +17,7 @@ export const mutations = {
   },
   SET_TOKEN(state, token) {
     state.token = token;
+    localStorage.setItem("token", token);
   },
   TOGGLE_LOGGED_IN(state) {
     state.loggedIn = !state.loggedIn;
@@ -53,6 +54,7 @@ export const actions = {
   // },
   // eslint-disable-next-line no-unused-vars
   logIn({ commit }, { username, password } = {}) {
+    // eslint-disable-next-line no-unused-vars
     return new Promise((resolve, reject) => {
       commit("TOGGLE_LOADING");
       API.post(`users/login`, {
@@ -61,12 +63,12 @@ export const actions = {
       })
         .then((res) => {
           const { data } = res;
-          API.defaults.headers.common["x-auth-token"] = data;
           commit("SET_TOKEN", data);
+          API.defaults.headers.common["x-auth-token"] = data;
           commit("TOGGLE_LOGGED_IN");
           resolve(res);
         })
-        .catch((err) => reject(err.response.data))
+        .catch((err) => reject(err))
         .finally(() => commit("TOGGLE_LOADING"));
     });
   },
@@ -75,6 +77,7 @@ export const actions = {
   logOut({ commit }) {
     commit("SET_TOKEN", null);
     commit("TOGGLE_LOGGED_IN");
+    localStorage.removeItem("token");
   },
 
   // resetPassword

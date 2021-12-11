@@ -9,9 +9,9 @@ export default {
     return {};
   },
   computed: {
-    ...layoutComputed
+    ...layoutComputed,
   },
-  methods: {}
+  methods: {},
 };
 </script>
 

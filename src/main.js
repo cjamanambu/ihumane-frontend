@@ -13,6 +13,7 @@ import vco from "v-click-outside";
 import router from "./router";
 import store from "@/state/store";
 import i18n from "./i18n";
+import apiService from "@/services/api.service";
 
 import "@/assets/scss/app.scss";
 
@@ -32,6 +33,7 @@ Vue.use(VueGoogleMaps, {
   installComponents: true,
 });
 Vue.component("apexchart", VueApexCharts);
+Vue.mixin(apiService);
 
 new Vue({
   router,

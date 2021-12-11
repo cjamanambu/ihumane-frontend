@@ -30,3 +30,10 @@ export const layoutMethods = mapActions("layout", [
   "changeTopbar",
   "changeLoaderValue",
 ]);
+
+export const authHeader = () => {
+  let token = localStorage.getItem("token");
+  if (token) {
+    return { "x-auth-token": token };
+  }
+};

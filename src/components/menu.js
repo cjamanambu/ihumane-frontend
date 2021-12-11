@@ -14,4 +14,15 @@ export const menuItems = [
     },
     link: "/",
   },
+  {
+    id: 3,
+    label: "Configuration",
+    isTitle: true,
+  },
+  {
+    id: 4,
+    label: "Users",
+    icon: "ri-user-settings-line",
+    link: "/users",
+  },
 ];
