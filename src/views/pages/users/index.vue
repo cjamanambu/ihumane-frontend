@@ -3,6 +3,7 @@ import Layout from "@/views/layouts/main";
 import PageHeader from "@/components/page-header";
 import appConfig from "@/app.config";
 import userService from "@/services/user.service";
+import { required, email } from "vuelidate/lib/validators";
 
 export default {
   mixins: [userService],
@@ -18,12 +19,67 @@ export default {
     this.getUsers().then((res) => {
       const { data } = res;
       this.users = data;
-      console.log(this.users);
       this.totalRows = this.users.length;
     });
   },
+  validations: {
+    username: { required },
+    fullname: { required },
+    email: { email, required },
+    password: { required },
+    token: { required },
+  },
+  methods: {
+    /**
+     * Search the table data with search input
+     */
+    onFiltered(filteredItems) {
+      // Trigger pagination to update the number of buttons/pages due to filtering
+      this.totalRows = filteredItems.length;
+      this.currentPage = 1;
+    },
+    editUser(user) {
+      console.log({ user });
+    },
+    newUser() {
+      this.submitted = true;
+      // stop here if form is invalid
+      this.$v.$touch();
+      if (this.$v.$invalid) {
+        this.$bvToast.toast(`Please fill in all fields correctly`, {
+          title: "Invalid User",
+          toaster: "b-toaster-top-right",
+          appendToast: true,
+          variant: "warning",
+        });
+      } else {
+        const newUser = {
+          username: this.username,
+          fullname: this.fullname,
+          email: this.email,
+          password: this.password,
+          userType: this.userType,
+          token: this.token,
+          userStatus: this.userStatus,
+        };
+        this.addUser(newUser).then((res) => {
+          this.apiResponseHandler(
+            `${res.data.user_username} has been added successfully`,
+            "New User Added"
+          );
+          this.getUsers().then((res) => {
+            const { data } = res;
+            this.users = data;
+            this.totalRows = this.users.length;
+          });
+          this.$refs["add-user"].hide();
+        });
+      }
+    },
+  },
   data() {
     return {
+      submitting: false,
       title: "Users",
       items: [
         {
@@ -56,6 +112,23 @@ export default {
         { key: "user_status", sortable: true },
         { key: "createdAt", sortable: true },
       ],
+      userType: 1,
+      userTypes: [
+        { text: "ADMIN", value: 1 },
+        { text: "MODERATOR", value: 2 },
+        { text: "EMPLOYEE", value: 3 },
+      ],
+      userStatus: 1,
+      userStatuses: [
+        { text: "Active", value: 1 },
+        { text: "Inactive", value: 0 },
+      ],
+      submitted: false,
+      username: null,
+      fullname: null,
+      email: null,
+      password: null,
+      token: null,
     };
   },
 };
@@ -64,28 +137,16 @@ export default {
 <template>
   <Layout>
     <PageHeader :title="title" :items="items" />
-    <div class="row">
-      <div class="col-md-3">
-        <div class="card">
-          <div class="card-body">
-            <div class="media">
-              <div class="media-body overflow-hidden">
-                <p class="text-truncate font-size-14 mb-2">Total Users</p>
-                <h4 class="mb-0">{{ this.users.length }}</h4>
-              </div>
-              <div class="text-success">
-                <i class="ri-user-settings-line font-size-24" />
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+    <div class="d-flex justify-content-end mb-3">
+      <b-button class="btn btn-success" @click="$refs['add-user'].show()">
+        <i class="mdi mdi-plus mr-2"></i>
+        Add User
+      </b-button>
     </div>
     <div class="row">
       <div class="col-12">
         <div class="card">
           <div class="card-body">
-            <h4 class="card-title">Data Table</h4>
             <div class="row mt-4">
               <div class="col-sm-12 col-md-6">
                 <div id="tickets-table_length" class="dataTables_length">
@@ -135,7 +196,30 @@ export default {
                 :filter="filter"
                 :filter-included-fields="filterOn"
                 @filtered="onFiltered"
-              ></b-table>
+                show-empty
+                select-mode="single"
+                @row-selected="editUser"
+              >
+                <template #cell(user_type)="row">
+                  <p v-if="row.value === 1">ADMIN</p>
+                  <p v-else-if="row.value === 2">MODERATOR</p>
+                  <p v-else>EMPLOYEE</p>
+                </template>
+                <template #cell(user_status)="row">
+                  <div
+                    class="badge badge-success badge-pill"
+                    v-if="row.value === 1"
+                  >
+                    Active
+                  </div>
+                  <div class="badge badge-danger badge-pill" v-else>
+                    Inactive
+                  </div>
+                </template>
+                <template #cell(createdAt)="row">
+                  {{ new Date(row.value).toDateString() }}
+                </template>
+              </b-table>
             </div>
             <div class="row">
               <div class="col">
@@ -157,5 +241,118 @@ export default {
         </div>
       </div>
     </div>
+    <b-modal
+      ref="add-user"
+      title="Add User"
+      hide-footer
+      centered
+      title-class="font-18"
+    >
+      <form @submit.prevent="newUser">
+        <div class="form-group">
+          <label for="username">
+            Username <span class="text-danger">*</span>
+          </label>
+          <input
+            id="username"
+            type="text"
+            v-model="username"
+            class="form-control"
+            :class="{
+              'is-invalid': submitted && $v.username.$error,
+            }"
+          />
+        </div>
+        <div class="form-group">
+          <label for="fullname">
+            Full Name <span class="text-danger">*</span>
+          </label>
+          <input
+            id="fullname"
+            type="text"
+            v-model="fullname"
+            class="form-control"
+            :class="{
+              'is-invalid': submitted && $v.fullname.$error,
+            }"
+          />
+        </div>
+        <div class="form-group">
+          <label for="email">Email <span class="text-danger">*</span></label>
+          <input
+            id="email"
+            type="email"
+            v-model="email"
+            class="form-control"
+            :class="{
+              'is-invalid': submitted && $v.email.$error,
+            }"
+          />
+        </div>
+        <div class="form-group">
+          <label for="password">
+            Password <span class="text-danger">*</span>
+          </label>
+          <input
+            id="password"
+            type="password"
+            v-model="password"
+            class="form-control"
+            :class="{
+              'is-invalid': submitted && $v.password.$error,
+            }"
+          />
+        </div>
+        <div class="d-flex justify-content-between flex-lg-row flex-column">
+          <b-form-group>
+            <label for="user_type">User Type</label><br />
+            <b-form-radio-group
+              id="user_type"
+              v-model="userType"
+              :options="userTypes"
+              button-variant="outline-success"
+              buttons
+            />
+          </b-form-group>
+          <b-form-group>
+            <label for="user_status">User Status</label><br />
+            <b-form-radio-group
+              id="user_status"
+              v-model="userStatus"
+              :options="userStatuses"
+              button-variant="outline-primary"
+              buttons
+            />
+          </b-form-group>
+        </div>
+        <div class="form-group">
+          <label for="token">Token</label>
+          <input
+            id="token"
+            type="text"
+            v-model="token"
+            class="form-control"
+            :class="{
+              'is-invalid': submitted && $v.token.$error,
+            }"
+          />
+        </div>
+        <b-button
+          v-if="!submitting"
+          class="btn btn-success btn-block mt-4"
+          type="submit"
+        >
+          Submit
+        </b-button>
+        <b-button
+          v-else
+          disabled
+          class="btn btn-success btn-block mt-4"
+          type="submit"
+        >
+          Submitting...
+        </b-button>
+      </form>
+    </b-modal>
   </Layout>
 </template>
