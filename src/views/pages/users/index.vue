@@ -15,7 +15,7 @@ export default {
     Layout,
     PageHeader,
   },
-  beforeMount() {
+  mounted() {
     this.getUsers().then((res) => {
       const { data } = res;
       this.users = data;
