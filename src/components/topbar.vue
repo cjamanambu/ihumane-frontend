@@ -1,8 +1,12 @@
 <script>
 import simplebar from "simplebar-vue";
 import i18n from "../i18n";
+import { authComputed } from "@/state/helpers";
 
 export default {
+  computed: {
+    ...authComputed,
+  },
   data() {
     return {
       languages: [
@@ -286,12 +290,12 @@ export default {
           <template v-slot:button-content>
             <img
               class="rounded-circle header-profile-user"
-              src="@/assets/images/users/avatar-2.jpg"
+              src="@/assets/images/users/avatar-svgrepo-com.svg"
               alt="Header Avatar"
             />
-            <span class="d-none d-xl-inline-block ml-1">{{
-              $t("navbar.dropdown.kevin.text")
-            }}</span>
+            <span class="d-none d-xl-inline-block ml-1 font-weight-bolder">
+              {{ getUser.user_username }}
+            </span>
             <i class="mdi mdi-chevron-down d-none d-xl-inline-block"></i>
           </template>
           <!-- item-->

@@ -72,6 +72,13 @@ export default {
             this.users = data;
             this.totalRows = this.users.length;
           });
+          this.username = null;
+          this.fullname = null;
+          this.email = null;
+          this.password = null;
+          this.token = null;
+          this.userStatus = 1;
+          this.userType = 1;
           this.$refs["add-user"].hide();
         });
       }

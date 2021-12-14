@@ -5,6 +5,7 @@ export const state = {
   loading: false,
   token: null,
   loggedIn: false,
+  userData: {},
 };
 
 export const mutations = {
@@ -22,6 +23,9 @@ export const mutations = {
   TOGGLE_LOGGED_IN(state) {
     state.loggedIn = !state.loggedIn;
   },
+  SET_USER_DATA(state, userData) {
+    state.userData = userData;
+  },
 };
 
 export const getters = {
@@ -31,6 +35,9 @@ export const getters = {
   },
   loading(state) {
     return state.loading;
+  },
+  getUser(state) {
+    return state.userData;
   },
 };
 
@@ -62,9 +69,10 @@ export const actions = {
         user_password: password,
       })
         .then((res) => {
-          const { data } = res;
-          commit("SET_TOKEN", data);
-          API.defaults.headers.common["x-auth-token"] = data;
+          const { userData, token } = res.data;
+          commit("SET_TOKEN", token);
+          commit("SET_USER_DATA", userData);
+          API.defaults.headers.common["x-auth-token"] = token;
           commit("TOGGLE_LOGGED_IN");
           resolve(res);
         })
