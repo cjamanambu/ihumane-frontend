@@ -15,7 +15,7 @@ export default {
             .then(() =>
               this.apiResponseHandler(
                 "You have logged in successfully",
-                "Welcome Back"
+                `Welcome Back, ${username}`
               )
             );
         })

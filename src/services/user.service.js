@@ -20,7 +20,7 @@ export default {
             user_name: newUser.fullname,
             user_email: newUser.email,
             user_password: newUser.password,
-            user_type: newUser.userType,
+            user_type: 1,
             user_token: newUser.token,
             user_status: newUser.userStatus,
           },
@@ -28,6 +28,26 @@ export default {
         )
           .then((res) => resolve(res))
           .catch((err) => this.apiErrorHandler(err, "Add User Error"))
+          .finally(() => (this.submitting = false));
+      });
+    },
+    editUser(user) {
+      this.submitting = true;
+      return new Promise((resolve) => {
+        API.patch(
+          `users/update-user/${user.userID}`,
+          {
+            user_username: user.username,
+            user_name: user.fullname,
+            user_email: user.email,
+            user_type: user.userType,
+            user_token: user.token,
+            user_status: user.userStatus,
+          },
+          { headers: authHeader() }
+        )
+          .then((res) => resolve(res))
+          .catch((err) => this.apiErrorHandler(err, "Edit User Error"))
           .finally(() => (this.submitting = false));
       });
     },

@@ -38,8 +38,27 @@ export default {
       this.totalRows = filteredItems.length;
       this.currentPage = 1;
     },
-    editUser(user) {
-      console.log({ user });
+    selectUser(user) {
+      user = user[0];
+      this.email = user.user_email;
+      this.userID = user.user_id;
+      this.fullname = user.user_name;
+      this.userStatus = user.user_status;
+      this.token = user.user_token;
+      this.userType = user.user_type;
+      this.username = user.user_username;
+      this.$refs["edit-user"].show();
+      this.$refs["user-table"].clearSelected();
+    },
+    resetForm() {
+      this.username = null;
+      this.fullname = null;
+      this.email = null;
+      this.password = null;
+      this.token = null;
+      this.userStatus = 1;
+      this.userType = 1;
+      this.$v.$reset();
     },
     newUser() {
       this.submitted = true;
@@ -72,14 +91,42 @@ export default {
             this.users = data;
             this.totalRows = this.users.length;
           });
-          this.username = null;
-          this.fullname = null;
-          this.email = null;
-          this.password = null;
-          this.token = null;
-          this.userStatus = 1;
-          this.userType = 1;
+          this.$v.$reset();
           this.$refs["add-user"].hide();
+        });
+      }
+    },
+    submitEdit() {
+      this.submitted = true;
+      this.password = "null";
+      // stop here if form is invalid
+      this.$v.$touch();
+      if (this.$v.$invalid) {
+        this.$bvToast.toast(`Please fill in all fields correctly`, {
+          title: "Invalid User",
+          toaster: "b-toaster-top-right",
+          appendToast: true,
+          variant: "warning",
+        });
+      } else {
+        const user = {
+          username: this.username,
+          fullname: this.fullname,
+          email: this.email,
+          userType: this.userType,
+          token: this.token,
+          userStatus: this.userStatus,
+          userID: this.userID,
+        };
+        this.editUser(user).then((res) => {
+          this.apiResponseHandler(`${res.data}`, "User Updated");
+          this.getUsers().then((res) => {
+            const { data } = res;
+            this.users = data;
+            this.totalRows = this.users.length;
+          });
+          this.$v.$reset();
+          this.$refs["edit-user"].hide();
         });
       }
     },
@@ -136,6 +183,7 @@ export default {
       email: null,
       password: null,
       token: null,
+      userID: null,
     };
   },
 };
@@ -190,6 +238,7 @@ export default {
             <!-- Table -->
             <div class="table-responsive mb-0">
               <b-table
+                ref="user-table"
                 bordered
                 selectable
                 hover
@@ -205,7 +254,7 @@ export default {
                 @filtered="onFiltered"
                 show-empty
                 select-mode="single"
-                @row-selected="editUser"
+                @row-selected="selectUser"
               >
                 <template #cell(user_type)="row">
                   <p v-if="row.value === 1">ADMIN</p>
@@ -254,6 +303,7 @@ export default {
       hide-footer
       centered
       title-class="font-18"
+      @hidden="resetForm"
     >
       <form @submit.prevent="newUser">
         <div class="form-group">
@@ -310,8 +360,96 @@ export default {
             }"
           />
         </div>
+        <b-form-group>
+          <label for="user_status">User Status</label><br />
+          <b-form-radio-group
+            id="user_status"
+            v-model="userStatus"
+            :options="userStatuses"
+            button-variant="outline-primary"
+            buttons
+          />
+        </b-form-group>
+        <div class="form-group">
+          <label for="token">Token</label>
+          <input
+            id="token"
+            type="text"
+            v-model="token"
+            class="form-control"
+            :class="{
+              'is-invalid': submitted && $v.token.$error,
+            }"
+          />
+        </div>
+        <b-button
+          v-if="!submitting"
+          class="btn btn-success btn-block mt-4"
+          type="submit"
+        >
+          Submit
+        </b-button>
+        <b-button
+          v-else
+          disabled
+          class="btn btn-success btn-block mt-4"
+          type="submit"
+        >
+          Submitting...
+        </b-button>
+      </form>
+    </b-modal>
+    <b-modal
+      ref="edit-user"
+      title="Edit User"
+      hide-footer
+      centered
+      title-class="font-18"
+      @hidden="resetForm"
+    >
+      <form @submit.prevent="submitEdit">
+        <div class="form-group">
+          <label for="username">
+            Username <span class="text-danger">*</span>
+          </label>
+          <input
+            id="username"
+            type="text"
+            v-model="username"
+            class="form-control"
+            :class="{
+              'is-invalid': submitted && $v.username.$error,
+            }"
+          />
+        </div>
+        <div class="form-group">
+          <label for="fullname">
+            Full Name <span class="text-danger">*</span>
+          </label>
+          <input
+            id="fullname"
+            type="text"
+            v-model="fullname"
+            class="form-control"
+            :class="{
+              'is-invalid': submitted && $v.fullname.$error,
+            }"
+          />
+        </div>
+        <div class="form-group">
+          <label for="email">Email <span class="text-danger">*</span></label>
+          <input
+            id="email"
+            type="email"
+            v-model="email"
+            class="form-control"
+            :class="{
+              'is-invalid': submitted && $v.email.$error,
+            }"
+          />
+        </div>
         <div class="d-flex justify-content-between flex-lg-row flex-column">
-          <b-form-group>
+          <b-form-group v-if="this.userType !== 1">
             <label for="user_type">User Type</label><br />
             <b-form-radio-group
               id="user_type"
