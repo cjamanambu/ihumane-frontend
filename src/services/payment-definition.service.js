@@ -1,12 +1,12 @@
 import API from "@/api";
 import { authHeader } from "@/state/helpers";
-const PD_URL = `payment-definitions`;
+const URL = `payment-definitions`;
 
 export default {
   methods: {
     getPaymentDefinitions() {
       return new Promise((resolve) => {
-        API.get(`${PD_URL}`, { headers: authHeader() })
+        API.get(`${URL}`, { headers: authHeader() })
           .then((res) => resolve(res))
           .catch((err) =>
             this.apiErrorHandler(err, "Get Payment Definitions Error")
@@ -17,7 +17,7 @@ export default {
       this.submitting = true;
       return new Promise((resolve) => {
         API.post(
-          `${PD_URL}/add-payment-definition`,
+          `${URL}/add-payment-definition`,
           {
             pd_payment_code: pd.code,
             pd_payment_name: pd.name,
@@ -41,7 +41,7 @@ export default {
       this.submitting = true;
       return new Promise((resolve) => {
         API.patch(
-          `${PD_URL}/update-payment-definition/${pd.pdID}`,
+          `${URL}/update-payment-definition/${pd.pdID}`,
           {
             pd_payment_code: pd.code,
             pd_payment_name: pd.name,

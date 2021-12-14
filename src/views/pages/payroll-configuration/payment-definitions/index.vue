@@ -2,11 +2,11 @@
 import Layout from "@/views/layouts/main";
 import PageHeader from "@/components/page-header";
 import appConfig from "@/app.config";
-import payrollConfigService from "@/services/payroll-config.service";
+import paymentDefinitionService from "@/services/payment-definition.service";
 import { required } from "vuelidate/lib/validators";
 
 export default {
-  mixins: [payrollConfigService],
+  mixins: [paymentDefinitionService],
   page: {
     title: "Payment Definitions",
     meta: [{ name: "description", content: appConfig.description }],

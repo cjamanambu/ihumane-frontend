@@ -35,6 +35,11 @@ export const menuItems = [
         label: "Payment Definitions",
         link: "/payment-definitions",
       },
+      {
+        id: 7,
+        label: "Tax Rates",
+        link: "/tax-rates",
+      },
     ],
   },
 ];
