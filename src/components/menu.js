@@ -25,4 +25,16 @@ export const menuItems = [
     icon: "ri-user-settings-line",
     link: "/users",
   },
+  {
+    id: 5,
+    label: "Payroll Configuration",
+    icon: "ri-pages-line",
+    subItems: [
+      {
+        id: 6,
+        label: "Payment Definitions",
+        link: "/payment-definitions",
+      },
+    ],
+  },
 ];

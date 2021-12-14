@@ -66,4 +66,13 @@ export default [
     },
     component: () => import("@/views/pages/users/index"),
   },
+  {
+    path: "/payment-definitions",
+    name: "payment-definitions",
+    meta: {
+      authRequired: true,
+    },
+    component: () =>
+      import("../views/pages/payroll-configuration/payment-definitions/index"),
+  },
 ];
