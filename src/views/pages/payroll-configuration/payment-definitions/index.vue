@@ -3,6 +3,7 @@ import Layout from "@/views/layouts/main";
 import PageHeader from "@/components/page-header";
 import appConfig from "@/app.config";
 import payrollConfigService from "@/services/payroll-config.service";
+import { required } from "vuelidate/lib/validators";
 
 export default {
   mixins: [payrollConfigService],
@@ -21,6 +22,10 @@ export default {
       this.totalRows = this.paymentDefinitions.length;
     });
   },
+  validations: {
+    code: { required },
+    name: { required },
+  },
   methods: {
     onFiltered(filteredItems) {
       // Trigger pagination to update the number of buttons/pages due to filtering
@@ -30,6 +35,7 @@ export default {
   },
   data() {
     return {
+      submitting: false,
       title: "Payment Definitions",
       items: [
         {
@@ -64,6 +70,37 @@ export default {
         { key: "pd_basic", label: "Basic", sortable: false },
         { key: "pd_tie_number", label: "Tie Number", sortable: false },
       ],
+      submitted: false,
+      code: null,
+      name: null,
+      type: 1,
+      types: [
+        { text: "INCOME", value: 1 },
+        { text: "DEDUCTION", value: 2 },
+      ],
+      variant: 1,
+      variants: [
+        { text: "STANDARD", value: 1 },
+        { text: "VARIATIONAL", value: 2 },
+      ],
+      taxable: 1,
+      taxables: [
+        { text: "TAXABLE", value: 1 },
+        { text: "NONTAXABLE", value: 0 },
+      ],
+      description: 1,
+      descriptions: [
+        { text: "LOAN", value: 1 },
+        { text: "TAX", value: 2 },
+        { text: "PENSION", value: 3 },
+        { text: "HMO", value: 4 },
+      ],
+      basic: 1,
+      basics: [
+        { text: "BASIC", value: 1 },
+        { text: "NONBASIC", value: 0 },
+      ],
+      tie: null,
     };
   },
 };
@@ -73,7 +110,10 @@ export default {
   <Layout>
     <PageHeader :title="title" :items="items" />
     <div class="d-flex justify-content-end mb-3">
-      <b-button class="btn btn-success" @click="$refs['add-user'].show()">
+      <b-button
+        class="btn btn-success"
+        @click="$refs['add-payment-definition'].show()"
+      >
         <i class="mdi mdi-plus mr-2"></i>
         Add Payment Definition
       </b-button>
@@ -181,5 +221,117 @@ export default {
         </div>
       </div>
     </div>
+    <b-modal
+      ref="add-payment-definition"
+      title="Add Payment Definition"
+      hide-footer
+      centered
+      title-class="font-18"
+      @hidden="resetForm"
+    >
+      <form @submit.prevent="newUser">
+        <div class="form-group">
+          <label for="username">
+            Payment Code <span class="text-danger">*</span>
+          </label>
+          <input
+            id="username"
+            type="text"
+            v-model="code"
+            class="form-control"
+            :class="{
+              'is-invalid': submitted && $v.code.$error,
+            }"
+          />
+        </div>
+        <div class="form-group">
+          <label for="fullname">
+            Payment Name <span class="text-danger">*</span>
+          </label>
+          <input
+            id="fullname"
+            type="text"
+            v-model="name"
+            class="form-control"
+            :class="{
+              'is-invalid': submitted && $v.name.$error,
+            }"
+          />
+        </div>
+        <div class="d-flex justify-content-between flex-lg-row flex-column">
+          <b-form-group>
+            <label for="user_type">Payment Type</label><br />
+            <b-form-radio-group
+              id="user_type"
+              v-model="type"
+              :options="types"
+              button-variant="outline-success"
+              buttons
+            />
+          </b-form-group>
+          <b-form-group>
+            <label for="user_status">Payment Variant</label><br />
+            <b-form-radio-group
+              id="user_status"
+              v-model="variant"
+              :options="variants"
+              button-variant="outline-success"
+              buttons
+            />
+          </b-form-group>
+        </div>
+        <div class="d-flex justify-content-between flex-lg-row flex-column">
+          <b-form-group>
+            <label for="user_type">Payment Taxable</label><br />
+            <b-form-radio-group
+              id="user_type"
+              v-model="taxable"
+              :options="taxables"
+              button-variant="outline-success"
+              buttons
+            />
+          </b-form-group>
+          <b-form-group>
+            <label for="user_status">Basic</label><br />
+            <b-form-radio-group
+              id="user_status"
+              v-model="basic"
+              :options="basics"
+              button-variant="outline-success"
+              buttons
+            />
+          </b-form-group>
+        </div>
+        <b-form-group>
+          <label for="user_status">Description</label><br />
+          <b-form-radio-group
+            id="user_status"
+            v-model="description"
+            :options="descriptions"
+            button-variant="outline-success"
+            buttons
+          />
+        </b-form-group>
+        <div class="form-group">
+          <label for="token">Tie Number</label>
+          <input id="token" type="text" v-model="tie" class="form-control" />
+        </div>
+        <b-button
+          v-if="!submitting"
+          class="btn btn-success btn-block mt-4"
+          type="submit"
+        >
+          Submit
+        </b-button>
+        <b-button
+          v-else
+          disabled
+          class="btn btn-success btn-block mt-4"
+          type="submit"
+        >
+          Submitting...
+        </b-button>
+      </form>
+    </b-modal>
   </Layout>
 </template>
