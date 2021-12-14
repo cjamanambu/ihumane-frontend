@@ -1,5 +1,3 @@
-// import API from "@/api";
-
 export default {
   methods: {
     apiResponseHandler(message, title) {
@@ -30,6 +28,14 @@ export default {
           });
         });
       }
+    },
+    apiFormHandler(title) {
+      this.$bvToast.toast(`Please fill in all fields correctly`, {
+        title: `${title}`,
+        toaster: "b-toaster-top-right",
+        appendToast: true,
+        variant: "warning",
+      });
     },
   },
 };

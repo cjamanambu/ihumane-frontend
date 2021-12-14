@@ -16,11 +16,7 @@ export default {
     PageHeader,
   },
   mounted() {
-    this.getUsers().then((res) => {
-      const { data } = res;
-      this.users = data;
-      this.totalRows = this.users.length;
-    });
+    this.refreshTable();
   },
   validations: {
     username: { required },
@@ -30,6 +26,13 @@ export default {
     token: { required },
   },
   methods: {
+    refreshTable() {
+      this.getUsers().then((res) => {
+        const { data } = res;
+        this.users = data;
+        this.totalRows = this.users.length;
+      });
+    },
     /**
      * Search the table data with search input
      */
@@ -65,12 +68,7 @@ export default {
       // stop here if form is invalid
       this.$v.$touch();
       if (this.$v.$invalid) {
-        this.$bvToast.toast(`Please fill in all fields correctly`, {
-          title: "Invalid User",
-          toaster: "b-toaster-top-right",
-          appendToast: true,
-          variant: "warning",
-        });
+        this.apiFormHandler("Invalid User");
       } else {
         const newUser = {
           username: this.username,
@@ -86,11 +84,7 @@ export default {
             `${res.data.user_username} has been added successfully`,
             "New User Added"
           );
-          this.getUsers().then((res) => {
-            const { data } = res;
-            this.users = data;
-            this.totalRows = this.users.length;
-          });
+          this.refreshTable();
           this.$v.$reset();
           this.$refs["add-user"].hide();
         });
@@ -102,12 +96,7 @@ export default {
       // stop here if form is invalid
       this.$v.$touch();
       if (this.$v.$invalid) {
-        this.$bvToast.toast(`Please fill in all fields correctly`, {
-          title: "Invalid User",
-          toaster: "b-toaster-top-right",
-          appendToast: true,
-          variant: "warning",
-        });
+        this.apiFormHandler("Invalid User");
       } else {
         const user = {
           username: this.username,
@@ -119,12 +108,8 @@ export default {
           userID: this.userID,
         };
         this.editUser(user).then((res) => {
-          this.apiResponseHandler(`${res.data}`, "User Updated");
-          this.getUsers().then((res) => {
-            const { data } = res;
-            this.users = data;
-            this.totalRows = this.users.length;
-          });
+          this.apiResponseHandler(`${res.data}`, "Update Successful");
+          this.refreshTable();
           this.$v.$reset();
           this.$refs["edit-user"].hide();
         });
@@ -401,7 +386,7 @@ export default {
     </b-modal>
     <b-modal
       ref="edit-user"
-      title="Edit User"
+      title="Update User"
       hide-footer
       centered
       title-class="font-18"

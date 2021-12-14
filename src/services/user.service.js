@@ -1,11 +1,12 @@
 import API from "@/api";
 import { authHeader } from "@/state/helpers";
+const URL = `users`;
 
 export default {
   methods: {
     getUsers() {
       return new Promise((resolve) => {
-        API.get(`users`, { headers: authHeader() })
+        API.get(`${URL}`, { headers: authHeader() })
           .then((res) => resolve(res))
           .catch((err) => this.apiErrorHandler(err, "Get Users Error"));
       });
@@ -14,7 +15,7 @@ export default {
       this.submitting = true;
       return new Promise((resolve) => {
         API.post(
-          `users/add-user`,
+          `${URL}/add-user`,
           {
             user_username: newUser.username,
             user_name: newUser.fullname,
@@ -35,7 +36,7 @@ export default {
       this.submitting = true;
       return new Promise((resolve) => {
         API.patch(
-          `users/update-user/${user.userID}`,
+          `${URL}/update-user/${user.userID}`,
           {
             user_username: user.username,
             user_name: user.fullname,
@@ -47,7 +48,7 @@ export default {
           { headers: authHeader() }
         )
           .then((res) => resolve(res))
-          .catch((err) => this.apiErrorHandler(err, "Edit User Error"))
+          .catch((err) => this.apiErrorHandler(err, "Update User Error"))
           .finally(() => (this.submitting = false));
       });
     },

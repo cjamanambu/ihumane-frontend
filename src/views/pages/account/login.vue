@@ -27,12 +27,7 @@ export default {
       this.$v.$touch();
 
       if (this.$v.$invalid) {
-        this.$bvToast.toast(`Please fill in all required fields`, {
-          title: "Invalid Login",
-          toaster: "b-toaster-top-right",
-          appendToast: true,
-          variant: "warning",
-        });
+        this.apiFormHandler("Invalid Login");
       } else {
         const { username, password } = this;
         this.login(username, password);

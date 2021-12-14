@@ -16,17 +16,110 @@ export default {
     PageHeader,
   },
   mounted() {
-    this.getPaymentDefinitions().then((res) => {
-      const { data } = res;
-      this.paymentDefinitions = data;
-      this.totalRows = this.paymentDefinitions.length;
-    });
+    this.refreshTable();
   },
   validations: {
     code: { required },
     name: { required },
   },
   methods: {
+    selectPD(pd) {
+      pd = pd[0];
+      this.pdID = pd.pd_id;
+      this.code = pd.pd_payment_code;
+      this.name = pd.pd_payment_name;
+      this.type = pd.pd_payment_type;
+      this.variant = pd.pd_payment_variant;
+      this.description = pd.pd_desc;
+      this.basic = pd.pd_basic;
+      this.tie = pd.pd_tie_number;
+      this.$refs["edit-payment-definition"].show();
+      this.$refs["pd-table"].clearSelected();
+    },
+    resetForm() {
+      this.code = null;
+      this.name = null;
+      this.type = 1;
+      this.variant = 1;
+      this.description = 1;
+      this.basic = 1;
+      this.tie = null;
+      this.$v.$reset();
+    },
+    refreshTable() {
+      this.getPaymentDefinitions().then((res) => {
+        const { data } = res;
+        this.paymentDefinitions = data;
+        this.totalRows = this.paymentDefinitions.length;
+      });
+    },
+    submitNew() {
+      this.submitted = true;
+      // stop here if form is invalid
+      this.$v.$touch();
+      if (this.$v.$invalid) {
+        this.apiFormHandler("Invalid Payment Definition");
+      } else {
+        const { code, name, type, variant, taxable, description, basic, tie } =
+          this;
+        const pd = {
+          code,
+          name,
+          type,
+          variant,
+          taxable,
+          description,
+          basic,
+          tie,
+        };
+        this.addPD(pd).then((res) => {
+          this.apiResponseHandler(
+            `${res.data.pd_payment_name} has been added successfully`,
+            "New Payment Definition Added"
+          );
+          this.refreshTable();
+          this.$v.$reset();
+          this.$refs["add-payment-definition"].hide();
+        });
+      }
+    },
+    submitUpdate() {
+      this.submitted = true;
+      // stop here if form is invalid
+      this.$v.$touch();
+      if (this.$v.$invalid) {
+        this.apiFormHandler("Invalid Payment Definition");
+      } else {
+        const {
+          pdID,
+          code,
+          name,
+          type,
+          variant,
+          taxable,
+          description,
+          basic,
+          tie,
+        } = this;
+        const pd = {
+          pdID,
+          code,
+          name,
+          type,
+          variant,
+          taxable,
+          description,
+          basic,
+          tie,
+        };
+        this.updatePD(pd).then((res) => {
+          this.apiResponseHandler(`${res.data}`, "Update Successful");
+          this.refreshTable();
+          this.$v.$reset();
+          this.$refs["edit-payment-definition"].hide();
+        });
+      }
+    },
     onFiltered(filteredItems) {
       // Trigger pagination to update the number of buttons/pages due to filtering
       this.totalRows = filteredItems.length;
@@ -101,6 +194,7 @@ export default {
         { text: "NONBASIC", value: 0 },
       ],
       tie: null,
+      pdID: null,
     };
   },
 };
@@ -158,7 +252,7 @@ export default {
             <!-- Table -->
             <div class="table-responsive mb-0">
               <b-table
-                ref="user-table"
+                ref="pd-table"
                 bordered
                 selectable
                 hover
@@ -174,7 +268,7 @@ export default {
                 @filtered="onFiltered"
                 show-empty
                 select-mode="single"
-                @row-selected="selectUser"
+                @row-selected="selectPD"
               >
                 <template #cell(pd_payment_type)="row">
                   <p v-if="row.value === 1">INCOME</p>
@@ -229,7 +323,119 @@ export default {
       title-class="font-18"
       @hidden="resetForm"
     >
-      <form @submit.prevent="newUser">
+      <form @submit.prevent="submitNew">
+        <div class="form-group">
+          <label for="username">
+            Payment Code <span class="text-danger">*</span>
+          </label>
+          <input
+            id="username"
+            type="text"
+            v-model="code"
+            class="form-control"
+            :class="{
+              'is-invalid': submitted && $v.code.$error,
+            }"
+          />
+        </div>
+        <div class="form-group">
+          <label for="fullname">
+            Payment Name <span class="text-danger">*</span>
+          </label>
+          <input
+            id="fullname"
+            type="text"
+            v-model="name"
+            class="form-control"
+            :class="{
+              'is-invalid': submitted && $v.name.$error,
+            }"
+          />
+        </div>
+        <div class="d-flex justify-content-between flex-lg-row flex-column">
+          <b-form-group>
+            <label for="user_type">Payment Type</label><br />
+            <b-form-radio-group
+              id="user_type"
+              v-model="type"
+              :options="types"
+              button-variant="outline-success"
+              buttons
+            />
+          </b-form-group>
+          <b-form-group>
+            <label for="user_status">Payment Variant</label><br />
+            <b-form-radio-group
+              id="user_status"
+              v-model="variant"
+              :options="variants"
+              button-variant="outline-success"
+              buttons
+            />
+          </b-form-group>
+        </div>
+        <div class="d-flex justify-content-between flex-lg-row flex-column">
+          <b-form-group>
+            <label for="user_type">Payment Taxable</label><br />
+            <b-form-radio-group
+              id="user_type"
+              v-model="taxable"
+              :options="taxables"
+              button-variant="outline-success"
+              buttons
+            />
+          </b-form-group>
+          <b-form-group>
+            <label for="user_status">Basic</label><br />
+            <b-form-radio-group
+              id="user_status"
+              v-model="basic"
+              :options="basics"
+              button-variant="outline-success"
+              buttons
+            />
+          </b-form-group>
+        </div>
+        <b-form-group>
+          <label for="user_status">Description</label><br />
+          <b-form-radio-group
+            id="user_status"
+            v-model="description"
+            :options="descriptions"
+            button-variant="outline-success"
+            buttons
+          />
+        </b-form-group>
+        <div class="form-group">
+          <label for="token">Tie Number</label>
+          <input id="token" type="text" v-model="tie" class="form-control" />
+        </div>
+        <b-button
+          v-if="!submitting"
+          class="btn btn-success btn-block mt-4"
+          type="submit"
+        >
+          Submit
+        </b-button>
+        <b-button
+          v-else
+          disabled
+          class="btn btn-success btn-block mt-4"
+          type="submit"
+        >
+          Submitting...
+        </b-button>
+      </form>
+    </b-modal>
+    <b-modal
+      ref="edit-payment-definition"
+      title="Update Payment Definition"
+      hide-footer
+      centered
+      title-class="font-18"
+      @hidden="resetForm"
+    >
+      <form @submit.prevent="submitUpdate">
         <div class="form-group">
           <label for="username">
             Payment Code <span class="text-danger">*</span>
