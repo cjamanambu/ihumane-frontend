@@ -1,12 +1,11 @@
 import API from "@/api";
-import { authHeader } from "@/state/helpers";
 const URL = `users`;
 
 export default {
   methods: {
     getUsers() {
       return new Promise((resolve) => {
-        API.get(`${URL}`, { headers: authHeader() })
+        API.get(`${URL}`, this.apiConfig())
           .then((res) => resolve(res))
           .catch((err) => this.apiErrorHandler(err, "Get Users Error"));
       });
@@ -25,7 +24,7 @@ export default {
             user_token: newUser.token,
             user_status: newUser.userStatus,
           },
-          { headers: authHeader() }
+          this.apiConfig()
         )
           .then((res) => resolve(res))
           .catch((err) => this.apiErrorHandler(err, "Add User Error"))
@@ -45,7 +44,7 @@ export default {
             user_token: user.token,
             user_status: user.userStatus,
           },
-          { headers: authHeader() }
+          this.apiConfig()
         )
           .then((res) => resolve(res))
           .catch((err) => this.apiErrorHandler(err, "Update User Error"))

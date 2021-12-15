@@ -1,5 +1,10 @@
+import { authHeader } from "@/state/helpers";
+
 export default {
   methods: {
+    apiConfig() {
+      return { headers: authHeader() };
+    },
     apiResponseHandler(message, title) {
       this.$bvToast.toast(`${message}`, {
         title,

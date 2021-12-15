@@ -40,6 +40,21 @@ export const menuItems = [
         label: "Tax Rates",
         link: "/tax-rates",
       },
+      {
+        id: 8,
+        label: "Salary Structures",
+        link: "/salary-structures",
+      },
+      {
+        id: 9,
+        label: "Salary Allowances",
+        link: "/salary-allowances",
+      },
+      {
+        id: 10,
+        label: "Payroll Setup",
+        link: "/payroll-setup",
+      },
     ],
   },
 ];

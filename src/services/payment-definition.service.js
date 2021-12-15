@@ -1,12 +1,11 @@
 import API from "@/api";
-import { authHeader } from "@/state/helpers";
 const URL = `payment-definitions`;
 
 export default {
   methods: {
     getPaymentDefinitions() {
       return new Promise((resolve) => {
-        API.get(`${URL}`, { headers: authHeader() })
+        API.get(`${URL}`, this.apiConfig())
           .then((res) => resolve(res))
           .catch((err) =>
             this.apiErrorHandler(err, "Get Payment Definitions Error")
@@ -28,7 +27,7 @@ export default {
             pd_basic: pd.basic,
             pd_tie_number: pd.tie,
           },
-          { headers: authHeader() }
+          this.apiConfig()
         )
           .then((res) => resolve(res))
           .catch((err) =>
@@ -52,7 +51,7 @@ export default {
             pd_basic: pd.basic,
             pd_tie_number: pd.tie,
           },
-          { headers: authHeader() }
+          this.apiConfig()
         )
           .then((res) => resolve(res))
           .catch((err) =>

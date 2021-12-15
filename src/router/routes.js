@@ -41,12 +41,15 @@ export default [
     meta: {
       authRequired: true,
       beforeResolve(routeTo, routeFrom, next) {
-        store.dispatch("auth/logOut");
-        const authRequiredOnPreviousRoute = routeFrom.matched.some((route) =>
-          route.push("/login")
-        );
+        store.dispatch("auth/logOut").then(() => {
+          const authRequiredOnPreviousRoute = routeFrom.matched.some((route) =>
+            route.push("/login")
+          );
+          next(
+            authRequiredOnPreviousRoute ? { name: "home" } : { ...routeFrom }
+          );
+        });
         // Navigate back to previous page, or home as a fallback
-        next(authRequiredOnPreviousRoute ? { name: "home" } : { ...routeFrom });
       },
     },
   },
@@ -73,6 +76,14 @@ export default [
       authRequired: true,
     },
     component: () =>
-      import("../views/pages/payroll-configuration/payment-definitions/index"),
+      import("../views/pages/payroll-configuration/payment-definitions"),
+  },
+  {
+    path: "/tax-rates",
+    name: "tax-rates",
+    meta: {
+      authRequired: true,
+    },
+    component: () => import("../views/pages/payroll-configuration/tax-rates"),
   },
 ];
