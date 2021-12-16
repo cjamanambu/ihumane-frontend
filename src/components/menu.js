@@ -22,7 +22,7 @@ export const menuItems = [
   {
     id: 4,
     label: "Users",
-    icon: "ri-user-settings-line",
+    icon: "ri-team-line",
     link: "/users",
   },
   {
@@ -54,6 +54,78 @@ export const menuItems = [
         id: 10,
         label: "Payroll Setup",
         link: "/payroll-setup",
+      },
+    ],
+  },
+  {
+    id: 11,
+    label: "HR Configuration",
+    icon: "ri-user-settings-line",
+    subItems: [
+      {
+        id: 12,
+        label: "Banks",
+        link: "/banks",
+      },
+      {
+        id: 13,
+        label: "Pension",
+        link: "/pension",
+      },
+      {
+        id: 14,
+        label: "HMO",
+        link: "/hmo",
+      },
+      {
+        id: 15,
+        label: "Departments",
+        link: "/departments",
+      },
+      {
+        id: 16,
+        label: "Grades",
+        link: "/grades",
+      },
+      {
+        id: 17,
+        label: "Job Roles",
+        link: "/job-roles",
+      },
+      {
+        id: 18,
+        label: "Locations",
+        link: "/locations",
+      },
+      {
+        id: 19,
+        label: "Appraisal",
+        link: "/appraisal",
+      },
+      {
+        id: 20,
+        label: "Qualifications",
+        link: "/qualifications",
+      },
+      {
+        id: 21,
+        label: "Subsidiary",
+        link: "/subsidiary",
+      },
+      {
+        id: 22,
+        label: "Leave Types",
+        link: "/leave-types",
+      },
+      {
+        id: 23,
+        label: "Training",
+        link: "/training",
+      },
+      {
+        id: 24,
+        label: "Documents",
+        link: "/documents",
       },
     ],
   },
