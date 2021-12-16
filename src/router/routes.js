@@ -69,6 +69,7 @@ export default [
     },
     component: () => import("@/views/pages/users/index"),
   },
+  // payroll configuration routes start //
   {
     path: "/payment-definitions",
     name: "payment-definitions",
@@ -86,4 +87,24 @@ export default [
     },
     component: () => import("../views/pages/payroll-configuration/tax-rates"),
   },
+  // payroll configuration routes end //
+
+  // hr configuration routes start //
+  {
+    path: "/banks",
+    name: "banks",
+    meta: {
+      authRequired: true,
+    },
+    component: () => import("../views/pages/hr-configuration/banks"),
+  },
+  {
+    path: "/departments",
+    name: "departments",
+    meta: {
+      authRequired: true,
+    },
+    component: () => import("../views/pages/hr-configuration/departments"),
+  },
+  // hr configuration routes end //
 ];
