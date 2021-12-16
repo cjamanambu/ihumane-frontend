@@ -106,5 +106,13 @@ export default [
     },
     component: () => import("../views/pages/hr-configuration/departments"),
   },
+  {
+    path: "/grades",
+    name: "grades",
+    meta: {
+      authRequired: true,
+    },
+    component: () => import("../views/pages/hr-configuration/grades"),
+  },
   // hr configuration routes end //
 ];
