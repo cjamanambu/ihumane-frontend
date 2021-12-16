@@ -40,6 +40,14 @@ export default {
       this.t3_code = null;
       this.$v.$reset();
     },
+    selectDept(dept) {
+      dept = dept[0];
+      this.deptID = dept.department_id;
+      this.name = dept.department_name;
+      this.t3_code = dept.d_t3_code;
+      this.$refs["update-dept"].show();
+      this.$refs["dept-table"].clearSelected();
+    },
     submitNew() {
       this.submitted = true;
       this.$v.$touch();
@@ -53,6 +61,22 @@ export default {
           this.refreshTable();
           this.$v.$reset();
           this.$refs["add-dept"].hide();
+        });
+      }
+    },
+    submitUpdate() {
+      this.submitted = true;
+      this.$v.$touch();
+      if (this.$v.$invalid) {
+        this.apiFormHandler("Invalid Department");
+      } else {
+        const { name, t3_code, deptID } = this;
+        const dept = { name, t3_code, deptID };
+        this.updateDepartment(dept).then((res) => {
+          this.apiResponseHandler(`${res.data}`, "Update Successful");
+          this.refreshTable();
+          this.$v.$reset();
+          this.$refs["update-dept"].hide();
         });
       }
     },
@@ -195,6 +219,60 @@ export default {
       @hidden="resetForm"
     >
       <form @submit.prevent="submitNew">
+        <div class="form-group">
+          <label for="name">
+            Department Name <span class="text-danger">*</span>
+          </label>
+          <input
+            id="name"
+            type="text"
+            v-model="name"
+            class="form-control"
+            :class="{
+              'is-invalid': submitted && $v.name.$error,
+            }"
+          />
+        </div>
+        <div class="form-group">
+          <label for="t3_code">
+            T3 Code <span class="text-danger">*</span>
+          </label>
+          <input
+            id="t3_code"
+            type="text"
+            v-model="t3_code"
+            class="form-control"
+            :class="{
+              'is-invalid': submitted && $v.t3_code.$error,
+            }"
+          />
+        </div>
+        <b-button
+          v-if="!submitting"
+          class="btn btn-success btn-block mt-4"
+          type="submit"
+        >
+          Submit
+        </b-button>
+        <b-button
+          v-else
+          disabled
+          class="btn btn-success btn-block mt-4"
+          type="submit"
+        >
+          Submitting...
+        </b-button>
+      </form>
+    </b-modal>
+    <b-modal
+      ref="update-dept"
+      title="Update Department"
+      hide-footer
+      centered
+      title-class="font-18"
+      @hidden="resetForm"
+    >
+      <form @submit.prevent="submitUpdate">
         <div class="form-group">
           <label for="name">
             Department Name <span class="text-danger">*</span>
