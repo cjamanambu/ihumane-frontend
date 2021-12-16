@@ -55,7 +55,7 @@ export default {
         )
           .then((res) => resolve(res))
           .catch((err) =>
-            this.apiResponseHandler(err, "Update Payment Definition")
+            this.apiErrorHandler(err, "Update Payment Definition Error")
           )
           .finally(() => (this.submitting = false));
       });
