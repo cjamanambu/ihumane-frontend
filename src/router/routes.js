@@ -114,5 +114,13 @@ export default [
     },
     component: () => import("../views/pages/hr-configuration/grades"),
   },
+  {
+    path: "/job-roles",
+    name: "job-roles",
+    meta: {
+      authRequired: true,
+    },
+    component: () => import("../views/pages/hr-configuration/job-roles"),
+  },
   // hr configuration routes end //
 ];

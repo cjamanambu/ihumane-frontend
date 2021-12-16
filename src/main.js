@@ -7,6 +7,7 @@ import VueSweetalert2 from "vue-sweetalert2";
 import VueMask from "v-mask";
 import * as VueGoogleMaps from "vue2-google-maps";
 import VueYoutube from "vue-youtube";
+import vSelect from "vue-select";
 
 import vco from "v-click-outside";
 
@@ -37,6 +38,8 @@ Vue.use(VueGoogleMaps, {
   installComponents: true,
 });
 Vue.component("apexchart", VueApexCharts);
+Vue.component("v-select", vSelect);
+import "vue-select/dist/vue-select.css";
 Vue.mixin(apiService);
 
 new Vue({
