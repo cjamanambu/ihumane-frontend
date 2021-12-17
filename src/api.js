@@ -18,4 +18,5 @@ export const ROUTES = {
   minimumTaxRate: `minimum-tax-rate`,
   taxRate: `tax-rates`,
   user: `users`,
+  location: `locations`,
 };

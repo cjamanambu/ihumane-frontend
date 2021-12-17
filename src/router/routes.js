@@ -130,5 +130,13 @@ export default [
     },
     component: () => import("../views/pages/hr-configuration/states"),
   },
+  {
+    path: "/locations",
+    name: "locations",
+    meta: {
+      authRequired: true,
+    },
+    component: () => import("../views/pages/hr-configuration/locations"),
+  },
   // hr configuration routes end //
 ];
