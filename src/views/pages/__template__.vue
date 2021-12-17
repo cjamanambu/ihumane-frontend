@@ -13,7 +13,6 @@ export default {
   },
   data() {
     return {
-      submitting: false,
       title: "Banks",
       items: [
         {
