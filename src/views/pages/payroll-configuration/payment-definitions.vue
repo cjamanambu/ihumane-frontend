@@ -2,11 +2,9 @@
 import Layout from "@/views/layouts/main";
 import PageHeader from "@/components/page-header";
 import appConfig from "@/app.config";
-import paymentDefinitionService from "@/services/payment-definition.service";
 import { required } from "vuelidate/lib/validators";
 
 export default {
-  mixins: [paymentDefinitionService],
   page: {
     title: "Payment Definitions",
     meta: [{ name: "description", content: appConfig.description }],
@@ -47,7 +45,10 @@ export default {
       this.$v.$reset();
     },
     refreshTable() {
-      this.getPaymentDefinitions().then((res) => {
+      this.apiGet(
+        this.ROUTES.paymentDefinition,
+        "Get Payment Definitions Error"
+      ).then((res) => {
         const { data } = res;
         this.paymentDefinitions = data;
         this.totalRows = this.paymentDefinitions.length;
@@ -55,24 +56,22 @@ export default {
     },
     submitNew() {
       this.submitted = true;
-      // stop here if form is invalid
       this.$v.$touch();
       if (this.$v.$invalid) {
         this.apiFormHandler("Invalid Payment Definition");
       } else {
-        const { code, name, type, variant, taxable, description, basic, tie } =
-          this;
-        const pd = {
-          code,
-          name,
-          type,
-          variant,
-          taxable,
-          description,
-          basic,
-          tie,
+        const data = {
+          pd_payment_code: this.code,
+          pd_payment_name: this.name,
+          pd_payment_type: this.type,
+          pd_payment_variant: this.variant,
+          pd_payment_taxable: this.taxable,
+          pd_desc: this.description,
+          pd_basic: this.basic,
+          pd_tie_number: this.tie,
         };
-        this.addPD(pd).then((res) => {
+        const url = `${this.ROUTES.paymentDefinition}/add-payment-definition`;
+        this.apiPost(url, data, "Add Payment Definition Error").then((res) => {
           this.apiResponseHandler(
             `${res.data.pd_payment_name} has been added successfully`,
             "New Payment Definition Added"
@@ -90,34 +89,25 @@ export default {
       if (this.$v.$invalid) {
         this.apiFormHandler("Invalid Payment Definition");
       } else {
-        const {
-          pdID,
-          code,
-          name,
-          type,
-          variant,
-          taxable,
-          description,
-          basic,
-          tie,
-        } = this;
-        const pd = {
-          pdID,
-          code,
-          name,
-          type,
-          variant,
-          taxable,
-          description,
-          basic,
-          tie,
+        const data = {
+          pd_payment_code: this.code,
+          pd_payment_name: this.name,
+          pd_payment_type: this.type,
+          pd_payment_variant: this.variant,
+          pd_payment_taxable: this.taxable,
+          pd_desc: this.description,
+          pd_basic: this.basic,
+          pd_tie_number: this.tie,
         };
-        this.updatePD(pd).then((res) => {
-          this.apiResponseHandler(`${res.data}`, "Update Successful");
-          this.refreshTable();
-          this.$v.$reset();
-          this.$refs["edit-payment-definition"].hide();
-        });
+        const url = `${this.ROUTES.paymentDefinition}/update-payment-definition/${this.pdID}`;
+        this.apiPatch(url, data, "Update Payment Definition Error").then(
+          (res) => {
+            this.apiResponseHandler(`${res.data}`, "Update Successful");
+            this.refreshTable();
+            this.$v.$reset();
+            this.$refs["edit-payment-definition"].hide();
+          }
+        );
       }
     },
     onFiltered(filteredItems) {
@@ -212,6 +202,7 @@ export default {
         Add Payment Definition
       </b-button>
     </div>
+    <div></div>
     <b-spinner type="grow" v-if="apiBusy" class="m-2" variant="success" />
     <div v-else class="row">
       <div class="col-12">

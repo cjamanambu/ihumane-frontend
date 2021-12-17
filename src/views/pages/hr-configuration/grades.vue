@@ -2,11 +2,9 @@
 import Layout from "@/views/layouts/main";
 import PageHeader from "@/components/page-header";
 import appConfig from "@/app.config";
-import gradeService from "@/services/grade.service";
 import { required } from "vuelidate/lib/validators";
 
 export default {
-  mixins: [gradeService],
   page: {
     title: "Grades",
     meta: [{ name: "description", content: appConfig.description }],
@@ -23,7 +21,7 @@ export default {
   },
   methods: {
     refreshTable() {
-      this.getGrades().then((res) => {
+      this.apiGet(this.ROUTES.grade, "Get Grades Error").then((res) => {
         const { data } = res;
         this.grades = data;
         this.totalRows = this.grades.length;
@@ -51,8 +49,10 @@ export default {
       if (this.$v.$invalid) {
         this.apiFormHandler("Invalid Grade");
       } else {
-        const { name } = this;
-        this.addGrade(name).then((res) => {
+        const data = {
+          grade_name: this.name,
+        };
+        this.apiPost(this.ROUTES.grade, data, "Add Grade Error").then((res) => {
           this.apiResponseHandler(`${res.data}`, "New Grade Added");
           this.refreshTable();
           this.$v.$reset();
@@ -66,9 +66,11 @@ export default {
       if (this.$v.$invalid) {
         this.apiFormHandler("Invalid Grade");
       } else {
-        const { name, gradeID } = this;
-        const grade = { name, gradeID };
-        this.updateGrade(grade).then((res) => {
+        const data = {
+          grade_name: this.name,
+        };
+        const url = `${this.ROUTES.grade}/${this.gradeID}`;
+        this.apiPatch(url, data, "Update Grade Error").then((res) => {
           this.apiResponseHandler(`${res.data}`, "Update Successful");
           this.refreshTable();
           this.$v.$reset();

@@ -79,13 +79,13 @@ export const menuItems = [
       },
       {
         id: 15,
-        label: "Departments",
-        link: "/departments",
+        label: "Grades",
+        link: "/grades",
       },
       {
         id: 16,
-        label: "Grades",
-        link: "/grades",
+        label: "Departments",
+        link: "/departments",
       },
       {
         id: 17,
@@ -94,36 +94,41 @@ export const menuItems = [
       },
       {
         id: 18,
+        label: "States",
+        link: "/states",
+      },
+      {
+        id: 19,
         label: "Locations",
         link: "/locations",
       },
       {
-        id: 19,
+        id: 20,
         label: "Appraisal",
         link: "/appraisal",
       },
       {
-        id: 20,
+        id: 21,
         label: "Qualifications",
         link: "/qualifications",
       },
       {
-        id: 21,
+        id: 22,
         label: "Subsidiary",
         link: "/subsidiary",
       },
       {
-        id: 22,
+        id: 23,
         label: "Leave Types",
         link: "/leave-types",
       },
       {
-        id: 23,
+        id: 24,
         label: "Training",
         link: "/training",
       },
       {
-        id: 24,
+        id: 25,
         label: "Documents",
         link: "/documents",
       },

@@ -2,11 +2,9 @@
 import Layout from "@/views/layouts/main";
 import PageHeader from "@/components/page-header";
 import appConfig from "@/app.config";
-import userService from "@/services/user.service";
 import { required, email } from "vuelidate/lib/validators";
 
 export default {
-  mixins: [userService],
   page: {
     title: "Users",
     meta: [{ name: "description", content: appConfig.description }],
@@ -27,7 +25,7 @@ export default {
   },
   methods: {
     refreshTable() {
-      this.getUsers().then((res) => {
+      this.apiGet(this.ROUTES.user, "Get Users Error").then((res) => {
         const { data } = res;
         this.users = data;
         this.totalRows = this.users.length;
@@ -65,21 +63,21 @@ export default {
     },
     newUser() {
       this.submitted = true;
-      // stop here if form is invalid
       this.$v.$touch();
       if (this.$v.$invalid) {
         this.apiFormHandler("Invalid User");
       } else {
-        const newUser = {
-          username: this.username,
-          fullname: this.fullname,
-          email: this.email,
-          password: this.password,
-          userType: this.userType,
-          token: this.token,
-          userStatus: this.userStatus,
+        const data = {
+          user_username: this.username,
+          user_name: this.fullname,
+          user_email: this.email,
+          user_password: this.password,
+          user_type: 1,
+          user_token: this.token,
+          user_status: this.userStatus,
         };
-        this.addUser(newUser).then((res) => {
+        const url = `${this.ROUTES.user}/add-user`;
+        this.apiPost(url, data, "Add User Error").then((res) => {
           this.apiResponseHandler(
             `${res.data.user_username} has been added successfully`,
             "New User Added"
@@ -98,16 +96,17 @@ export default {
       if (this.$v.$invalid) {
         this.apiFormHandler("Invalid User");
       } else {
-        const user = {
-          username: this.username,
-          fullname: this.fullname,
-          email: this.email,
-          userType: this.userType,
-          token: this.token,
-          userStatus: this.userStatus,
-          userID: this.userID,
+        const data = {
+          user_username: this.username,
+          user_name: this.fullname,
+          user_email: this.email,
+          user_password: this.password,
+          user_type: 1,
+          user_token: this.token,
+          user_status: this.userStatus,
         };
-        this.editUser(user).then((res) => {
+        const url = `${this.ROUTES.user}/update-user/${this.userID}`;
+        this.apiPatch(url, data, "Update User Error").then((res) => {
           this.apiResponseHandler(`${res.data}`, "Update Successful");
           this.refreshTable();
           this.$v.$reset();

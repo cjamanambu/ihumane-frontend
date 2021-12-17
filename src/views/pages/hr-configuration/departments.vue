@@ -2,11 +2,9 @@
 import Layout from "@/views/layouts/main";
 import PageHeader from "@/components/page-header";
 import appConfig from "@/app.config";
-import departmentService from "@/services/department.service";
 import { required } from "vuelidate/lib/validators";
 
 export default {
-  mixins: [departmentService],
   page: {
     title: "Departments",
     meta: [{ name: "description", content: appConfig.description }],
@@ -24,11 +22,13 @@ export default {
   },
   methods: {
     refreshTable() {
-      this.getDepartments().then((res) => {
-        const { data } = res;
-        this.depts = data;
-        this.totalRows = this.depts.length;
-      });
+      this.apiGet(this.ROUTES.department, "Get Departments Error").then(
+        (res) => {
+          const { data } = res;
+          this.depts = data;
+          this.totalRows = this.depts.length;
+        }
+      );
     },
     onFiltered(filteredItems) {
       // Trigger pagination to update the number of buttons/pages due to filtering
@@ -54,14 +54,18 @@ export default {
       if (this.$v.$invalid) {
         this.apiFormHandler("Invalid Department");
       } else {
-        const { name, t3_code } = this;
-        const dept = { name, t3_code };
-        this.addDepartment(dept).then((res) => {
-          this.apiResponseHandler(`${res.data}`, "New Department Added");
-          this.refreshTable();
-          this.$v.$reset();
-          this.$refs["add-dept"].hide();
-        });
+        const data = {
+          department_name: this.name,
+          t3_code: this.t3_code,
+        };
+        this.apiPost(this.ROUTES.department, data, "Add Department Error").then(
+          (res) => {
+            this.apiResponseHandler(`${res.data}`, "New Department Added");
+            this.refreshTable();
+            this.$v.$reset();
+            this.$refs["add-dept"].hide();
+          }
+        );
       }
     },
     submitUpdate() {
@@ -70,9 +74,12 @@ export default {
       if (this.$v.$invalid) {
         this.apiFormHandler("Invalid Department");
       } else {
-        const { name, t3_code, deptID } = this;
-        const dept = { name, t3_code, deptID };
-        this.updateDepartment(dept).then((res) => {
+        const data = {
+          department_name: this.name,
+          t3_code: this.t3_code,
+        };
+        const url = `${this.ROUTES.department}/${this.deptID}`;
+        this.apiPatch(url, data, "Update Department Error").then((res) => {
           this.apiResponseHandler(`${res.data}`, "Update Successful");
           this.refreshTable();
           this.$v.$reset();

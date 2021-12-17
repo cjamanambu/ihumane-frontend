@@ -1,12 +1,42 @@
 import { authHeader } from "@/state/helpers";
+import { ROUTES, API } from "@/api";
 
 export default {
   data() {
     return {
       apiBusy: false,
+      submitting: false,
+      ROUTES,
     };
   },
   methods: {
+    apiGet(url, errTitle) {
+      this.apiBusy = true;
+      return new Promise((resolve) => {
+        API.get(`${url}`, this.apiConfig())
+          .then((res) => resolve(res))
+          .catch((err) => this.apiErrorHandler(err, errTitle))
+          .finally(() => (this.apiBusy = false));
+      });
+    },
+    apiPost(url, data, errTitle) {
+      this.submitting = true;
+      return new Promise((resolve) => {
+        API.post(`${url}`, data, this.apiConfig())
+          .then((res) => resolve(res))
+          .catch((err) => this.apiErrorHandler(err, errTitle))
+          .finally(() => (this.submitting = false));
+      });
+    },
+    apiPatch(url, data, errTitle) {
+      this.submitting = true;
+      return new Promise((resolve) => {
+        API.patch(`${url}`, data, this.apiConfig())
+          .then((res) => resolve(res))
+          .catch((err) => this.apiErrorHandler(err, errTitle))
+          .finally(() => (this.submitting = false));
+      });
+    },
     apiConfig() {
       return { headers: authHeader() };
     },

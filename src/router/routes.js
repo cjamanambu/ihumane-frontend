@@ -67,7 +67,7 @@ export default [
     meta: {
       authRequired: true,
     },
-    component: () => import("@/views/pages/users/index"),
+    component: () => import("@/views/pages/users"),
   },
   // payroll configuration routes start //
   {
@@ -121,6 +121,14 @@ export default [
       authRequired: true,
     },
     component: () => import("../views/pages/hr-configuration/job-roles"),
+  },
+  {
+    path: "/states",
+    name: "states",
+    meta: {
+      authRequired: true,
+    },
+    component: () => import("../views/pages/hr-configuration/states"),
   },
   // hr configuration routes end //
 ];

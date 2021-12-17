@@ -2,11 +2,9 @@
 import Layout from "@/views/layouts/main";
 import PageHeader from "@/components/page-header";
 import appConfig from "@/app.config";
-import taxRateService from "@/services/tax-rate.service";
 import { required } from "vuelidate/lib/validators";
 
 export default {
-  mixins: [taxRateService],
   page: {
     title: "Tax Rates",
     meta: [{ name: "description", content: appConfig.description }],
@@ -37,13 +35,16 @@ export default {
       this.currentPage = 1;
     },
     refreshMTR() {
-      this.getMTR().then((res) => {
+      this.apiGet(
+        this.ROUTES.minimumTaxRate,
+        "Get Minimum Tax Rate Error"
+      ).then((res) => {
         const { data } = res;
         this.mtr = data[0].mtr_rate;
       });
     },
     refreshTable() {
-      this.getTRs().then((res) => {
+      this.apiGet(this.ROUTES.taxRate, "Get Tax Rates Error").then((res) => {
         const { data } = res;
         this.trs = data;
         this.totalRows = this.trs.length;
@@ -77,8 +78,11 @@ export default {
       if (this.$v.$invalid) {
         this.apiFormHandler("Invalid MTR");
       } else {
-        const { mtrRate } = this;
-        this.updateMTR(mtrRate).then((res) => {
+        const data = {
+          mtr_rate: this.mtrRate,
+        };
+        const url = `${this.ROUTES.minimumTaxRate}/update-minimum-tax-rate/1`;
+        this.apiPost(url, data, "Update Minimum Tax Rate Error").then((res) => {
           this.apiResponseHandler(`${res.data}`, "Update Successful");
           this.refreshMTR();
           this.$v.$reset();
@@ -93,14 +97,13 @@ export default {
       if (this.$v.$invalid) {
         this.apiFormHandler("Invalid Tax Rate");
       } else {
-        const { rate } = this;
-        let { band } = this;
-        band = parseFloat(band.replace(/,/g, ""));
-        const tr = {
-          rate,
-          band,
+        this.band = parseFloat(this.band.replace(/,/g, ""));
+        const data = {
+          tr_band: this.band,
+          tr_rate: this.rate,
         };
-        this.addTR(tr).then((res) => {
+        const url = `${this.ROUTES.taxRate}/add-tax-rate`;
+        this.apiPost(url, data, "Add Tax Rate Error").then((res) => {
           this.apiResponseHandler(
             `${res.data.tr_band} has been added successfully`,
             "New Tax Rate Added"
@@ -118,16 +121,17 @@ export default {
       if (this.$v.$invalid) {
         this.apiFormHandler("Invalid Tax Rate");
       } else {
-        const { rate, trID } = this;
-        let { band } = this;
-        band = parseFloat(band.replace(/,/g, ""));
-        const tr = {
-          rate,
-          band,
-          trID,
+        this.band = parseFloat(this.band.replace(/,/g, ""));
+        const data = {
+          tr_band: this.band,
+          tr_rate: this.rate,
         };
-        this.updateTR(tr).then((res) => {
-          this.apiResponseHandler(`${res.data}`, "Update Successful");
+        const url = `${this.ROUTES.taxRate}/update-tax-rate/${this.trID}`;
+        this.apiPatch(url, data, "Update Tax Rate Error").then((res) => {
+          this.apiResponseHandler(
+            `${res.data.tr_band} has been added successfully`,
+            "New Tax Rate Added"
+          );
           this.refreshTable();
           this.$v.$reset();
           this.$refs["update-tr"].hide();

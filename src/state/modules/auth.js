@@ -1,4 +1,4 @@
-import API from "@/api";
+import { ROUTES, SET_TOKEN, API } from "@/api";
 
 export const state = {
   currentUser: sessionStorage.getItem("authUser"),
@@ -18,7 +18,7 @@ export const mutations = {
   },
   SET_TOKEN(state, token) {
     state.token = token;
-    localStorage.setItem("token", token);
+    SET_TOKEN(token);
   },
   TOGGLE_LOGGED_IN(state) {
     state.loggedIn = !state.loggedIn;
@@ -64,15 +64,16 @@ export const actions = {
     // eslint-disable-next-line no-unused-vars
     return new Promise((resolve, reject) => {
       commit("TOGGLE_LOADING");
-      API.post(`users/login`, {
+      const url = `${ROUTES.user}/login`;
+      const data = {
         user_username: username,
         user_password: password,
-      })
+      };
+      API.post(url, data)
         .then((res) => {
           const { userData, token } = res.data;
           commit("SET_TOKEN", token);
           commit("SET_USER_DATA", userData);
-          API.defaults.headers.common["x-auth-token"] = token;
           commit("TOGGLE_LOGGED_IN");
           resolve(res);
         })
@@ -85,7 +86,7 @@ export const actions = {
   logOut({ commit }) {
     commit("SET_TOKEN", null);
     commit("TOGGLE_LOGGED_IN");
-    localStorage.removeItem("token");
+    localStorage.clear();
   },
 
   // resetPassword

@@ -2,12 +2,9 @@
 import Layout from "@/views/layouts/main";
 import PageHeader from "@/components/page-header";
 import appConfig from "@/app.config";
-import jobRoleService from "@/services/job-role.service";
-import departmentService from "@/services/department.service";
 import { required } from "vuelidate/lib/validators";
 
 export default {
-  mixins: [jobRoleService, departmentService],
   page: {
     title: "Job Roles",
     meta: [{ name: "description", content: appConfig.description }],
@@ -34,25 +31,27 @@ export default {
       this.$v.$reset();
     },
     refreshTable() {
-      this.getJRs().then((res) => {
+      this.apiGet(this.ROUTES.jobRole, "Get Job Roles Error").then((res) => {
         const { data } = res;
         this.jrs = data;
         this.totalRows = this.jrs.length;
       });
     },
     fetchDepartments() {
-      this.getDepartments().then((res) => {
-        this.departments = [
-          { value: null, text: "Please select a department" },
-        ];
-        const { data } = res;
-        data.forEach((department) => {
-          this.departments.push({
-            value: department.department_id,
-            text: department.department_name,
+      this.apiGet(this.ROUTES.department, "Get Departments Error").then(
+        (res) => {
+          this.departments = [
+            { value: null, text: "Please select a department" },
+          ];
+          const { data } = res;
+          data.forEach((department) => {
+            this.departments.push({
+              value: department.department_id,
+              text: department.department_name,
+            });
           });
-        });
-      });
+        }
+      );
     },
     onFiltered(filteredItems) {
       // Trigger pagination to update the number of buttons/pages due to filtering
@@ -74,15 +73,19 @@ export default {
       if (this.$v.$invalid) {
         this.apiFormHandler("Invalid Job Role");
       } else {
-        const { role, department, description } = this;
-        const jr = { role, department, description };
-        console.log({ jr });
-        this.addJR(jr).then((res) => {
-          this.apiResponseHandler(`${res.data}`, "New Job Role Added");
-          this.refreshTable();
-          this.$v.$reset();
-          this.$refs["add-jr"].hide();
-        });
+        const data = {
+          job_role: this.role,
+          department_id: this.department,
+          description: this.description,
+        };
+        this.apiPost(this.ROUTES.jobRole, data, "Add Job Role Error").then(
+          (res) => {
+            this.apiResponseHandler(`${res.data}`, "New Job Role Added");
+            this.refreshTable();
+            this.$v.$reset();
+            this.$refs["add-jr"].hide();
+          }
+        );
       }
     },
     submitUpdate() {
@@ -91,9 +94,13 @@ export default {
       if (this.$v.$invalid) {
         this.apiFormHandler("Invalid Job Role");
       } else {
-        const { role, department, description, jobRoleID } = this;
-        const jr = { role, department, description, jobRoleID };
-        this.updateJR(jr).then((res) => {
+        const url = `${this.ROUTES.jobRole}/${this.jobRoleID}`;
+        const data = {
+          job_role: this.role,
+          department_id: this.department,
+          description: this.description,
+        };
+        this.apiPatch(url, data, "Update Job Role Error").then((res) => {
           this.apiResponseHandler(`${res.data}`, "Update Successful");
           this.refreshTable();
           this.$v.$reset();
