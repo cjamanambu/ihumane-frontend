@@ -1,6 +1,11 @@
 import { authHeader } from "@/state/helpers";
 
 export default {
+  data() {
+    return {
+      apiBusy: false,
+    };
+  },
   methods: {
     apiConfig() {
       return { headers: authHeader() };

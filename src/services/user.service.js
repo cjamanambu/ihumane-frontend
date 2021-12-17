@@ -4,10 +4,12 @@ const URL = `users`;
 export default {
   methods: {
     getUsers() {
+      this.apiBusy = true;
       return new Promise((resolve) => {
         API.get(`${URL}`, this.apiConfig())
           .then((res) => resolve(res))
-          .catch((err) => this.apiErrorHandler(err, "Get Users Error"));
+          .catch((err) => this.apiErrorHandler(err, "Get Users Error"))
+          .finally(() => (this.apiBusy = false));
       });
     },
     addUser(newUser) {

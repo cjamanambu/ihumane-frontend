@@ -123,7 +123,8 @@ export default {
         Add Grade
       </b-button>
     </div>
-    <div class="row">
+    <b-spinner type="grow" v-if="apiBusy" class="m-2" variant="success" />
+    <div v-else class="row">
       <div class="col-12">
         <div class="card">
           <div class="card-body">

@@ -4,12 +4,14 @@ const URL = `payment-definitions`;
 export default {
   methods: {
     getPaymentDefinitions() {
+      this.apiBusy = true;
       return new Promise((resolve) => {
         API.get(`${URL}`, this.apiConfig())
           .then((res) => resolve(res))
           .catch((err) =>
             this.apiErrorHandler(err, "Get Payment Definitions Error")
-          );
+          )
+          .finally(() => (this.apiBusy = false));
       });
     },
     addPD(pd) {

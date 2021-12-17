@@ -36,7 +36,6 @@ export default {
     refreshTable() {
       this.getJRs().then((res) => {
         const { data } = res;
-        console.log({ data });
         this.jrs = data;
         this.totalRows = this.jrs.length;
       });
@@ -65,7 +64,7 @@ export default {
       this.jobRoleID = jr.job_role_id;
       this.role = jr.job_role;
       this.description = jr.description;
-      this.department = jr.department_id;
+      this.department = jr.jb_department_id;
       this.$refs["update-jr"].show();
       this.$refs["jr-table"].clearSelected();
     },
@@ -83,6 +82,22 @@ export default {
           this.refreshTable();
           this.$v.$reset();
           this.$refs["add-jr"].hide();
+        });
+      }
+    },
+    submitUpdate() {
+      this.submitted = false;
+      this.$v.$touch();
+      if (this.$v.$invalid) {
+        this.apiFormHandler("Invalid Job Role");
+      } else {
+        const { role, department, description, jobRoleID } = this;
+        const jr = { role, department, description, jobRoleID };
+        this.updateJR(jr).then((res) => {
+          this.apiResponseHandler(`${res.data}`, "Update Successful");
+          this.refreshTable();
+          this.$v.$reset();
+          this.$refs["update-jr"].hide();
         });
       }
     },
@@ -118,7 +133,7 @@ export default {
         { key: "job_role_id", label: "ID", sortable: true },
         { key: "job_role", label: "Role", sortable: true },
         { key: "description", label: "Description", sortable: true },
-        { key: "Departments[0]", label: "Department", sortable: true },
+        { key: "Department", label: "Department", sortable: true },
       ],
       role: null,
       department: null,
@@ -143,7 +158,8 @@ export default {
         Add Job Role
       </b-button>
     </div>
-    <div class="row">
+    <b-spinner type="grow" v-if="apiBusy" class="m-2" variant="success" />
+    <div v-else class="row">
       <div class="col-12">
         <div class="card">
           <div class="card-body">
@@ -201,7 +217,7 @@ export default {
                 select-mode="single"
                 @row-selected="selectJR"
               >
-                <template #cell(Departments[0])="row">
+                <template #cell(Department)="row">
                   <p class="mb-n1 text-uppercase">
                     {{ row.value.department_name }}
                   </p>
@@ -238,6 +254,78 @@ export default {
       @hidden="resetForm"
     >
       <form @submit.prevent="submitNew">
+        <div class="form-group">
+          <label for="role">
+            Job Role <span class="text-danger">*</span>
+          </label>
+          <input
+            id="role"
+            type="text"
+            v-model="role"
+            class="form-control"
+            :class="{
+              'is-invalid': submitted && $v.role.$error,
+            }"
+          />
+        </div>
+        <div class="form-group">
+          <label for="department">
+            Department <span class="text-danger">*</span>
+          </label>
+          <b-form-select
+            id="department"
+            v-model="department"
+            :options="departments"
+            :class="{
+              'is-invalid': submitted && $v.department.$error,
+            }"
+          />
+          <small
+            class="form-text text-muted manage"
+            @click="$router.push('/departments')"
+          >
+            Manage Departments
+          </small>
+        </div>
+        <div class="form-group">
+          <label for="description">
+            Description <span class="text-danger">*</span>
+          </label>
+          <b-textarea
+            v-model="description"
+            id="description"
+            no-resize
+            :class="{
+              'is-invalid': submitted && $v.description.$error,
+            }"
+          />
+        </div>
+        <b-button
+          v-if="!submitting"
+          class="btn btn-success btn-block mt-4"
+          type="submit"
+        >
+          Submit
+        </b-button>
+        <b-button
+          v-else
+          disabled
+          class="btn btn-success btn-block mt-4"
+          type="submit"
+        >
+          Submitting...
+        </b-button>
+      </form>
+    </b-modal>
+    <b-modal
+      ref="update-jr"
+      title="Update Job Role"
+      hide-footer
+      centered
+      title-class="font-18"
+      @hidden="resetForm"
+    >
+      <form @submit.prevent="submitUpdate">
         <div class="form-group">
           <label for="role">
             Job Role <span class="text-danger">*</span>

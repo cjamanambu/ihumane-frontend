@@ -7,11 +7,13 @@ export default {
   methods: {
     getMTR() {
       return new Promise((resolve) => {
+        this.apiBusy = true;
         API.get(`${MTR_URL}`, this.apiConfig())
           .then((res) => resolve(res))
           .catch((err) =>
             this.apiErrorHandler(err, "Get Minimum Tax Rate Error")
-          );
+          )
+          .finally(() => (this.apiBusy = false));
       });
     },
     updateMTR(mtr_rate) {

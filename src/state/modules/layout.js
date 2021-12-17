@@ -1,12 +1,12 @@
 export const state = {
-  layoutType: 'vertical',
-  layoutWidth: 'fluid',
-  leftSidebarType: 'dark',
-  topbar: 'dark',
-  loader: false
-}
+  layoutType: "vertical",
+  layoutWidth: "fluid",
+  leftSidebarType: "dark",
+  topbar: "dark",
+  loader: false,
+};
 
-export const getters = {}
+export const getters = {};
 
 export const mutations = {
   CHANGE_LAYOUT(state, layoutType) {
@@ -22,28 +22,28 @@ export const mutations = {
     state.topbar = topbar;
   },
   LOADER(state, loader) {
-    state.loader = loader
-  }
-}
+    state.loader = loader;
+  },
+};
 
 export const actions = {
   changeLayoutType({ commit }, { layoutType }) {
-    commit('CHANGE_LAYOUT', layoutType);
+    commit("CHANGE_LAYOUT", layoutType);
   },
 
   changeLayoutWidth({ commit }, { layoutWidth }) {
-    commit('CHANGE_LAYOUT_WIDTH', layoutWidth)
+    commit("CHANGE_LAYOUT_WIDTH", layoutWidth);
   },
 
   changeLeftSidebarType({ commit }, { leftSidebarType }) {
-    commit('CHANGE_LEFT_SIDEBAR_TYPE', leftSidebarType)
+    commit("CHANGE_LEFT_SIDEBAR_TYPE", leftSidebarType);
   },
 
   changeTopbar({ commit }, { topbar }) {
-    commit('CHANGE_TOPBAR', topbar)
+    commit("CHANGE_TOPBAR", topbar);
   },
 
   changeLoaderValue({ commit }, { loader }) {
-    commit('LOADER', loader)
-  }
-}
+    commit("LOADER", loader);
+  },
+};

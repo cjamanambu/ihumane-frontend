@@ -4,10 +4,12 @@ const URL = "/grades";
 export default {
   methods: {
     getGrades() {
+      this.apiBusy = true;
       return new Promise((resolve) => {
         API.get(`${URL}`, this.apiConfig())
           .then((res) => resolve(res))
-          .catch((err) => this.apiErrorHandler(err, "Get Grades Error"));
+          .catch((err) => this.apiErrorHandler(err, "Get Grades Error"))
+          .finally(() => (this.apiBusy = false));
       });
     },
     addGrade(grade_name) {

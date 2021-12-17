@@ -5,10 +5,12 @@ const URL = `job-roles`;
 export default {
   methods: {
     getJRs() {
+      this.apiBusy = true;
       return new Promise((resolve) => {
         API.get(`${URL}`, this.apiConfig())
           .then((res) => resolve(res))
-          .catch((err) => this.apiErrorHandler(err, "Get Job Roles Error"));
+          .catch((err) => this.apiErrorHandler(err, "Get Job Roles Error"))
+          .finally(() => (this.apiBusy = false));
       });
     },
     addJR(jr) {
@@ -31,7 +33,7 @@ export default {
     updateJR(jr) {
       this.submitting = true;
       return new Promise((resolve) => {
-        API.post(
+        API.patch(
           `${URL}/${jr.jobRoleID}`,
           {
             job_role: jr.role,

@@ -5,10 +5,12 @@ const URL = `departments`;
 export default {
   methods: {
     getDepartments() {
+      this.apiBusy = true;
       return new Promise((resolve) => {
         API.get(`${URL}`, this.apiConfig())
           .then((res) => resolve(res))
-          .catch((err) => this.apiErrorHandler(err, "Get Departments Error"));
+          .catch((err) => this.apiErrorHandler(err, "Get Departments Error"))
+          .finally(() => (this.apiBusy = false));
       });
     },
     addDepartment(dept) {
