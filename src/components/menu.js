@@ -4,6 +4,7 @@ export const menuItems = [
     label: "Administrative Menu",
     isTitle: true,
   },
+
   {
     id: 2,
     label: "Dashboard",
@@ -13,6 +14,23 @@ export const menuItems = [
       text: "menuitems.dashboard.badge",
     },
     link: "/",
+  },
+  {
+    id: 26,
+    label: "Employee Management",
+    isTitle: true,
+  },
+  {
+    id: 27,
+    label: "Employee",
+    icon: "ri-user-settings-line",
+    subItems: [
+      {
+        id: 28,
+        label: "New Employee",
+        link: "/new-employee",
+      },
+       ],
   },
   {
     id: 3,
