@@ -19,4 +19,6 @@ export const ROUTES = {
   taxRate: `tax-rates`,
   user: `users`,
   location: `locations`,
+  bank: 'banks',
+  employee: 'employees'
 };
