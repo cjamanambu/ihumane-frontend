@@ -13,22 +13,22 @@ export default {
    // this.refreshTable();
     this.fetchLocations();
     this.fetchPositions();
+    this.fetchBanks();
   },
   methods: {
     resetForm() {
-      this.role = null;
-      this.department = null;
-      this.description = null;
-      this.jobRoleID = null;
-      this.$v.$reset();
+      this.first_name = null;
+          this.last_name = null;
+          this.other_name = null;
+          this.employee_number = null;
+          this.personal_email = null;
+          this.official_email = null;
+          this.location = null;
+          this.position = null;
+          this.account_number = null;
+          this.bank = null;
     },
-    refreshTable() {
-      this.apiGet(this.ROUTES.jobRole, "Get Job Roles Error").then((res) => {
-        const { data } = res;
-        this.jrs = data;
-        this.totalRows = this.jrs.length;
-      });
-    },
+
     fetchLocations() {
       this.apiGet(this.ROUTES.location, "Get Location Error").then(
           (res) => {
@@ -61,20 +61,23 @@ export default {
           }
       );
     },
-    onFiltered(filteredItems) {
-      // Trigger pagination to update the number of buttons/pages due to filtering
-      this.totalRows = filteredItems.length;
-      this.currentPage = 1;
+    fetchBanks() {
+      this.apiGet(this.ROUTES.bank, "Get Bank Error").then(
+          (res) => {
+            this.positions = [
+              { value: null, text: "Please select a position" },
+            ];
+            const { data } = res;
+            data.forEach((bank) => {
+              this.banks.push({
+                value: bank.bank_id,
+                text:bank.bank_name,
+              });
+            });
+          }
+      );
     },
-    selectJR(jr) {
-      jr = jr[0];
-      this.jobRoleID = jr.job_role_id;
-      this.role = jr.job_role;
-      this.description = jr.description;
-      this.department = jr.jb_department_id;
-      this.$refs["update-jr"].show();
-      this.$refs["jr-table"].clearSelected();
-    },
+
     submitNew() {
       this.submitted = true;
       this.$v.$touch();
@@ -82,40 +85,29 @@ export default {
         this.apiFormHandler("Invalid Job Role");
       } else {
         const data = {
-          job_role: this.role,
-          department_id: this.department,
-          description: this.description,
+
+          first_name: this.first_name,
+          last_name:this.last_name,
+          other_name:this.other_name,
+          unique_id:this.employee_number,
+          personal_email:this.personal_email,
+          office_email:this.official_email,
+          location:this.location,
+          job_role:this.position,
+          account_no:this.account_number,
+          bank:this.bank,
         };
-        this.apiPost(this.ROUTES.jobRole, data, "Add Job Role Error").then(
+        const url = `${this.ROUTES.employee}/employee-enrollment`;
+        this.apiPost(url, data, "Add Job Role Error").then(
             (res) => {
-              this.apiResponseHandler(`${res.data}`, "New Job Role Added");
-              this.refreshTable();
-              this.$v.$reset();
-              this.$refs["add-jr"].hide();
+              this.apiResponseHandler(`${res.data}`, "New Employee Enrolled");
+               this.$v.$reset();
+              this.resetForm();
             }
         );
       }
     },
-    submitUpdate() {
-      this.submitted = false;
-      this.$v.$touch();
-      if (this.$v.$invalid) {
-        this.apiFormHandler("Invalid Job Role");
-      } else {
-        const url = `${this.ROUTES.jobRole}/${this.jobRoleID}`;
-        const data = {
-          job_role: this.role,
-          department_id: this.department,
-          description: this.description,
-        };
-        this.apiPatch(url, data, "Update Job Role Error").then((res) => {
-          this.apiResponseHandler(`${res.data}`, "Update Successful");
-          this.refreshTable();
-          this.$v.$reset();
-          this.$refs["update-jr"].hide();
-        });
-      }
-    },
+
   },
   data() {
     return {
@@ -134,8 +126,21 @@ export default {
           active: true,
         },
       ],
+      location: null,
+      position: null,
+      bank: null,
       locations: [{ value: null, text: "Please select a location" }],
       positions: [{ value: null, text: "Please select a position" }],
+      banks: [{ value: null, text: "Please Select a Bank"}],
+      employee_number: null,
+      first_name: null,
+      last_name: null,
+      other_name: null,
+      personal_email: null,
+      official_email: null,
+      telephone: null,
+      account_number: null,
+      submitted: false,
     };
   },
 
@@ -289,11 +294,14 @@ export default {
                     <div class="form-group row mb-3">
                       <label class="col-md-3 col-form-label" for="otherName">Bank</label>
                       <div class="col-md-9">
-                        <select class="form-control">
-                          <option>Select</option>
-                          <option>Large select</option>
-                          <option>Small select</option>
-                        </select>
+                        <b-form-select
+                            id="bank"
+                            v-model="bank"
+                            :options="banks"
+                            :class="{
+              'is-invalid': submitted && $v.location.$error,
+            }"
+                        />
                       </div>
                     </div>
 
@@ -325,7 +333,7 @@ export default {
                             type="text"
                             class="form-control"
                             name="nuban"
-                            placeholder="Last Name"
+                            placeholder="Account Number"
                         />
                       </div>
                     </div>
@@ -348,8 +356,7 @@ export default {
                       <h3 class="mt-0">Thank you !</h3>
 
                       <p class="w-75 mb-2 mx-auto">
-                        Quisque nec turpis at urna dictum luctus. Suspendisse convallis dignissim eros at volutpat. In egestas mattis dui. Aliquam
-                        mattis dictum aliquet.
+                        All Good.
                       </p>
 
                       <div class="mb-3">
