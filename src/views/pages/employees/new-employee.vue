@@ -3,6 +3,7 @@ import { FormWizard, TabContent } from "vue-form-wizard";
 import Layout from "@/views/layouts/main";
 import PageHeader from "@/components/page-header";
 import appConfig from "@/app.config";
+import {required} from "vuelidate/lib/validators";
 export default {
   page: {
     title: "New Employee",
@@ -10,10 +11,23 @@ export default {
   },
   components: { Layout, PageHeader, FormWizard, TabContent },
   mounted() {
-   // this.refreshTable();
     this.fetchLocations();
     this.fetchPositions();
     this.fetchBanks();
+  },
+  validations: {
+    location: { required },
+    position: { required },
+    bank: { required },
+    employee_number: { required },
+    first_name: { required },
+    last_name: { required },
+    other_name: { required },
+      personal_email: { required },
+    official_email: { required },
+    telephone: { required },
+    account_number: { required },
+
   },
   methods: {
     resetForm() {
@@ -28,8 +42,7 @@ export default {
           this.account_number = null;
           this.bank = null;
     },
-
-    fetchLocations() {
+   fetchLocations() {
       this.apiGet(this.ROUTES.location, "Get Location Error").then(
           (res) => {
             this.locations = [
@@ -77,28 +90,28 @@ export default {
           }
       );
     },
-
     submitNew() {
       this.submitted = true;
       this.$v.$touch();
       if (this.$v.$invalid) {
-        this.apiFormHandler("Invalid Job Role");
+        this.apiFormHandler("Invalid Employee");
       } else {
         const data = {
 
           first_name: this.first_name,
           last_name:this.last_name,
-          other_name:this.other_name,
-          unique_id:this.employee_number,
+           unique_id:this.employee_number,
           personal_email:this.personal_email,
           office_email:this.official_email,
           location:this.location,
           job_role:this.position,
           account_no:this.account_number,
           bank:this.bank,
+          phone_no: this.telephone
+
         };
         const url = `${this.ROUTES.employee}/employee-enrollment`;
-        this.apiPost(url, data, "Add Job Role Error").then(
+        this.apiPost(url, data, "Employee Enrollment Error").then(
             (res) => {
               this.apiResponseHandler(`${res.data}`, "New Employee Enrolled");
                this.$v.$reset();
@@ -107,6 +120,11 @@ export default {
         );
       }
     },
+    onComplete: function() {
+     //alert('i got here');
+      this.submitNew();
+    },
+
 
   },
   data() {
@@ -145,6 +163,8 @@ export default {
   },
 
 };
+
+
 </script>
 
 <template>
@@ -165,7 +185,7 @@ export default {
         <div class="card">
           <div class="card-body">
             <h4 class="card-title">New Employee</h4>
-            <form-wizard color="#556ee6">
+            <form-wizard color="#556ee6" @on-complete="onComplete">
               <tab-content icon="mdi mdi-account-circle">
                 <div class="row">
                   <div class="col-6">
@@ -176,6 +196,7 @@ export default {
                         <input
                             id="employeeNumber"
                             type="text"
+                            v-model="employee_number"
                             class="form-control"
                             name="employeeNumber"
                             placeholder="Employee Number"
@@ -185,18 +206,7 @@ export default {
 
 
 
-                    <div class="form-group row mb-3">
-                      <label class="col-md-3 col-form-label" for="otherName">Other Name</label>
-                      <div class="col-md-9">
-                        <input
-                            id="otherName"
-                            type="text"
-                            class="form-control"
-                            name="otherName"
-                            placeholder="Other Name"
-                        />
-                      </div>
-                    </div>
+
 
                     <div class="form-group row mb-3">
                       <label class="col-md-3 col-form-label" for="otherName">Personal Email</label>
@@ -204,6 +214,7 @@ export default {
                         <input
                             id="personalEmail"
                             type="email"
+                            v-model="personal_email"
                             class="form-control"
                             name="personalEmail"
                             placeholder="Personal Email"
@@ -217,6 +228,7 @@ export default {
                         <input
                             id="officialEmail"
                             type="email"
+                            v-model="official_email"
                             class="form-control"
                             name="officialEmail"
                             placeholder="Official Email"
@@ -235,6 +247,7 @@ export default {
                             type="text"
                             class="form-control"
                             name="firstName"
+                            v-model="first_name"
                             placeholder="First Name"
                         />
                       </div>
@@ -247,6 +260,7 @@ export default {
                             type="text"
                             class="form-control"
                             name="lastName"
+                            v-model="last_name"
                             placeholder="Last Name"
                         />
                       </div>
@@ -259,6 +273,7 @@ export default {
                             id="telephone"
                             type="text"
                             class="form-control"
+                            v-model="telephone"
                             name="telephone"
                             placeholder="Phone Number"
                         />
@@ -331,6 +346,7 @@ export default {
                         <input
                             id="nuban"
                             type="text"
+                            v-model="account_number"
                             class="form-control"
                             name="nuban"
                             placeholder="Account Number"
