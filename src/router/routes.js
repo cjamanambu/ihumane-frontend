@@ -139,4 +139,14 @@ export default [
     component: () => import("../views/pages/hr-configuration/locations"),
   },
   // hr configuration routes end //
+
+    // employee management
+  {
+    path: "/new-employee",
+    name: "new-employee",
+    meta: {
+      authRequired: true,
+    },
+    component: () => import("../views/pages/employees/new-employee"),
+  },
 ];
