@@ -209,7 +209,7 @@ export default {
 
 
                     <div class="form-group row mb-3">
-                      <label class="col-md-3 col-form-label" for="otherName">Personal Email</label>
+                      <label class="col-md-3 col-form-label" for="personalEmail">Personal Email</label>
                       <div class="col-md-9">
                         <input
                             id="personalEmail"

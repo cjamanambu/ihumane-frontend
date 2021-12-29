@@ -138,6 +138,14 @@ export default [
     },
     component: () => import("../views/pages/hr-configuration/locations"),
   },
+  {
+    path: "/leave-types",
+    name: "leave-types",
+    meta: {
+      authRequired: true,
+    },
+    component: () => import("../views/pages/hr-configuration/leave-types"),
+  },
   // hr configuration routes end //
 
     // employee management
@@ -148,5 +156,14 @@ export default [
       authRequired: true,
     },
     component: () => import("../views/pages/employees/new-employee"),
+  },
+
+  {
+    path: "/employee-leave",
+    name: "employee-leave",
+    meta: {
+      authRequired: true,
+    },
+    component: () => import("../views/pages/leaves/leave"),
   },
 ];
