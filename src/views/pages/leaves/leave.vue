@@ -15,10 +15,14 @@ export default {
   },
   mounted() {
     this.refreshTable();
+    this.getEmployees();
+    this.getLeaveTypes();
   },
   validations: {
-    name: { required },
-    t3_code: { required },
+    employee: { required },
+    leaveType: { required },
+    leapp_start_date: { required },
+    leapp_end_date: { required }
   },
   methods: {
     refreshTable() {
@@ -93,45 +97,67 @@ export default {
       this.$refs["show-leave"].show();
       this.$refs["leave-application-table"].clearSelected();
     },
+
+    getLeaveTypes(){
+      this.apiGet(this.ROUTES.leaveType, "Get Leave Types Error").then(
+          (res) => {
+            this.leaveTypes = [
+              { value: null, text: "Please select a leave type" },
+            ];
+            const { data } = res;
+            data.forEach((leaveType) => {
+              this.leaveTypes.push({
+                value: leaveType.leave_type_id,
+                text:leaveType.leave_name,
+              });
+            });
+          }
+      );
+    },
+
+
+    getEmployees(){
+      this.apiGet(this.ROUTES.employee, "Get Leave Types Error").then(
+          (res) => {
+            this.employees = [
+              { value: null, text: "Please select an employee" },
+            ];
+            const { data } = res;
+            data.forEach((employee) => {
+              this.employees.push({
+                value: employee.emp_id,
+                text:`${employee.emp_first_name} ${employee.emp_last_name}`,
+              });
+            });
+          }
+      );
+    },
     submitNew() {
       this.submitted = true;
       this.$v.$touch();
       if (this.$v.$invalid) {
-        this.apiFormHandler("Invalid Department");
+        this.apiFormHandler("Invalid Leave Application");
       } else {
         const data = {
-          department_name: this.name,
-          t3_code: this.t3_code,
+
+          leapp_empid: this.employee,
+          leapp_leave_type: this.leaveType,
+          leapp_start_date: this.leapp_start_date,
+          leapp_end_date: this.leapp_end_date,
+
         };
-        this.apiPost(this.ROUTES.department, data, "Add Department Error").then(
+        const url = `${this.ROUTES.leaveApplication}/add-leave-application`;
+        this.apiPost(url, data, "Add Leave Application").then(
             (res) => {
-              this.apiResponseHandler(`${res.data}`, "New Department Added");
+              this.apiResponseHandler(`${res.data}`, "New leave application Added");
               this.refreshTable();
               this.$v.$reset();
-              this.$refs["add-dept"].hide();
+              this.$refs["add-leave"].hide();
             }
         );
       }
     },
-    submitUpdate() {
-      this.submitted = true;
-      this.$v.$touch();
-      if (this.$v.$invalid) {
-        this.apiFormHandler("Invalid Department");
-      } else {
-        const data = {
-          department_name: this.name,
-          t3_code: this.t3_code,
-        };
-        const url = `${this.ROUTES.department}/${this.deptID}`;
-        this.apiPatch(url, data, "Update Department Error").then((res) => {
-          this.apiResponseHandler(`${res.data}`, "Update Successful");
-          this.refreshTable();
-          this.$v.$reset();
-          this.$refs["update-dept"].hide();
-        });
-      }
-    },
+
   },
   data() {
     return {
@@ -182,6 +208,10 @@ export default {
       leapp_approve_date: null,
       leapp_recommend_by :null,
       leapp_recommend_date: null,
+      leaveTypes: [],
+      leaveType: null,
+      employees: [],
+      employee: null,
       recommend: null,
       verify:null,
       approved: null,
@@ -196,7 +226,7 @@ export default {
   <Layout>
     <PageHeader :title="title" :items="items" />
     <div class="d-flex justify-content-end mb-3">
-      <b-button class="btn btn-success" @click="$refs['add-dept'].show()">
+      <b-button class="btn btn-success" @click="$refs['add-leave'].show()">
         <i class="mdi mdi-plus mr-2"></i>
         Initiate Leave
       </b-button>
@@ -283,8 +313,8 @@ export default {
       </div>
     </div>
     <b-modal
-        ref="add-dept"
-        title="Add Department"
+        ref="add-leave"
+        title="New Leave Application"
         hide-footer
         centered
         title-class="font-18"
@@ -292,30 +322,58 @@ export default {
     >
       <form @submit.prevent="submitNew">
         <div class="form-group">
-          <label for="name">
-            Department Name <span class="text-danger">*</span>
+          <label for="employee">
+            Employee <span class="text-danger">*</span>
           </label>
-          <input
-              id="name"
-              type="text"
-              v-model="name"
-              class="form-control"
+          <b-form-select
+              id="employee"
+              v-model="employee"
+              :options="employees"
               :class="{
-              'is-invalid': submitted && $v.name.$error,
+              'is-invalid': submitted && $v.employee.$error,
             }"
           />
         </div>
         <div class="form-group">
-          <label for="t3_code">
-            T3 Code <span class="text-danger">*</span>
+          <label for="leave-types">
+            Leave Type <span class="text-danger">*</span>
+          </label>
+          <b-form-select
+              id="leave-types"
+              v-model="leaveType"
+              :options="leaveTypes"
+              :class="{
+              'is-invalid': submitted && $v.leaveType.$error,
+            }"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="start-date">
+            Start Date <span class="text-danger">*</span>
           </label>
           <input
-              id="t3_code"
-              type="text"
-              v-model="t3_code"
+              id="start-date"
+              type="date"
+              v-model="leapp_start_date"
               class="form-control"
               :class="{
-              'is-invalid': submitted && $v.t3_code.$error,
+              'is-invalid': submitted && $v.leapp_start_date.$error,
+            }"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="end-dates">
+            End Date <span class="text-danger">*</span>
+          </label>
+          <input
+              id="end-date"
+              type="date"
+              v-model="leapp_end_date"
+              class="form-control"
+              :class="{
+              'is-invalid': submitted && $v.leapp_end_date.$error,
             }"
           />
         </div>
@@ -526,21 +584,7 @@ export default {
           </div>
         </template>
 
-        <b-button
-            v-if="!submitting"
-            class="btn btn-success btn-block mt-4"
-            type="submit"
-        >
-          Submit
-        </b-button>
-        <b-button
-            v-else
-            disabled
-            class="btn btn-success btn-block mt-4"
-            type="submit"
-        >
-          Submitting...
-        </b-button>
+
       </form>
     </b-modal>
   </Layout>
