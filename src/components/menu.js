@@ -30,7 +30,15 @@ export const menuItems = [
         label: "New Employee",
         link: "/new-employee",
       },
+
        ],
+  },
+
+  {
+    id: 29,
+    label: "Employee Leaves",
+    icon: "ri-user-settings-line",
+    link: "/employee-leave",
   },
   {
     id: 3,
