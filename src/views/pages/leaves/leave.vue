@@ -190,6 +190,7 @@ export default {
         { key: "employee.emp_unique_id", label: "Employee ID", sortable: true },
         { key: "employee.emp_first_name", label: "Employee Name", sortable: true },
         { key: "LeaveType.leave_name", label: "Leave Type", sortable: true },
+        { key: "leapp_total_days", label: "Days", sortable: true },
         { key: "leapp_start_date", label: "Start Date", sortable: true },
         { key: "leapp_end_date", label: "End Date", sortable: true },
         { key: "leapp_status", label: "Status", sortable: true },
