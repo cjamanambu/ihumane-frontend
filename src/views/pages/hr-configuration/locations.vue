@@ -21,7 +21,7 @@ export default {
   },
   validations: {
     name: { required },
-    states: { required },
+    state: { required },
     t6_code: { required },
   },
   methods: {
@@ -77,7 +77,7 @@ export default {
           location_state: this.state,
           location_t6_code: this.t6_code,
         };
-        const url = `${this.ROUTES.location}/${this.location_id}`;
+        const url = `${this.ROUTES.location}/${this.locationID}`;
         this.apiPatch(url, data, "Update Location Error").then((res) => {
           this.apiResponseHandler(`${res.data}`, "Update Successful");
           this.refreshTable();
@@ -136,7 +136,7 @@ export default {
       fields: [
         { key: "location_id", label: "ID", sortable: true },
         { key: "location_name", label: "Location", sortable: true },
-        { key: "l_state_id", label: "State", sortable: true },
+        { key: "State.s_name", label: "State", sortable: true },
         { key: "l_t6_code", label: "T6 Code", sortable: true },
       ],
       name: null,
@@ -148,7 +148,11 @@ export default {
   },
 };
 </script>
-
+<style>
+.manage:hover {
+  cursor: pointer;
+}
+</style>
 <template>
   <Layout>
     <PageHeader :title="title" :items="items" />
@@ -158,7 +162,7 @@ export default {
         Add Location
       </b-button>
     </div>
-    <div v-if="this.apiBusy" style="margin-left: 50%; margin-top: 20%">
+    <div v-if="this.apiBusy">
       <b-spinner type="grow" class="m-2" variant="success" />
     </div>
     <div v-else class="row">
@@ -174,8 +178,7 @@ export default {
                       v-model="perPage"
                       size="sm"
                       :options="pageOptions"
-                    ></b-form-select
-                    >&nbsp;entries
+                    />&nbsp; entries
                   </label>
                 </div>
               </div>
@@ -192,7 +195,7 @@ export default {
                       type="search"
                       placeholder="Search..."
                       class="form-control form-control-sm ml-2"
-                    ></b-form-input>
+                    />
                   </label>
                 </div>
               </div>
@@ -201,7 +204,7 @@ export default {
             <!-- Table -->
             <div class="table-responsive mb-0">
               <b-table
-                ref="state-table"
+                ref="location-table"
                 bordered
                 selectable
                 hover
@@ -251,48 +254,118 @@ export default {
     >
       <form @submit.prevent="submitNew">
         <div class="form-group">
-          <label for="role">
-            Job Role <span class="text-danger">*</span>
+          <label for="name">
+            Location Name <span class="text-danger">*</span>
           </label>
           <input
-            id="role"
+            id="name"
             type="text"
-            v-model="role"
+            v-model="name"
             class="form-control"
             :class="{
-              'is-invalid': submitted && $v.role.$error,
+              'is-invalid': submitted && $v.name.$error,
             }"
           />
         </div>
         <div class="form-group">
-          <label for="department">
-            Department <span class="text-danger">*</span>
-          </label>
+          <label for="state"> State <span class="text-danger">*</span> </label>
           <b-form-select
-            id="department"
-            v-model="department"
-            :options="departments"
+            id="state"
+            v-model="state"
+            :options="states"
             :class="{
-              'is-invalid': submitted && $v.department.$error,
+              'is-invalid': submitted && $v.state.$error,
             }"
           />
           <small
             class="form-text text-muted manage"
-            @click="$router.push('/departments')"
+            @click="$router.push('/states')"
           >
-            Manage Departments
+            Manage States
           </small>
         </div>
         <div class="form-group">
-          <label for="description">
-            Description <span class="text-danger">*</span>
+          <label for="t6-code">
+            T6 Code <span class="text-danger">*</span>
           </label>
-          <b-textarea
-            v-model="description"
-            id="description"
-            no-resize
+          <input
+            id="t6-code"
+            type="text"
+            v-model="t6_code"
+            class="form-control"
             :class="{
-              'is-invalid': submitted && $v.description.$error,
+              'is-invalid': submitted && $v.t6_code.$error,
+            }"
+          />
+        </div>
+        <b-button
+          v-if="!submitting"
+          class="btn btn-success btn-block mt-4"
+          type="submit"
+        >
+          Submit
+        </b-button>
+        <b-button
+          v-else
+          disabled
+          class="btn btn-success btn-block mt-4"
+          type="submit"
+        >
+          Submitting...
+        </b-button>
+      </form>
+    </b-modal>
+    <b-modal
+      ref="update-location"
+      title="Update Location"
+      hide-footer
+      centered
+      title-class="font-18"
+      @hidden="resetForm"
+    >
+      <form @submit.prevent="submitUpdate">
+        <div class="form-group">
+          <label for="name">
+            Location Name <span class="text-danger">*</span>
+          </label>
+          <input
+            id="name"
+            type="text"
+            v-model="name"
+            class="form-control"
+            :class="{
+              'is-invalid': submitted && $v.name.$error,
+            }"
+          />
+        </div>
+        <div class="form-group">
+          <label for="state"> State <span class="text-danger">*</span> </label>
+          <b-form-select
+            id="state"
+            v-model="state"
+            :options="states"
+            :class="{
+              'is-invalid': submitted && $v.state.$error,
+            }"
+          />
+          <small
+            class="form-text text-muted manage"
+            @click="$router.push('/states')"
+          >
+            Manage States
+          </small>
+        </div>
+        <div class="form-group">
+          <label for="t6-code">
+            T6 Code <span class="text-danger">*</span>
+          </label>
+          <input
+            id="t6-code"
+            type="text"
+            v-model="t6_code"
+            class="form-control"
+            :class="{
+              'is-invalid': submitted && $v.t6_code.$error,
             }"
           />
         </div>
