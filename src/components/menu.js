@@ -139,8 +139,8 @@ export const menuItems = [
       },
       {
         id: 22,
-        label: "Subsidiary",
-        link: "/subsidiary",
+        label: "Subsidiaries",
+        link: "/subsidiaries",
       },
       {
         id: 23,

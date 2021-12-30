@@ -156,6 +156,22 @@ export default [
     component: () => import("../views/pages/hr-configuration/locations"),
   },
   {
+    path: "/qualifications",
+    name: "qualifications",
+    meta: {
+      authRequired: true,
+    },
+    component: () => import("../views/pages/hr-configuration/qualifications"),
+  },
+  {
+    path: "/subsidiaries",
+    name: "subsidiaries",
+    meta: {
+      authRequired: true,
+    },
+    component: () => import("../views/pages/hr-configuration/subsidiaries"),
+  },
+  {
     path: "/leave-types",
     name: "leave-types",
     meta: {

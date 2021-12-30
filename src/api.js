@@ -26,4 +26,6 @@ export const ROUTES = {
   leaveApplication: `leave-application`,
   pensionProvider: `pension-providers`,
   hmo: `hmos`,
+  qualification: `qualifications`,
+  subsidiary: `subsidiaries`,
 };
