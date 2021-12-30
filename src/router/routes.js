@@ -99,6 +99,15 @@ export default [
     component: () => import("../views/pages/hr-configuration/banks"),
   },
   {
+    path: "/pension-providers",
+    name: "pension-providers",
+    meta: {
+      authRequired: true,
+    },
+    component: () =>
+      import("../views/pages/hr-configuration/pension-providers"),
+  },
+  {
     path: "/departments",
     name: "departments",
     meta: {
@@ -148,7 +157,7 @@ export default [
   },
   // hr configuration routes end //
 
-    // employee management
+  // employee management
   {
     path: "/new-employee",
     name: "new-employee",

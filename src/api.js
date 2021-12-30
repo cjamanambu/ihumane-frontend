@@ -1,7 +1,7 @@
 import axios from "axios";
 
 export const API = axios.create({
-   baseURL: `https://irc-api.ihumane.net/`,
+  baseURL: `https://irc-api.ihumane.net/`,
   //baseURL: `http://localhost:9000/`,
 });
 
@@ -22,6 +22,7 @@ export const ROUTES = {
   location: `locations`,
   bank: `banks`,
   employee: `employees`,
-  leaveType:`leave-types`,
+  leaveType: `leave-types`,
   leaveApplication: `leave-application`,
+  pensionProvider: `pension-providers`,
 };
