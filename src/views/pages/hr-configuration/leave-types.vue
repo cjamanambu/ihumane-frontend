@@ -129,7 +129,7 @@ export default {
       fields: [
         { key: "leave_type_id", label: "SN", sortable: true },
         { key: "leave_name", label: "Leave Type", sortable: true },
-        { key: "lt_rate", label: "Rate", sortable: true },
+        { key: "lt_rate", label: "Rate(Days)", sortable: true },
         { key: "lt_mode", label: "Mode", sortable: true },
       ],
       lt_id: null,
@@ -210,6 +210,24 @@ export default {
                 select-mode="single"
                 @row-selected="selectLeaveType"
               >
+
+                <template #cell(lt_mode)="row">
+                  <div
+                      class="badge badge-info badge-pill"
+                      v-if="row.value === 1"
+                  >
+                    Monthly
+                  </div>
+
+                  <div
+                      class="badge badge-warning badge-pill"
+                      v-if="row.value === 2"
+                  >
+                    Yearly
+                  </div>
+
+
+                </template>
               </b-table>
             </div>
             <div class="row">

@@ -291,6 +291,47 @@ export default {
                   select-mode="single"
                   @row-selected="selectLeave"
               >
+                <template #cell(leapp_status)="row">
+                  <div
+                      class="badge badge-info badge-pill"
+                      v-if="row.value === 0"
+                  >
+                    Pending
+                  </div>
+
+                  <div
+                      class="badge badge-warning badge-pill"
+                      v-if="row.value === 1"
+                  >
+                    Verified
+                  </div>
+
+                  <div
+                      class="badge badge-primary badge-pill"
+                      v-if="row.value === 2"
+                  >
+                    Recommended
+                  </div>
+
+                  <div
+                      class="badge badge-success badge-pill"
+                      v-if="row.value === 3"
+                  >
+                    Approved
+                  </div>
+
+                  <div class="badge badge-danger badge-pill" v-if="row.value === 4">
+                    Disapproved
+                  </div>
+                </template>
+
+                <template #cell(leapp_start_date)="row">
+                  {{ new Date(row.value).toDateString() }}
+                </template>
+
+                <template #cell(leapp_end_date)="row">
+                  {{ new Date(row.value).toDateString() }}
+                </template>
               </b-table>
             </div>
             <div class="row">
