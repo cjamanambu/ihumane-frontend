@@ -108,6 +108,14 @@ export default [
       import("../views/pages/hr-configuration/pension-providers"),
   },
   {
+    path: "/hmos",
+    name: "hmos",
+    meta: {
+      authRequired: true,
+    },
+    component: () => import("../views/pages/hr-configuration/hmos"),
+  },
+  {
     path: "/departments",
     name: "departments",
     meta: {
@@ -146,6 +154,22 @@ export default [
       authRequired: true,
     },
     component: () => import("../views/pages/hr-configuration/locations"),
+  },
+  {
+    path: "/qualifications",
+    name: "qualifications",
+    meta: {
+      authRequired: true,
+    },
+    component: () => import("../views/pages/hr-configuration/qualifications"),
+  },
+  {
+    path: "/subsidiaries",
+    name: "subsidiaries",
+    meta: {
+      authRequired: true,
+    },
+    component: () => import("../views/pages/hr-configuration/subsidiaries"),
   },
   {
     path: "/leave-types",

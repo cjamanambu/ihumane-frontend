@@ -99,8 +99,8 @@ export const menuItems = [
       },
       {
         id: 14,
-        label: "HMO",
-        link: "/hmo",
+        label: "HMOs",
+        link: "/hmos",
       },
       {
         id: 15,
@@ -139,8 +139,8 @@ export const menuItems = [
       },
       {
         id: 22,
-        label: "Subsidiary",
-        link: "/subsidiary",
+        label: "Subsidiaries",
+        link: "/subsidiaries",
       },
       {
         id: 23,

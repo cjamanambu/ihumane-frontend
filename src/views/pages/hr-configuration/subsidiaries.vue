@@ -6,7 +6,7 @@ import { required } from "vuelidate/lib/validators";
 
 export default {
   page: {
-    title: "Pension Providers",
+    title: "Subsidiaries",
     meta: [{ name: "description", content: appConfig.description }],
   },
   components: {
@@ -21,66 +21,61 @@ export default {
   },
   methods: {
     refreshTable() {
-      this.apiGet(
-        this.ROUTES.pensionProvider,
-        "Get Pension Providers Error"
-      ).then((res) => {
-        const { data } = res;
-        this.pensionProviders = data;
-        this.totalRows = this.pensionProviders.length;
-      });
+      this.apiGet(this.ROUTES.subsidiary, "Get Subsidiaries Error").then(
+        (res) => {
+          const { data } = res;
+          this.subsidiaries = data;
+          this.totalRows = this.subsidiaries.length;
+        }
+      );
     },
     submitNew() {
       this.submitted = true;
       this.$v.$touch();
       if (this.$v.$invalid) {
-        this.apiFormHandler("Invalid Pension Provider");
+        this.apiFormHandler("Invalid Subsidiary");
       } else {
         const data = {
-          provider_name: this.name,
+          subsidiary_name: this.name,
         };
-        this.apiPost(
-          this.ROUTES.pensionProvider,
-          data,
-          "New Pension Provider Error"
-        ).then((res) => {
-          this.apiResponseHandler(`${res.data}`, "New Pension Provider Added");
-          this.refreshTable();
-          this.$v.$reset();
-          this.$refs["add-pension-provider"].hide();
-        });
+        this.apiPost(this.ROUTES.subsidiary, data, "New Subsidiary Error").then(
+          (res) => {
+            this.apiResponseHandler(`${res.data}`, "New Subsidiary Added");
+            this.refreshTable();
+            this.$v.$reset();
+            this.$refs["add-subsidiary"].hide();
+          }
+        );
       }
     },
     submitUpdate() {
       this.submitted = true;
       this.$v.$touch();
       if (this.$v.$invalid) {
-        this.apiFormHandler("Invalid Pension Provider");
+        this.apiFormHandler("Invalid Subsidiary");
       } else {
         const data = {
-          provider_name: this.name,
+          subsidiary_name: this.name,
         };
-        const url = `${this.ROUTES.pensionProvider}/${this.pensionProviderID}`;
-        this.apiPatch(url, data, "Update Pension Provider Error").then(
-          (res) => {
-            this.apiResponseHandler(`${res.data}`, "Update Successful");
-            this.refreshTable();
-            this.$v.$reset();
-            this.$refs["update-pension-provider"].hide();
-          }
-        );
+        const url = `${this.ROUTES.subsidiary}/${this.subsidiaryID}`;
+        this.apiPatch(url, data, "Update Subsidiary Error").then((res) => {
+          this.apiResponseHandler(`${res.data}`, "Update Successful");
+          this.refreshTable();
+          this.$v.$reset();
+          this.$refs["update-subsidiary"].hide();
+        });
       }
     },
     resetForm() {
       this.name = null;
       this.$v.$reset();
     },
-    selectRow(pensionProvider) {
-      pensionProvider = pensionProvider[0];
-      this.pensionProviderID = pensionProvider.pension_provider_id;
-      this.name = pensionProvider.provider_name;
-      this.$refs["update-pension-provider"].show();
-      this.$refs["pension-provider-table"].clearSelected();
+    selectRow(subsidiary) {
+      subsidiary = subsidiary[0];
+      this.subsidiaryID = subsidiary.subsidiary_id;
+      this.name = subsidiary.subsidiary_name;
+      this.$refs["update-subsidiary"].show();
+      this.$refs["subsidiary-table"].clearSelected();
     },
     onFiltered(filteredItems) {
       // Trigger pagination to update the number of buttons/pages due to filtering
@@ -90,7 +85,7 @@ export default {
   },
   data() {
     return {
-      title: "Pension Providers",
+      title: "Subsidiaries",
       items: [
         {
           text: "IHUMANE",
@@ -100,26 +95,26 @@ export default {
           href: "/",
         },
         {
-          text: "Pension Providers",
+          text: "Subsidiaries",
           active: true,
         },
       ],
       submitted: false,
-      pensionProviders: [],
+      subsidiaries: [],
       totalRows: 1,
       currentPage: 1,
       perPage: 10,
       pageOptions: [10, 25, 50, 100],
       filter: null,
       filterOn: [],
-      sortBy: "pension_provider_id",
+      sortBy: "subsidiary_id",
       sortDesc: false,
       fields: [
-        { key: "pension_provider_id", label: "ID", sortable: true },
-        { key: "provider_name", label: "Pension Provider", sortable: true },
+        { key: "subsidiary_id", label: "ID", sortable: true },
+        { key: "subsidiary_name", label: "Subsidiary", sortable: true },
       ],
       name: null,
-      pensionProviderID: null,
+      subsidiaryID: null,
     };
   },
 };
@@ -129,12 +124,9 @@ export default {
   <Layout>
     <PageHeader :title="title" :items="items" />
     <div class="d-flex justify-content-end mb-3">
-      <b-button
-        class="btn btn-success"
-        @click="$refs['add-pension-provider'].show()"
-      >
+      <b-button class="btn btn-success" @click="$refs['add-subsidiary'].show()">
         <i class="mdi mdi-plus mr-2"></i>
-        Add Pension Provider
+        Add Subsidiary
       </b-button>
     </div>
     <div v-if="this.apiBusy">
@@ -184,7 +176,7 @@ export default {
                 bordered
                 selectable
                 hover
-                :items="pensionProviders"
+                :items="subsidiaries"
                 :fields="fields"
                 responsive="sm"
                 :per-page="perPage"
@@ -221,8 +213,8 @@ export default {
       </div>
     </div>
     <b-modal
-      ref="add-pension-provider"
-      title="Add Pension Provider"
+      ref="add-subsidiary"
+      title="Add Subsidiary"
       hide-footer
       centered
       title-class="font-18"
@@ -231,7 +223,7 @@ export default {
       <form @submit.prevent="submitNew">
         <div class="form-group">
           <label for="name">
-            Provider Name <span class="text-danger">*</span>
+            Subsidiary Name <span class="text-danger">*</span>
           </label>
           <input
             id="name"
@@ -261,8 +253,8 @@ export default {
       </form>
     </b-modal>
     <b-modal
-      ref="update-pension-provider"
-      title="Update Pension Provider"
+      ref="update-subsidiary"
+      title="Update Subsidiary"
       hide-footer
       centered
       title-class="font-18"
@@ -271,7 +263,7 @@ export default {
       <form @submit.prevent="submitUpdate">
         <div class="form-group">
           <label for="name">
-            Provider Name <span class="text-danger">*</span>
+            Subsidiary Name <span class="text-danger">*</span>
           </label>
           <input
             id="name"

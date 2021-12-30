@@ -6,7 +6,7 @@ import { required } from "vuelidate/lib/validators";
 
 export default {
   page: {
-    title: "Pension Providers",
+    title: "Qualifications",
     meta: [{ name: "description", content: appConfig.description }],
   },
   components: {
@@ -21,33 +21,32 @@ export default {
   },
   methods: {
     refreshTable() {
-      this.apiGet(
-        this.ROUTES.pensionProvider,
-        "Get Pension Providers Error"
-      ).then((res) => {
-        const { data } = res;
-        this.pensionProviders = data;
-        this.totalRows = this.pensionProviders.length;
-      });
+      this.apiGet(this.ROUTES.qualification, "Get Qualification Error").then(
+        (res) => {
+          const { data } = res;
+          this.qualifications = data;
+          this.totalRows = this.qualifications.length;
+        }
+      );
     },
     submitNew() {
       this.submitted = true;
       this.$v.$touch();
       if (this.$v.$invalid) {
-        this.apiFormHandler("Invalid Pension Provider");
+        this.apiFormHandler("Invalid Qualification");
       } else {
         const data = {
-          provider_name: this.name,
+          qualification_name: this.name,
         };
         this.apiPost(
-          this.ROUTES.pensionProvider,
+          this.ROUTES.qualification,
           data,
-          "New Pension Provider Error"
+          "New Qualification Error"
         ).then((res) => {
-          this.apiResponseHandler(`${res.data}`, "New Pension Provider Added");
+          this.apiResponseHandler(`${res.data}`, "New Qualification Added");
           this.refreshTable();
           this.$v.$reset();
-          this.$refs["add-pension-provider"].hide();
+          this.$refs["add-qualification"].hide();
         });
       }
     },
@@ -55,32 +54,30 @@ export default {
       this.submitted = true;
       this.$v.$touch();
       if (this.$v.$invalid) {
-        this.apiFormHandler("Invalid Pension Provider");
+        this.apiFormHandler("Invalid Qualification");
       } else {
         const data = {
-          provider_name: this.name,
+          qualification_name: this.name,
         };
-        const url = `${this.ROUTES.pensionProvider}/${this.pensionProviderID}`;
-        this.apiPatch(url, data, "Update Pension Provider Error").then(
-          (res) => {
-            this.apiResponseHandler(`${res.data}`, "Update Successful");
-            this.refreshTable();
-            this.$v.$reset();
-            this.$refs["update-pension-provider"].hide();
-          }
-        );
+        const url = `${this.ROUTES.qualification}/${this.qualificationID}`;
+        this.apiPatch(url, data, "Update Qualification Error").then((res) => {
+          this.apiResponseHandler(`${res.data}`, "Update Successful");
+          this.refreshTable();
+          this.$v.$reset();
+          this.$refs["update-qualification"].hide();
+        });
       }
     },
     resetForm() {
       this.name = null;
       this.$v.$reset();
     },
-    selectRow(pensionProvider) {
-      pensionProvider = pensionProvider[0];
-      this.pensionProviderID = pensionProvider.pension_provider_id;
-      this.name = pensionProvider.provider_name;
-      this.$refs["update-pension-provider"].show();
-      this.$refs["pension-provider-table"].clearSelected();
+    selectRow(qualification) {
+      qualification = qualification[0];
+      this.qualificationID = qualification.qualification_id;
+      this.name = qualification.qualification_name;
+      this.$refs["update-qualification"].show();
+      this.$refs["qualification-table"].clearSelected();
     },
     onFiltered(filteredItems) {
       // Trigger pagination to update the number of buttons/pages due to filtering
@@ -90,7 +87,7 @@ export default {
   },
   data() {
     return {
-      title: "Pension Providers",
+      title: "Qualifications",
       items: [
         {
           text: "IHUMANE",
@@ -100,26 +97,26 @@ export default {
           href: "/",
         },
         {
-          text: "Pension Providers",
+          text: "Qualifications",
           active: true,
         },
       ],
       submitted: false,
-      pensionProviders: [],
+      qualifications: [],
       totalRows: 1,
       currentPage: 1,
       perPage: 10,
       pageOptions: [10, 25, 50, 100],
       filter: null,
       filterOn: [],
-      sortBy: "pension_provider_id",
+      sortBy: "qualification_id",
       sortDesc: false,
       fields: [
-        { key: "pension_provider_id", label: "ID", sortable: true },
-        { key: "provider_name", label: "Pension Provider", sortable: true },
+        { key: "qualification_id", label: "ID", sortable: true },
+        { key: "qualification_name", label: "Qualification", sortable: true },
       ],
       name: null,
-      pensionProviderID: null,
+      qualificationID: null,
     };
   },
 };
@@ -131,10 +128,10 @@ export default {
     <div class="d-flex justify-content-end mb-3">
       <b-button
         class="btn btn-success"
-        @click="$refs['add-pension-provider'].show()"
+        @click="$refs['add-qualification'].show()"
       >
         <i class="mdi mdi-plus mr-2"></i>
-        Add Pension Provider
+        Add Qualification
       </b-button>
     </div>
     <div v-if="this.apiBusy">
@@ -184,7 +181,7 @@ export default {
                 bordered
                 selectable
                 hover
-                :items="pensionProviders"
+                :items="qualifications"
                 :fields="fields"
                 responsive="sm"
                 :per-page="perPage"
@@ -221,8 +218,8 @@ export default {
       </div>
     </div>
     <b-modal
-      ref="add-pension-provider"
-      title="Add Pension Provider"
+      ref="add-qualification"
+      title="Add Qualification"
       hide-footer
       centered
       title-class="font-18"
@@ -231,7 +228,7 @@ export default {
       <form @submit.prevent="submitNew">
         <div class="form-group">
           <label for="name">
-            Provider Name <span class="text-danger">*</span>
+            Qualification Name <span class="text-danger">*</span>
           </label>
           <input
             id="name"
@@ -261,8 +258,8 @@ export default {
       </form>
     </b-modal>
     <b-modal
-      ref="update-pension-provider"
-      title="Update Pension Provider"
+      ref="update-qualification"
+      title="Update Qualification"
       hide-footer
       centered
       title-class="font-18"
@@ -271,7 +268,7 @@ export default {
       <form @submit.prevent="submitUpdate">
         <div class="form-group">
           <label for="name">
-            Provider Name <span class="text-danger">*</span>
+            Qualification Name <span class="text-danger">*</span>
           </label>
           <input
             id="name"
