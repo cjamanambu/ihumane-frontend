@@ -99,8 +99,8 @@ export const menuItems = [
       },
       {
         id: 14,
-        label: "HMO",
-        link: "/hmo",
+        label: "HMOs",
+        link: "/hmos",
       },
       {
         id: 15,
