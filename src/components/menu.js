@@ -30,8 +30,7 @@ export const menuItems = [
         label: "New Employee",
         link: "/new-employee",
       },
-
-       ],
+    ],
   },
 
   {
@@ -95,8 +94,8 @@ export const menuItems = [
       },
       {
         id: 13,
-        label: "Pension",
-        link: "/pension",
+        label: "Pension Providers",
+        link: "/pension-providers",
       },
       {
         id: 14,

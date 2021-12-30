@@ -6,7 +6,7 @@ import { required } from "vuelidate/lib/validators";
 
 export default {
   page: {
-    title: "Locations",
+    title: "Pension Providers",
     meta: [{ name: "description", content: appConfig.description }],
   },
   components: {
@@ -15,88 +15,72 @@ export default {
   },
   mounted() {
     this.refreshTable();
-    this.fetchStates();
   },
   validations: {
     name: { required },
-    state: { required },
-    t6_code: { required },
   },
   methods: {
     refreshTable() {
-      this.apiGet(this.ROUTES.location, "Get Locations Error").then((res) => {
+      this.apiGet(
+        this.ROUTES.pensionProvider,
+        "Get Pension Providers Error"
+      ).then((res) => {
         const { data } = res;
-        this.locations = data;
-        this.totalRows = this.locations.length;
-      });
-    },
-    fetchStates() {
-      this.apiGet(this.ROUTES.state, "Get States Error").then((res) => {
-        this.states = [{ value: null, text: "Please select a state" }];
-        const { data } = res;
-        data.forEach((state) => {
-          this.states.push({
-            value: state.s_id,
-            text: state.s_name,
-          });
-        });
+        this.pensionProviders = data;
+        this.totalRows = this.pensionProviders.length;
       });
     },
     submitNew() {
       this.submitted = true;
       this.$v.$touch();
       if (this.$v.$invalid) {
-        this.apiFormHandler("Invalid Location");
+        this.apiFormHandler("Invalid Pension Provider");
       } else {
         const data = {
-          location_name: this.name,
-          location_state: this.state,
-          location_t6_code: this.t6_code,
+          provider_name: this.name,
         };
-        this.apiPost(this.ROUTES.location, data, "New Location Error").then(
-          (res) => {
-            this.apiResponseHandler(`${res.data}`, "New Location Added");
-            this.refreshTable();
-            this.$v.$reset();
-            this.$refs["add-location"].hide();
-          }
-        );
+        this.apiPost(
+          this.ROUTES.pensionProvider,
+          data,
+          "New Pension Provider Error"
+        ).then((res) => {
+          this.apiResponseHandler(`${res.data}`, "New Pension Provider Added");
+          this.refreshTable();
+          this.$v.$reset();
+          this.$refs["add-pension-provider"].hide();
+        });
       }
     },
     submitUpdate() {
       this.submitted = true;
       this.$v.$touch();
       if (this.$v.$invalid) {
-        this.apiFormHandler("Invalid Location");
+        this.apiFormHandler("Invalid Pension Provider");
       } else {
         const data = {
-          location_name: this.name,
-          location_state: this.state,
-          location_t6_code: this.t6_code,
+          provider_name: this.name,
         };
-        const url = `${this.ROUTES.location}/${this.locationID}`;
-        this.apiPatch(url, data, "Update Location Error").then((res) => {
-          this.apiResponseHandler(`${res.data}`, "Update Successful");
-          this.refreshTable();
-          this.$v.$reset();
-          this.$refs["update-location"].hide();
-        });
+        const url = `${this.ROUTES.pensionProvider}/${this.pensionProviderID}`;
+        this.apiPatch(url, data, "Update Pension Provider Error").then(
+          (res) => {
+            this.apiResponseHandler(`${res.data}`, "Update Successful");
+            this.refreshTable();
+            this.$v.$reset();
+            this.$refs["update-pension-provider"].hide();
+          }
+        );
       }
     },
     resetForm() {
       this.name = null;
-      this.state = null;
-      this.t6_code = null;
       this.$v.$reset();
     },
-    selectLocation(location) {
-      location = location[0];
-      this.locationID = location.location_id;
-      this.name = location.location_name;
-      this.state = location.l_state_id;
-      this.t6_code = location.l_t6_code;
-      this.$refs["update-location"].show();
-      this.$refs["location-table"].clearSelected();
+    selectRow(pensionProvider) {
+      pensionProvider = pensionProvider[0];
+      this.pensionProviderID = pensionProvider.pension_provider_id;
+      this.name = pensionProvider.provider_name;
+      this.$refs["update-pension-provider"].show();
+      this.$refs["pension-provider-table"].clearSelected();
     },
     onFiltered(filteredItems) {
       // Trigger pagination to update the number of buttons/pages due to filtering
@@ -106,7 +90,7 @@ export default {
   },
   data() {
     return {
-      title: "Locations",
+      title: "Pension Providers",
       items: [
         {
           text: "IHUMANE",
@@ -116,47 +100,41 @@ export default {
           href: "/",
         },
         {
-          text: "Locations",
+          text: "Pension Providers",
           active: true,
         },
       ],
       submitted: false,
-      locations: [],
+      pensionProviders: [],
       totalRows: 1,
       currentPage: 1,
       perPage: 10,
       pageOptions: [10, 25, 50, 100],
       filter: null,
       filterOn: [],
-      sortBy: "location_id",
+      sortBy: "pension_provider_id",
       sortDesc: false,
       fields: [
-        { key: "location_id", label: "ID", sortable: true },
-        { key: "location_name", label: "Location", sortable: true },
-        { key: "State.s_name", label: "State", sortable: true },
-        { key: "l_t6_code", label: "T6 Code", sortable: true },
+        { key: "pension_provider_id", label: "ID", sortable: true },
+        { key: "provider_name", label: "Pension Provider", sortable: true },
       ],
       name: null,
-      t6_code: null,
-      state: null,
-      states: [{ value: null, text: "Please select a state" }],
-      locationID: null,
+      pensionProviderID: null,
     };
   },
 };
 </script>
-<style>
-.manage:hover {
-  cursor: pointer;
-}
-</style>
+
 <template>
   <Layout>
     <PageHeader :title="title" :items="items" />
     <div class="d-flex justify-content-end mb-3">
-      <b-button class="btn btn-success" @click="$refs['add-location'].show()">
+      <b-button
+        class="btn btn-success"
+        @click="$refs['add-pension-provider'].show()"
+      >
         <i class="mdi mdi-plus mr-2"></i>
-        Add Location
+        Add Pension Provider
       </b-button>
     </div>
     <div v-if="this.apiBusy">
@@ -206,7 +184,7 @@ export default {
                 bordered
                 selectable
                 hover
-                :items="locations"
+                :items="pensionProviders"
                 :fields="fields"
                 responsive="sm"
                 :per-page="perPage"
@@ -218,7 +196,7 @@ export default {
                 @filtered="onFiltered"
                 show-empty
                 select-mode="single"
-                @row-selected="selectLocation"
+                @row-selected="selectRow"
               >
               </b-table>
             </div>
@@ -243,8 +221,8 @@ export default {
       </div>
     </div>
     <b-modal
-      ref="add-location"
-      title="Add Location"
+      ref="add-pension-provider"
+      title="Add Pension Provider"
       hide-footer
       centered
       title-class="font-18"
@@ -253,7 +231,7 @@ export default {
       <form @submit.prevent="submitNew">
         <div class="form-group">
           <label for="name">
-            Location Name <span class="text-danger">*</span>
+            Provider Name <span class="text-danger">*</span>
           </label>
           <input
             id="name"
@@ -262,37 +240,6 @@ export default {
             class="form-control"
             :class="{
               'is-invalid': submitted && $v.name.$error,
-            }"
-          />
-        </div>
-        <div class="form-group">
-          <label for="state"> State <span class="text-danger">*</span> </label>
-          <b-form-select
-            id="state"
-            v-model="state"
-            :options="states"
-            :class="{
-              'is-invalid': submitted && $v.state.$error,
-            }"
-          />
-          <small
-            class="form-text text-muted manage"
-            @click="$router.push('/states')"
-          >
-            Manage States
-          </small>
-        </div>
-        <div class="form-group">
-          <label for="t6-code">
-            T6 Code <span class="text-danger">*</span>
-          </label>
-          <input
-            id="t6-code"
-            type="text"
-            v-model="t6_code"
-            class="form-control"
-            :class="{
-              'is-invalid': submitted && $v.t6_code.$error,
             }"
           />
         </div>
@@ -314,8 +261,8 @@ export default {
       </form>
     </b-modal>
     <b-modal
-      ref="update-location"
-      title="Update Location"
+      ref="update-pension-provider"
+      title="Update Pension Provider"
       hide-footer
       centered
       title-class="font-18"
@@ -324,7 +271,7 @@ export default {
       <form @submit.prevent="submitUpdate">
         <div class="form-group">
           <label for="name">
-            Location Name <span class="text-danger">*</span>
+            Provider Name <span class="text-danger">*</span>
           </label>
           <input
             id="name"
@@ -333,37 +280,6 @@ export default {
             class="form-control"
             :class="{
               'is-invalid': submitted && $v.name.$error,
-            }"
-          />
-        </div>
-        <div class="form-group">
-          <label for="state"> State <span class="text-danger">*</span> </label>
-          <b-form-select
-            id="state"
-            v-model="state"
-            :options="states"
-            :class="{
-              'is-invalid': submitted && $v.state.$error,
-            }"
-          />
-          <small
-            class="form-text text-muted manage"
-            @click="$router.push('/states')"
-          >
-            Manage States
-          </small>
-        </div>
-        <div class="form-group">
-          <label for="t6-code">
-            T6 Code <span class="text-danger">*</span>
-          </label>
-          <input
-            id="t6-code"
-            type="text"
-            v-model="t6_code"
-            class="form-control"
-            :class="{
-              'is-invalid': submitted && $v.t6_code.$error,
             }"
           />
         </div>
