@@ -153,8 +153,8 @@ export default {
       userType: 1,
       userTypes: [
         { text: "ADMIN", value: 1 },
-        { text: "MODERATOR", value: 2 },
-        { text: "EMPLOYEE", value: 3 },
+        { text: "MODERATOR", value: 3 },
+        { text: "EMPLOYEE", value: 2 },
       ],
       userStatus: 1,
       userStatuses: [
@@ -243,7 +243,7 @@ export default {
               >
                 <template #cell(user_type)="row">
                   <p v-if="row.value === 1">ADMIN</p>
-                  <p v-else-if="row.value === 2">MODERATOR</p>
+                  <p v-else-if="row.value === 3">MODERATOR</p>
                   <p v-else>EMPLOYEE</p>
                 </template>
                 <template #cell(user_status)="row">

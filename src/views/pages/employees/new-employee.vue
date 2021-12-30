@@ -22,7 +22,7 @@ export default {
     employee_number: { required },
     first_name: { required },
     last_name: { required },
-    other_name: { required },
+
       personal_email: { required },
     official_email: { required },
     telephone: { required },
@@ -41,6 +41,7 @@ export default {
           this.position = null;
           this.account_number = null;
           this.bank = null;
+      this.telephone = null;
     },
    fetchLocations() {
       this.apiGet(this.ROUTES.location, "Get Location Error").then(
@@ -77,8 +78,8 @@ export default {
     fetchBanks() {
       this.apiGet(this.ROUTES.bank, "Get Bank Error").then(
           (res) => {
-            this.positions = [
-              { value: null, text: "Please select a position" },
+            this.banks = [
+              { value: null, text: "Please select a bank" },
             ];
             const { data } = res;
             data.forEach((bank) => {
@@ -121,7 +122,6 @@ export default {
       }
     },
     onComplete: function() {
-     //alert('i got here');
       this.submitNew();
     },
 
@@ -148,7 +148,7 @@ export default {
       position: null,
       bank: null,
       locations: [{ value: null, text: "Please select a location" }],
-      positions: [{ value: null, text: "Please select a position" }],
+      positions: [ ],
       banks: [{ value: null, text: "Please Select a Bank"}],
       employee_number: null,
       first_name: null,
@@ -314,7 +314,7 @@ export default {
                             v-model="bank"
                             :options="banks"
                             :class="{
-              'is-invalid': submitted && $v.location.$error,
+              'is-invalid': submitted && $v.bank.$error,
             }"
                         />
                       </div>
