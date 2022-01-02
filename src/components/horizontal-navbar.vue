@@ -5,7 +5,7 @@ import { menuItems } from "./horizontal-menu";
 export default {
   data() {
     return {
-      menuItems: menuItems
+      menuItems: menuItems,
     };
   },
   mounted() {
@@ -83,8 +83,8 @@ export default {
       document.body.setAttribute("data-layout-size", "boxed");
       document.body.removeAttribute("data-topbar", "light");
       document.body.setAttribute("data-topbar", "dark");
-    }
-  }
+    },
+  },
 };
 </script>
 
@@ -94,7 +94,11 @@ export default {
       <nav class="navbar navbar-light navbar-expand-lg topnav-menu">
         <div class="collapse navbar-collapse" id="topnav-menu-content">
           <ul class="navbar-nav">
-            <li class="nav-item dropdown" v-for="(item, index) of menuItems" :key="index">
+            <li
+              class="nav-item dropdown"
+              v-for="(item, index) of menuItems"
+              :key="index"
+            >
               <router-link
                 tag="a"
                 v-if="!item.subItems"
@@ -102,7 +106,7 @@ export default {
                 class="nav-link dropdown-toggle arrow-none"
               >
                 <i :class="`${item.icon} mr-2`"></i>
-                {{$t(item.label)}}
+                {{ $t(item.label) }}
               </router-link>
 
               <a
@@ -114,7 +118,7 @@ export default {
                 role="button"
               >
                 <i :class="`${item.icon} mr-2`"></i>
-                {{$t(item.label)}}
+                {{ $t(item.label) }}
                 <div class="arrow-down"></div>
               </a>
               <div
@@ -122,15 +126,24 @@ export default {
                 aria-labelledby="topnav-dashboard"
                 v-if="hasItems(item)"
               >
-                <template v-for="(subitem) of item.subItems">
+                <template v-for="subitem of item.subItems">
                   <router-link
                     :key="subitem.id"
                     class="col dropdown-item side-nav-link-ref"
                     v-if="!hasItems(subitem)"
                     :to="subitem.link"
-                  >{{$t(subitem.label)}}</router-link>
-                  <div class="dropdown" v-if="hasItems(subitem)" :key="subitem.id">
-                    <a class="dropdown-item" href="javascript: void(0);" @click="onMenuClick">
+                    >{{ $t(subitem.label) }}</router-link
+                  >
+                  <div
+                    class="dropdown"
+                    v-if="hasItems(subitem)"
+                    :key="subitem.id"
+                  >
+                    <a
+                      class="dropdown-item"
+                      href="javascript: void(0);"
+                      @click="onMenuClick"
+                    >
                       {{ $t(subitem.label) }}
                       <div class="arrow-down"></div>
                     </a>
@@ -140,29 +153,11 @@ export default {
                         :key="index"
                         :to="subSubitem.link"
                         class="dropdown-item side-nav-link-ref"
-                      >{{ $t(subSubitem.label) }}</router-link>
+                        >{{ $t(subSubitem.label) }}</router-link
+                      >
                     </div>
                   </div>
                 </template>
-              </div>
-            </li>
-            <li class="nav-item dropdown">
-              <a
-                class="nav-link dropdown-toggle arrow-none"
-                id="topnav-layout"
-                role="button"
-                data-toggle="dropdown"
-                aria-haspopup="true"
-                aria-expanded="false"
-                @click="onMenuClick"
-              >
-                <i class="ri-layout-3-line mr-2"></i>{{ $t('menuitems.layouts.text') }}
-                <div class="arrow-down"></div>
-              </a>
-              <div class="dropdown-menu dropdown-menu-right" aria-labelledby="topnav-layout">
-                <a @click="change_layout('vertical')" class="dropdown-item">{{ $t('menuitems.layouts.list.vertical') }}</a>
-                <a @click="topbarLight()" class="dropdown-item">{{ $t('menuitems.layouts.list.lighttopbar') }}</a>
-                <a @click="boxedWidth()" class="dropdown-item">{{ $t('menuitems.layouts.list.boxed') }}</a>
               </div>
             </li>
           </ul>
