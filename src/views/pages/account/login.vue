@@ -30,8 +30,44 @@ export default {
         this.apiFormHandler("Invalid Login");
       } else {
         const { username, password } = this;
-        this.login(username, password);
+        this.login(username, password).then((userType) => {
+          switch (userType) {
+            case 2:
+              this.employeeLogin(username);
+              break;
+            case 3:
+              this.$refs["account-selector"].show();
+              break;
+            default:
+              this.adminLogin(username);
+              break;
+          }
+        });
       }
+    },
+    adminLogin(username) {
+      this.changeLayoutType({ layoutType: "vertical" });
+      this.changeTopbar({ topbar: "dark" });
+      this.$router
+        .push(this.$route.query.redirectFrom || { name: "home" })
+        .then(() =>
+          this.apiResponseHandler(
+            "You have logged in successfully",
+            `Welcome Back, ${username}`
+          )
+        );
+    },
+    employeeLogin(username) {
+      this.changeLayoutType({ layoutType: "horizontal" });
+      this.changeTopbar({ topbar: "light" });
+      this.$router
+        .push(this.$route.query.redirectFrom || { name: "home" })
+        .then(() =>
+          this.apiResponseHandler(
+            "You have logged in successfully",
+            `Welcome Back, ${username}`
+          )
+        );
     },
   },
 };
@@ -39,6 +75,52 @@ export default {
 
 <template>
   <div>
+    <b-modal
+      ref="account-selector"
+      title="Large modal"
+      title-class="font-18"
+      hide-header
+      hide-footer
+      no-close-on-backdrop
+      no-close-on-esc
+      centered
+    >
+      <div class="card-body text-center">
+        <span class="logo-sm">
+          <img
+            :src="require('@/assets/images/ihumane-green-short.svg')"
+            alt
+            height="50"
+          />
+        </span>
+        <h4 class="card-title mt-4">Welcome, {{ getUser.user_username }}.</h4>
+        <p class="card-title-desc mt-3">
+          Please select the account you want to login as.
+        </p>
+        <b-row>
+          <b-col lg="6">
+            <a
+              href="javascript: void(0);"
+              class="dropdown-icon-item"
+              @click="adminLogin(`${getUser.user_username}`)"
+            >
+              <i class="dripicons-user" style="font-size: 2em"></i>
+              <span>Admin Account</span>
+            </a>
+          </b-col>
+          <b-col lg="6" class="mt-lg-0 mt-3">
+            <a
+              href="javascript: void(0);"
+              class="dropdown-icon-item"
+              @click="employeeLogin(`${getUser.user_username}`)"
+            >
+              <i class="dripicons-user-group" style="font-size: 2em"></i>
+              <span>Employee Self-Service</span>
+            </a>
+          </b-col>
+        </b-row>
+      </div>
+    </b-modal>
     <div>
       <div class="container-fluid p-0">
         <div class="row no-gutters">
