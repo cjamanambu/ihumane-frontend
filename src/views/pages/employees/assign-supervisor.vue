@@ -98,7 +98,7 @@ export default {
   data() {
     return {
       submitting: false,
-      title: "Supervisors",
+      title: "Assign Supervisor",
       items: [
         {
           text: "IHUMANE",
@@ -108,7 +108,7 @@ export default {
           href: "/",
         },
         {
-          text: "Supervisors",
+          text: "Assign Supervisor",
           active: true,
         },
       ],
@@ -243,7 +243,7 @@ export default {
 
     <b-modal
         ref="update-supervisor"
-        title="Remove Supervisor"
+        title="Assign Supervisor"
         hide-footer
         centered
         title-class="font-18"
