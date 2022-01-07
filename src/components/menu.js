@@ -30,6 +30,24 @@ export const menuItems = [
         label: "New Employee",
         link: "/new-employee",
       },
+
+      {
+        id: 30,
+        label: "Manage Employees",
+        link: "/new-employee",
+      },
+
+      {
+        id: 31,
+        label: "Supervisors",
+        link: "/supervisors",
+      },
+
+      {
+        id: 32,
+        label: "Supervisor Assignment",
+        link: "/assign-supervisor",
+      },
     ],
   },
 
