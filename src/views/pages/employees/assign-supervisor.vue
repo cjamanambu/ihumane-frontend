@@ -15,19 +15,19 @@ export default {
   },
   mounted() {
     this.refreshTable();
-     this.getNoneSupervisors();
+
   },
   validations: {
-    nonSupervisor: { required },
+    supervisor: { required },
   },
   methods: {
     refreshTable() {
-      const url = `${this.ROUTES.employee}/get-supervisor`;
-      this.apiGet(url, "Get Supervisors Error").then(
+      const url = `${this.ROUTES.employee}`;
+      this.apiGet(url, "Get Employees Error").then(
           (res) => {
             const { data } = res;
-            this.supervisors = data;
-            this.totalRows = this.supervisors.length;
+            this.employees = data;
+            this.totalRows = this.employees.length;
           }
       );
     },
@@ -43,33 +43,31 @@ export default {
       this.nonSupervisor = null;
       this.$v.$reset();
     },
-    selectSupervisor(supervisor) {
-      supervisor = supervisor[0];
-      this.nonSupervisor = supervisor.emp_id;
-      this.emp_name = `${supervisor.emp_first_name} ${supervisor.emp_last_name}`;
+    selectEmployee(employee) {
+      employee = employee[0];
+      this.supervisor = employee.emp_supervisor_id;
+      this.emp_id = employee.emp_id;
+      this.emp_name = `${employee.emp_first_name} ${employee.emp_last_name}`;
 
-
-      this.$refs["show-supervisor"].show();
-      this.$refs["supervisor-table"].clearSelected();
-    },
-    getNoneSupervisors(){
-      const url = `${this.ROUTES.employee}/get-none-supervisor`;
-    this.nonSupervisors =   [
+      const url = `${this.ROUTES.employee}/get-supervisor`;
+      this.supervisors =   [
         { value: null, text: "Please select an employee" },
       ];
       this.apiGet(url, "Get Supervisors Error").then(
           (res) => {
-
             const { data } = res;
-            data.forEach((employee) => {
-              this.nonSupervisors.push({
-                value: employee.emp_id,
-                text:`${employee.emp_first_name} ${employee.emp_last_name}`,
+            data.forEach((supervisor) => {
+              this.supervisors.push({
+                value: supervisor.emp_id,
+                text:`${supervisor.emp_first_name} ${supervisor.emp_last_name}`,
               });
             });
           }
       );
+      this.$refs["update-supervisor"].show();
+      this.$refs["supervisor-table"].clearSelected();
     },
+
     submitNew() {
       this.submitted = true;
       this.$v.$touch();
@@ -78,48 +76,23 @@ export default {
       } else {
         const data = {
 
-          emp_id: this.nonSupervisor,
-          emp_supervisor_status: 1,
+          sa_emp_id: this.emp_id,
+          sa_supervisor_id: this.supervisor,
 
 
         };
-        const url = `${this.ROUTES.employee}/set-supervisor`;
-        this.apiPost(url, data, "Set Supervisor Error").then(
+        const url = `${this.ROUTES.supervisorAssignment}/add-assignment`;
+        this.apiPost(url, data, "Assign Supervisor Error").then(
             (res) => {
-              this.apiResponseHandler(`${res.data}`, "New Supervisor Added");
+              this.apiResponseHandler(`${res.data}`, "Supervisor Assignment");
               this.refreshTable();
-              this.getNoneSupervisors();
               this.$v.$reset();
-              this.$refs["add-supervisor"].hide();
+              this.$refs["update-supervisor"].hide();
             }
         );
       }
     },
-    submitOld() {
-      this.submitted = true;
-      this.$v.$touch();
-      if (this.$v.$invalid) {
-        this.apiFormHandler("Invalid Supervisor Application");
-      } else {
-        const data = {
 
-          emp_id: this.nonSupervisor,
-          emp_supervisor_status: 0,
-
-
-        };
-        const url = `${this.ROUTES.employee}/set-supervisor`;
-        this.apiPost(url, data, "Set Supervisor Error").then(
-            (res) => {
-              this.apiResponseHandler(`${res.data}`, "Supervisor Updated");
-              this.refreshTable();
-              this.getNoneSupervisors();
-              this.$v.$reset();
-              this.$refs["show-supervisor"].hide();
-            }
-        );
-      }
-    },
 
   },
   data() {
@@ -151,17 +124,17 @@ export default {
         { key: "emp_id", label:"SN", sortable: true },
         { key: "emp_unique_id", label: "Employee ID", sortable: true },
         { key: "emp_first_name", label: "Employee Name", sortable: true },
+        { key: "supervisor", label: "Supervisor", sortable: true },
       ],
 
 
-      nonSupervisors: [],
-      nonSupervisor: null,
+      employees: [],
       supervisors: [],
+      supervisor: null,
       employee: null,
       emp_name: null,
       emp_id: null,
-      supervisorStatus: null,
-       submitted: false,
+     submitted: false,
     };
   },
 };
@@ -170,12 +143,7 @@ export default {
 <template>
   <Layout>
     <PageHeader :title="title" :items="items" />
-    <div class="d-flex justify-content-end mb-3">
-      <b-button class="btn btn-success" @click="$refs['add-supervisor'].show()">
-        <i class="mdi mdi-plus mr-2"></i>
-        Add Supervisor
-      </b-button>
-    </div>
+
     <b-spinner type="grow" v-if="apiBusy" class="m-2" variant="success" />
     <div v-else class="row">
       <div class="col-12">
@@ -217,11 +185,11 @@ export default {
             <!-- Table -->
             <div class="table-responsive mb-0">
               <b-table
-                  ref="supervisor-table"
+                  ref="employee-table"
                   bordered
                   selectable
                   hover
-                  :items="supervisors"
+                  :items="employees"
                   :fields="fields"
                   responsive="sm"
                   :per-page="perPage"
@@ -233,12 +201,22 @@ export default {
                   @filtered="onFiltered"
                   show-empty
                   select-mode="single"
-                  @row-selected="selectSupervisor"
+                  @row-selected="selectEmployee"
               >
 
                 <template #cell(emp_first_name)="data">
                   <b> {{ data.item.emp_first_name }} </b>,  {{ data.item.emp_last_name.toUpperCase() }}
                 </template>
+
+                <template #cell(supervisor)="data">
+              <div v-if="data.item.supervisor !== null">
+                <b > {{ data.item.supervisor.emp_first_name }} </b>,  {{ data.item.supervisor.emp_last_name.toUpperCase() }}
+
+              </div>
+                  <div v-if="data.item.supervisor == null">
+                    N/A
+                  </div>
+                      </template>
 
               </b-table>
             </div>
@@ -262,61 +240,16 @@ export default {
         </div>
       </div>
     </div>
+
     <b-modal
-        ref="add-supervisor"
-        title="New Supervisor"
-        hide-footer
-        centered
-        title-class="font-18"
-        @hidden="resetForm"
-    >
-      <form @submit.prevent="submitNew">
-        <div class="form-group">
-          <label for="">
-            Employee <span class="text-danger">*</span>
-          </label>
-          <b-form-select
-              id="employee"
-              v-model="nonSupervisor"
-              :options="nonSupervisors"
-              :class="{
-              'is-invalid': submitted && $v.nonSupervisor.$error,
-            }"
-          />
-        </div>
-
-
-
-
-
-
-
-        <b-button
-            v-if="!submitting"
-            class="btn btn-success btn-block mt-4"
-            type="submit"
-        >
-          Submit
-        </b-button>
-        <b-button
-            v-else
-            disabled
-            class="btn btn-success btn-block mt-4"
-            type="submit"
-        >
-          Submitting...
-        </b-button>
-      </form>
-    </b-modal>
-    <b-modal
-        ref="show-supervisor"
+        ref="update-supervisor"
         title="Remove Supervisor"
         hide-footer
         centered
         title-class="font-18"
         @hidden="resetForm"
     >
-      <form @submit.prevent="submitOld">
+      <form @submit.prevent="submitNew">
         <div class="form-group">
           <label for="emp-names">
             Employee Name <span class="text-danger">*</span>
@@ -332,13 +265,16 @@ export default {
 
 
         <div class="form-group">
-
-          <input
-              id="start-dates"
-              type="hidden"
-              v-model="emp_id"
-              class="form-control"
-
+          <label for="">
+           Supervisors <span class="text-danger">*</span>
+          </label>
+          <b-form-select
+              id="employee"
+              v-model="supervisor"
+              :options="supervisors"
+              :class="{
+              'is-invalid': submitted && $v.supervisor.$error,
+            }"
           />
         </div>
 

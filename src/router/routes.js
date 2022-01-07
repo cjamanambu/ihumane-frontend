@@ -208,4 +208,13 @@ export default [
     },
     component: () => import("../views/pages/employees/supervisors"),
   },
+
+  {
+    path: "/assign-supervisor",
+    name: "assign-supervisor",
+    meta: {
+      authRequired: true,
+    },
+    component: () => import("../views/pages/employees/assign-supervisor"),
+  },
 ];

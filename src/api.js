@@ -28,4 +28,5 @@ export const ROUTES = {
   hmo: `hmos`,
   qualification: `qualifications`,
   subsidiary: `subsidiaries`,
+  supervisorAssignment: `supervisor-assignment`
 };
