@@ -199,4 +199,13 @@ export default [
     },
     component: () => import("../views/pages/leaves/leave"),
   },
+
+  {
+    path: "/supervisors",
+    name: "supervisors",
+    meta: {
+      authRequired: true,
+    },
+    component: () => import("../views/pages/employees/supervisors"),
+  },
 ];
