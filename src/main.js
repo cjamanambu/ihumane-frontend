@@ -15,6 +15,8 @@ import router from "./router";
 import store from "@/state/store";
 import i18n from "./i18n";
 import apiService from "@/services/api.service";
+import getMonth from "@/filters/get-month";
+import getDay from "@/filters/get-day";
 
 import "@/assets/scss/app.scss";
 
@@ -41,6 +43,8 @@ Vue.component("apexchart", VueApexCharts);
 Vue.component("v-select", vSelect);
 import "vue-select/dist/vue-select.css";
 Vue.mixin(apiService);
+Vue.filter("getMonth", getMonth);
+Vue.filter("getDay", getDay);
 
 new Vue({
   router,
