@@ -27,7 +27,7 @@ export const menuItems = [
       {
         id: 5,
         label: "TimeSheet",
-        link: "/new-employee",
+        link: "/timesheet",
       },
 
       {
