@@ -200,9 +200,9 @@ export default {
         timer: 1000,
       });
     },
-    fillTER(dateInfo) {
+    fillTSE(dateInfo) {
       this.$router.push({
-        name: "time-effort-reporting",
+        name: "timesheet-entry",
         params: { date: dateInfo.dateStr },
       });
     },
@@ -226,14 +226,14 @@ export default {
     </div>
     <b-modal
       v-model="showModal"
-      title="Time & Effort Reporting"
+      title="Timesheet Entry"
       centered
       title-class="text-black font-18"
       body-class="p-3"
       hide-footer
     >
       <p v-if="dateInfo" class="mb-4">
-        Manage your Time & Effort Report for
+        Manage your Time Sheet Entry for
         <strong>{{ dateInfo.date.toDateString() }}</strong> or select another
         date to continue.
       </p>
@@ -241,10 +241,10 @@ export default {
         <a
           href="javascript: void(0);"
           class="dropdown-icon-item"
-          @click="fillTER(dateInfo)"
+          @click="fillTSE(dateInfo)"
         >
           <i class="dripicons-clock" style="font-size: 2em"></i>
-          <span>Manage Time & Effort Report</span>
+          <span>Manage Timesheet Entry</span>
         </a>
       </div>
     </b-modal>
