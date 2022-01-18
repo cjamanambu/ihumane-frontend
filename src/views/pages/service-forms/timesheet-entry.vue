@@ -3,6 +3,7 @@ import Layout from "@/views/layouts/main";
 import PageHeader from "@/components/page-header";
 import appConfig from "@/app.config";
 import { authComputed } from "@/state/helpers";
+import { required } from "vuelidate/lib/validators";
 
 export default {
   page: {
@@ -18,6 +19,12 @@ export default {
   },
   mounted() {
     this.setTimesheetDate();
+    this.getTimesheetData();
+  },
+  validations: {
+    start: { required },
+    end: { required },
+    duration: { required },
   },
   data() {
     return {
@@ -36,6 +43,10 @@ export default {
         },
       ],
       timesheetDate: null,
+      start: "08:00",
+      end: "17:00",
+      duration: 9,
+      submitted: false,
     };
   },
   methods: {
@@ -43,7 +54,32 @@ export default {
       this.timesheetDate = new Date(this.$route.params.date);
     },
     getTimesheetData() {
-      this.apiGet();
+      const employeeID = this.getEmployee.emp_id;
+      const date = this.$route.params.date;
+      const url = `${this.ROUTES.timesheet}/get-time-sheet/${employeeID}/${date}`;
+      this.apiGet(url).then((res) => console.log(res));
+    },
+    submit() {
+      this.submitted = true;
+      this.$v.$touch();
+      if (this.$v.$invalid) {
+        this.apiFormHandler("Invalid Timesheet Entry");
+      } else {
+        const url = `${this.ROUTES.timesheet}/add-time-sheet`;
+        const data = {
+          ts_emp_id: this.getEmployee.emp_id,
+          ts_month: `${this.timesheetDate.getMonth() + 1}`,
+          ts_year: `${this.timesheetDate.getFullYear()}`,
+          ts_day: `${this.timesheetDate.getDate()}`,
+          ts_start: this.start,
+          ts_end: this.end,
+          ts_duration: this.duration,
+        };
+        this.apiPost(url, data, "Add Timesheet Error").then((res) => {
+          console.log({ res });
+          this.$v.$reset();
+        });
+      }
     },
   },
 };
@@ -61,60 +97,81 @@ export default {
         <div class="card">
           <div class="card-body">
             <div class="p-3 bg-light mb-4">
-              <h5 class="font-size-14 mb-0">File Report</h5>
+              <h5 class="font-size-14 mb-0">File Entry</h5>
             </div>
-            <form @submit.prevent>
+            <form @submit.prevent="submit">
               <div class="row">
-                <div class="col-lg-8">
+                <div class="col-lg-5">
                   <div class="form-group">
-                    <label for="match-code">
-                      Match Code (T0) <span class="text-danger">*</span>
+                    <label for="start">
+                      Start Time <span class="text-danger">*</span>
                     </label>
-                    <input id="match-code" type="text" class="form-control" />
+                    <input
+                      id="start"
+                      type="time"
+                      v-model="start"
+                      class="form-control"
+                      :class="{
+                        'is-invalid': submitted && $v.start.$error,
+                      }"
+                    />
+                    <div
+                      v-if="submitted && $v.start.$error"
+                      class="invalid-feedback"
+                    >
+                      <span v-if="!$v.start.required">
+                        Start time is required.
+                      </span>
+                    </div>
                   </div>
                 </div>
-                <div class="col-lg-4">
+                <div class="col-lg-5">
                   <div class="form-group">
-                    <label for="charge-1">
-                      % to Charge (T0) <span class="text-danger">*</span>
+                    <label for="end">
+                      End Time <span class="text-danger">*</span>
                     </label>
-                    <input id="charge-1" type="number" class="form-control" />
+                    <input
+                      id="end"
+                      type="time"
+                      class="form-control"
+                      v-model="end"
+                      :class="{
+                        'is-invalid': submitted && $v.end.$error,
+                      }"
+                    />
+                    <div
+                      v-if="submitted && $v.end.$error"
+                      class="invalid-feedback"
+                    >
+                      <span v-if="!$v.end.required">
+                        End time is required.
+                      </span>
+                    </div>
                   </div>
                 </div>
-              </div>
-              <div class="row">
-                <div class="col-lg-8">
+                <div class="col-lg-2">
                   <div class="form-group">
-                    <label for="grant-code">
-                      Grant Code (T1) <span class="text-danger">*</span>
+                    <label for="duration">
+                      Duration (hrs) <span class="text-danger">*</span>
                     </label>
-                    <input id="grant-code" type="text" class="form-control" />
-                  </div>
-                </div>
-                <div class="col-lg-4">
-                  <div class="form-group">
-                    <label for="charge-2">
-                      % to Charge (T1) <span class="text-danger">*</span>
-                    </label>
-                    <input id="charge-2" type="number" class="form-control" />
-                  </div>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col-lg-6">
-                  <div class="form-group">
-                    <label for="end-date">
-                      End Date <span class="text-danger">*</span>
-                    </label>
-                    <input id="end-date" type="date" class="form-control" />
-                  </div>
-                </div>
-                <div class="col-lg-6">
-                  <div class="form-group">
-                    <label for="program-code">
-                      Program Code (T3) <span class="text-danger">*</span>
-                    </label>
-                    <input id="program-code" type="text" class="form-control" />
+                    <input
+                      id="duration"
+                      type="number"
+                      class="form-control"
+                      step=".01"
+                      v-model="duration"
+                      :class="{
+                        'is-invalid': submitted && $v.duration.$error,
+                      }"
+                    />
+                    <div
+                      v-if="submitted && $v.duration.$error"
+                      class="invalid-feedback"
+                    >
+                      <span v-if="!$v.duration.required">
+                        Duration is required.
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -144,43 +201,13 @@ export default {
           <div class="card-body">
             <div class="p-3 bg-light mb-4">
               <h5 class="font-size-14 mb-0 d-flex justify-content-between">
-                International Rescue Committee - Overseas Staff
+                Timesheet Data
                 <span class="back text-danger" @click="$router.back()">
                   Go Back
                 </span>
               </h5>
             </div>
-            <div class="d-flex justify-content-between">
-              <p>Payroll Reporting Period</p>
-              <p>
-                <span class="mr-1">{{
-                  timesheetDate.getMonth() | getMonth
-                }}</span>
-                <span>{{ timesheetDate.getFullYear() }}</span>
-              </p>
-            </div>
-            <div class="d-flex justify-content-between">
-              <p>Name</p>
-              <p>
-                {{ getUser.user_name }}
-              </p>
-            </div>
-            <div class="d-flex justify-content-between">
-              <p>T7 Code</p>
-              <p>-</p>
-            </div>
-            <div class="d-flex justify-content-between">
-              <p>Location (T5)</p>
-              <p>-</p>
-            </div>
-            <div class="d-flex justify-content-between">
-              <p>Site Code (T6)</p>
-              <p>-</p>
-            </div>
-            <div class="d-flex justify-content-between mb-4">
-              <p>Nationality</p>
-              <p>Non-US</p>
-            </div>
+
             <div class="d-flex justify-content-between">
               <p>Pay Period Day</p>
               <p>

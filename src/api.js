@@ -30,4 +30,6 @@ export const ROUTES = {
   subsidiary: `subsidiaries`,
   supervisorAssignment: `supervisor-assignment`,
   timesheet: `time-sheet`,
+  timeAllocation: `time-allocation`,
+  payrollMonthYear: `payroll-month-year`,
 };

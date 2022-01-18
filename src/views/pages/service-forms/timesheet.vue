@@ -9,6 +9,7 @@ import interactionPlugin from "@fullcalendar/interaction";
 import bootstrapPlugin from "@fullcalendar/bootstrap";
 import listPlugin from "@fullcalendar/list";
 import Swal from "sweetalert2";
+import { authComputed } from "@/state/helpers";
 
 export default {
   page: {
@@ -19,6 +20,12 @@ export default {
     FullCalendar,
     Layout,
     PageHeader,
+  },
+  computed: {
+    ...authComputed,
+  },
+  mounted() {
+    this.fetchPayrollMonthYear();
   },
   data() {
     return {
@@ -38,9 +45,9 @@ export default {
       ],
       calendarOptions: {
         headerToolbar: {
-          left: "prev,next today",
+          left: "",
           center: "title",
-          right: "dayGridMonth",
+          right: "",
         },
         plugins: [
           dayGridPlugin,
@@ -51,6 +58,7 @@ export default {
         ],
         initialView: "dayGridMonth",
         themeSystem: "bootstrap",
+        initialDate: null,
         initialEvents: [],
         editable: true,
         droppable: true,
@@ -80,9 +88,29 @@ export default {
         editcategory: "",
       },
       dateInfo: null,
+      pymYear: "",
+      pymMonth: "",
+      extraFields: 0,
     };
   },
   methods: {
+    fetchPayrollMonthYear() {
+      this.apiGet(this.ROUTES.payrollMonthYear).then((res) => {
+        if (res.data) {
+          const { pym_year, pym_month } = res.data;
+          this.pymYear = pym_year;
+          this.pymMonth = pym_month;
+          this.calendarOptions.initialDate = `${pym_year}-${pym_month}-01`;
+        }
+      });
+    },
+    addField() {
+      this.extraFields++;
+    },
+    delField() {
+      this.extraFields--;
+    },
+
     /**
      * Modal form submit
      */
@@ -147,7 +175,10 @@ export default {
     dateClicked(info) {
       this.newEventData = info;
       this.dateInfo = info;
-      console.log({ info });
+      const { date } = info;
+      const chosenDateMonth = date.getMonth;
+      const chosenDateYear = date.getFullYear;
+      console.log({ chosenDateMonth, chosenDateYear });
       this.showModal = true;
     },
     /**
@@ -213,13 +244,134 @@ export default {
 <template>
   <Layout>
     <PageHeader :title="title" :items="items" />
-    <div class="row">
-      <div class="col-12">
+    <scale-loader class="scale-loader" v-if="this.apiBusy" />
+    <div v-else class="row">
+      <div class="col-lg-7">
         <div class="card">
           <div class="card-body">
             <div class="app-calendar">
               <FullCalendar ref="fullCalendar" :options="calendarOptions" />
             </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-5">
+        <div class="card mb-3">
+          <div class="card-body">
+            <div class="p-3 bg-light mb-4">
+              <h5 class="font-size-14 mb-0">
+                International Rescue Committee - Overseas Staff
+              </h5>
+            </div>
+            <div class="d-flex justify-content-between">
+              <p>Payroll Reporting Period</p>
+              <p class="font-weight-bolder">
+                <span>
+                  {{ (parseInt(pymMonth) - 1) | getMonth }}
+                </span>
+                <span>{{ pymYear }}</span>
+              </p>
+            </div>
+            <div class="d-flex justify-content-between">
+              <p>Name</p>
+              <p>
+                {{ getUser.user_name }}
+              </p>
+            </div>
+            <div class="d-flex justify-content-between">
+              <p>T7 Code</p>
+              <p>-</p>
+            </div>
+            <div class="d-flex justify-content-between">
+              <p>Location (T5)</p>
+              <p>-</p>
+            </div>
+            <div class="d-flex justify-content-between">
+              <p>Site Code (T6)</p>
+              <p>-</p>
+            </div>
+            <div class="d-flex justify-content-between">
+              <p>Nationality</p>
+              <p>Non-US</p>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-body">
+            <div class="p-3 bg-light mb-4">
+              <h5 class="font-size-14 mb-0">Time & Effort Report</h5>
+            </div>
+            <form @submit.prevent>
+              <div class="row" v-for="index in extraFields" :key="index">
+                <div class="col-lg-6">
+                  <div class="form-group">
+                    <label for="grant">
+                      Grant Code (T1) <span class="text-danger">*</span>
+                    </label>
+                    <input id="grant" class="form-control" />
+                  </div>
+                </div>
+                <div class="col-lg-4">
+                  <div class="form-group">
+                    <label>
+                      % to Charge (T1) <span class="text-danger">*</span>
+                    </label>
+                    <b-form-spinbutton id="charge" min="1" max="100" />
+                  </div>
+                </div>
+                <div class="col-lg-2">
+                  <div class="form-group">
+                    <label for="" style="visibility: hidden">hidden</label>
+                    <button class="btn btn-danger" @click="delField">
+                      del
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-lg-6">
+                  <div class="form-group">
+                    <label for="grant">
+                      Grant Code (T1) <span class="text-danger">*</span>
+                    </label>
+                    <input id="grant" class="form-control" />
+                  </div>
+                </div>
+                <div class="col-lg-4">
+                  <div class="form-group">
+                    <label>
+                      % to Charge (T1) <span class="text-danger">*</span>
+                    </label>
+                    <b-form-spinbutton id="charge" min="1" max="100" />
+                  </div>
+                </div>
+                <div class="col-lg-2">
+                  <div class="form-group">
+                    <label for="" style="visibility: hidden">hidden</label>
+                    <button class="btn btn-success" @click="addField">
+                      add
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group">
+                <b-button
+                  v-if="!submitting"
+                  class="btn btn-success btn-block mt-4"
+                  type="submit"
+                >
+                  Submit
+                </b-button>
+                <b-button
+                  v-else
+                  disabled
+                  class="btn btn-success btn-block mt-4"
+                  type="submit"
+                >
+                  Submitting...
+                </b-button>
+              </div>
+            </form>
           </div>
         </div>
       </div>
