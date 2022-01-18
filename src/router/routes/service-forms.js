@@ -8,12 +8,11 @@ export default [
     component: () => import("@/views/pages/service-forms/timesheet"),
   },
   {
-    path: "/time-effort-reporting/:date",
-    name: "time-effort-reporting",
+    path: "/timesheet-entry/:date",
+    name: "timesheet-entry",
     meta: {
       authRequired: true,
     },
-    component: () =>
-      import("@/views/pages/service-forms/time-effort-reporting"),
+    component: () => import("@/views/pages/service-forms/timesheet-entry"),
   },
 ];

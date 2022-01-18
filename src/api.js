@@ -1,8 +1,8 @@
 import axios from "axios";
 
 export const API = axios.create({
-baseURL: `https://irc-api.ihumane.net/`,
- // baseURL: `http://localhost:9000/`,
+  baseURL: `https://irc-api.ihumane.net/`,
+  // baseURL: `http://localhost:9000/`,
 });
 
 export function SET_TOKEN(token) {
@@ -28,5 +28,6 @@ export const ROUTES = {
   hmo: `hmos`,
   qualification: `qualifications`,
   subsidiary: `subsidiaries`,
-  supervisorAssignment: `supervisor-assignment`
+  supervisorAssignment: `supervisor-assignment`,
+  timesheet: `time-sheet`,
 };

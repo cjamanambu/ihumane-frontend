@@ -6,7 +6,7 @@ import { authComputed } from "@/state/helpers";
 
 export default {
   page: {
-    title: "Time & Effort Reporting",
+    title: "Timesheet Entry",
     meta: [{ name: "description", content: appConfig.description }],
   },
   components: {
@@ -21,7 +21,7 @@ export default {
   },
   data() {
     return {
-      title: "Time & Effort Reporting",
+      title: "Timesheet Entry",
       items: [
         {
           text: "IHUMANE",
@@ -31,7 +31,7 @@ export default {
           href: "/",
         },
         {
-          text: "Time & Effort Reporting",
+          text: "Timesheet Entry",
           active: true,
         },
       ],
@@ -41,6 +41,9 @@ export default {
   methods: {
     setTimesheetDate() {
       this.timesheetDate = new Date(this.$route.params.date);
+    },
+    getTimesheetData() {
+      this.apiGet();
     },
   },
 };
