@@ -10,6 +10,7 @@ import bootstrapPlugin from "@fullcalendar/bootstrap";
 import listPlugin from "@fullcalendar/list";
 import Swal from "sweetalert2";
 import { authComputed } from "@/state/helpers";
+import TimeEffortForm from "./components/time-effort-form";
 
 export default {
   page: {
@@ -20,6 +21,7 @@ export default {
     FullCalendar,
     Layout,
     PageHeader,
+    TimeEffortForm,
   },
   computed: {
     ...authComputed,
@@ -45,8 +47,8 @@ export default {
       ],
       calendarOptions: {
         headerToolbar: {
-          left: "",
-          center: "title",
+          left: "title",
+          center: "",
           right: "",
         },
         plugins: [
@@ -59,10 +61,20 @@ export default {
         initialView: "dayGridMonth",
         themeSystem: "bootstrap",
         initialDate: null,
-        initialEvents: [],
-        editable: true,
-        droppable: true,
-        eventResizableFromStart: true,
+        initialEvents: [
+          {
+            // this object will be "parsed" into an Event Object
+            id: 0,
+            title: "8:00am to 5:00pm", // a property!
+            start: "2022-04-01", // a property!
+            end: "2022-04-01", // a property! ** see important note below about 'end' **
+            display: "background",
+            textColor: "white",
+          },
+        ],
+        editable: false,
+        droppable: false,
+        eventResizableFromStart: false,
         dateClick: this.dateClicked,
         eventClick: this.editEvent,
         eventsSet: this.handleEvents,
@@ -90,7 +102,7 @@ export default {
       dateInfo: null,
       pymYear: "",
       pymMonth: "",
-      extraFields: 0,
+      fetching: false,
     };
   },
   methods: {
@@ -104,11 +116,19 @@ export default {
         }
       });
     },
-    addField() {
-      this.extraFields++;
-    },
-    delField() {
-      this.extraFields--;
+    populateTimesheetData() {
+      // const employeeID = this.getEmployee.emp_id;
+      let numDays = new Date(this.pymYear, this.pymMonth, 0).getDate();
+      while (numDays > 0) {
+        this.fetching = true;
+        // let day = numDays;
+        // const date = `${this.pymYear}-${this.pymMonth}-${day}`;
+        // const url = `${this.ROUTES.timesheet}/get-time-sheet/${employeeID}/${date}`;
+        // this.apiGet(url)
+        //   .then((res) => console.log(res.data))
+        //   .finally(() => numDays--);
+      }
+      this.fetching = false;
     },
 
     /**
@@ -244,7 +264,13 @@ export default {
 <template>
   <Layout>
     <PageHeader :title="title" :items="items" />
-    <scale-loader class="scale-loader" v-if="this.apiBusy" />
+    <div class="d-flex justify-content-end mb-3">
+      <b-button class="btn btn-success" @click="populateTimesheetData">
+        <i class="mdi mdi-plus mr-2"></i>
+        Populate Timesheet
+      </b-button>
+    </div>
+    <scale-loader class="scale-loader" v-if="this.apiBusy || this.fetching" />
     <div v-else class="row">
       <div class="col-lg-7">
         <div class="card">
@@ -299,79 +325,9 @@ export default {
         <div class="card">
           <div class="card-body">
             <div class="p-3 bg-light mb-4">
-              <h5 class="font-size-14 mb-0">Time & Effort Report</h5>
+              <h5 class="font-size-14 mb-0">Time & Effort Reporting</h5>
             </div>
-            <form @submit.prevent>
-              <div class="row" v-for="index in extraFields" :key="index">
-                <div class="col-lg-6">
-                  <div class="form-group">
-                    <label for="grant">
-                      Grant Code (T1) <span class="text-danger">*</span>
-                    </label>
-                    <input id="grant" class="form-control" />
-                  </div>
-                </div>
-                <div class="col-lg-4">
-                  <div class="form-group">
-                    <label>
-                      % to Charge (T1) <span class="text-danger">*</span>
-                    </label>
-                    <b-form-spinbutton id="charge" min="1" max="100" />
-                  </div>
-                </div>
-                <div class="col-lg-2">
-                  <div class="form-group">
-                    <label for="" style="visibility: hidden">hidden</label>
-                    <button class="btn btn-danger" @click="delField">
-                      del
-                    </button>
-                  </div>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col-lg-6">
-                  <div class="form-group">
-                    <label for="grant">
-                      Grant Code (T1) <span class="text-danger">*</span>
-                    </label>
-                    <input id="grant" class="form-control" />
-                  </div>
-                </div>
-                <div class="col-lg-4">
-                  <div class="form-group">
-                    <label>
-                      % to Charge (T1) <span class="text-danger">*</span>
-                    </label>
-                    <b-form-spinbutton id="charge" min="1" max="100" />
-                  </div>
-                </div>
-                <div class="col-lg-2">
-                  <div class="form-group">
-                    <label for="" style="visibility: hidden">hidden</label>
-                    <button class="btn btn-success" @click="addField">
-                      add
-                    </button>
-                  </div>
-                </div>
-              </div>
-              <div class="form-group">
-                <b-button
-                  v-if="!submitting"
-                  class="btn btn-success btn-block mt-4"
-                  type="submit"
-                >
-                  Submit
-                </b-button>
-                <b-button
-                  v-else
-                  disabled
-                  class="btn btn-success btn-block mt-4"
-                  type="submit"
-                >
-                  Submitting...
-                </b-button>
-              </div>
-            </form>
+            <TimeEffortForm />
           </div>
         </div>
       </div>

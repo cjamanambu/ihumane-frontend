@@ -5,7 +5,7 @@ export default [
     meta: {
       authRequired: true,
     },
-    component: () => import("@/views/pages/service-forms/timesheet"),
+    component: () => import("@/views/pages/service-forms/timesheet/index"),
   },
   {
     path: "/timesheet-entry/:date",
@@ -13,6 +13,7 @@ export default [
     meta: {
       authRequired: true,
     },
-    component: () => import("@/views/pages/service-forms/timesheet-entry"),
+    component: () =>
+      import("@/views/pages/service-forms/timesheet/timesheet-entry"),
   },
 ];
