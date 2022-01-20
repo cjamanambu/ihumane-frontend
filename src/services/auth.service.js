@@ -12,8 +12,8 @@ export default {
         this.logIn({ username, password })
           .then(() => {
             // check user type here first before routing
-            console.log(this.getUser);
-            console.log(this.getEmployee);
+            // console.log(this.getUser);
+            // console.log(this.getEmployee);
             resolve(this.getUser.user_type);
           })
           .catch((err) => {

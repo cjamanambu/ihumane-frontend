@@ -38,6 +38,10 @@ export default {
           href: "/",
         },
         {
+          text: "TimeSheet",
+          href: "/timesheet",
+        },
+        {
           text: "Timesheet Entry",
           active: true,
         },

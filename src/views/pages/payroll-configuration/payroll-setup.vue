@@ -113,27 +113,30 @@ export default {
 <template>
   <Layout>
     <PageHeader :title="title" :items="items" />
-    <div
-      class="d-flex justify-content-between align-items-start mb-3 flex-lg-row flex-column"
-    >
-      <b-card
-        header-class="bg-transparent border-success"
-        class="border border-success d-inline-block"
+    <scale-loader v-if="apiBusy" />
+    <div v-else>
+      <div
+        class="d-flex justify-content-between align-items-start mb-3 flex-lg-row flex-column"
       >
-        <template v-slot:header>
-          <h5 class="my-0 text-success">
-            <i class="mdi mdi-calendar-sync mr-3"></i>
-            Payroll Month & Year
+        <b-card
+          header-class="bg-transparent border-success"
+          class="border border-success d-inline-block"
+        >
+          <template v-slot:header>
+            <h5 class="my-0 text-success">
+              <i class="mdi mdi-calendar-sync mr-3"></i>
+              Payroll Month & Year
+            </h5>
+          </template>
+          <h5 class="card-title mt-0">
+            {{ (parseInt(this.pmyMonth) - 1) | getMonth }} {{ this.pmyYear }}
           </h5>
-        </template>
-        <h5 class="card-title mt-0">
-          {{ (parseInt(this.pmyMonth) - 1) | getMonth }} {{ this.pmyYear }}
-        </h5>
-        <p v-if="pmySet" class="card-text update-mtr" @click="selectPMY">
-          Update PMY
-        </p>
-        <p v-else class="card-text update-mtr" @click="selectPMY">Set PMY</p>
-      </b-card>
+          <p v-if="pmySet" class="card-text update-mtr" @click="selectPMY">
+            Update PMY
+          </p>
+          <p v-else class="card-text update-mtr" @click="selectPMY">Set PMY</p>
+        </b-card>
+      </div>
     </div>
     <b-modal
       ref="set-pmy"

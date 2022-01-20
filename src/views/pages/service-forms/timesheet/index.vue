@@ -61,24 +61,14 @@ export default {
         initialView: "dayGridMonth",
         themeSystem: "bootstrap",
         initialDate: null,
-        initialEvents: [
-          {
-            // this object will be "parsed" into an Event Object
-            id: 0,
-            title: "8:00am to 5:00pm", // a property!
-            start: "2022-04-01", // a property!
-            end: "2022-04-01", // a property! ** see important note below about 'end' **
-            display: "background",
-            textColor: "white",
-          },
-        ],
+        initialEvents: [],
         editable: false,
         droppable: false,
         eventResizableFromStart: false,
         dateClick: this.dateClicked,
         eventClick: this.editEvent,
         eventsSet: this.handleEvents,
-        weekends: true,
+        weekends: false,
         selectable: true,
         selectMirror: true,
         dayMaxEvents: true,
@@ -103,34 +93,79 @@ export default {
       pymYear: "",
       pymMonth: "",
       fetching: false,
+      populateOption: false,
+      entryCount: 0,
+      populating: false,
     };
   },
   methods: {
     fetchPayrollMonthYear() {
+      this.fetching = true;
       this.apiGet(this.ROUTES.payrollMonthYear).then((res) => {
         if (res.data) {
           const { pym_year, pym_month } = res.data;
           this.pymYear = pym_year;
           this.pymMonth = pym_month;
           this.calendarOptions.initialDate = `${pym_year}-${pym_month}-01`;
+          this.fetchTimesheetData();
         }
       });
     },
-    populateTimesheetData() {
-      // const employeeID = this.getEmployee.emp_id;
-      let numDays = new Date(this.pymYear, this.pymMonth, 0).getDate();
-      while (numDays > 0) {
-        this.fetching = true;
-        // let day = numDays;
-        // const date = `${this.pymYear}-${this.pymMonth}-${day}`;
-        // const url = `${this.ROUTES.timesheet}/get-time-sheet/${employeeID}/${date}`;
-        // this.apiGet(url)
-        //   .then((res) => console.log(res.data))
-        //   .finally(() => numDays--);
-      }
+    fetchTimesheetData() {
+      const employeeID = this.getEmployee.emp_id;
+      const url = `${this.ROUTES.timesheet}/get-time-sheets/${employeeID}`;
+      this.apiGet(url, "Get Timesheet Error").then((res) => {
+        const { data } = res;
+        if (!data.length) {
+          this.populateTimesheetData();
+        } else {
+          data.forEach((entry) => {
+            console.log({ entry });
+            let month, day, title;
+            title = `${entry.ts_start} - ${entry.ts_end} for ${entry.ts_duration} hrs`;
+            entry.ts_month.length === 1
+              ? (month = `0${entry.ts_month}`)
+              : (month = entry.ts_month);
+            entry.ts_day.length === 1
+              ? (day = `0${entry.ts_day}`)
+              : (day = entry.ts_day);
+            const date = `${entry.ts_year}-${month}-${day}`;
+            const entryObj = {
+              id: this.entryCount++,
+              title,
+              start: date,
+              end: date,
+              display: "background",
+            };
+            let calendarApi = this.$refs.fullCalendar.getApi();
+            calendarApi.addEvent(entryObj);
+          });
+        }
+      });
       this.fetching = false;
     },
-
+    populateTimesheetData() {
+      this.populateOption = true;
+    },
+    cancelPopulate() {
+      this.populateOption = false;
+    },
+    runTimesheetPopulate() {
+      this.populating = true;
+      const employeeID = this.getEmployee.emp_id;
+      const url = `${this.ROUTES.timesheet}/preload-date/${employeeID}`;
+      this.apiGet(url, "Populate Timesheet Error")
+        .then((res) => {
+          if (res.data) {
+            this.apiResponseHandler(`${res.data}`, "Timesheet Population Done");
+            this.fetchTimesheetData();
+          }
+        })
+        .finally(() => {
+          this.populating = false;
+          this.populateOption = false;
+        });
+    },
     /**
      * Modal form submit
      */
@@ -355,6 +390,60 @@ export default {
           <span>Manage Timesheet Entry</span>
         </a>
       </div>
+    </b-modal>
+    <b-modal
+      v-model="populateOption"
+      title="Populate Timesheet"
+      centered
+      no-close-on-esc
+      no-close-on-backdrop
+      title-class="text-black font-18"
+      body-class="p-3"
+      hide-footer
+      hide-header
+    >
+      <div class="text-center">
+        <i
+          class="mdi mdi-alert-octagon-outline text-info"
+          style="font-size: 4em"
+        />
+        <h5 class="mt-n3 text-info">Notice</h5>
+      </div>
+
+      <div class="alert alert-info mt-3">
+        You are about to auto-populate your timesheet for the payroll reporting
+        period
+        <strong>
+          {{ (parseInt(pymMonth) - 1) | getMonth }} {{ pymYear }}.
+        </strong>
+        This process will overwrite any manual changes.
+        <br />
+        Please note, you can modify each day's timesheet entry later before
+        submission.
+      </div>
+      <scale-loader v-if="populating" />
+      <b-row v-else>
+        <b-col lg="6">
+          <a
+            href="javascript: void(0);"
+            class="dropdown-icon-item"
+            @click="cancelPopulate"
+          >
+            <i class="dripicons-wrong" style="font-size: 2em"></i>
+            <span>Cancel Auto-Populate</span>
+          </a>
+        </b-col>
+        <b-col lg="6" class="mt-lg-0 mt-3">
+          <a
+            href="javascript: void(0);"
+            class="dropdown-icon-item"
+            @click="runTimesheetPopulate"
+          >
+            <i class="dripicons-checkmark" style="font-size: 2em"></i>
+            <span>Run Auto-Populate</span>
+          </a>
+        </b-col>
+      </b-row>
     </b-modal>
   </Layout>
 </template>
