@@ -47,9 +47,9 @@ export default {
         },
       ],
       timesheetDate: null,
-      start: "08:00",
-      end: "17:00",
-      duration: 9,
+      start: "",
+      end: "",
+      duration: 0,
       submitted: false,
     };
   },
@@ -61,7 +61,15 @@ export default {
       const employeeID = this.getEmployee.emp_id;
       const date = this.$route.params.date;
       const url = `${this.ROUTES.timesheet}/get-time-sheet/${employeeID}/${date}`;
-      this.apiGet(url).then((res) => console.log(res));
+      this.apiGet(url).then((res) => {
+        const { data } = res;
+        if (data) {
+          console.log({ data });
+          this.start = data.ts_start;
+          this.end = data.ts_end;
+          this.duration = data.ts_duration;
+        }
+      });
     },
     submit() {
       this.submitted = true;
@@ -96,7 +104,8 @@ export default {
 <template>
   <Layout>
     <PageHeader :title="title" :items="items" />
-    <div class="row">
+    <scale-loader v-if="apiBusy" />
+    <div v-else class="row">
       <div class="col-lg-7">
         <div class="card">
           <div class="card-body">
@@ -237,19 +246,18 @@ export default {
               >
                 WEEKEND
               </p>
-              <p v-else>8:00am</p>
+              <p v-else>{{ start }}</p>
             </div>
             <div class="d-flex justify-content-between">
               <p>Finish Time</p>
-              <p v-if="timesheetDate.getDay() === 5">3:00pm</p>
               <p
-                v-else-if="
+                v-if="
                   timesheetDate.getDay() === 0 || timesheetDate.getDay() === 6
                 "
               >
                 WEEKEND
               </p>
-              <p v-else>5:00pm</p>
+              <p v-else>{{ end }}</p>
             </div>
             <div class="d-flex justify-content-between">
               <p>Break Hours</p>
@@ -273,7 +281,7 @@ export default {
               >
                 WEEKEND
               </p>
-              <p v-else>8:15</p>
+              <p v-else>{{ this.duration }}</p>
             </div>
           </div>
         </div>
