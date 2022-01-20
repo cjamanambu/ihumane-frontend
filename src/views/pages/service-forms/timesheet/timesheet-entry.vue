@@ -64,7 +64,6 @@ export default {
       this.apiGet(url).then((res) => {
         const { data } = res;
         if (data) {
-          console.log({ data });
           this.start = data.ts_start;
           this.end = data.ts_end;
           this.duration = data.ts_duration;
@@ -88,8 +87,12 @@ export default {
           ts_duration: this.duration,
         };
         this.apiPost(url, data, "Add Timesheet Error").then((res) => {
-          console.log({ res });
+          const { data } = res;
+          if (data) {
+            this.apiResponseHandler(data, "Modified Timesheet Entry");
+          }
           this.$v.$reset();
+          this.getTimesheetData();
         });
       }
     },
@@ -273,15 +276,14 @@ export default {
             </div>
             <div class="d-flex justify-content-between">
               <p>Hours Worked</p>
-              <p v-if="timesheetDate.getDay() === 5">7:00</p>
               <p
-                v-else-if="
+                v-if="
                   timesheetDate.getDay() === 0 || timesheetDate.getDay() === 6
                 "
               >
                 WEEKEND
               </p>
-              <p v-else>{{ this.duration }}</p>
+              <p v-else>{{ duration }}</p>
             </div>
           </div>
         </div>

@@ -1,4 +1,6 @@
 <script>
+import { authComputed } from "@/state/helpers";
+
 export default {
   data() {
     return {
@@ -6,10 +8,24 @@ export default {
       invalidCharge: false,
       sum: 100,
       fields: [{ id: 0, grant: null, charge: 100 }],
+      confirmTER: false,
     };
   },
   mounted() {
     this.calc();
+  },
+  computed: {
+    ...authComputed,
+  },
+  props: {
+    pmyMonth: {
+      type: String,
+      required: true,
+    },
+    pmyYear: {
+      type: String,
+      required: true,
+    },
   },
   methods: {
     addField() {
@@ -30,6 +46,35 @@ export default {
       });
       this.invalidCharge = this.sum !== 100;
     },
+    confirm() {
+      const valid = this.fields.every((field) => {
+        if (!field.grant) {
+          return false;
+        }
+        return true;
+      });
+      if (valid) {
+        this.confirmTER = true;
+      } else {
+        this.apiFormHandler("Invalid Grant Code(s)");
+      }
+    },
+    submit() {
+      this.confirmTER = false;
+      const url = `${this.ROUTES.timeAllocation}/add-time-allocation`;
+      this.fields.forEach(async (field) => {
+        const data = {
+          ta_emp_id: this.getEmployee.emp_id,
+          ta_month: this.pmyMonth,
+          ta_year: this.pmyYear,
+          ta_tcode: field.grant,
+          ta_charge: field.charge,
+        };
+        await this.apiPost(url, data, "Add Time Allocation Error").then();
+      });
+      this.$emit("added-ta");
+      this.apiResponseHandler("Process Complete", "Time Allocation Added");
+    },
   },
 };
 </script>
@@ -44,7 +89,7 @@ export default {
 </style>
 <template>
   <div>
-    <form @submit.prevent>
+    <form @submit.prevent="confirm">
       <div class="row" v-for="(field, index) in fields" :key="index">
         <div class="col-lg-6">
           <div class="form-group">
@@ -67,11 +112,19 @@ export default {
         <div class="col-lg-2">
           <div v-if="field.id > 0" class="form-group">
             <label style="visibility: hidden">hidden</label>
-            <button class="btn btn-danger" @click="delField(index)">DEL</button>
+            <button
+              type="button"
+              class="btn btn-danger"
+              @click="delField(index)"
+            >
+              DEL
+            </button>
           </div>
           <div v-else class="form-group">
             <label style="visibility: hidden">hidden</label>
-            <button class="btn btn-success" @click="addField">ADD</button>
+            <button type="button" class="btn btn-success" @click="addField">
+              ADD
+            </button>
           </div>
         </div>
       </div>
@@ -100,5 +153,50 @@ export default {
         </b-button>
       </div>
     </form>
+    <b-modal
+      v-model="confirmTER"
+      title="Populate Timesheet"
+      centered
+      no-close-on-esc
+      no-close-on-backdrop
+      title-class="text-black font-18"
+      body-class="p-3"
+      hide-footer
+      hide-header
+    >
+      <div class="text-center">
+        <i
+          class="mdi mdi-alert-octagon-outline text-success"
+          style="font-size: 4em"
+        />
+        <h5 class="mt-n3 text-success">Are you sure?</h5>
+      </div>
+      <div class="alert alert-success mt-4">
+        This process is irreversible. Please, ensure all details provided are
+        accurate before confirming.
+      </div>
+      <b-row>
+        <b-col lg="6">
+          <a
+            href="javascript: void(0);"
+            class="dropdown-icon-item"
+            @click="confirmTER = false"
+          >
+            <i class="dripicons-wrong" style="font-size: 2em"></i>
+            <span>Cancel</span>
+          </a>
+        </b-col>
+        <b-col lg="6" class="mt-lg-0 mt-3">
+          <a
+            href="javascript: void(0);"
+            class="dropdown-icon-item"
+            @click="submit"
+          >
+            <i class="dripicons-checkmark" style="font-size: 2em"></i>
+            <span>Confirm</span>
+          </a>
+        </b-col>
+      </b-row>
+    </b-modal>
   </div>
 </template>
