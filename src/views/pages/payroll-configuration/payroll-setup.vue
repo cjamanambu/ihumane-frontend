@@ -38,6 +38,7 @@ export default {
       pmyYear: null,
       pmyMonth: null,
       pmyDate: null,
+      submitted: false,
     };
   },
   methods: {
@@ -59,6 +60,9 @@ export default {
     selectPMY() {
       if (!this.pmySet) {
         this.$refs["set-pmy"].show();
+      } else {
+        this.pmyDate = `${this.pmyYear}-${this.pmyMonth}`;
+        this.$refs["set-pmy"].show();
       }
     },
     resetPMYForm() {
@@ -67,6 +71,31 @@ export default {
     },
     setPMY() {
       this.submitted = true;
+      this.$v.$touch();
+      if (this.$v.$invalid) {
+        this.apiFormHandler("Invalid Payroll Month & Year");
+      } else {
+        const date = this.pmyDate.split("-");
+        const data = {
+          pym_year: date[0],
+          pym_month: date[1],
+        };
+        const url = `${this.ROUTES.payrollMonthYear}/add-payroll-month-year`;
+        this.apiPost(url, data, "Add Payroll Month & Year Error").then(
+          (res) => {
+            if (res.data) {
+              console.log({ res });
+              this.apiResponseHandler(
+                `Payroll month & year has been set successfully`,
+                "New Payroll Month & Year Set"
+              );
+              this.refreshPMY();
+              this.$v.$reset();
+              this.$refs["set-pmy"].hide();
+            }
+          }
+        );
+      }
     },
   },
 };
@@ -97,7 +126,9 @@ export default {
             Payroll Month & Year
           </h5>
         </template>
-        <h5 class="card-title mt-0">{{ mtr }}%</h5>
+        <h5 class="card-title mt-0">
+          {{ (parseInt(this.pmyMonth) - 1) | getMonth }} {{ this.pmyYear }}
+        </h5>
         <p v-if="pmySet" class="card-text update-mtr" @click="selectPMY">
           Update PMY
         </p>
@@ -106,17 +137,27 @@ export default {
     </div>
     <b-modal
       ref="set-pmy"
-      title="Set Payroll Month & Year"
+      title="Set PMY"
       hide-footer
       centered
       title-class="font-18"
-      size=""
+      size="sm"
       @hidden="resetPMYForm"
     >
       <form @submit.prevent="setPMY">
         <div class="form-group">
-          <label> Payroll Month & Year </label>
-          <b-form-input v-model="pmyDate" type="month" @change="test" />
+          <label for="pmy">
+            Payroll Month & Year <span class="text-danger">*</span>
+          </label>
+          <input
+            id="pmy"
+            v-model="pmyDate"
+            type="month"
+            class="form-control"
+            :class="{
+              'is-invalid': submitted && $v.pmyDate.$error,
+            }"
+          />
         </div>
         <b-button
           v-if="!submitting"
