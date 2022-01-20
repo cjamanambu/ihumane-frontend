@@ -202,8 +202,7 @@ export default {
         Add Payment Definition
       </b-button>
     </div>
-    <div></div>
-    <b-spinner type="grow" v-if="apiBusy" class="m-2" variant="success" />
+    <scale-loader v-if="apiBusy" />
     <div v-else class="row">
       <div class="col-12">
         <div class="card">

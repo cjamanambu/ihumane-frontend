@@ -6,6 +6,7 @@ export const state = {
   token: null,
   loggedIn: false,
   userData: {},
+  employee: {},
 };
 
 export const mutations = {
@@ -26,6 +27,9 @@ export const mutations = {
   SET_USER_DATA(state, userData) {
     state.userData = userData;
   },
+  SET_EMPLOYEE(state, employee) {
+    state.employee = employee;
+  },
 };
 
 export const getters = {
@@ -38,6 +42,9 @@ export const getters = {
   },
   getUser(state) {
     return state.userData;
+  },
+  getEmployee(state) {
+    return state.employee;
   },
 };
 
@@ -71,9 +78,10 @@ export const actions = {
       };
       API.post(url, data)
         .then((res) => {
-          const { userData, token } = res.data;
+          const { userData, token, employee } = res.data;
           commit("SET_TOKEN", token);
           commit("SET_USER_DATA", userData);
+          commit("SET_EMPLOYEE", employee);
           commit("TOGGLE_LOGGED_IN");
           resolve(res);
         })

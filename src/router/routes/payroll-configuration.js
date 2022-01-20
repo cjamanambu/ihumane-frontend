@@ -16,4 +16,13 @@ export default [
     },
     component: () => import("@/views/pages/payroll-configuration/tax-rates"),
   },
-]
+  {
+    path: "/payroll-setup",
+    name: "payroll-setup",
+    meta: {
+      authRequired: true,
+    },
+    component: () =>
+      import("@/views/pages/payroll-configuration/payroll-setup"),
+  },
+];
