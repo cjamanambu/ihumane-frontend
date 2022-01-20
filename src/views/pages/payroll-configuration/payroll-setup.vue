@@ -2,6 +2,7 @@
 import Layout from "@/views/layouts/main";
 import PageHeader from "@/components/page-header";
 import appConfig from "@/app.config";
+import { required } from "vuelidate/lib/validators";
 export default {
   page: {
     title: "Payroll Setup",
@@ -13,6 +14,9 @@ export default {
   },
   mounted() {
     this.refreshPMY();
+  },
+  validations: {
+    pmyDate: { required },
   },
   data() {
     return {
@@ -30,20 +34,52 @@ export default {
           active: true,
         },
       ],
+      pmySet: true,
+      pmyYear: null,
+      pmyMonth: null,
+      pmyDate: null,
     };
   },
   methods: {
     refreshPMY() {
       this.apiGet(
         this.ROUTES.payrollMonthYear,
-        "Get Payroll Month & Year error"
+        "Get Payroll Month & Year Error"
       ).then((res) => {
-        console.log({ res });
+        if (res.data) {
+          this.pmySet = true;
+          const { pym_year, pym_month } = res.data;
+          this.pmyMonth = pym_month;
+          this.pmyYear = pym_year;
+        } else {
+          this.pmySet = false;
+        }
       });
+    },
+    selectPMY() {
+      if (!this.pmySet) {
+        this.$refs["set-pmy"].show();
+      }
+    },
+    resetPMYForm() {
+      this.pmyDate = null;
+      this.$v.reset();
+    },
+    setPMY() {
+      this.submitted = true;
     },
   },
 };
 </script>
+<style>
+.update-mtr {
+  transition: 0.5s ease;
+}
+.update-mtr:hover {
+  cursor: pointer;
+  opacity: 0.8;
+}
+</style>
 
 <template>
   <Layout>
@@ -62,8 +98,42 @@ export default {
           </h5>
         </template>
         <h5 class="card-title mt-0">{{ mtr }}%</h5>
-        <p class="card-text update-mtr" @click="selectMTR">Update MTR</p>
+        <p v-if="pmySet" class="card-text update-mtr" @click="selectPMY">
+          Update PMY
+        </p>
+        <p v-else class="card-text update-mtr" @click="selectPMY">Set PMY</p>
       </b-card>
     </div>
+    <b-modal
+      ref="set-pmy"
+      title="Set Payroll Month & Year"
+      hide-footer
+      centered
+      title-class="font-18"
+      size=""
+      @hidden="resetPMYForm"
+    >
+      <form @submit.prevent="setPMY">
+        <div class="form-group">
+          <label> Payroll Month & Year </label>
+          <b-form-input v-model="pmyDate" type="month" @change="test" />
+        </div>
+        <b-button
+          v-if="!submitting"
+          class="btn btn-success btn-block mt-4"
+          type="submit"
+        >
+          Submit
+        </b-button>
+        <b-button
+          v-else
+          disabled
+          class="btn btn-success btn-block mt-4"
+          type="submit"
+        >
+          Submitting...
+        </b-button>
+      </form>
+    </b-modal>
   </Layout>
 </template>
