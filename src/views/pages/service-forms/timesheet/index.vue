@@ -404,13 +404,12 @@ export default {
     >
       <div class="text-center">
         <i
-          class="mdi mdi-alert-octagon-outline text-info"
+          class="mdi mdi-alert-octagon-outline text-success"
           style="font-size: 4em"
         />
-        <h5 class="mt-n3 text-info">Notice</h5>
+        <h5 class="mt-n3 text-success">Notice</h5>
       </div>
-
-      <div class="alert alert-info mt-3">
+      <div class="alert alert-success mt-3">
         You are about to auto-populate your timesheet for the payroll reporting
         period
         <strong>
