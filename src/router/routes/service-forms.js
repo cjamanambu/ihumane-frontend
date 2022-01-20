@@ -5,15 +5,15 @@ export default [
     meta: {
       authRequired: true,
     },
-    component: () => import("@/views/pages/service-forms/timesheet"),
+    component: () => import("@/views/pages/service-forms/timesheet/index"),
   },
   {
-    path: "/time-effort-reporting/:date",
-    name: "time-effort-reporting",
+    path: "/timesheet-entry/:date",
+    name: "timesheet-entry",
     meta: {
       authRequired: true,
     },
     component: () =>
-      import("@/views/pages/service-forms/time-effort-reporting"),
+      import("@/views/pages/service-forms/timesheet/timesheet-entry"),
   },
 ];
