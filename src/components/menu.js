@@ -98,6 +98,21 @@ export const menuItems = [
         label: "Payroll Setup",
         link: "/payroll-setup",
       },
+      {
+        id: 10,
+        label: "Salary Grades",
+        link: "/salary-grades",
+      },
+      {
+        id: 10,
+        label: "Donors",
+        link: "/donors",
+      },
+      {
+        id: 10,
+        label: "Location Allowances",
+        link: "/location-allowances",
+      },
     ],
   },
   {
@@ -164,6 +179,11 @@ export const menuItems = [
         id: 23,
         label: "Leave Types",
         link: "/leave-types",
+      },
+      {
+        id: 24,
+        label: "Ratings",
+        link: "/ratings",
       },
       {
         id: 24,
