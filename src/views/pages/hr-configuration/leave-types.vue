@@ -6,7 +6,7 @@ import { required } from "vuelidate/lib/validators";
 
 export default {
   page: {
-    title: "Locations",
+    title: "Leave Types",
     meta: [{ name: "description", content: appConfig.description }],
   },
   components: {
@@ -15,50 +15,65 @@ export default {
   },
   mounted() {
     this.refreshTable();
-    this.fetchStates();
   },
   validations: {
-    name: { required },
-    state: { required },
-    t6_code: { required },
+    leave_name:{ required },
+   lt_rate: { required },
+    lt_mode: { required }
+
+
   },
   methods: {
     refreshTable() {
-      this.apiGet(this.ROUTES.location, "Get Locations Error").then((res) => {
-        const { data } = res;
-        this.locations = data;
-        this.totalRows = this.locations.length;
-      });
+      this.apiGet(this.ROUTES.leaveType, "Get Leave Types Error").then(
+        (res) => {
+          const { data } = res;
+          this.leaveTypes = data;
+          this.totalRows = this.leaveTypes.length;
+        }
+      );
     },
-    fetchStates() {
-      this.apiGet(this.ROUTES.state, "Get States Error").then((res) => {
-        this.states = [{ value: null, text: "Please select a state" }];
-        const { data } = res;
-        data.forEach((state) => {
-          this.states.push({
-            value: state.s_id,
-            text: state.s_name,
-          });
-        });
-      });
+    onFiltered(filteredItems) {
+      // Trigger pagination to update the number of buttons/pages due to filtering
+      this.totalRows = filteredItems.length;
+      this.currentPage = 1;
+    },
+    resetForm() {
+      this.lt_id = null
+      this.leave_name = null
+       this.lt_rate= null
+       this.lt_mode= null
+      this.$v.$reset();
+    },
+    selectLeaveType(leaveType) {
+      leaveType = leaveType[0];
+      this.lt_id = leaveType.leave_type_id;
+      this.leave_name = leaveType.leave_name;
+      this.lt_rate = leaveType.lt_rate;
+      this.lt_mode = leaveType.lt_mode;
+      this.$refs["update-leave-type"].show();
+      this.$refs["leave-type-table"].clearSelected();
     },
     submitNew() {
       this.submitted = true;
       this.$v.$touch();
       if (this.$v.$invalid) {
-        this.apiFormHandler("Invalid Location");
+        this.apiFormHandler("Invalid Leave Type");
       } else {
         const data = {
-          location_name: this.name,
-          location_state: this.state,
-          location_t6_code: this.t6_code,
+
+          leave_name: this.leave_name,
+          leave_mode: this.lt_mode,
+          leave_rate: this.lt_rate,
+          leave_duration: 5,
+
         };
-        this.apiPost(this.ROUTES.location, data, "New Location Error").then(
+        this.apiPost(this.ROUTES.leaveType, data, "Add Leave Type Error").then(
           (res) => {
-            this.apiResponseHandler(`${res.data}`, "New Location Added");
+            this.apiResponseHandler(`${res.data}`, "New Leave Type Added");
             this.refreshTable();
             this.$v.$reset();
-            this.$refs["add-location"].hide();
+            this.$refs["add-leave-type"].hide();
           }
         );
       }
@@ -67,46 +82,28 @@ export default {
       this.submitted = true;
       this.$v.$touch();
       if (this.$v.$invalid) {
-        this.apiFormHandler("Invalid Location");
+        this.apiFormHandler("Invalid Leave Type");
       } else {
         const data = {
-          location_name: this.name,
-          location_state: this.state,
-          location_t6_code: this.t6_code,
+          leave_name: this.leave_name,
+          leave_mode: this.lt_mode,
+          leave_rate: this.lt_rate,
+          leave_duration: 5,
         };
-        const url = `${this.ROUTES.location}/${this.locationID}`;
-        this.apiPatch(url, data, "Update Location Error").then((res) => {
+        const url = `${this.ROUTES.leaveType}/${this.lt_id}`;
+        this.apiPatch(url, data, "Update Leave Type Error").then((res) => {
           this.apiResponseHandler(`${res.data}`, "Update Successful");
           this.refreshTable();
           this.$v.$reset();
-          this.$refs["update-location"].hide();
+          this.$refs["update-leave-type"].hide();
         });
       }
-    },
-    resetForm() {
-      this.name = null;
-      this.state = null;
-      this.t6_code = null;
-      this.$v.$reset();
-    },
-    selectLocation(location) {
-      location = location[0];
-      this.locationID = location.location_id;
-      this.name = location.location_name;
-      this.state = location.l_state_id;
-      this.t6_code = location.l_t6_code;
-      this.$refs["update-location"].show();
-      this.$refs["location-table"].clearSelected();
-    },
-    onFiltered(filteredItems) {
-      // Trigger pagination to update the number of buttons/pages due to filtering
-      this.totalRows = filteredItems.length;
-      this.currentPage = 1;
     },
   },
   data() {
     return {
-      title: "Locations",
+      submitting: false,
+      title: "Leave Types",
       items: [
         {
           text: "IHUMANE",
@@ -116,52 +113,45 @@ export default {
           href: "/",
         },
         {
-          text: "Locations",
+          text: "Leave Types",
           active: true,
         },
       ],
-      submitted: false,
-      locations: [],
+      leaveTypes: [],
       totalRows: 1,
       currentPage: 1,
       perPage: 10,
       pageOptions: [10, 25, 50, 100],
       filter: null,
       filterOn: [],
-      sortBy: "location_id",
+      sortBy: "lt_id",
       sortDesc: false,
       fields: [
-        { key: "location_id", label: "ID", sortable: true },
-        { key: "location_name", label: "Location", sortable: true },
-        { key: "State.s_name", label: "State", sortable: true },
-        { key: "l_t6_code", label: "T6 Code", sortable: true },
+        { key: "leave_type_id", label: "SN", sortable: true },
+        { key: "leave_name", label: "Leave Type", sortable: true },
+        { key: "lt_rate", label: "Rate(Days)", sortable: true },
+        { key: "lt_mode", label: "Mode", sortable: true },
       ],
-      name: null,
-      t6_code: null,
-      state: null,
-      states: [{ value: null, text: "Please select a state" }],
-      locationID: null,
+      lt_id: null,
+      leave_name: null,
+      lt_rate: null,
+      lt_mode: null,
+      submitted: false,
     };
   },
 };
 </script>
-<style>
-.manage:hover {
-  cursor: pointer;
-}
-</style>
+
 <template>
   <Layout>
     <PageHeader :title="title" :items="items" />
     <div class="d-flex justify-content-end mb-3">
-      <b-button class="btn btn-success" @click="$refs['add-location'].show()">
+      <b-button class="btn btn-success" @click="$refs['add-leave-type'].show()">
         <i class="mdi mdi-plus mr-2"></i>
-        Add Location
+        Add Leave Type
       </b-button>
     </div>
-    <div v-if="this.apiBusy">
-      <b-spinner type="grow" class="m-2" variant="success" />
-    </div>
+    <b-spinner type="grow" v-if="apiBusy" class="m-2" variant="success" />
     <div v-else class="row">
       <div class="col-12">
         <div class="card">
@@ -193,7 +183,7 @@ export default {
                       type="search"
                       placeholder="Search..."
                       class="form-control form-control-sm ml-2"
-                    />
+                    ></b-form-input>
                   </label>
                 </div>
               </div>
@@ -202,11 +192,11 @@ export default {
             <!-- Table -->
             <div class="table-responsive mb-0">
               <b-table
-                ref="location-table"
+                ref="dept-table"
                 bordered
                 selectable
                 hover
-                :items="locations"
+                :items="leaveTypes"
                 :fields="fields"
                 responsive="sm"
                 :per-page="perPage"
@@ -218,8 +208,26 @@ export default {
                 @filtered="onFiltered"
                 show-empty
                 select-mode="single"
-                @row-selected="selectLocation"
+                @row-selected="selectLeaveType"
               >
+
+                <template #cell(lt_mode)="row">
+                  <div
+                      class="badge badge-info badge-pill"
+                      v-if="row.value === 1"
+                  >
+                    Monthly
+                  </div>
+
+                  <div
+                      class="badge badge-warning badge-pill"
+                      v-if="row.value === 2"
+                  >
+                    Yearly
+                  </div>
+
+
+                </template>
               </b-table>
             </div>
             <div class="row">
@@ -243,8 +251,8 @@ export default {
       </div>
     </div>
     <b-modal
-      ref="add-location"
-      title="Add Location"
+      ref="add-leave-type"
+      title="Add Department"
       hide-footer
       centered
       title-class="font-18"
@@ -252,47 +260,44 @@ export default {
     >
       <form @submit.prevent="submitNew">
         <div class="form-group">
-          <label for="name">
-            Location Name <span class="text-danger">*</span>
+          <label for="lt-name-add">
+            Leave Type <span class="text-danger">*</span>
           </label>
           <input
-            id="name"
-            type="text"
-            v-model="name"
-            class="form-control"
-            :class="{
-              'is-invalid': submitted && $v.name.$error,
+              id="lt-name-add"
+              type="text"
+              v-model="leave_name"
+              class="form-control"
+              :class="{
+              'is-invalid': submitted && $v.leave_name.$error,
             }"
           />
         </div>
         <div class="form-group">
-          <label for="state"> State <span class="text-danger">*</span> </label>
-          <b-form-select
-            id="state"
-            v-model="state"
-            :options="states"
-            :class="{
-              'is-invalid': submitted && $v.state.$error,
-            }"
-          />
-          <small
-            class="form-text text-muted manage"
-            @click="$router.push('/states')"
-          >
-            Manage States
-          </small>
-        </div>
-        <div class="form-group">
-          <label for="t6-code">
-            T6 Code <span class="text-danger">*</span>
+          <label for="lt-rate-add">
+            Rate <span class="text-danger">*</span>
           </label>
           <input
-            id="t6-code"
-            type="text"
-            v-model="t6_code"
-            class="form-control"
-            :class="{
-              'is-invalid': submitted && $v.t6_code.$error,
+              id="lt-rate-add"
+              type="text"
+              v-model="lt_rate"
+              class="form-control"
+              :class="{
+              'is-invalid': submitted && $v.lt_rate.$error,
+            }"
+          />
+        </div>
+        <div class="form-group">
+          <label for="lt-mode-add">
+            Mode <span class="text-danger">*</span>
+          </label>
+          <input
+              id="lt-mode-add"
+              type="text"
+              v-model="lt_mode"
+              class="form-control"
+              :class="{
+              'is-invalid': submitted && $v.lt_mode.$error,
             }"
           />
         </div>
@@ -314,8 +319,8 @@ export default {
       </form>
     </b-modal>
     <b-modal
-      ref="update-location"
-      title="Update Location"
+      ref="update-leave-type"
+      title="Update Leave Type"
       hide-footer
       centered
       title-class="font-18"
@@ -323,47 +328,44 @@ export default {
     >
       <form @submit.prevent="submitUpdate">
         <div class="form-group">
-          <label for="name">
-            Location Name <span class="text-danger">*</span>
+          <label for="lt-name">
+            Leave Type <span class="text-danger">*</span>
           </label>
           <input
-            id="name"
+            id="lt-name"
             type="text"
-            v-model="name"
+            v-model="leave_name"
             class="form-control"
             :class="{
-              'is-invalid': submitted && $v.name.$error,
+              'is-invalid': submitted && $v.leave_name.$error,
             }"
           />
         </div>
         <div class="form-group">
-          <label for="state"> State <span class="text-danger">*</span> </label>
-          <b-form-select
-            id="state"
-            v-model="state"
-            :options="states"
-            :class="{
-              'is-invalid': submitted && $v.state.$error,
-            }"
-          />
-          <small
-            class="form-text text-muted manage"
-            @click="$router.push('/states')"
-          >
-            Manage States
-          </small>
-        </div>
-        <div class="form-group">
-          <label for="t6-code">
-            T6 Code <span class="text-danger">*</span>
+          <label for="lt-rate">
+            Rate <span class="text-danger">*</span>
           </label>
           <input
-            id="t6-code"
+            id="lt-rate"
             type="text"
-            v-model="t6_code"
+            v-model="lt_rate"
             class="form-control"
             :class="{
-              'is-invalid': submitted && $v.t6_code.$error,
+              'is-invalid': submitted && $v.lt_rate.$error,
+            }"
+          />
+        </div>
+        <div class="form-group">
+          <label for="lt-mode">
+            Mode <span class="text-danger">*</span>
+          </label>
+          <input
+              id="lt-mode"
+              type="text"
+              v-model="lt_mode"
+              class="form-control"
+              :class="{
+              'is-invalid': submitted && $v.lt_mode.$error,
             }"
           />
         </div>

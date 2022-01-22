@@ -1,4 +1,4 @@
-import { authMethods, authComputed } from "@/state/helpers";
+import { authMethods, authComputed, layoutMethods } from "@/state/helpers";
 
 export default {
   computed: {
@@ -6,22 +6,20 @@ export default {
   },
   methods: {
     ...authMethods,
+    ...layoutMethods,
     login(username, password) {
-      this.logIn({ username, password })
-        .then(() => {
-          // check user type here first before routing
-          this.$router
-            .push(this.$route.query.redirectFrom || { name: "home" })
-            .then(() =>
-              this.apiResponseHandler(
-                "You have logged in successfully",
-                `Welcome Back, ${username}`
-              )
-            );
-        })
-        .catch((err) => {
-          this.apiErrorHandler(err, "Login Error");
-        });
+      return new Promise((resolve) => {
+        this.logIn({ username, password })
+          .then(() => {
+            // check user type here first before routing
+            // console.log(this.getUser);
+            // console.log(this.getEmployee);
+            resolve(this.getUser.user_type);
+          })
+          .catch((err) => {
+            this.apiErrorHandler(err, "Login Error");
+          });
+      });
     },
   },
 };

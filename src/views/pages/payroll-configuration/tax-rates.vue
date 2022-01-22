@@ -40,7 +40,12 @@ export default {
         "Get Minimum Tax Rate Error"
       ).then((res) => {
         const { data } = res;
-        this.mtr = data[0].mtr_rate;
+        if (data.length) {
+          this.mtrSet = true;
+          this.mtr = data[0].mtr_rate;
+        } else {
+          this.mtrSet = false;
+        }
       });
     },
     refreshTable() {
@@ -53,6 +58,10 @@ export default {
     selectMTR() {
       this.mtrRate = this.mtr;
       this.$refs["update-mtr"].show();
+    },
+    setMTR() {
+      this.mtrRate = this.mtr;
+      this.$refs["set-mtr"].show();
     },
     selectTR(tr) {
       tr = tr[0];
@@ -68,8 +77,30 @@ export default {
       this.$v.$reset();
     },
     resetMtrForm() {
-      this.mtrRate = null;
+      this.mtrRate = 0;
       this.$v.$reset();
+    },
+    submitNewMTR() {
+      this.submitted = true;
+      this.band = 0;
+      this.$v.$touch();
+      if (this.$v.$invalid) {
+        this.apiFormHandler("Invalid MTR");
+      } else {
+        const data = {
+          mtr_rate: this.mtrRate,
+        };
+        const url = `${this.ROUTES.minimumTaxRate}/add-minimum-tax-rate`;
+        this.apiPost(url, data, "Add Minimum Tax Rate Error").then(() => {
+          this.apiResponseHandler(
+            "Successfully set the minimum tax rate",
+            "Successfully Added"
+          );
+          this.refreshMTR();
+          this.$v.$reset();
+          this.$refs["set-mtr"].hide();
+        });
+      }
     },
     submitMTR() {
       this.submitted = true;
@@ -82,12 +113,14 @@ export default {
           mtr_rate: this.mtrRate,
         };
         const url = `${this.ROUTES.minimumTaxRate}/update-minimum-tax-rate/1`;
-        this.apiPost(url, data, "Update Minimum Tax Rate Error").then((res) => {
-          this.apiResponseHandler(`${res.data}`, "Update Successful");
-          this.refreshMTR();
-          this.$v.$reset();
-          this.$refs["update-mtr"].hide();
-        });
+        this.apiPatch(url, data, "Update Minimum Tax Rate Error").then(
+          (res) => {
+            this.apiResponseHandler(`${res.data}`, "Update Successful");
+            this.refreshMTR();
+            this.$v.$reset();
+            this.$refs["update-mtr"].hide();
+          }
+        );
       }
     },
     submitAdd() {
@@ -128,10 +161,7 @@ export default {
         };
         const url = `${this.ROUTES.taxRate}/update-tax-rate/${this.trID}`;
         this.apiPatch(url, data, "Update Tax Rate Error").then((res) => {
-          this.apiResponseHandler(
-            `${res.data.tr_band} has been added successfully`,
-            "New Tax Rate Added"
-          );
+          this.apiResponseHandler(`${res.data}`, "Update Successful");
           this.refreshTable();
           this.$v.$reset();
           this.$refs["update-tr"].hide();
@@ -156,9 +186,10 @@ export default {
         },
       ],
       mtr: 0,
+      mtrSet: true,
       submitted: false,
       submitting: false,
-      mtrRate: null,
+      mtrRate: 0,
       trs: [],
       totalRows: 1,
       currentPage: 1,
@@ -194,114 +225,118 @@ export default {
 <template>
   <Layout>
     <PageHeader :title="title" :items="items" />
-
-    <div
-      class="d-flex justify-content-between align-items-start mb-3 flex-lg-row flex-column"
-    >
-      <b-card
-        header-class="bg-transparent border-success"
-        class="border border-success d-inline-block"
+    <scale-loader v-if="apiBusy" />
+    <div v-else>
+      <div
+        class="d-flex justify-content-between align-items-start mb-3 flex-lg-row flex-column"
       >
-        <template v-slot:header>
-          <h5 class="my-0 text-success">
-            <i class="mdi mdi-file-percent-outline mr-3"></i>Minimum Tax Rate
-          </h5>
-        </template>
-        <h5 class="card-title mt-0">{{ mtr }}%</h5>
-        <p class="card-text update-mtr" @click="selectMTR">Update MTR</p>
-      </b-card>
-      <b-button class="btn btn-success" @click="$refs['add-tr'].show()">
-        <i class="mdi mdi-plus mr-2"></i>
-        Add Tax Rate
-      </b-button>
-    </div>
-    <b-spinner type="grow" v-if="apiBusy" class="m-2" variant="success" />
-    <div v-else class="row">
-      <div class="col-12">
-        <div class="card">
-          <div class="card-body">
-            <div class="row mt-4">
-              <div class="col-sm-12 col-md-6">
-                <div id="tickets-table_length" class="dataTables_length">
-                  <label class="d-inline-flex align-items-center">
-                    Show&nbsp;
-                    <b-form-select
-                      v-model="perPage"
-                      size="sm"
-                      :options="pageOptions"
-                    ></b-form-select
-                    >&nbsp;entries
-                  </label>
+        <b-card
+          header-class="bg-transparent border-success"
+          class="border border-success d-inline-block"
+        >
+          <template v-slot:header>
+            <h5 class="my-0 text-success">
+              <i class="mdi mdi-file-percent-outline mr-3"></i>Minimum Tax Rate
+            </h5>
+          </template>
+          <h5 class="card-title mt-0">{{ mtr }}%</h5>
+          <p v-if="mtrSet" class="card-text update-mtr" @click="selectMTR">
+            Update MTR
+          </p>
+          <p v-else class="card-text update-mtr" @click="setMTR">Set MTR</p>
+        </b-card>
+        <b-button class="btn btn-success" @click="$refs['add-tr'].show()">
+          <i class="mdi mdi-plus mr-2"></i>
+          Add Tax Rate
+        </b-button>
+      </div>
+      <div class="row">
+        <div class="col-12">
+          <div class="card">
+            <div class="card-body">
+              <div class="row mt-4">
+                <div class="col-sm-12 col-md-6">
+                  <div id="tickets-table_length" class="dataTables_length">
+                    <label class="d-inline-flex align-items-center">
+                      Show&nbsp;
+                      <b-form-select
+                        v-model="perPage"
+                        size="sm"
+                        :options="pageOptions"
+                      ></b-form-select
+                      >&nbsp;entries
+                    </label>
+                  </div>
                 </div>
-              </div>
-              <!-- Search -->
-              <div class="col-sm-12 col-md-6">
-                <div
-                  id="tickets-table_filter"
-                  class="dataTables_filter text-md-right"
-                >
-                  <label class="d-inline-flex align-items-center">
-                    Search:
-                    <b-form-input
-                      v-model="filter"
-                      type="search"
-                      placeholder="Search..."
-                      class="form-control form-control-sm ml-2"
-                    ></b-form-input>
-                  </label>
+                <!-- Search -->
+                <div class="col-sm-12 col-md-6">
+                  <div
+                    id="tickets-table_filter"
+                    class="dataTables_filter text-md-right"
+                  >
+                    <label class="d-inline-flex align-items-center">
+                      Search:
+                      <b-form-input
+                        v-model="filter"
+                        type="search"
+                        placeholder="Search..."
+                        class="form-control form-control-sm ml-2"
+                      ></b-form-input>
+                    </label>
+                  </div>
                 </div>
+                <!-- End search -->
               </div>
-              <!-- End search -->
-            </div>
-            <!-- Table -->
-            <div class="table-responsive mb-0">
-              <b-table
-                ref="tr-table"
-                bordered
-                selectable
-                hover
-                :items="trs"
-                :fields="fields"
-                responsive="sm"
-                :per-page="perPage"
-                :current-page="currentPage"
-                :sort-by.sync="sortBy"
-                :sort-desc.sync="sortDesc"
-                :filter="filter"
-                :filter-included-fields="filterOn"
-                @filtered="onFiltered"
-                show-empty
-                select-mode="single"
-                @row-selected="selectTR"
-              >
-                <template #cell(tr_band)="row">
-                  <p>
-                    &#8358;
-                    {{
-                      parseFloat(row.value).toLocaleString("en-US", {
-                        maximumFractionDigits: 2,
-                      })
-                    }}
-                  </p>
-                </template>
-                <template #cell(tr_rate)="row">
-                  <p>{{ row.value }}%</p>
-                </template>
-              </b-table>
-            </div>
-            <div class="row">
-              <div class="col">
-                <div
-                  class="dataTables_paginate paging_simple_numbers float-right"
+              <!-- Table -->
+              <div class="table-responsive mb-0">
+                <b-table
+                  ref="tr-table"
+                  bordered
+                  selectable
+                  hover
+                  :items="trs"
+                  :fields="fields"
+                  responsive="sm"
+                  :per-page="perPage"
+                  :current-page="currentPage"
+                  :sort-by.sync="sortBy"
+                  :sort-desc.sync="sortDesc"
+                  :filter="filter"
+                  :filter-included-fields="filterOn"
+                  @filtered="onFiltered"
+                  show-empty
+                  select-mode="single"
+                  @row-selected="selectTR"
                 >
-                  <ul class="pagination pagination-rounded mb-0">
-                    <!-- pagination -->
-                    <b-pagination
-                      v-model="currentPage"
-                      :total-rows="totalRows"
-                      :per-page="perPage"
-                    ></b-pagination>
-                  </ul>
+                  <template #cell(tr_band)="row">
+                    <p>
+                      &#8358;
+                      {{
+                        parseFloat(row.value).toLocaleString("en-US", {
+                          maximumFractionDigits: 2,
+                        })
+                      }}
+                    </p>
+                  </template>
+                  <template #cell(tr_rate)="row">
+                    <p>{{ row.value }}%</p>
+                  </template>
+                </b-table>
+              </div>
+              <div class="row">
+                <div class="col">
+                  <div
+                    class="dataTables_paginate paging_simple_numbers float-right"
+                  >
+                    <ul class="pagination pagination-rounded mb-0">
+                      <!-- pagination -->
+                      <b-pagination
+                        v-model="currentPage"
+                        :total-rows="totalRows"
+                        :per-page="perPage"
+                      ></b-pagination>
+                    </ul>
+                  </div>
                 </div>
               </div>
             </div>
@@ -309,6 +344,43 @@ export default {
         </div>
       </div>
     </div>
+    <b-modal
+      ref="set-mtr"
+      title="Set MTR"
+      hide-footer
+      centered
+      title-class="font-18"
+      size="sm"
+      @hidden="resetMtrForm"
+    >
+      <form @submit.prevent="submitNewMTR">
+        <div class="form-group">
+          <label for="mtr-rate"> Minimum Tax Rate </label>
+          <b-form-spinbutton
+            id="mtr-rate"
+            v-model="mtrRate"
+            min="1"
+            max="100"
+            step=".10"
+          />
+        </div>
+        <b-button
+          v-if="!submitting"
+          class="btn btn-success btn-block mt-4"
+          type="submit"
+        >
+          Submit
+        </b-button>
+        <b-button
+          v-else
+          disabled
+          class="btn btn-success btn-block mt-4"
+          type="submit"
+        >
+          Submitting...
+        </b-button>
+      </form>
+    </b-modal>
     <b-modal
       ref="update-mtr"
       title="Update MTR"
@@ -326,6 +398,7 @@ export default {
             v-model="mtrRate"
             min="1"
             max="100"
+            step=".10"
           />
         </div>
         <b-button
@@ -371,7 +444,13 @@ export default {
         </div>
         <div class="form-group">
           <label for="rate"> Tax Rate (%) </label>
-          <b-form-spinbutton id="rate" v-model="rate" min="1" max="100" />
+          <b-form-spinbutton
+            id="rate"
+            v-model="rate"
+            min="1"
+            max="100"
+            step=".10"
+          />
         </div>
         <b-button
           v-if="!submitting"

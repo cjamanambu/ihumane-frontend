@@ -2,10 +2,11 @@
 import Layout from "@/views/layouts/main";
 import PageHeader from "@/components/page-header";
 import appConfig from "@/app.config";
-import {required} from "vuelidate/lib/validators";
+import { required } from "vuelidate/lib/validators";
+
 export default {
   page: {
-    title: "Banks",
+    title: "Supervisors",
     meta: [{ name: "description", content: appConfig.description }],
   },
   components: {
@@ -14,15 +15,90 @@ export default {
   },
   mounted() {
     this.refreshTable();
+
   },
   validations: {
-    name: { required },
-    bank_code: { required },
+    supervisor: { required },
+  },
+  methods: {
+    refreshTable() {
+      const url = `${this.ROUTES.employee}`;
+      this.apiGet(url, "Get Employees Error").then(
+          (res) => {
+            const { data } = res;
+            this.employees = data;
+            this.totalRows = this.employees.length;
+          }
+      );
+    },
+
+
+
+    onFiltered(filteredItems) {
+
+      this.totalRows = filteredItems.length;
+      this.currentPage = 1;
+    },
+    resetForm() {
+      this.nonSupervisor = null;
+      this.$v.$reset();
+    },
+    selectEmployee(employee) {
+      employee = employee[0];
+      this.supervisor = employee.emp_supervisor_id;
+      this.emp_id = employee.emp_id;
+      this.emp_name = `${employee.emp_first_name} ${employee.emp_last_name}`;
+
+      const url = `${this.ROUTES.employee}/get-supervisor`;
+      this.supervisors =   [
+        { value: null, text: "Please select an employee" },
+      ];
+      this.apiGet(url, "Get Supervisors Error").then(
+          (res) => {
+            const { data } = res;
+            data.forEach((supervisor) => {
+              this.supervisors.push({
+                value: supervisor.emp_id,
+                text:`${supervisor.emp_first_name} ${supervisor.emp_last_name}`,
+              });
+            });
+          }
+      );
+      this.$refs["update-supervisor"].show();
+      this.$refs["supervisor-table"].clearSelected();
+    },
+
+    submitNew() {
+      this.submitted = true;
+      this.$v.$touch();
+      if (this.$v.$invalid) {
+        this.apiFormHandler("Invalid Supervisor Application");
+      } else {
+        const data = {
+
+          sa_emp_id: this.emp_id,
+          sa_supervisor_id: this.supervisor,
+
+
+        };
+        const url = `${this.ROUTES.supervisorAssignment}/add-assignment`;
+        this.apiPost(url, data, "Assign Supervisor Error").then(
+            (res) => {
+              this.apiResponseHandler(`${res.data}`, "Supervisor Assignment");
+              this.refreshTable();
+              this.$v.$reset();
+              this.$refs["update-supervisor"].hide();
+            }
+        );
+      }
+    },
+
+
   },
   data() {
     return {
       submitting: false,
-      title: "Banks",
+      title: "Assign Supervisor",
       items: [
         {
           text: "IHUMANE",
@@ -32,116 +108,41 @@ export default {
           href: "/",
         },
         {
-          text: "Banks",
+          text: "Assign Supervisor",
           active: true,
         },
       ],
-      banks: [],
       totalRows: 1,
       currentPage: 1,
       perPage: 10,
       pageOptions: [10, 25, 50, 100],
       filter: null,
       filterOn: [],
-      sortBy: "bank_id",
+      sortBy: "emp_id",
       sortDesc: false,
       fields: [
-        { key: "bank_id", sortable: true },
-        { key: "bank_name", sortable: true },
-        { key: "bank_code", label: "Bank Code", sortable: true },
+        { key: "emp_id", label:"SN", sortable: true },
+        { key: "emp_unique_id", label: "Employee ID", sortable: true },
+        { key: "emp_first_name", label: "Employee Name", sortable: true },
+        { key: "supervisor", label: "Supervisor", sortable: true },
       ],
-      name: null,
-      bank_code: null,
-      bank_id: null,
-      submitted: false,
+
+
+      employees: [],
+      supervisors: [],
+      supervisor: null,
+      employee: null,
+      emp_name: null,
+      emp_id: null,
+     submitted: false,
     };
   },
-
-  methods: {
-    refreshTable() {
-      this.apiGet(this.ROUTES.bank, "Get Banks Error").then(
-          (res) => {
-            const { data } = res;
-            this.banks = data;
-            this.totalRows = this.banks.length;
-          }
-      );
-    },
-    onFiltered(filteredItems) {
-      // Trigger pagination to update the number of buttons/pages due to filtering
-      this.totalRows = filteredItems.length;
-      this.currentPage = 1;
-    },
-    resetForm() {
-      this.bank_code= null;
-      this.name = null;
-      this.$v.$reset();
-    },
-    selectBank(bank) {
-      bank = bank[0];
-      this.bank_id = bank.bank_id;
-      this.name = bank.bank_name;
-      this.bank_code = bank.bank_code;
-      this.$refs["update-bank"].show();
-      this.$refs["dept-table"].clearSelected();
-    },
-    submitNew() {
-      this.submitted = true;
-      this.$v.$touch();
-      if (this.$v.$invalid) {
-        this.apiFormHandler("Invalid Bank");
-      } else {
-        const data = {
-          bank_name: this.name,
-          bank_code: this.bank_code,
-        };
-        this.apiPost(this.ROUTES.bank, data, "Add Bank Error").then(
-            (res) => {
-              this.apiResponseHandler(`${res.data}`, "New Bank Added");
-              this.refreshTable();
-              this.$v.$reset();
-              this.$refs["add-bank"].hide();
-            }
-        );
-      }
-    },
-    submitUpdate() {
-      this.submitted = true;
-      this.$v.$touch();
-      if (this.$v.$invalid) {
-        this.apiFormHandler("Invalid Bank");
-      } else {
-        const data = {
-          bank_name: this.name,
-          bank_code: this.bank_code,
-        };
-        const url = `${this.ROUTES.bank}/${this.bank_id}`;
-        this.apiPatch(url, data, "Update Bank Error").then((res) => {
-          this.apiResponseHandler(`${res.data}`, "Update Successful");
-          this.refreshTable();
-          this.$v.$reset();
-          this.$refs["update-bank"].hide();
-        });
-      }
-    },
-  },
-
-
 };
 </script>
 
 <template>
   <Layout>
     <PageHeader :title="title" :items="items" />
-    <div class="d-flex justify-content-end mb-3">
-      <b-button
-        class="btn btn-success"
-        @click="$refs['add-bank'].show()"
-      >
-        <i class="mdi mdi-plus mr-2"></i>
-        Add Bank
-      </b-button>
-    </div>
 
     <b-spinner type="grow" v-if="apiBusy" class="m-2" variant="success" />
     <div v-else class="row">
@@ -184,11 +185,11 @@ export default {
             <!-- Table -->
             <div class="table-responsive mb-0">
               <b-table
-                  ref="dept-table"
+                  ref="employee-table"
                   bordered
                   selectable
                   hover
-                  :items="banks"
+                  :items="employees"
                   :fields="fields"
                   responsive="sm"
                   :per-page="perPage"
@@ -200,8 +201,23 @@ export default {
                   @filtered="onFiltered"
                   show-empty
                   select-mode="single"
-                  @row-selected="selectBank"
+                  @row-selected="selectEmployee"
               >
+
+                <template #cell(emp_first_name)="data">
+                  <b> {{ data.item.emp_first_name }} </b>,  {{ data.item.emp_last_name.toUpperCase() }}
+                </template>
+
+                <template #cell(supervisor)="data">
+              <div v-if="data.item.supervisor !== null">
+                <b > {{ data.item.supervisor.emp_first_name }} </b>,  {{ data.item.supervisor.emp_last_name.toUpperCase() }}
+
+              </div>
+                  <div v-if="data.item.supervisor == null">
+                    N/A
+                  </div>
+                      </template>
+
               </b-table>
             </div>
             <div class="row">
@@ -226,8 +242,8 @@ export default {
     </div>
 
     <b-modal
-        ref="add-bank"
-        title="Add Bank"
+        ref="update-supervisor"
+        title="Assign Supervisor"
         hide-footer
         centered
         title-class="font-18"
@@ -235,87 +251,34 @@ export default {
     >
       <form @submit.prevent="submitNew">
         <div class="form-group">
-          <label for="name">
-            Bank Name <span class="text-danger">*</span>
+          <label for="emp-names">
+            Employee Name <span class="text-danger">*</span>
           </label>
           <input
-              id="name"
+              id="emp-names"
               type="text"
-              v-model="name"
+              v-model="emp_name"
               class="form-control"
-              :class="{
-              'is-invalid': submitted && $v.name.$error,
-            }"
+              readonly
           />
         </div>
-        <div class="form-group">
-          <label for="bank_code">
-            Bank Code <span class="text-danger">*</span>
-          </label>
-          <input
-              id="bank_code"
-              type="text"
-              v-model="bank_code"
-              class="form-control"
-              :class="{
-              'is-invalid': submitted && $v.bank_code.$error,
-            }"
-          />
-        </div>
-        <b-button
-            v-if="!submitting"
-            class="btn btn-success btn-block mt-4"
-            type="submit"
-        >
-          Submit
-        </b-button>
-        <b-button
-            v-else
-            disabled
-            class="btn btn-success btn-block mt-4"
-            type="submit"
-        >
-          Submitting...
-        </b-button>
-      </form>
-    </b-modal>
-    <b-modal
-        ref="update-bank"
-        title="Update Bank"
-        hide-footer
-        centered
-        title-class="font-18"
-        @hidden="resetForm"
-    >
-      <form @submit.prevent="submitUpdate">
-        <div class="form-group">
-          <label for="name">
-            Bank Name <span class="text-danger">*</span>
-          </label>
-          <input
-              id=""
-              type="text"
-              v-model="name"
-              class="form-control"
-              :class="{
-              'is-invalid': submitted && $v.name.$error,
-            }"
-          />
-        </div>
+
+
         <div class="form-group">
           <label for="">
-            Bank Code <span class="text-danger">*</span>
+           Supervisors <span class="text-danger">*</span>
           </label>
-          <input
-              id="banck_code"
-              type="text"
-              v-model="bank_code"
-              class="form-control"
+          <b-form-select
+              id="employee"
+              v-model="supervisor"
+              :options="supervisors"
               :class="{
-              'is-invalid': submitted && $v.bank_code.$error,
+              'is-invalid': submitted && $v.supervisor.$error,
             }"
           />
         </div>
+
+
         <b-button
             v-if="!submitting"
             class="btn btn-success btn-block mt-4"
@@ -331,6 +294,7 @@ export default {
         >
           Submitting...
         </b-button>
+
       </form>
     </b-modal>
   </Layout>

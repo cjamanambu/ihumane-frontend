@@ -4,6 +4,7 @@ export const menuItems = [
     label: "Administrative Menu",
     isTitle: true,
   },
+
   {
     id: 2,
     label: "Dashboard",
@@ -13,6 +14,48 @@ export const menuItems = [
       text: "menuitems.dashboard.badge",
     },
     link: "/",
+  },
+  {
+    id: 26,
+    label: "Employee Management",
+    isTitle: true,
+  },
+  {
+    id: 27,
+    label: "Employee",
+    icon: "ri-user-settings-line",
+    subItems: [
+      {
+        id: 28,
+        label: "New Employee",
+        link: "/new-employee",
+      },
+
+      {
+        id: 30,
+        label: "Manage Employees",
+        link: "/new-employee",
+      },
+
+      {
+        id: 31,
+        label: "Supervisors",
+        link: "/supervisors",
+      },
+
+      {
+        id: 32,
+        label: "Supervisor Assignment",
+        link: "/assign-supervisor",
+      },
+    ],
+  },
+
+  {
+    id: 29,
+    label: "Employee Leaves",
+    icon: "ri-user-settings-line",
+    link: "/employee-leave",
   },
   {
     id: 3,
@@ -69,13 +112,13 @@ export const menuItems = [
       },
       {
         id: 13,
-        label: "Pension",
-        link: "/pension",
+        label: "Pension Providers",
+        link: "/pension-providers",
       },
       {
         id: 14,
-        label: "HMO",
-        link: "/hmo",
+        label: "HMOs",
+        link: "/hmos",
       },
       {
         id: 15,
@@ -114,8 +157,8 @@ export const menuItems = [
       },
       {
         id: 22,
-        label: "Subsidiary",
-        link: "/subsidiary",
+        label: "Subsidiaries",
+        link: "/subsidiaries",
       },
       {
         id: 23,
