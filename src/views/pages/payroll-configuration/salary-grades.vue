@@ -43,10 +43,9 @@ export default {
   },
   methods: {
     refreshTable() {
-      this.apiGet(this.ROUTES.salaryGrade, "Get Salary Grade Error").then(
+      this.apiGet(this.ROUTES.salaryGrade, "Get Salary Grades Error").then(
         (res) => {
           const { data } = res;
-          console.log({ data });
           this.salaryGrades = data;
           this.totalRows = this.salaryGrades.length;
         }
@@ -64,7 +63,6 @@ export default {
       this.min = row.sg_minimum.toString();
       this.mid = row.sg_midpoint.toString();
       this.max = row.sg_maximum.toString();
-      console.log(this.max);
       this.$refs["edit-salary-grade"].show();
       this.$refs["sg-table"].clearSelected();
     },

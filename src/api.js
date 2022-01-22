@@ -10,6 +10,13 @@ export function SET_TOKEN(token) {
   localStorage.setItem("token", token);
 }
 
+export const AUTH_HEADER = () => {
+  let token = localStorage.getItem("token");
+  if (token) {
+    return { "x-auth-token": token };
+  }
+};
+
 export const ROUTES = {
   department: `departments`,
   grade: `grades`,
@@ -33,4 +40,5 @@ export const ROUTES = {
   timeAllocation: `time-allocation`,
   payrollMonthYear: `payroll-month-year`,
   salaryGrade: `salary-grade`,
+  donor: `donor`,
 };

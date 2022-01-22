@@ -34,4 +34,12 @@ export default [
     component: () =>
       import("@/views/pages/payroll-configuration/salary-grades"),
   },
+  {
+    path: "/donors",
+    name: "donors",
+    meta: {
+      authRequired: true,
+    },
+    component: () => import("@/views/pages/payroll-configuration/donors"),
+  },
 ];

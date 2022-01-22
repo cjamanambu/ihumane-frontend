@@ -103,6 +103,11 @@ export const menuItems = [
         label: "Salary Grades",
         link: "/salary-grades",
       },
+      {
+        id: 10,
+        label: "Donors",
+        link: "/donors",
+      },
     ],
   },
   {
