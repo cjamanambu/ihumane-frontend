@@ -98,6 +98,11 @@ export const menuItems = [
         label: "Payroll Setup",
         link: "/payroll-setup",
       },
+      {
+        id: 10,
+        label: "Salary Grades",
+        link: "/salary-grades",
+      },
     ],
   },
   {

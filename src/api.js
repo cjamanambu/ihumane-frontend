@@ -32,4 +32,5 @@ export const ROUTES = {
   timesheet: `time-sheet`,
   timeAllocation: `time-allocation`,
   payrollMonthYear: `payroll-month-year`,
+  salaryGrade: `salary-grade`,
 };

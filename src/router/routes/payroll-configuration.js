@@ -25,4 +25,13 @@ export default [
     component: () =>
       import("@/views/pages/payroll-configuration/payroll-setup"),
   },
+  {
+    path: "/salary-grades",
+    name: "salary-grades",
+    meta: {
+      authRequired: true,
+    },
+    component: () =>
+      import("@/views/pages/payroll-configuration/salary-grades"),
+  },
 ];
