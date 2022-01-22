@@ -2,7 +2,6 @@ import axios from "axios";
 
 export const API = axios.create({
   baseURL: `https://irc-api.ihumane.net/`,
-  // baseURL: `http://localhost:9000/`,
 });
 
 export function SET_TOKEN(token) {
@@ -27,6 +26,7 @@ export const ROUTES = {
   taxRate: `tax-rates`,
   user: `users`,
   location: `locations`,
+  publicHolidays:`public-holidays`,
   bank: `banks`,
   employee: `employees`,
   leaveType: `leave-types`,
