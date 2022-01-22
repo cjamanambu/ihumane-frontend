@@ -41,4 +41,5 @@ export const ROUTES = {
   payrollMonthYear: `payroll-month-year`,
   salaryGrade: `salary-grade`,
   donor: `donor`,
+  locationAllowance: `location-allowance`,
 };

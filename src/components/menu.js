@@ -108,6 +108,11 @@ export const menuItems = [
         label: "Donors",
         link: "/donors",
       },
+      {
+        id: 10,
+        label: "Location Allowances",
+        link: "/location-allowances",
+      },
     ],
   },
   {
