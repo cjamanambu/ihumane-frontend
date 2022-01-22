@@ -1,5 +1,5 @@
-import { authHeader } from "@/state/helpers";
-import { ROUTES, API } from "@/api";
+// import { authHeader } from "@/state/helpers";
+import { ROUTES, API, AUTH_HEADER } from "@/api";
 
 export default {
   data() {
@@ -38,7 +38,7 @@ export default {
       });
     },
     apiConfig() {
-      return { headers: authHeader() };
+      return { headers: AUTH_HEADER() };
     },
     apiResponseHandler(message, title) {
       this.$bvToast.toast(`${message}`, {

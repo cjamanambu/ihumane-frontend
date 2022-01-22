@@ -97,34 +97,44 @@ export default {
             <input id="grant" v-model="field.grant" class="form-control" />
           </div>
         </div>
-        <div class="col-lg-4">
-          <div class="form-group">
-            <label> % to Charge (T1) </label>
-            <b-form-spinbutton
-              v-model="field.charge"
-              id="charge"
-              min="1"
-              max="100"
-              @change="calc(field.charge)"
-            />
-          </div>
-        </div>
-        <div class="col-lg-2">
-          <div v-if="field.id > 0" class="form-group">
-            <label style="visibility: hidden">hidden</label>
-            <button
-              type="button"
-              class="btn btn-danger"
-              @click="delField(index)"
-            >
-              DEL
-            </button>
-          </div>
-          <div v-else class="form-group">
-            <label style="visibility: hidden">hidden</label>
-            <button type="button" class="btn btn-success" @click="addField">
-              ADD
-            </button>
+        <div class="col-lg-6">
+          <div class="row">
+            <div class="col-9">
+              <div class="form-group">
+                <label> % to Charge (T1) </label>
+                <b-form-spinbutton
+                  v-model="field.charge"
+                  id="charge"
+                  min="1"
+                  max="100"
+                  @change="calc(field.charge)"
+                />
+              </div>
+            </div>
+            <div class="col-3">
+              <div class="form-group">
+                <div v-if="field.id > 0" class="form-group">
+                  <label style="visibility: hidden">hidden</label>
+                  <button
+                    type="button"
+                    class="btn btn-danger"
+                    @click="delField(index)"
+                  >
+                    DEL
+                  </button>
+                </div>
+                <div v-else class="form-group">
+                  <label style="visibility: hidden">hidden</label>
+                  <button
+                    type="button"
+                    class="btn btn-success"
+                    @click="addField"
+                  >
+                    ADD
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -172,8 +182,8 @@ export default {
         <h5 class="mt-n3 text-success">Are you sure?</h5>
       </div>
       <div class="alert alert-success mt-4">
-        This process is irreversible. Please, ensure all details provided are
-        accurate before confirming.
+        This process is irreversible. Please, ensure you have filled in your
+        timesheet and all details provided are accurate before confirming.
       </div>
       <b-row>
         <b-col lg="6">
