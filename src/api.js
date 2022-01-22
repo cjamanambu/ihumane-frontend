@@ -42,4 +42,5 @@ export const ROUTES = {
   salaryGrade: `salary-grade`,
   donor: `donor`,
   locationAllowance: `location-allowance`,
+  rating: `rating`,
 };

@@ -182,6 +182,11 @@ export const menuItems = [
       },
       {
         id: 24,
+        label: "Ratings",
+        link: "/ratings",
+      },
+      {
+        id: 24,
         label: "Training",
         link: "/training",
       },
