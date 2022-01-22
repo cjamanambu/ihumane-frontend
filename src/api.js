@@ -19,4 +19,5 @@ export const ROUTES = {
   taxRate: `tax-rates`,
   user: `users`,
   location: `locations`,
+  publicHolidays:`public-holidays`,
 };

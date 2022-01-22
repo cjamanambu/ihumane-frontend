@@ -123,6 +123,11 @@ export const menuItems = [
         link: "/leave-types",
       },
       {
+        id:26,
+        label: "Public Holidays",
+        link: "/public-holidays"
+      },
+      {
         id: 24,
         label: "Training",
         link: "/training",

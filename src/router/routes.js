@@ -115,6 +115,14 @@ export default [
     component: () => import("../views/pages/hr-configuration/grades"),
   },
   {
+    path: "/public-holidays",
+    name: "public-holidays",
+    meta: {
+      authRequired: true,
+    },
+    component: () => import("../views/pages/hr-configuration/public-holidays"),
+  },
+  {
     path: "/job-roles",
     name: "job-roles",
     meta: {
