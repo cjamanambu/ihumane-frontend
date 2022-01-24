@@ -7,6 +7,7 @@ export const state = {
   loggedIn: false,
   userData: {},
   employee: {},
+  locked: false,
 };
 
 export const mutations = {
@@ -30,6 +31,9 @@ export const mutations = {
   SET_EMPLOYEE(state, employee) {
     state.employee = employee;
   },
+  TOGGLE_LOCKED(state) {
+    state.locked = !state.locked;
+  },
 };
 
 export const getters = {
@@ -45,6 +49,9 @@ export const getters = {
   },
   getEmployee(state) {
     return state.employee;
+  },
+  locked(state) {
+    return state.locked;
   },
 };
 
@@ -89,12 +96,38 @@ export const actions = {
         .finally(() => commit("TOGGLE_LOADING"));
     });
   },
+  unlockScreen({ commit }, { username, password } = {}) {
+    return new Promise((resolve, reject) => {
+      commit("TOGGLE_LOADING");
+      const url = `${ROUTES.user}/login`;
+      const data = {
+        user_username: username,
+        user_password: password,
+      };
+      API.post(url, data)
+        .then((res) => {
+          const { userData, token, employee } = res.data;
+          commit("SET_TOKEN", token);
+          commit("SET_USER_DATA", userData);
+          commit("SET_EMPLOYEE", employee);
+          commit("TOGGLE_LOCKED");
+          resolve(res);
+        })
+        .catch((err) => reject(err))
+        .finally(() => commit("TOGGLE_LOADING"));
+    });
+  },
+  toggleLockedScreen({ commit }) {
+    commit("TOGGLE_LOCKED");
+  },
 
   // Logs out the current user.
   logOut({ commit }) {
-    commit("SET_TOKEN", null);
-    commit("TOGGLE_LOGGED_IN");
-    localStorage.clear();
+    return new Promise(() => {
+      commit("SET_TOKEN", null);
+      commit("TOGGLE_LOGGED_IN");
+      localStorage.clear();
+    });
   },
 
   // resetPassword

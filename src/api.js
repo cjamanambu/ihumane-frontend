@@ -43,4 +43,5 @@ export const ROUTES = {
   donor: `donor`,
   locationAllowance: `location-allowance`,
   rating: `rating`,
+  grantChart: `grant-chart`,
 };

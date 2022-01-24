@@ -1,7 +1,9 @@
 // import { authHeader } from "@/state/helpers";
 import { ROUTES, API, AUTH_HEADER } from "@/api";
+import authService from "@/services/auth.service";
 
 export default {
+  mixins: [authService],
   data() {
     return {
       apiBusy: false,
@@ -57,15 +59,17 @@ export default {
           variant: "danger",
         });
       } else {
-        this.$router.push({ name: "logout" }).then(() => {
-          this.$router.push({ name: "login" }).then(() => {
-            this.$bvToast.toast(`${error.response.data}`, {
-              title,
+        this.logOut().then(() => {});
+        this.$router.push({ name: "login" }).then(() => {
+          this.$bvToast.toast(
+            `Your session has expired. Please log in again.`,
+            {
+              title: `${error.response.data}`,
               toaster: "b-toaster-top-right",
               appendToast: true,
               variant: "danger",
-            });
-          });
+            }
+          );
         });
       }
     },
