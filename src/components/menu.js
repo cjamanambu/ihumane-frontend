@@ -113,6 +113,11 @@ export const menuItems = [
         label: "Location Allowances",
         link: "/location-allowances",
       },
+      {
+        id: 10,
+        label: "Grant Charts",
+        link: "/grant-charts",
+      },
     ],
   },
   {
