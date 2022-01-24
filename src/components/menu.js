@@ -113,6 +113,11 @@ export const menuItems = [
         label: "Location Allowances",
         link: "/location-allowances",
       },
+      {
+        id: 10,
+        label: "Grant Charts",
+        link: "/grant-charts",
+      },
     ],
   },
   {
@@ -179,6 +184,11 @@ export const menuItems = [
         id: 23,
         label: "Leave Types",
         link: "/leave-types",
+      },
+      {
+        id:26,
+        label: "Public Holidays",
+        link: "/public-holidays"
       },
       {
         id: 24,

@@ -51,4 +51,12 @@ export default [
     component: () =>
       import("@/views/pages/payroll-configuration/location-allowances"),
   },
+  {
+    path: "/grant-charts",
+    name: "grant-charts",
+    meta: {
+      authRequired: true,
+    },
+    component: () => import("@/views/pages/payroll-configuration/grant-charts"),
+  },
 ];
