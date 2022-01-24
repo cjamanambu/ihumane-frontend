@@ -46,10 +46,10 @@
                 public_month:"",
                 public_year:"",
                 fields: [
-                    { key: "Holiday Name", sortable: true },
-                    { key: "Day", sortable: true },
-                    { key: "Month", sortable: true },
-                    { key: "Year", sortable: true },
+                    { key: "ph_name", label:"Holiday Name", sortable: true },
+                    { key: "ph_day", label: "Day", sortable: true },
+                    { key: "ph_month", label: "Month", sortable: true },
+                    { key: "ph_year", label: "Year", sortable: true },
                 ],
 
             };
@@ -60,6 +60,7 @@
                     const { data } = res;
                     this.holidays = data;
                     this.totalRows = this.holidays.length;
+                    console.log(res);
                 });
             },
             resetForm() {

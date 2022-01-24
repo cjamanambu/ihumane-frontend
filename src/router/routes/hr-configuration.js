@@ -81,6 +81,14 @@ export default [
     component: () => import("@/views/pages/hr-configuration/subsidiaries"),
   },
   {
+    path: "/public-holidays",
+    name: "public-hoildays",
+    meta: {
+      authRequired: true,
+    },
+    component: () => import("@/views/pages/hr-configuration/public-holidays"),
+  },
+  {
     path: "/leave-types",
     name: "leave-types",
     meta: {
