@@ -25,4 +25,38 @@ export default [
     component: () =>
       import("@/views/pages/payroll-configuration/payroll-setup"),
   },
+  {
+    path: "/salary-grades",
+    name: "salary-grades",
+    meta: {
+      authRequired: true,
+    },
+    component: () =>
+      import("@/views/pages/payroll-configuration/salary-grades"),
+  },
+  {
+    path: "/donors",
+    name: "donors",
+    meta: {
+      authRequired: true,
+    },
+    component: () => import("@/views/pages/payroll-configuration/donors"),
+  },
+  {
+    path: "/location-allowances",
+    name: "location-allowances",
+    meta: {
+      authRequired: true,
+    },
+    component: () =>
+      import("@/views/pages/payroll-configuration/location-allowances"),
+  },
+  {
+    path: "/grant-charts",
+    name: "grant-charts",
+    meta: {
+      authRequired: true,
+    },
+    component: () => import("@/views/pages/payroll-configuration/grant-charts"),
+  },
 ];

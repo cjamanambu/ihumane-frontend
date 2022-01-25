@@ -2,12 +2,21 @@ import axios from "axios";
 
 export const API = axios.create({
   baseURL: `https://irc-api.ihumane.net/`,
+   //baseURL: `http://localhost:9000/`,
+
 });
 
 export function SET_TOKEN(token) {
   API.defaults.headers.common["x-auth-token"] = token;
   localStorage.setItem("token", token);
 }
+
+export const AUTH_HEADER = () => {
+  let token = localStorage.getItem("token");
+  if (token) {
+    return { "x-auth-token": token };
+  }
+};
 
 export const ROUTES = {
   department: `departments`,
@@ -32,4 +41,12 @@ export const ROUTES = {
   timesheet: `time-sheet`,
   timeAllocation: `time-allocation`,
   payrollMonthYear: `payroll-month-year`,
+  salaryGrade: `salary-grade`,
+  donor: `donor`,
+  locationAllowance: `location-allowance`,
+  rating: `rating`,
+  goalSetting: `goal-setting`,
+  endOfYear: `end-year-assessment`,
+  grantChart: `grant-chart`,
+
 };

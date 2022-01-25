@@ -13,8 +13,7 @@ export default [
     meta: {
       authRequired: true,
     },
-    component: () =>
-      import("@/views/pages/hr-configuration/pension-providers"),
+    component: () => import("@/views/pages/hr-configuration/pension-providers"),
   },
   {
     path: "/hmos",
@@ -96,4 +95,28 @@ export default [
     },
     component: () => import("@/views/pages/hr-configuration/leave-types"),
   },
-]
+  {
+    path: "/ratings",
+    name: "ratings",
+    meta: {
+      authRequired: true,
+    },
+    component: () => import("@/views/pages/hr-configuration/ratings"),
+  },
+  {
+    path: "/goal-settings",
+    name: "goal-settings",
+    meta: {
+      authRequired: true,
+    },
+    component: () => import("@/views/pages/hr-configuration/goal-settings"),
+  },
+  {
+    path: "/end-of-year",
+    name: "end-of-year",
+    meta: {
+      authRequired: true,
+    },
+    component: () => import("@/views/pages/hr-configuration/end-of-year"),
+  },
+];

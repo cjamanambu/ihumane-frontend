@@ -41,16 +41,13 @@ export default [
     meta: {
       authRequired: true,
       beforeResolve(routeTo, routeFrom, next) {
-        store.dispatch("auth/logOut").then(() => {
-          const authRequiredOnPreviousRoute = routeFrom.matched.some((route) =>
-            route.push("/login")
-          );
-          next(
-            authRequiredOnPreviousRoute ? { name: "home" } : { ...routeFrom }
-          );
-        });
+        store.dispatch("auth/logOut").then(() => {});
+        const authRequiredOnPreviousRoute = routeFrom.matched.some((route) =>
+          route.push("/login")
+        );
+        next(authRequiredOnPreviousRoute ? { name: "home" } : { ...routeFrom });
         // Navigate back to previous page, or home as a fallback
       },
     },
   },
-]
+];

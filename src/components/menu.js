@@ -98,6 +98,26 @@ export const menuItems = [
         label: "Payroll Setup",
         link: "/payroll-setup",
       },
+      {
+        id: 10,
+        label: "Salary Grades",
+        link: "/salary-grades",
+      },
+      {
+        id: 10,
+        label: "Donors",
+        link: "/donors",
+      },
+      {
+        id: 10,
+        label: "Location Allowances",
+        link: "/location-allowances",
+      },
+      {
+        id: 10,
+        label: "Grant Charts",
+        link: "/grant-charts",
+      },
     ],
   },
   {
@@ -146,10 +166,21 @@ export const menuItems = [
         link: "/locations",
       },
       {
-        id: 20,
-        label: "Appraisal",
-        link: "/appraisal",
+        id: 24,
+        label: "Ratings",
+        link: "/ratings",
       },
+      {
+        id: 20,
+        label: "Goal Settings",
+        link: "/goal-settings",
+      },
+      {
+        id: 33,
+        label: "End of Year Questions",
+        link: "/end-of-year",
+      },
+
       {
         id: 21,
         label: "Qualifications",
@@ -165,11 +196,18 @@ export const menuItems = [
         label: "Leave Types",
         link: "/leave-types",
       },
+
       {
         id:26,
         label: "Public Holidays",
         link: "/public-holidays"
       },
+      {
+        id: 34,
+        label: "Ratings",
+        link: "/ratings",
+      },
+
       {
         id: 24,
         label: "Training",
