@@ -103,4 +103,12 @@ export default [
     },
     component: () => import("@/views/pages/hr-configuration/goal-settings"),
   },
+  {
+    path: "/end-of-year",
+    name: "end-of-year",
+    meta: {
+      authRequired: true,
+    },
+    component: () => import("@/views/pages/hr-configuration/end-of-year"),
+  },
 ];

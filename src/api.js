@@ -43,5 +43,6 @@ export const ROUTES = {
   donor: `donor`,
   locationAllowance: `location-allowance`,
   rating: `rating`,
-  goalSetting: `goal-setting`
+  goalSetting: `goal-setting`,
+  endOfYear: `end-year-assessment`
 };
