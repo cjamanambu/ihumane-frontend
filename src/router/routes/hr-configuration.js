@@ -95,4 +95,12 @@ export default [
     },
     component: () => import("@/views/pages/hr-configuration/ratings"),
   },
+  {
+    path: "/goal-settings",
+    name: "goal-settings",
+    meta: {
+      authRequired: true,
+    },
+    component: () => import("@/views/pages/hr-configuration/goal-settings"),
+  },
 ];

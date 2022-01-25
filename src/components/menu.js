@@ -162,8 +162,8 @@ export const menuItems = [
       },
       {
         id: 20,
-        label: "Appraisal",
-        link: "/appraisal",
+        label: "Goal Settings",
+        link: "/goal-settings",
       },
       {
         id: 21,
