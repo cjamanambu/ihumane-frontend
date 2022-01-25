@@ -2,6 +2,7 @@
     import Layout from "@/views/layouts/main";
     import PageHeader from "@/components/page-header";
     import appConfig from "@/app.config";
+    import { required } from "vuelidate/lib/validators";
     export default {
         page: {
             title: "Public Holiday",
@@ -13,6 +14,12 @@
         },
         mounted() {
             this.refreshTable();
+        },
+        validations: {
+            public_name: { required },
+            public_day: { required },
+            public_month: { required },
+            public_year: { required },
         },
         data() {
             return {
@@ -45,11 +52,12 @@
                 public_day:"",
                 public_month:"",
                 public_year:"",
+                ph_id:"",
                 fields: [
-                    { key: "Holiday Name", sortable: true },
-                    { key: "Day", sortable: true },
-                    { key: "Month", sortable: true },
-                    { key: "Year", sortable: true },
+                    { key: "ph_name", label:"Holiday Name", sortable: true },
+                    { key: "ph_day", label: "Day", sortable: true },
+                    { key: "ph_month", label: "Month", sortable: true },
+                    { key: "ph_year", label: "Year", sortable: true },
                 ],
 
             };
@@ -66,12 +74,44 @@
                 this.name = null;
                 this.$v.$reset();
             },
+            selectPublicHoliday(ph) {
+                console.log(ph);
+                ph = ph[0];
+                this.ph_id = ph.ph_id;
+                this.public_name = ph.ph_name;
+                this.public_day = ph.ph_day;
+                this.public_month = ph.ph_month;
+                this.public_year = ph.ph_year;
+                this.$refs["update-ph"].show();
+                this.$refs["ph-table"].clearSelected();
+            },
+            updatePublicHoliday() {
+                this.submitted = false;
+                this.$v.$touch();
+                if (this.$v.$invalid) {
+                    this.apiFormHandler("Invalid Entry");
+                } else {
+                    const url = `${this.ROUTES.publicHolidays}/${this.ph_id}`;
+                    const data = {
+                        public_name: this.public_name,
+                        public_day: this.public_day,
+                        public_month: this.public_month,
+                        public_year: this.public_year,
+                    };
+                    this.apiPatch(url, data, "Error updating public holiday").then((res) => {
+                        this.apiResponseHandler(`${res.data}`, "Update Successful");
+                        this.refreshTable();
+                        this.$v.$reset();
+                        this.$refs["update-ph"].hide();
+                    });
+                }
+            },
             submitNewPublicHoliday(){
                 this.submitted = true;
-                /*this.$v.$touch();
+                this.$v.$touch();
                 if (this.$v.$invalid) {
                     this.apiFormHandler("Something went wrong. Inspect form and try again.");
-                } else {*/
+                } else {
                     const data = {
                         public_name: this.public_name,
                         public_day: this.public_day,
@@ -82,9 +122,9 @@
                         this.apiResponseHandler(`${res.data}`, "New Public Holiday added successfully.");
                         this.refreshTable();
                         this.$v.$reset();
-                        this.$refs["add-new-public-holiday"].hide();
+                        this.$refs["add-ph"].hide();
                     });
-               // }
+                }
             },
             onFiltered(filteredItems) {
 
@@ -101,7 +141,7 @@
         <div class="d-flex justify-content-end mb-3">
             <b-button
                     class="btn btn-success"
-                    @click="$refs['add-new-public-holiday'].show()"
+                    @click="$refs['add-ph'].show()"
             >
                 <i class="mdi mdi-plus mr-2"></i>
                 Add New Public Holiday
@@ -148,7 +188,7 @@
                         <!-- Table -->
                         <div class="table-responsive mb-0">
                             <b-table
-                                    ref="public-holiday-table"
+                                    ref="ph-table"
                                     bordered
                                     selectable
                                     hover
@@ -164,7 +204,7 @@
                                     @filtered="onFiltered"
                                     show-empty
                                     select-mode="single"
-                                    @row-selected="selectGrade"
+                                    @row-selected="selectPublicHoliday"
                             >
                             </b-table>
                         </div>
@@ -190,7 +230,7 @@
         </div>
 
         <b-modal
-                ref="add-new-public-holiday"
+                ref="add-ph"
                 title="Add New Public Holiday"
                 hide-footer
                 centered
@@ -198,6 +238,93 @@
                 @hidden="resetForm"
         >
             <form @submit.prevent="submitNewPublicHoliday">
+                <div class="form-group">
+                    <label for="public_name">
+                        Holiday Name <span class="text-danger">*</span>
+                    </label>
+                    <input
+                            id="public_name"
+                            type="text"
+                            v-model="public_name"
+                            class="form-control"
+                            placeholder="Holiday Name"
+                            :class="{
+                          'is-invalid': submitted && $v.public_name.$error,
+                        }"
+                    />
+                </div>
+                <div class="form-group">
+                    <label for="public_name">
+                        Day <span class="text-danger">*</span>
+                    </label>
+                    <input
+                            id="public_day"
+                            type="number"
+                            max="31"
+                            v-model="public_day"
+                            class="form-control"
+                            placeholder="Day"
+                            :class="{
+                          'is-invalid': submitted && $v.public_day.$error,
+                        }"
+                    />
+                </div>
+                <div class="form-group">
+                    <label for="public_month">
+                        Month <span class="text-danger">*</span>
+                    </label>
+                    <input
+                            id="public_month"
+                            type="number"
+                            v-model="public_month"
+                            class="form-control"
+                            placeholder="Month"
+                            :class="{
+                          'is-invalid': submitted && $v.public_month.$error,
+                        }"
+                    />
+                </div>
+                <div class="form-group">
+                    <label for="public_year">
+                        Year <span class="text-danger">*</span>
+                    </label>
+                    <input
+                            id="public_year"
+                            type="number"
+                            v-model="public_year"
+                            class="form-control"
+                            placeholder="Year"
+                            :class="{
+                          'is-invalid': submitted && $v.public_year.$error,
+                        }"
+                    />
+                </div>
+                <b-button
+                        v-if="!submitting"
+                        class="btn btn-success btn-block mt-4"
+                        type="submit"
+                >
+                    Submit
+                </b-button>
+                <b-button
+                        v-else
+                        disabled
+                        class="btn btn-success btn-block mt-4"
+                        type="submit"
+                >
+                    Submitting...
+                </b-button>
+            </form>
+        </b-modal>
+        <b-modal
+                ref="update-ph"
+                title="Update Public Holiday"
+                hide-footer
+                centered
+                title-class="font-18"
+                @hidden="resetForm"
+        >
+            <form @submit.prevent="updatePublicHoliday">
                 <div class="form-group">
                     <label for="public_name">
                         Holiday Name <span class="text-danger">*</span>
