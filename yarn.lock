@@ -9289,6 +9289,11 @@
   dependencies:
     "vue" "^2.5.22"
 
+"vue-spinner@^1.0.4":
+  "integrity" "sha512-GNG2F+8BLX201JT/jUX+84Gsi3ZteVQwt9K7mues3ts9FcQ95dGn7uu6a5ndSxdYYUEzfh1KngZiOE0u+l4itA=="
+  "resolved" "https://registry.npmjs.org/vue-spinner/-/vue-spinner-1.0.4.tgz"
+  "version" "1.0.4"
+
 "vue-star-rating@^1.7.0":
   "integrity" "sha512-2qdONqnIlvFzJoallfr7VuFRB6hBzYgBVEbXC3yYZz2TfMhx36WtYQ5p7JRjW+pzZx2PGQYZ75UFoBE0jwIANw=="
   "resolved" "https://registry.npmjs.org/vue-star-rating/-/vue-star-rating-1.7.0.tgz"
