@@ -41,6 +41,7 @@ export default {
       this.apiGet(this.ROUTES.grantChart, "Get Grant Charts Error").then(
         (res) => {
           const { data } = res;
+          this.generateChart(data);
           this.grantCharts = data;
           this.totalRows = this.grantCharts.length;
         }
@@ -166,6 +167,19 @@ export default {
         });
       }
     },
+    generateChart(data) {
+      this.donors_ = {};
+      data.forEach((expense) => {
+        let code = expense.donor.donor_code;
+        if (code in this.donors_) {
+          this.donors_[code].push(expense);
+        } else {
+          this.donors_[code] = [];
+          this.donors_[code].push(expense);
+        }
+        console.log(this.donors_);
+      });
+    },
   },
   data() {
     return {
@@ -211,6 +225,7 @@ export default {
       departments: [{ value: null, text: "Please select a department" }],
       donor: null,
       donors: [{ value: null, text: "Please select a donor" }],
+      donors_: {},
       expense: null,
       description: null,
       amount: null,
@@ -222,122 +237,138 @@ export default {
 .manage:hover {
   cursor: pointer;
 }
+.update-mtr {
+  transition: 0.5s ease;
+}
+.update-mtr:hover {
+  cursor: pointer;
+  opacity: 0.8;
+}
 </style>
 <template>
   <Layout>
     <PageHeader :title="title" :items="items" />
-    <div class="d-flex justify-content-end mb-3">
-      <b-button
-        class="btn btn-success"
-        @click="$refs['add-grant-chart'].show()"
-      >
-        <i class="mdi mdi-plus mr-2"></i>
-        Add Grant Chart
-      </b-button>
-    </div>
     <scale-loader v-if="apiBusy" />
-    <div v-else class="row">
-      <div class="col-12">
-        <div class="card">
-          <div class="card-body">
-            <div class="row mt-4">
-              <div class="col-sm-12 col-md-6">
-                <div id="tickets-table_length" class="dataTables_length">
-                  <label class="d-inline-flex align-items-center">
-                    Show&nbsp;
-                    <b-form-select
-                      v-model="perPage"
-                      size="sm"
-                      :options="pageOptions"
-                    ></b-form-select
-                    >&nbsp;entries
-                  </label>
-                </div>
-              </div>
-              <!-- Search -->
-              <div class="col-sm-12 col-md-6">
-                <div
-                  id="tickets-table_filter"
-                  class="dataTables_filter text-md-right"
-                >
-                  <label class="d-inline-flex align-items-center">
-                    Search:
-                    <b-form-input
-                      v-model="filter"
-                      type="search"
-                      placeholder="Search..."
-                      class="form-control form-control-sm ml-2"
-                    ></b-form-input>
-                  </label>
-                </div>
-              </div>
-              <!-- End search -->
-            </div>
-            <!-- Table -->
-            <div class="table-responsive mb-0">
-              <b-table
-                ref="gc-table"
-                bordered
-                selectable
-                hover
-                :items="grantCharts"
-                :fields="fields"
-                responsive="sm"
-                :per-page="perPage"
-                :current-page="currentPage"
-                :sort-by.sync="sortBy"
-                :sort-desc.sync="sortDesc"
-                :filter="filter"
-                :filter-included-fields="filterOn"
-                @filtered="onFiltered"
-                show-empty
-                select-mode="single"
-                @row-selected="selectRow"
-              >
-                <template #cell(Location)="row">
-                  <p class="mb-n1 text-uppercase">
-                    {{ row.value.location_name }}
-                  </p>
-                  <small>{{ row.value.l_t6_code }}</small>
-                </template>
-                <template #cell(Department)="row">
-                  <p class="mb-n1 text-uppercase">
-                    {{ row.value.department_name }}
-                  </p>
-                  <small>{{ row.value.d_t3_code }}</small>
-                </template>
-                <template #cell(donor)="row">
-                  <p class="mb-n1 text-uppercase">
-                    {{ row.value.donor_code }}
-                  </p>
-                  <small>{{ row.value.donor_description }}</small>
-                </template>
-                <template #cell(gc_amount)="row">
-                  &#8358;
-                  {{
-                    parseFloat(row.value).toLocaleString("en-US", {
-                      maximumFractionDigits: 2,
-                    })
-                  }}
-                </template>
-              </b-table>
-            </div>
-            <div class="row">
-              <div class="col">
-                <div
-                  class="dataTables_paginate paging_simple_numbers float-right"
-                >
-                  <ul class="pagination pagination-rounded mb-0">
-                    <!-- pagination -->
-                    <b-pagination
-                      v-model="currentPage"
-                      :total-rows="totalRows"
-                      :per-page="perPage"
-                    ></b-pagination>
-                  </ul>
-                </div>
-              </div>
-            </div>
+    <div v-else>
+      <div class="d-flex">
+        <b-card
+          header-class="bg-transparent border-success"
+          class="border border-success d-inline-block mr-4"
+        >
+          <template v-slot:header>
+            <h5 class="my-0 text-success">
+              <i class="mdi mdi-file-percent-outline mr-3"></i>Donors
+            </h5>
+          </template>
+          <h5 class="card-title mt-0">{{ donors.length }} donors</h5>
+          <p
+            class="card-text update-mtr"
+            @click="$router.push({ name: 'donors' })"
+          >
+            Setup Donor
+          </p>
+        </b-card>
+        <b-card
+          header-class="bg-transparent border-success"
+          class="border border-success d-inline-block"
+        >
+          <template v-slot:header>
+            <h5 class="my-0 text-success">
+              <i class="mdi mdi-file-percent-outline mr-3"></i>Expenses
+            </h5>
+          </template>
+          <h5 class="card-title mt-0">{{ grantCharts.length }} expenses</h5>
+          <p
+            class="card-text update-mtr"
+            @click="$refs['add-grant-chart'].show()"
+          >
+            Setup Expense
+          </p>
+        </b-card>
+      </div>
+      <div class="row">
+        <div class="col-12">
+          <div>
+            <b-table-simple bordered striped hover outlined responsive>
+              <b-thead head-variant="dark">
+                <b-tr>
+                  <b-th colspan="2">Donors</b-th>
+                  <b-th colspan="5">Expenses</b-th>
+                </b-tr>
+                <b-tr>
+                  <b-th>Donor Code</b-th>
+                  <b-th>Donor Description</b-th>
+                  <b-th>Expense Name</b-th>
+                  <b-th>Account Code</b-th>
+                  <b-th>Expense Description</b-th>
+                  <b-th>T3 (Sector)</b-th>
+                  <b-th>T6 (Location)</b-th>
+                </b-tr>
+              </b-thead>
+              <b-tbody v-for="(donor, code) in donors_" :key="code">
+                <b-tr>
+                  <b-th :rowspan="donor.length" variant="secondary">
+                    {{ code }}
+                  </b-th>
+                  <b-th :rowspan="donor.length" variant="secondary">
+                    {{ donor[0].donor.donor_description }}
+                  </b-th>
+                  <b-td>{{ donor[0].gc_expense }}</b-td>
+                  <b-td>{{ donor[0].gc_account_code }}</b-td>
+                  <b-td>{{ donor[0].gc_description }}</b-td>
+                  <b-td>
+                    <p class="mb-0">{{ donor[0].Department.d_t3_code }}</p>
+                    <small class="text-muted">
+                      ({{ donor[0].Department.department_name }})
+                    </small>
+                  </b-td>
+                  <b-td>
+                    <p class="mb-0">{{ donor[0].Location.l_t6_code }}</p>
+                    <small class="text-muted">
+                      ({{ donor[0].Location.location_name }})
+                    </small>
+                  </b-td>
+                </b-tr>
+                <b-tr v-for="(d, index) in donor" :key="index">
+                  <b-td v-if="donor.length > 1 && ++index < donor.length">
+                    {{ donor[index].gc_expense }}
+                  </b-td>
+                  <b-td v-if="donor.length > 1 && index < donor.length">
+                    {{ donor[index].gc_account_code }}
+                  </b-td>
+                  <b-td v-if="donor.length > 1 && index < donor.length">
+                    {{ donor[index].gc_description }}
+                  </b-td>
+                  <b-td v-if="donor.length > 1 && index < donor.length">
+                    <p class="mb-0">{{ donor[index].Department.d_t3_code }}</p>
+                    <small class="text-muted">
+                      ({{ donor[index].Department.department_name }})
+                    </small>
+                  </b-td>
+                  <b-td v-if="donor.length > 1 && index < donor.length">
+                    <p class="mb-0">{{ donor[index].Location.l_t6_code }}</p>
+                    <small class="text-muted">
+                      ({{ donor[index].Location.location_name }})
+                    </small>
+                  </b-td>
+                </b-tr>
+              </b-tbody>
+              <b-tfoot foot-variant="dark">
+                <b-tr>
+                  <b-th>Donor Code</b-th>
+                  <b-th>Donor Description</b-th>
+                  <b-th>Expense Name</b-th>
+                  <b-th>Account Code</b-th>
+                  <b-th>Expense Description</b-th>
+                  <b-th>T3 (Sector)</b-th>
+                  <b-th>T6 (Location)</b-th>
+                </b-tr>
+                <b-tr>
+                  <b-th colspan="2">Donors</b-th>
+                  <b-th colspan="5">Expenses</b-th>
+                </b-tr>
+              </b-tfoot>
+            </b-table-simple>
           </div>
         </div>
       </div>
