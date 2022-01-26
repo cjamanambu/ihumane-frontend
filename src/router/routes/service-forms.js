@@ -16,4 +16,13 @@ export default [
     component: () =>
       import("@/views/pages/service-forms/timesheet/timesheet-entry"),
   },
+  {
+    path: "/travel-authorization",
+    name: "travel-authorization",
+    meta: {
+      authRequired: true,
+    },
+    component: () =>
+      import("@/views/pages/service-forms/travel-authorization/index"),
+  },
 ];
