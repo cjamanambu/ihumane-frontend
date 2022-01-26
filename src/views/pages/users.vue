@@ -133,6 +133,7 @@ export default {
         },
       ],
       users: [],
+      sn: 1,
       totalRows: 1,
       currentPage: 1,
       perPage: 10,
@@ -142,7 +143,12 @@ export default {
       sortBy: "user_id",
       sortDesc: false,
       fields: [
-        { key: "user_id", sortable: true },
+        {
+          key: "sn",
+          label: "S/n",
+          sortable: true,
+          thStyle: { width: "5%" },
+        },
         { key: "user_username", sortable: true },
         { key: "user_name", sortable: true },
         { key: "user_email", sortable: true },
@@ -182,7 +188,7 @@ export default {
         Add User
       </b-button>
     </div>
-    <b-spinner type="grow" v-if="apiBusy" class="m-2" variant="success" />
+    <scale-loader v-if="apiBusy" />
     <div v-else class="row">
       <div class="col-12">
         <div class="card">
@@ -241,6 +247,9 @@ export default {
                 select-mode="single"
                 @row-selected="selectUser"
               >
+                <template #cell(sn)>
+                  {{ sn++ }}
+                </template>
                 <template #cell(user_type)="row">
                   <p v-if="row.value === 1">ADMIN</p>
                   <p v-else-if="row.value === 3">MODERATOR</p>
