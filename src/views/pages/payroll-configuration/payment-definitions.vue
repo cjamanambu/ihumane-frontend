@@ -30,7 +30,10 @@ export default {
       this.variant = pd.pd_payment_variant;
       this.description = pd.pd_desc;
       this.basic = pd.pd_basic;
-      this.tie = pd.pd_tie_number;
+      this.pdPercentage = pd.pd_percentage;
+      this.pdValue = pd.pd_value;
+      this.pdAmount = pd.pd_amount;
+      this.pdPrGross = pd.pd_pr_gross;
       this.$refs["edit-payment-definition"].show();
       this.$refs["pd-table"].clearSelected();
     },
@@ -66,9 +69,14 @@ export default {
           pd_payment_type: this.type,
           pd_payment_variant: this.variant,
           pd_payment_taxable: this.taxable,
-          pd_desc: this.description,
+          pd_desc: 'null',
           pd_basic: this.basic,
-          pd_tie_number: this.tie,
+          pd_tie_number: 'null',
+          pd_pr_gross: this.pdPrGross,
+          pd_percentage: this.pdPercentage,
+          pd_value: this.pdValue,
+          pd_amount: this.pdAmount
+
         };
         const url = `${this.ROUTES.paymentDefinition}/add-payment-definition`;
         this.apiPost(url, data, "Add Payment Definition Error").then((res) => {
@@ -95,9 +103,13 @@ export default {
           pd_payment_type: this.type,
           pd_payment_variant: this.variant,
           pd_payment_taxable: this.taxable,
-          pd_desc: this.description,
+          pd_desc: 'null',
           pd_basic: this.basic,
-          pd_tie_number: this.tie,
+          pd_tie_number: 'null',
+          pd_pr_gross: this.pdPrGross,
+          pd_percentage: parseInt(this.pdPercentage),
+          pd_value: parseInt(this.pdValue),
+          pd_amount: parseFloat(this.pdAmount)
         };
         const url = `${this.ROUTES.paymentDefinition}/update-payment-definition/${this.pdID}`;
         this.apiPatch(url, data, "Update Payment Definition Error").then(
@@ -183,8 +195,23 @@ export default {
         { text: "BASIC", value: 1 },
         { text: "NONBASIC", value: 0 },
       ],
+
       tie: null,
       pdID: null,
+      pdPrGross: 0,
+      pdValue: 1,
+      pdValues: [
+
+        {text: 'Flat', value: 1},
+        {text: 'Computed', value: 2}
+      ],
+      pdAmount: 1,
+      pdAmounts: [
+
+        { text: 'Of Gross', value: 1},
+        {text: 'Of Basic', value: 2}
+      ],
+      pdPercentage: 0
     };
   },
 };
@@ -387,20 +414,78 @@ export default {
             />
           </b-form-group>
         </div>
-        <b-form-group>
-          <label for="user_status">Description</label><br />
-          <b-form-radio-group
-            id="user_status"
-            v-model="description"
-            :options="descriptions"
-            button-variant="outline-success"
-            buttons
-          />
-        </b-form-group>
         <div class="form-group">
-          <label for="token">Tie Number</label>
-          <input id="token" type="text" v-model="tie" class="form-control" />
+          <div class="row">
+            <div class="col-12">
+              <label >
+                Percentage of Gross <span class="text-danger">*</span>
+              </label>
+              <input
+
+                  type="number"
+                  step="0.01"
+                  v-model="pdPrGross"
+                  class="form-control"
+                  min="0"
+                  :class="{
+              'is-invalid': submitted && $v.pdPrGross.$error,
+            }"
+              />
+            </div>
+          </div>
         </div>
+
+        <div class="form-group">
+              <div class="row">
+            <div class="col-6">
+              <b-form-group>
+                <label >Payment Value</label><br />
+                <b-form-radio-group
+                    id="payment_value"
+                    v-model="pdValue"
+                    :options="pdValues"
+                    button-variant="outline-success"
+                    buttons
+                />
+              </b-form-group>
+            </div>
+            <div class="col-6">
+              <b-form-group>
+                <label >Percentage of</label><br />
+                <b-form-radio-group
+                    id="user_type"
+                    v-model="pdAmount"
+                    :options="pdAmounts"
+                    button-variant="outline-success"
+                    buttons
+                />
+              </b-form-group>
+            </div>
+
+          </div>
+           </div>
+
+        <div class="form-group">
+          <div class="row">
+
+            <div class="col-12">
+              <label >
+                Percentage % <span class="text-danger">*</span>
+              </label>
+              <input
+                  type="number"
+                  step="0.01"
+                  v-model="pdPercentage"
+                  class="form-control"
+                  min="0"
+              />
+            </div>
+          </div>
+
+
+
+        </div>
+
         <b-button
           v-if="!submitting"
           class="btn btn-success btn-block mt-4"
@@ -499,20 +584,93 @@ export default {
             />
           </b-form-group>
         </div>
-        <b-form-group>
-          <label for="user_status">Description</label><br />
-          <b-form-radio-group
-            id="user_status"
-            v-model="description"
-            :options="descriptions"
-            button-variant="outline-success"
-            buttons
-          />
-        </b-form-group>
+<!--        <b-form-group>-->
+<!--          <label for="user_status">Description</label><br />-->
+<!--          <b-form-radio-group-->
+<!--            id="user_status"-->
+<!--            v-model="description"-->
+<!--            :options="descriptions"-->
+<!--            button-variant="outline-success"-->
+<!--            buttons-->
+<!--          />-->
+<!--        </b-form-group>-->
+<!--        <div class="form-group">-->
+<!--          <label for="token">Tie Number</label>-->
+<!--          <input id="token" type="text" v-model="tie" class="form-control" />-->
+<!--        </div>-->
+
         <div class="form-group">
-          <label for="token">Tie Number</label>
-          <input id="token" type="text" v-model="tie" class="form-control" />
+          <div class="row">
+            <div class="col-12">
+              <label >
+                Percentage of Gross <span class="text-danger">*</span>
+              </label>
+              <input
+
+                  type="number"
+                  step="0.01"
+                  v-model="pdPrGross"
+                  class="form-control"
+                  min="0"
+                  :class="{
+              'is-invalid': submitted && $v.pdPrGross.$error,
+            }"
+              />
+            </div>
+          </div>
         </div>
+
+        <div class="form-group">
+          <div class="row">
+            <div class="col-6">
+              <b-form-group>
+                <label >Payment Value</label><br />
+                <b-form-radio-group
+                    id="payment_value"
+                    v-model="pdValue"
+                    :options="pdValues"
+                    button-variant="outline-success"
+                    buttons
+                />
+              </b-form-group>
+            </div>
+            <div class="col-6">
+              <b-form-group>
+                <label >Percentage of</label><br />
+                <b-form-radio-group
+                    id="user_type"
+                    v-model="pdAmount"
+                    :options="pdAmounts"
+                    button-variant="outline-success"
+                    buttons
+                />
+              </b-form-group>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="form-group">
+          <div class="row">
+
+            <div class="col-12">
+              <label >
+                Percentage % <span class="text-danger">*</span>
+              </label>
+              <input
+                  type="number"
+                  step="0.01"
+                  v-model="pdPercentage"
+                  class="form-control"
+                  min="0"
+              />
+            </div>
+          </div>
+
+
+
+        </div>
+
         <b-button
           v-if="!submitting"
           class="btn btn-success btn-block mt-4"
