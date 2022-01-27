@@ -8,6 +8,7 @@ export const state = {
   userData: {},
   employee: {},
   locked: false,
+  panel: "admin",
 };
 
 export const mutations = {
@@ -34,6 +35,9 @@ export const mutations = {
   TOGGLE_LOCKED(state) {
     state.locked = !state.locked;
   },
+  SET_PANEL(state, panel) {
+    state.panel = panel;
+  },
 };
 
 export const getters = {
@@ -52,6 +56,9 @@ export const getters = {
   },
   locked(state) {
     return state.locked;
+  },
+  panel(state) {
+    return state.panel;
   },
 };
 
@@ -119,6 +126,9 @@ export const actions = {
   },
   toggleLockedScreen({ commit }) {
     commit("TOGGLE_LOCKED");
+  },
+  setPanel({ commit }, { panel }) {
+    commit("SET_PANEL", panel);
   },
 
   // Logs out the current user.

@@ -48,6 +48,7 @@ export default {
     adminLogin(username) {
       this.changeLayoutType({ layoutType: "vertical" });
       this.changeTopbar({ topbar: "dark" });
+      this.setPanel({ panel: "admin" });
       this.$router
         .push(this.$route.query.redirectFrom || { name: "home" })
         .then(() =>
@@ -60,6 +61,7 @@ export default {
     employeeLogin(username) {
       this.changeLayoutType({ layoutType: "horizontal" });
       this.changeTopbar({ topbar: "light" });
+      this.setPanel({ panel: "self-service" });
       this.$router
         .push(this.$route.query.redirectFrom || { name: "home" })
         .then(() =>

@@ -11,6 +11,7 @@ export const authComputed = {
     "getUser",
     "getEmployee",
     "locked",
+    "panel",
   ]),
 };
 
@@ -30,6 +31,7 @@ export const authMethods = mapActions("auth", [
   "resetPassword",
   "toggleLockedScreen",
   "unlockScreen",
+  "setPanel",
 ]);
 
 export const layoutMethods = mapActions("layout", [
