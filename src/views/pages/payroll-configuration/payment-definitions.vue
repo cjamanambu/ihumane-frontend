@@ -84,9 +84,10 @@ export default {
             `${res.data.pd_payment_name} has been added successfully`,
             "New Payment Definition Added"
           );
-          this.refreshTable();
+
           this.$v.$reset();
           this.$refs["add-payment-definition"].hide();
+          this.refreshTable();
         });
       }
     },
@@ -118,6 +119,7 @@ export default {
             this.refreshTable();
             this.$v.$reset();
             this.$refs["edit-payment-definition"].hide();
+            this.refreshTable();
           }
         );
       }
