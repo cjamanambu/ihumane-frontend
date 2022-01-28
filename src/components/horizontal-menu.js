@@ -42,6 +42,12 @@ export const menuItems = [
         link: "/self-assessment",
       },
 
+      {
+        id: 11,
+        label: "Assess Employee",
+        link: "/assess-employee",
+      },
+
     ],
   },
 

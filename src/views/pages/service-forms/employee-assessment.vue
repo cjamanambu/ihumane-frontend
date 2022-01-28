@@ -7,7 +7,7 @@ import { required } from "vuelidate/lib/validators";
 
 export default {
   page: {
-    title: "Self Assessment",
+    title: "Employee Assessment",
     meta: [{ name: "description", content: appConfig.description }],
   },
   components: {
@@ -18,10 +18,12 @@ export default {
     ...authComputed,
   },
   beforeMount() {
-    this.getOpenGoalSetting();
+    this.getOpenGoalSetting()
     },
   mounted() {
-   this.getOpenGoalSetting();
+    this.$route.params.empid
+
+   this.getOpenGoalSetting()
     this.prefillAssessment()
     this.getSelfAssessment()
 
@@ -34,7 +36,7 @@ export default {
   },
   data() {
     return {
-      title: "Self Assessment",
+      title: "Employee Assessment",
       items: [
         {
           text: "IHUMANE",
@@ -44,8 +46,8 @@ export default {
           href: "/",
         },
         {
-          text: "Self Assessment",
-          href: "/self-assessment",
+          text: "Employee Assessment",
+          href: "/employee-assessment",
           active: true
         },
 
