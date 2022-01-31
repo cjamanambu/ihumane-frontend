@@ -90,6 +90,19 @@ export default {
       i18n.locale = locale;
       this.current_language = i18n.locale;
     },
+    switchPanel() {
+      this.changeLayoutType({ layoutType: "vertical" });
+      this.changeTopbar({ topbar: "dark" });
+      this.setPanel({ panel: "admin" });
+      this.$router
+        .push({ name: "home" })
+        .then(() =>
+          this.apiResponseHandler(
+            "Welcome back to your admin panel",
+            `Welcome Back, ${this.getUser.user_username}`
+          )
+        );
+    },
   },
   mounted() {
     this.value = this.languages.find((x) => x.language === i18n.locale);
@@ -393,6 +406,15 @@ export default {
           <a class="dropdown-item" href="#">
             <i class="ri-lock-unlock-line align-middle mr-1"></i>
             {{ $t("navbar.dropdown.kevin.list.lockscreen") }}
+          </a>
+          <a
+            v-if="getUser.user_type === 3"
+            class="dropdown-item"
+            href="javascript:void(0)"
+            @click="switchPanel"
+          >
+            <i class="ri-arrow-left-fill align-middle mr-1"></i>
+            Go to Admin
           </a>
           <div class="dropdown-divider"></div>
           <a class="dropdown-item text-danger" href="/logout">
