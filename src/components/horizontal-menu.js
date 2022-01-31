@@ -35,6 +35,21 @@ export const menuItems = [
         label: "Travel Authorization",
         link: "/travel-authorization",
       },
+
+
+      {
+        id: 11,
+        label: "Self Assessment",
+        link: "/self-assessment",
+      },
+
+      {
+        id: 11,
+        label: "Assess Employee",
+        link: "/assess-employee",
+      },
+
+
     ],
   },
 
