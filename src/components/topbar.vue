@@ -78,6 +78,19 @@ export default {
       i18n.locale = locale;
       this.current_language = i18n.locale;
     },
+    switchPanel() {
+      this.changeLayoutType({ layoutType: "horizontal" });
+      this.changeTopbar({ topbar: "light" });
+      this.setPanel({ panel: "self-service" });
+      this.$router
+        .push({ name: "home" })
+        .then(() =>
+          this.apiResponseHandler(
+            "Welcome back to your self-service panel",
+            `Welcome Back, ${this.getUser.user_username}`
+          )
+        );
+    },
   },
 };
 </script>
@@ -315,6 +328,15 @@ export default {
           <a class="dropdown-item" href="#">
             <i class="ri-lock-unlock-line align-middle mr-1"></i>
             {{ $t("navbar.dropdown.kevin.list.lockscreen") }}
+          </a>
+          <a
+            v-if="getUser.user_type === 3"
+            class="dropdown-item"
+            href="javascript:void(0)"
+            @click="switchPanel"
+          >
+            <i class="ri-arrow-right-fill align-middle mr-1"></i>
+            Go to Self-Service
           </a>
           <div class="dropdown-divider"></div>
           <a class="dropdown-item text-danger" href="/logout">
