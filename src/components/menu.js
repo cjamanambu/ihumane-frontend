@@ -16,48 +16,6 @@ export const menuItems = [
     link: "/",
   },
   {
-    id: 26,
-    label: "Employee Management",
-    isTitle: true,
-  },
-  {
-    id: 27,
-    label: "Employee",
-    icon: "ri-user-settings-line",
-    subItems: [
-      {
-        id: 28,
-        label: "New Employee",
-        link: "/new-employee",
-      },
-
-      {
-        id: 30,
-        label: "Manage Employees",
-        link: "/new-employee",
-      },
-
-      {
-        id: 31,
-        label: "Supervisors",
-        link: "/supervisors",
-      },
-
-      {
-        id: 32,
-        label: "Supervisor Assignment",
-        link: "/assign-supervisor",
-      },
-    ],
-  },
-
-  {
-    id: 29,
-    label: "Employee Leaves",
-    icon: "ri-user-settings-line",
-    link: "/employee-leave",
-  },
-  {
     id: 3,
     label: "Configuration",
     isTitle: true,
@@ -126,61 +84,72 @@ export const menuItems = [
     icon: "ri-user-settings-line",
     subItems: [
       {
+        id: 11,
+        label: "House Keeping",
+        subItems: [
+          {
+            id: 12,
+            label: "Banks",
+            link: "/banks",
+          },
+          {
+            id: 13,
+            label: "Pension Providers",
+            link: "/pension-providers",
+          },
+          {
+            id: 14,
+            label: "HMOs",
+            link: "/hmos",
+          },
+          {
+            id: 15,
+            label: "Grades",
+            link: "/grades",
+          },
+          {
+            id: 16,
+            label: "Departments",
+            link: "/departments",
+          },
+          {
+            id: 17,
+            label: "Job Roles",
+            link: "/job-roles",
+          },
+          {
+            id: 18,
+            label: "States",
+            link: "/states",
+          },
+          {
+            id: 19,
+            label: "Locations",
+            link: "/locations",
+          },
+        ],
+      },
+      {
         id: 12,
-        label: "Banks",
-        link: "/banks",
+        label: "Self-Assessment",
+        subItems: [
+          {
+            id: 24,
+            label: "Ratings",
+            link: "/ratings",
+          },
+          {
+            id: 20,
+            label: "Goal Settings",
+            link: "/goal-settings",
+          },
+          {
+            id: 33,
+            label: "End of Year Questions",
+            link: "/end-of-year",
+          },
+        ],
       },
-      {
-        id: 13,
-        label: "Pension Providers",
-        link: "/pension-providers",
-      },
-      {
-        id: 14,
-        label: "HMOs",
-        link: "/hmos",
-      },
-      {
-        id: 15,
-        label: "Grades",
-        link: "/grades",
-      },
-      {
-        id: 16,
-        label: "Departments",
-        link: "/departments",
-      },
-      {
-        id: 17,
-        label: "Job Roles",
-        link: "/job-roles",
-      },
-      {
-        id: 18,
-        label: "States",
-        link: "/states",
-      },
-      {
-        id: 19,
-        label: "Locations",
-        link: "/locations",
-      },
-      {
-        id: 24,
-        label: "Ratings",
-        link: "/ratings",
-      },
-      {
-        id: 20,
-        label: "Goal Settings",
-        link: "/goal-settings",
-      },
-      {
-        id: 33,
-        label: "End of Year Questions",
-        link: "/end-of-year",
-      },
-
       {
         id: 21,
         label: "Qualifications",
@@ -196,28 +165,53 @@ export const menuItems = [
         label: "Leave Types",
         link: "/leave-types",
       },
-
       {
-        id:26,
+        id: 26,
         label: "Public Holidays",
-        link: "/public-holidays"
-      },
-      {
-        id: 34,
-        label: "Ratings",
-        link: "/ratings",
-      },
-
-      {
-        id: 24,
-        label: "Training",
-        link: "/training",
-      },
-      {
-        id: 25,
-        label: "Documents",
-        link: "/documents",
+        link: "/public-holidays",
       },
     ],
+  },
+  {
+    id: 26,
+    label: "Employee Management",
+    isTitle: true,
+  },
+  {
+    id: 27,
+    label: "Employee",
+    icon: "ri-user-settings-line",
+    subItems: [
+      {
+        id: 28,
+        label: "New Employee",
+        link: "/new-employee",
+      },
+
+      {
+        id: 30,
+        label: "Manage Employees",
+        link: "/new-employee",
+      },
+
+      {
+        id: 31,
+        label: "Supervisors",
+        link: "/supervisors",
+      },
+
+      {
+        id: 32,
+        label: "Supervisor Assignment",
+        link: "/assign-supervisor",
+      },
+    ],
+  },
+
+  {
+    id: 29,
+    label: "Employee Leaves",
+    icon: "ri-user-settings-line",
+    link: "/employee-leave",
   },
 ];

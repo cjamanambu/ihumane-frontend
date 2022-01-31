@@ -41,6 +41,14 @@ export default [
       authRequired: true,
     },
     component: () =>
-        import("@/views/pages/service-forms/employee-assessment"),
+        import("@/views/pages/service-forms/employee-assessment"),    
   },
+  {
+    path: "/travel-authorization",
+    name: "travel-authorization",
+    meta: {
+      authRequired: true,
+    },
+    component: () => import("@/views/pages/service-forms/travel-authorization/index"),
+  }
 ];
