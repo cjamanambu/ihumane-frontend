@@ -123,7 +123,8 @@ export default {
             this.prefillStatus = true
             const dat = {
               id: datum.sa_id,
-              goal: datum.sa_comment
+              goal: datum.sa_comment,
+              status: datum.sa_status
             }
 
             this.assessments.push(dat)
@@ -152,7 +153,8 @@ export default {
             const dat = {
               id: datum.sa_id,
               goal: datum.sa_comment,
-              response: datum.sa_response
+              response: datum.sa_response,
+               status: datum.sa_status
             }
 
             this.prefillAssessments.push(dat)
@@ -352,7 +354,7 @@ export default {
             <form @submit.prevent="update">
               <div class="row" v-for="(field, index) in assessments" :key="index">
 
-                <div class="col-lg-12">
+                <div v-if="field.status === 0" class="col-lg-12">
                   <div class="row">
                     <div class="col-9">
                       <div class="form-group">
@@ -369,6 +371,36 @@ export default {
             }"
                         />
                       </div>
+                    </div>
+
+
+
+                  </div>
+                </div>
+
+                <div v-else class="col-lg-12">
+                  <div class="row">
+                    <div class="col-9">
+                      <div class="form-group">
+                        <label for="goal">
+                          Question <span class="text-danger">*</span>
+                        </label>
+                        <b-form-textarea
+                            id="eya_question"
+                            type="date"
+                            disabled
+                            v-model="field.goal"
+                            class="form-control"
+                            :class="{
+              'is-invalid': submitted && $v.goal.$error,
+            }"
+                        />
+                      </div>
+                    </div>
+                    <div class="col-3">
+                      <i>
+                        Reviewed By Supervisor
+                      </i>
                     </div>
 
 
@@ -417,7 +449,7 @@ export default {
               <form @submit.prevent="submitNew">
                 <div class="row" v-for="(field, index) in prefillAssessments" :key="index">
 
-                  <div class="col-lg-12">
+                  <div  v-if="field.status === 0" class="col-lg-12">
                     <div class="row">
                       <div class="col-9">
                         <div class="form-group">
@@ -461,6 +493,36 @@ export default {
                           </div>
                         </div>
                       </div>
+                    </div>
+                  </div>
+
+                  <div v-else class="col-lg-12">
+                    <div class="row">
+                      <div class="col-9">
+                        <div class="form-group">
+                          <label for="goal">
+                            Question <span class="text-danger">*</span>
+                          </label>
+                          <b-form-textarea
+                              id="eya_question"
+                              type="date"
+                              disabled
+                              v-model="field.goal"
+                              class="form-control"
+                              :class="{
+              'is-invalid': submitted && $v.goal.$error,
+            }"
+                          />
+                        </div>
+                      </div>
+                      <div class="col-3">
+                        <i>
+                          Reviewed By Supervisor
+                        </i>
+                      </div>
+
+
+
                     </div>
                   </div>
 

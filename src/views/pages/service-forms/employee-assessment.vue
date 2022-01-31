@@ -17,14 +17,12 @@ export default {
   computed: {
     ...authComputed,
   },
-  beforeMount() {
-    this.getOpenGoalSetting()
-    },
+
   mounted() {
-    this.$route.params.empid
+    this.empId = this.$route.params.empid
 
    this.getOpenGoalSetting()
-    this.prefillAssessment()
+
     this.getSelfAssessment()
 
 
@@ -66,103 +64,50 @@ export default {
       prefillStatus: false,
       selfAssessmentGoals: [ ],
       assessments: [ ],
-      prefillAssessments: [ ]
+      prefillAssessments: [ ],
+      empId: this.$route.params.empid,
+      statuses: [
+        { text: "CLOSE", value: 1 },
+        { text: "OPEN", value: 0 },
+      ],
+      // statues: [{ value: 0, text: "Open" }, { value: 1, text: "Closed" }],
     };
   },
   methods: {
-    addField() {
-      this.texts.push({ id: this.count++, goal: null });
-      this.count++;
-    },
-
-    delField(index) {
-      if (index > 0) {
-        this.texts.splice(index, 1);
-
-      }
-    },
-
-    addAssessment() {
-      this.assessments.push({ id: this.count++, goal: null });
-      this.count++;
-    },
-
-    delAssessment(index) {
-      if (index > 0) {
-        this.assessments.splice(index, 1);
-
-      }
-    },
-
-    addPrefillAssessment() {
-      this.prefillAssessments.push({ id: this.count++, goal: null });
-      this.count++;
-    },
-
-    delPrefillAssessment(index) {
-      if (index > 0) {
-        this.prefillAssessments.splice(index, 1);
-
-      }
-    },
 
    async getSelfAssessment(){
       const urls = `${this.ROUTES.goalSetting}/get-open-goal-setting`;
      const url = await this.apiGet(urls).then((res) => {
        const { data } = res;
         if (data) {
-          return `${this.ROUTES.selfAssessment}/get-self-assessment/${this.getEmployee.emp_id}/${parseInt(data[0].gs_id)}`;
-        }
-      });
-     await this.apiGet(url).then((res) => {
-        const { data } = res;
-        if (data) {
 
-          this.assessments = [ ]
-
-          data.forEach(async (datum) => {
-            this.selfAssessmentStatus = true
-            this.prefillStatus = true
-            const dat = {
-              id: datum.sa_id,
-              goal: datum.sa_comment
-            }
-
-            this.assessments.push(dat)
-
-          });
+            return `${this.ROUTES.selfAssessment}/get-self-assessment/${this.empId}/${parseInt(data[0].gs_id)}`;
 
         }
       });
-    },
 
-   async prefillAssessment(){
-      const urls = `${this.ROUTES.goalSetting}/get-open-goal-setting`;
-      const url = await this.apiGet(urls).then((res) => {
-        const { data } = res;
-        if (data) {
-          return `${this.ROUTES.selfAssessment}/prefill-self-assessment/${this.getEmployee.emp_id}/${parseInt(data[0].gs_id)}`;
-        }
-      });
-      await this.apiGet(url).then((res) => {
-        const { data } = res;
-        if (data) {
-          const questions = data.questions
-          this.prefillAssessments = [ ]
-        questions.forEach(async (datum) => {
-        this.prefillStatus = false
-            const dat = {
-              id: datum.sa_id,
-              goal: datum.sa_comment,
-              response: datum.sa_response
-            }
+       await this.apiGet(url).then((res) => {
+         const { data } = res;
+         if (data) {
 
-            this.prefillAssessments.push(dat)
+           this.assessments = [ ]
 
-          });
+           data.forEach(async (datum) => {
 
-        }
-      });
+             const dat = {
+               id: datum.sa_id,
+               goal: datum.sa_comment,
+               status: parseInt(datum.sa_status)
+             }
+
+             this.assessments.push(dat)
+
+           });
+
+         }
+       });
+
+
     },
 
     getOpenGoalSetting(){
@@ -176,34 +121,15 @@ export default {
       });
     },
 
-    submitNewBeginning(){
-      const employeeID = this.getEmployee.emp_id;
-      const url = `${this.ROUTES.selfAssessment}/add-self-assessment/${employeeID}/${this.openGoalActivityId}`;
-      this.goals = [ ]
-      this.texts.forEach(async (field) => {
-        const data = {
-             sa_comment: field.goal,
-        };
-
-        this.goals.push(data)
-
-      });
-      this.apiPost(url, this.goals, "Add goals Error").then();
-
-      this.getSelfAssessment();
-      this.apiResponseHandler("Process Complete", "Goals Added");
-
-
-    },
-
     update(){
-      const employeeID = this.getEmployee.emp_id;
-      const url = `${this.ROUTES.selfAssessment}/update-self-assessment/${employeeID}`;
+      const employeeID = this.empId
+      const url = `${this.ROUTES.selfAssessment}/supervisor-update-self-assessment/${employeeID}`;
       this.goals = [ ]
       this.assessments.forEach(async (field) => {
         const data = {
           sa_id: field.id,
           sa_comment: field.goal,
+          sa_status: field.status
         };
         this.goals.push(data)
 
@@ -215,43 +141,9 @@ export default {
 
     },
 
-    respond(){
-      const employeeID = this.getEmployee.emp_id;
-      const url = `${this.ROUTES.selfAssessment}/respond-self-assessment/${employeeID}`;
-      this.goals = [ ]
-      this.prefillAssessments.forEach(async (field) => {
-        const data = {
-          sa_id: field.id,
-          sa_response: field.response
-        };
-
-        this.goals.push(data)
-
-      });
-      this.apiPatch(url, this.goals, "Update goals Error").then();
-      this.apiResponseHandler("Process Complete", "Goals Updated");
-      this.prefillAssessment()
 
 
-    },
 
-    submitNew() {
-      const employeeID = this.getEmployee.emp_id;
-      const url = `${this.ROUTES.selfAssessment}/add-self-assessment/${employeeID}/${this.openGoalActivityId}`;
-      this.goals = [ ]
-      this.prefillAssessments.forEach(async (field) => {
-        const data = {
-          sa_comment: field.goal,
-        };
-
-        this.goals.push(data)
-
-      });
-      this.apiPost(url, this.goals, "Add goals Error").then();
-      this.apiResponseHandler("Process Complete", "Goals Added");
-      this.getSelfAssessment()
-      //this.prefillAssessment()
-    },
 
   },
 };
@@ -274,87 +166,118 @@ export default {
             <h5 class="font-size-14 mb-0">Beginning of the Year</h5>
           </div>
 
-          <div v-if="!selfAssessmentStatus">
-            <form @submit.prevent="submitNewBeginning">
-              <div class="row" v-for="(field, index) in texts" :key="index">
+            <form @submit.prevent="update">
+            <div class="row" v-for="(field, index) in assessments" :key="index">
 
-                <div class="col-lg-12">
-                  <div class="row">
-                    <div class="col-9">
-                      <div class="form-group">
-                        <label for="goal">
-                          Question <span class="text-danger">*</span>
-                        </label>
-                        <b-form-textarea
-                            id="eya_question"
-                            type="date"
-                            v-model="field.goal"
-                            class="form-control"
-                            :class="{
+              <div class="col-lg-12" v-if="field.status === 0">
+                <div class="row">
+                  <div class="col-9">
+                    <div class="form-group">
+                      <label for="goal">
+                        Question <span class="text-danger">*</span>
+                      </label>
+                      <b-form-textarea
+                          id="eya_question"
+                          type="date"
+                          v-model="field.goal"
+                          class="form-control"
+                          :class="{
               'is-invalid': submitted && $v.goal.$error,
             }"
-                        />
-                      </div>
-                    </div>
-
-
-                    <div class="col-3">
-                      <div class="form-group">
-                        <div v-if="index > 0" class="form-group">
-                          <label style="visibility: hidden">hidden</label>
-                          <button
-                              type="button"
-                              class="btn btn-danger"
-                              @click="delField(index)"
-                          >
-                            DEL
-                          </button>
-                        </div>
-                        <div v-else class="form-group">
-                          <label style="visibility: hidden">hidden</label>
-                          <button
-                              type="button"
-                              class="btn btn-success"
-                              @click="addField"
-                          >
-                            ADD
-                          </button>
-                        </div>
-                      </div>
+                      />
                     </div>
                   </div>
-                </div>
+                  <div class="col-3">
+                    <b-form-group>
+                      <label>Status</label><br />
+<!--                      <b-form-select-->
+<!--                          id="location"-->
+<!--                          v-model="field.status"-->
+<!--                          :options="statues"-->
+<!--                          :class="{-->
+<!--              'is-invalid': submitted && $v.location.$error,-->
+<!--            }"-->
+<!--                      />-->
+                      <b-form-radio-group
+                          id="user_type"
+                          v-model="field.status"
+                          :options="statuses"
+                          button-variant="outline-success"
+                          buttons
+                      />
 
+                    </b-form-group>
+
+
+                </div>
+              </div>
+              </div>
+
+              <div class="col-lg-12" v-else>
+                <div class="row">
+                  <div class="col-9">
+                    <div class="form-group">
+                      <label for="goal">
+                        Question <span class="text-danger">*</span>
+                      </label>
+                      <b-form-textarea
+                          id="eya_question"
+                          type="date"
+                          disabled
+                          v-model="field.goal"
+                          class="form-control"
+                          :class="{
+              'is-invalid': submitted && $v.goal.$error,
+            }"
+                      />
+                    </div>
+                  </div>
+
+                </div>
               </div>
 
 
-              <div class="row">
-                <div class="col-lg-9">
-                  <b-button
-                      v-if="!submitting"
-                      class="btn btn-success btn-block mt-4"
-                      type="submit"
-                  >
-                    Submit
-                  </b-button>
-                  <b-button
-                      v-else
-                      disabled
-                      class="btn btn-success btn-block mt-4"
-                      type="submit"
-                  >
-                    Submitting...
-                  </b-button>
-                </div>
-              </div>
-            </form>
-          </div>
+            </div>
 
-          <div v-else>
+
+            <div class="row">
+              <div class="col-lg-9">
+                <b-button
+                    v-if="!submitting"
+                    class="btn btn-success btn-block mt-4"
+                    type="submit"
+                >
+                  Update
+                </b-button>
+                <b-button
+                    v-else
+                    disabled
+                    class="btn btn-success btn-block mt-4"
+                    type="submit"
+                >
+                  Updating...
+                </b-button>
+              </div>
+            </div>
+          </form>
+
+
+
+        </div>
+      </div>
+    </div>
+
+      <div v-else-if="openGoalActivity === 2" class="col-lg-12">
+        <div class="card">
+          <div class="card-body">
+            <div class="p-3 bg-light mb-4">
+              <h5 class="font-size-14 mb-0">Mid Year Checking</h5>
+            </div>
+
             <form @submit.prevent="update">
               <div class="row" v-for="(field, index) in assessments" :key="index">
 
-                <div class="col-lg-12">
+                <div class="col-lg-12" v-if="field.status === 0">
                   <div class="row">
                     <div class="col-9">
                       <div class="form-group">
@@ -372,11 +295,55 @@ export default {
                         />
                       </div>
                     </div>
+                    <div class="col-3">
+                      <b-form-group>
+                        <label>Status</label><br />
+                        <!--                      <b-form-select-->
+                        <!--                          id="location"-->
+                        <!--                          v-model="field.status"-->
+                        <!--                          :options="statues"-->
+                        <!--                          :class="{-->
+                        <!--              'is-invalid': submitted && $v.location.$error,-->
+                        <!--            }"-->
+                        <!--                      />-->
+                        <b-form-radio-group
+                            id="user_type"
+                            v-model="field.status"
+                            :options="statuses"
+                            button-variant="outline-success"
+                            buttons
+                        />
+
+                      </b-form-group>
 
 
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-lg-12" v-else>
+                  <div class="row">
+                    <div class="col-9">
+                      <div class="form-group">
+                        <label for="goal">
+                          Question <span class="text-danger">*</span>
+                        </label>
+                        <b-form-textarea
+                            id="eya_question"
+                            type="date"
+                            disabled
+                            v-model="field.goal"
+                            class="form-control"
+                            :class="{
+              'is-invalid': submitted && $v.goal.$error,
+            }"
+                        />
+                      </div>
+                    </div>
 
                   </div>
                 </div>
+
 
               </div>
 
@@ -401,240 +368,10 @@ export default {
                 </div>
               </div>
             </form>
-          </div>
-
-
-        </div>
-      </div>
-    </div>
-
-      <div v-else-if="openGoalActivity === 2" class="col-lg-12">
-        <div class="card">
-          <div class="card-body">
-            <div class="p-3 bg-light mb-4">
-              <h5 class="font-size-14 mb-0">Mid Year Checking</h5>
-            </div>
-
-            <div v-if="!prefillStatus">
-              <form @submit.prevent="submitNew">
-                <div class="row" v-for="(field, index) in prefillAssessments" :key="index">
-
-                  <div class="col-lg-12">
-                    <div class="row">
-                      <div class="col-9">
-                        <div class="form-group">
-                          <label for="goal">
-                            Question <span class="text-danger">*</span>
-                          </label>
-                          <b-form-textarea
-                              id="eya_question"
-                              type="date"
-                              v-model="field.goal"
-                              class="form-control"
-                              :class="{
-              'is-invalid': submitted && $v.goal.$error,
-            }"
-                          />
-                        </div>
-                      </div>
-
-
-                      <div class="col-3">
-                        <div class="form-group">
-                          <div v-if="index > 0" class="form-group">
-                            <label style="visibility: hidden">hidden</label>
-                            <button
-                                type="button"
-                                class="btn btn-danger"
-                                @click="delPrefillAssessment(index)"
-                            >
-                              DEL
-                            </button>
-                          </div>
-                          <div v-else class="form-group">
-                            <label style="visibility: hidden">hidden</label>
-                            <button
-                                type="button"
-                                class="btn btn-success"
-                                @click="addPrefillAssessment"
-                            >
-                              ADD
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                </div>
-
-
-
-                <div class="row">
-                  <div class="col-lg-9">
-                    <b-button
-                        v-if="!submitting"
-                        class="btn btn-success btn-block mt-4"
-                        type="submit"
-                    >
-                      Submit
-                    </b-button>
-                    <b-button
-                        v-else
-                        disabled
-                        class="btn btn-success btn-block mt-4"
-                        type="submit"
-                    >
-                      Submitting...
-                    </b-button>
-                  </div>
-                </div>
-
-
-
-              </form>
-            </div>
-            <div v-else>
-              <form @submit.prevent="update">
-                <div class="row" v-for="(field, index) in assessments" :key="index">
-
-                  <div class="col-lg-12">
-                    <div class="row">
-                      <div class="col-9">
-                        <div class="form-group">
-                          <label for="goal">
-                            Question <span class="text-danger">*</span>
-                          </label>
-                          <b-form-textarea
-                              id="eya_question"
-                              type="date"
-                              v-model="field.goal"
-                              class="form-control"
-                              :class="{
-              'is-invalid': submitted && $v.goal.$error,
-            }"
-                          />
-                        </div>
-                      </div>
-
-
-
-                    </div>
-                  </div>
-
-                </div>
-
-
-                <div class="row">
-                  <div class="col-lg-9">
-                    <b-button
-                        v-if="!submitting"
-                        class="btn btn-success btn-block mt-4"
-                        type="submit"
-                    >
-                      Update
-                    </b-button>
-                    <b-button
-                        v-else
-                        disabled
-                        class="btn btn-success btn-block mt-4"
-                        type="submit"
-                    >
-                      Updating...
-                    </b-button>
-                  </div>
-                </div>
-              </form>
-            </div>
 
           </div>
         </div>
       </div>
-
-      <div v-else-if="openGoalActivity === 3" class="col-lg-12">
-        <div class="card">
-          <div class="card-body">
-            <div class="p-3 bg-light mb-4">
-              <h5 class="font-size-14 mb-0">End of Year Checking</h5>
-            </div>
-
-            <div v-if="!prefillStatus">
-              <form @submit.prevent="respond">
-                <div class="row" v-for="(field, index) in prefillAssessments" :key="index">
-
-                  <div class="col-lg-12">
-                    <div class="row">
-                      <div class="col-4">
-                        <div class="form-group">
-                          <label for="goal">
-                            Question <span class="text-danger">*</span>
-                          </label>
-                          <b-form-textarea
-                              id="eya_question"
-                              disabled
-                              type="date"
-                              v-model="field.goal"
-                              class="form-control"
-                              :class="{
-              'is-invalid': submitted && $v.goal.$error,
-            }"
-                          />
-                        </div>
-                      </div>
-
-                      <div class="col-4">
-                        <div class="form-group">
-                          <label for="goal">
-                           Response <span class="text-danger">*</span>
-                          </label>
-                          <b-form-textarea
-                              id="eya_question"
-                              type="date"
-                              v-model="field.response"
-                              class="form-control"
-                              :class="{
-              'is-invalid': submitted && $v.goal.$error,
-            }"
-                          />
-                        </div>
-                      </div>
-
-                    </div>
-                  </div>
-
-                </div>
-
-
-
-                <div class="row">
-                  <div class="col-lg-8">
-                    <b-button
-                        v-if="!submitting"
-                        class="btn btn-success btn-block mt-4"
-                        type="submit"
-                    >
-                      Submit
-                    </b-button>
-                    <b-button
-                        v-else
-                        disabled
-                        class="btn btn-success btn-block mt-4"
-                        type="submit"
-                    >
-                      Submitting...
-                    </b-button>
-                  </div>
-                </div>
-
-
-
-              </form>
-            </div>
-
-          </div>
-        </div>
-      </div>
-
 
 
 

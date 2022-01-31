@@ -8,7 +8,7 @@ import { required } from "vuelidate/lib/validators";
 
 export default {
   page: {
-    title: "Self Assessment",
+    title: "Assess Employee",
     meta: [{ name: "description", content: appConfig.description }],
   },
   components: {
