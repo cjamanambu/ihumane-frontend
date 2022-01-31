@@ -19,15 +19,20 @@ export default {
 
   },
   validations: {
-    gs_from:{ required },
-   gs_to: { required },
-    gs_year: { required },
-    gs_activity: { required }
-
-
-
+    eya_question:{ required },
   },
   methods: {
+    addField() {
+      this.texts[0].charge--;
+      this.texts.push({ id: this.count++, eyaQuestion: null });
+      this.count++;
+    },
+    delField(index) {
+      if (index > 0) {
+        this.texts.splice(index, 1);
+        this.calc();
+      }
+    },
     refreshTable() {
       this.apiGet(this.ROUTES.endOfYear, "Get Questions Error").then(
         (res) => {
@@ -42,8 +47,13 @@ export default {
       const url = `${this.ROUTES.goalSetting}/get-open-end-Year`
       this.apiGet(url, "Get current year error").then(
           (res) => {
-            const { data } = res;
-            this.eya_year = data[0].eya_year;
+            if(res){
+              const { data } = res;
+              this.eya_year = data[0].eya_year
+              this.eyaYearStatus = true
+              this.eya_gs_id = data[0].gs_id
+            }
+
           }
       );
     },
@@ -64,53 +74,44 @@ export default {
       this.$refs["update-question"].show();
       this.$refs["question-table"].clearSelected();
     },
+
+
     submitNew() {
-      this.submitted = true;
-      this.$v.$touch();
-      if (this.$v.$invalid) {
-        this.apiFormHandler("Invalid Leave Type");
-      } else {
+
+      const url = `${this.ROUTES.endOfYear}/add-question`;
+      this.texts.forEach(async (field) => {
         const data = {
+          eya_gs_id: parseInt(this.eya_gs_id),
+          eya_question: field.eyaQuestion,
+                  };
 
-          gs_from: this.gs_from,
-          gs_to: this.gs_to,
-          gs_year: this.gs_year,
-          gs_activity: String(this.gs_activity)
+        this.questions.push(data)
 
-        };
-        const url = `${this.ROUTES.goalSetting}/add-goal-setting`
-        this.apiPost(url, data, "Add goal setting error").then(
-          (res) => {
-            this.apiResponseHandler(`${res.data}`, "New Goal Setting added");
-            this.refreshTable();
-            this.$v.$reset();
-            this.$refs["add-goal-setting"].hide();
-          }
-        );
-      }
+      });
+       this.apiPost(url, this.questions, "Add Question Error").then();
+           this.apiResponseHandler("Process Complete", "Questions Added");
+      this.$refs["add-question"].hide();
+      this.refreshTable();
     },
 
-    submitUpdate() {
+    async submitUpdate() {
       this.submitted = true;
       this.$v.$touch();
       if (this.$v.$invalid) {
-        this.apiFormHandler("Invalid Leave Type");
+        this.apiFormHandler("Invalid Question");
       } else {
         const data = {
-
-          gs_from: this.gs_from,
-          gs_to: this.gs_to,
-          gs_year: this.gs_year,
-          gs_activity: this.gs_activity,
-          gs_status: this.gs_status
+          eya_question: this.eya_question,
 
         };
-        const url = `${this.ROUTES.goalSetting}/close-goal-setting/${this.gs_id}`
-        this.apiPatch(url, data, "Close Goal Setting Error").then((res) => {
-          this.apiResponseHandler(`${res.data}`, "Close Goal Setting");
-          this.refreshTable();
+        const url = `${this.ROUTES.endOfYear}/update-question/${this.eya_id}`
+        this.apiPatch(url, data, "Update Question Error").then((res) => {
+         this.apiResponseHandler(`${res.data}`, "Update Question");
+
           this.$v.$reset();
-          this.$refs["update-goal-setting"].hide();
+          this.$refs["update-question"].hide();
+          this.eya_questions = null
+          this.refreshTable();
         });
       }
     },
@@ -132,7 +133,8 @@ export default {
           active: true,
         },
       ],
-
+      texts: [{ id: 0, eyaQuestion: null }],
+      count: 1,
       totalRows: 1,
       currentPage: 1,
       perPage: 10,
@@ -149,8 +151,10 @@ export default {
       ],
       eya_gs_id: null,
       eya_questions: [],
+      questions: [],
       eya_question: null,
       eya_year: null,
+      eyaYearStatus: false,
        submitted: false,
     };
   },
@@ -160,12 +164,21 @@ export default {
 <template>
   <Layout>
     <PageHeader :title="title" :items="items" />
-    <div class="d-flex justify-content-end mb-3">
+    <div v-if="eyaYearStatus" class="d-flex justify-content-end mb-3">
       <b-button class="btn btn-success" @click="$refs['add-question'].show()">
         <i class="mdi mdi-plus mr-2"></i>
         Add New Questions
       </b-button>
     </div>
+
+    <div v-else class="d-flex justify-content-end mb-3">
+      <b-button class="btn btn-warning" >
+
+        No End of Year Activity Set
+      </b-button>
+    </div>
+
+
     <b-spinner type="grow" v-if="apiBusy" class="m-2" variant="success" />
     <div v-else class="row">
       <div class="col-12">
@@ -258,20 +271,58 @@ export default {
       @hidden="resetForm"
     >
       <form @submit.prevent="submitNew">
-        <div class="form-group">
-          <label for="eya_question">
-            Question <span class="text-danger">*</span>
-          </label>
-          <b-form-textarea
-              id="eya_question"
-              type="date"
-              v-model="eya_question"
-              class="form-control"
-              :class="{
+        <div class="row" v-for="(field, index) in texts" :key="index">
+
+          <div class="col-lg-12">
+            <div class="row">
+              <div class="col-9">
+                <div class="form-group">
+                  <label for="eya_question">
+                    Question <span class="text-danger">*</span>
+                  </label>
+                  <b-form-textarea
+                      id="eya_question"
+                      type="date"
+                      v-model="field.eyaQuestion"
+                      class="form-control"
+                      :class="{
               'is-invalid': submitted && $v.gs_from.$error,
             }"
-          />
+                  />
+                </div>
+              </div>
+
+
+              <div class="col-3">
+                <div class="form-group">
+                  <div v-if="field.id > 0" class="form-group">
+                    <label style="visibility: hidden">hidden</label>
+                    <button
+                        type="button"
+                        class="btn btn-danger"
+                        @click="delField(index)"
+                    >
+                      DEL
+                    </button>
+                  </div>
+                  <div v-else class="form-group">
+                    <label style="visibility: hidden">hidden</label>
+                    <button
+                        type="button"
+                        class="btn btn-success"
+                        @click="addField"
+                    >
+                      ADD
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
         </div>
+
+
 
 
 
@@ -311,7 +362,7 @@ export default {
               v-model="eya_question"
               class="form-control"
               :class="{
-              'is-invalid': submitted && $v.gs_from.$error,
+              'is-invalid': submitted && $v.eya_question.$error,
             }"
           />
         </div>
