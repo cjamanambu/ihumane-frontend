@@ -48,6 +48,8 @@ export const ROUTES = {
   goalSetting: `goal-setting`,
   endOfYear: `end-year-assessment`,
   grantChart: `grant-chart`,
-  selfAssessment: 'self-assessment'
+  selfAssessment: 'self-assessment',
+  endYearRating: 'end-year-rating'
+
 
 };
