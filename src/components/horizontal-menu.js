@@ -33,8 +33,9 @@ export const menuItems = [
       {
         id: 6,
         label: "Travel Authorization",
-        link: "/supervisors",
+        link: "/travel-authorization",
       },
+
 
       {
         id: 11,
@@ -47,6 +48,7 @@ export const menuItems = [
         label: "Assess Employee",
         link: "/assess-employee",
       },
+
 
     ],
   },
@@ -61,7 +63,6 @@ export const menuItems = [
         label: "PaySlips",
         link: "/new-employee",
       },
-
     ],
   },
 
@@ -75,7 +76,6 @@ export const menuItems = [
         label: "PaySlips",
         link: "/new-employee",
       },
-
     ],
   },
 ];
