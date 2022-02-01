@@ -25,6 +25,9 @@ export default {
 
     this.getSelfAssessment()
 
+    this.getEndYearAssessment()
+    this.getRatings()
+
 
   },
   validations: {
@@ -51,9 +54,16 @@ export default {
 
       ],
       texts: [{ id: 0, goal: null }],
+      year: null,
       endYearQuestions: [ ],
       openGoalActivity: null,
       openGoalActivityId:null,
+      rating: null,
+      ratingStatus: null,
+      ratings: [ ],
+      ratingsArray: [ ],
+      ratingsStatuses: [ ],
+      employeeRating: null,
       goals: [],
       start: "",
       end: "",
@@ -63,6 +73,7 @@ export default {
       selfAssessmentStatus: false,
       prefillStatus: false,
       selfAssessmentGoals: [ ],
+      endYearAssessments: [ ],
       assessments: [ ],
       prefillAssessments: [ ],
       empId: this.$route.params.empid,
@@ -75,13 +86,49 @@ export default {
   },
   methods: {
 
+    async getRatings(){
+      const url = `${this.ROUTES.rating}`;
+
+
+      await this.apiGet(url).then((res) => {
+        const { data } = res;
+        if (data) {
+          this.ratingsArray = [ ]
+          this.ratings = [ ]
+
+          data.forEach(async (datum) => {
+
+            const dat = {
+              text: datum.rating_name,
+              value: datum.rating_id,
+            }
+
+            const dats = {
+              text: datum.rating_name,
+              desc: datum.rating_desc
+            }
+
+            this.ratingsArray.push(dat)
+            this.ratings.push(dats)
+
+          });
+
+        }
+      });
+    },
+
    async getSelfAssessment(){
       const urls = `${this.ROUTES.goalSetting}/get-open-goal-setting`;
      const url = await this.apiGet(urls).then((res) => {
        const { data } = res;
         if (data) {
 
+
+
             return `${this.ROUTES.selfAssessment}/get-self-assessment/${this.empId}/${parseInt(data[0].gs_id)}`;
+
+
+
 
         }
       });
@@ -97,6 +144,7 @@ export default {
              const dat = {
                id: datum.sa_id,
                goal: datum.sa_comment,
+               response: datum.sa_response,
                status: parseInt(datum.sa_status)
              }
 
@@ -106,6 +154,52 @@ export default {
 
          }
        });
+
+
+    },
+
+    async getEndYearAssessment(){
+      const urls = `${this.ROUTES.goalSetting}/get-open-goal-setting`;
+      const url = await this.apiGet(urls).then((res) => {
+        const { data } = res;
+        if (data) {
+
+
+
+          return `${this.ROUTES.selfAssessment}/get-end-questions/${this.empId}/${parseInt(data[0].gs_id)}`;
+
+
+
+
+        }
+      });
+
+      await this.apiGet(url).then((res) => {
+        const { data } = res;
+        if (data) {
+          this.ratingStatus = data.ratingStatus
+          this.year = data.year
+          if(data.ratingDetails){
+            this.employeeRating = data.ratingDetails.eyr_rating
+          }
+
+          this.endYearAssessments = [ ]
+          let questionData = data.question
+          questionData.forEach(async (datum) => {
+
+            const dat = {
+              id: datum.sa_id,
+              goal: datum.sa_comment,
+              response: datum.sa_response,
+              status: parseInt(datum.sa_status)
+            }
+
+            this.endYearAssessments.push(dat)
+
+          });
+
+        }
+      });
 
 
     },
@@ -122,21 +216,19 @@ export default {
     },
 
     update(){
-      const employeeID = this.empId
-      const url = `${this.ROUTES.selfAssessment}/supervisor-update-self-assessment/${employeeID}`;
-      this.goals = [ ]
-      this.assessments.forEach(async (field) => {
-        const data = {
-          sa_id: field.id,
-          sa_comment: field.goal,
-          sa_status: field.status
-        };
-        this.goals.push(data)
 
-      });
-      this.apiPatch(url, this.goals, "Update goals Error").then();
-      this.apiResponseHandler("Process Complete", "Goals Updated");
-      this.getSelfAssessment()
+      const url = `${this.ROUTES.endYearRating}/add-rating`;
+      const data = {
+        eyr_empid: this.empId,
+        eyr_year: this.year,
+        eyr_rating: this.employeeRating,
+        eyr_by: this.getEmployee.emp_id
+      };
+
+      this.apiPost(url, data, "Rate Employee Error").then();
+      this.apiResponseHandler("Process Complete", "Employee Rated");
+      this.getRatings()
+      this.getEndYearAssessment()
 
 
     },
@@ -368,6 +460,196 @@ export default {
                 </div>
               </div>
             </form>
+
+          </div>
+        </div>
+      </div>
+
+
+      <div v-else-if="openGoalActivity === 3" class="col-lg-12">
+        <div class="card">
+          <div class="card-body">
+            <div class="p-3 bg-light mb-4">
+              <h5 class="font-size-14 mb-0">End Of Year Assessment</h5>
+            </div>
+
+
+              <div class="row" v-for="(field, index) in endYearAssessments" :key="index">
+
+                <div class="col-lg-12">
+                  <div class="row">
+                    <div class="col-6">
+
+                      <div class="form-group">
+
+                        <div>
+                          <b-card title="Questions">
+                            <br>
+                            <b-card-text>
+                              {{field.goal }}
+                            </b-card-text>
+
+
+
+                          </b-card>
+                        </div>
+
+
+
+                      </div>
+                     </div>
+                    <div class="col-6">
+
+                      <div class="form-group">
+
+                        <div>
+                          <b-card title="Response">
+                           <br>
+                            <b-card-text>
+                              {{field.response }}
+                            </b-card-text>
+
+
+
+                          </b-card>
+                        </div>
+
+
+
+                      </div>
+
+                    </div>
+                  </div>
+                </div>
+
+
+
+
+              </div>
+
+                <div  v-if="parseInt(ratingStatus) === 0">
+                  <div class="row">
+
+
+
+
+                    <div class="col-lg-12">
+                      <div class="card-body">
+                        <div class="p-3 bg-light mb-4">
+                          <h5 class="font-size-14 mb-0">Grading Rubric</h5>
+                        </div>
+                      </div>
+
+                      <b-card v-for="(field, index) in ratings" :key="index" :title="field.text">
+                        <br>
+                        <b-card-text>
+                          {{field.desc }}
+                        </b-card-text>
+
+
+
+                      </b-card>
+
+
+                    </div>
+                  </div>
+                  <div class="row">
+                    <form @submit.prevent="update">
+                    <div class="col-lg-12">
+                      <b-form-group>
+                        <label>Overall Rating</label><br />
+
+                        <b-form-radio-group
+                            id="user_type"
+                            v-model="employeeRating"
+                            :options="ratingsArray"
+                            button-variant="outline-success"
+                            buttons
+
+
+                        />
+
+                      </b-form-group>
+
+                      <b-button
+                          v-if="!submitting"
+                          class="btn btn-success mt-4"
+                          type="submit"
+                      >
+                        Update
+                      </b-button>
+                      <b-button
+                          v-else
+                          disabled
+                          class="btn btn-success mt-4"
+                          type="submit"
+                      >
+                        Updating...
+                      </b-button>
+                    </div>
+                    </form>
+
+
+
+                  </div>
+                </div>
+
+            <div  v-else>
+              <div class="row">
+
+
+
+
+                <div class="col-lg-12">
+                  <div class="card-body">
+                    <div class="p-3 bg-light mb-4">
+                      <h5 class="font-size-14 mb-0">Grading Rubric</h5>
+                    </div>
+                  </div>
+
+                  <b-card v-for="(field, index) in ratings" :key="index" :title="field.text">
+                    <br>
+                    <b-card-text>
+                      {{field.desc }}
+                    </b-card-text>
+
+
+
+                  </b-card>
+
+
+                </div>
+              </div>
+              <div class="row">
+                <form @submit.prevent="update">
+                  <div class="col-lg-12">
+                    <b-form-group>
+                      <label>Overall Rating </label><br />
+
+                      <b-form-radio-group
+                          id="user_type"
+                          v-model="employeeRating"
+                          :options="ratingsArray"
+                          readonly
+
+                          button-variant="outline-success"
+                          buttons
+
+
+                      />
+
+                    </b-form-group>
+
+
+                  </div>
+                </form>
+
+
+
+              </div>
+            </div>
+
+
 
           </div>
         </div>

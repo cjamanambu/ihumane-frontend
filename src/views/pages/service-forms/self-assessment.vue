@@ -373,6 +373,30 @@ export default {
                       </div>
                     </div>
 
+                    <div class="col-3">
+                      <div class="form-group">
+                        <div v-if="index > 0" class="form-group">
+                          <label style="visibility: hidden">hidden</label>
+                          <button
+                              type="button"
+                              class="btn btn-danger"
+                              @click="delAssessment(index)"
+                          >
+                            DEL
+                          </button>
+                        </div>
+                        <div v-else class="form-group">
+                          <label style="visibility: hidden">hidden</label>
+                          <button
+                              type="button"
+                              class="btn btn-success"
+                              @click="addAssessment"
+                          >
+                            ADD
+                          </button>
+                        </div>
+                      </div>
+                    </div>
 
 
                   </div>
@@ -449,7 +473,7 @@ export default {
               <form @submit.prevent="submitNew">
                 <div class="row" v-for="(field, index) in prefillAssessments" :key="index">
 
-                  <div  v-if="field.status === 0" class="col-lg-12">
+                  <div  class="col-lg-12">
                     <div class="row">
                       <div class="col-9">
                         <div class="form-group">
@@ -496,35 +520,7 @@ export default {
                     </div>
                   </div>
 
-                  <div v-else class="col-lg-12">
-                    <div class="row">
-                      <div class="col-9">
-                        <div class="form-group">
-                          <label for="goal">
-                            Question <span class="text-danger">*</span>
-                          </label>
-                          <b-form-textarea
-                              id="eya_question"
-                              type="date"
-                              disabled
-                              v-model="field.goal"
-                              class="form-control"
-                              :class="{
-              'is-invalid': submitted && $v.goal.$error,
-            }"
-                          />
-                        </div>
-                      </div>
-                      <div class="col-3">
-                        <i>
-                          Reviewed By Supervisor
-                        </i>
-                      </div>
 
-
-
-                    </div>
-                  </div>
 
                 </div>
 
@@ -554,11 +550,13 @@ export default {
 
               </form>
             </div>
+
+
             <div v-else>
               <form @submit.prevent="update">
                 <div class="row" v-for="(field, index) in assessments" :key="index">
 
-                  <div class="col-lg-12">
+                  <div  v-if="field.status === 0" class="col-lg-12">
                     <div class="row">
                       <div class="col-9">
                         <div class="form-group">
@@ -581,8 +579,36 @@ export default {
 
                     </div>
                   </div>
+                  <div  v-else class="col-lg-12">
+                    <div class="row">
+                      <div class="col-9">
+                        <div class="form-group">
+                          <label for="goal">
+                            Question <span class="text-danger">*</span>
+                          </label>
+                          <b-form-textarea
+                              id="eya_question"
+                              disabled
+                              type="date"
+                              v-model="field.goal"
+                              class="form-control"
+                              :class="{
+              'is-invalid': submitted && $v.goal.$error,
+            }"
+                          />
+                        </div>
+                      </div>
+                      <div class="col-3">
+                        <p> Reviewed By Supervisor</p>
+                      </div>
 
+
+
+                    </div>
+                  </div>
                 </div>
+
+
 
 
                 <div class="row">
@@ -632,7 +658,7 @@ export default {
                           <b-form-textarea
                               id="eya_question"
                               disabled
-                              type="date"
+
                               v-model="field.goal"
                               class="form-control"
                               :class="{
@@ -648,8 +674,7 @@ export default {
                            Response <span class="text-danger">*</span>
                           </label>
                           <b-form-textarea
-                              id="eya_question"
-                              type="date"
+
                               v-model="field.response"
                               class="form-control"
                               :class="{
