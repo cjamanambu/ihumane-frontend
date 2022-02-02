@@ -60,7 +60,7 @@ export default {
           destinationEdit: false,
         },
       ],
-      perDiem: 0,
+      perDiem: null,
       perDiemEdit: false,
       perDiemDays: null,
       perDiemDaysEdit: null,
@@ -183,7 +183,7 @@ export default {
         });
       });
       this.expense.forEach((code) => {
-        code = code.toString();
+        // code = code.toString();
         t2_code.push({
           code,
         });
@@ -221,9 +221,10 @@ export default {
       const url = `${this.ROUTES.travelApplication}/new-travel-application`;
       this.confirmTA = false;
       this.apiPost(url, data, "Add Travel Application").then((res) => {
-        const { message } = res.data;
+        console.log({ res });
+        const { data } = res;
         this.$router.push({ name: "travel-requests" }).then(() => {
-          this.apiResponseHandler(message, "Travel Application Submitted");
+          this.apiResponseHandler(data, "Travel Application Submitted");
         });
       });
     },
@@ -279,7 +280,7 @@ export default {
         @click="$router.push({ name: 'travel-requests' })"
       >
         <i class="mdi mdi-plus mr-2"></i>
-        Manage Travel Requests
+        View Travel Requests
       </b-button>
     </div>
     <div class="row">

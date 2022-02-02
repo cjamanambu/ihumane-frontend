@@ -60,4 +60,13 @@ export default [
         "@/views/pages/service-forms/travel-authorization/travel-requests"
       ),
   },
+  {
+    path: "/travel-requests/:travelAppID",
+    name: "travel-request",
+    meta: {
+      authRequired: true,
+    },
+    component: () =>
+      import("@/views/pages/service-forms/travel-authorization/travel-request"),
+  },
 ];

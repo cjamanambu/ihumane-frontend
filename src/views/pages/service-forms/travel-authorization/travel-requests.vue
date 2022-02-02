@@ -23,14 +23,24 @@ export default {
       let employeeID = this.getEmployee.emp_id;
       const url = `${this.ROUTES.travelApplication}/get-travel-application/${employeeID}`;
       this.apiGet(url, "Get Travel Applications").then((res) => {
-        const { applications } = res.data;
-        this.applications = applications;
+        const { data } = res;
+        this.applications = data;
+        this.totalRows = this.applications.length;
+        console.log(this.totalRows);
       });
     },
     onFiltered(filteredItems) {
       // Trigger pagination to update the number of buttons/pages due to filtering
       this.totalRows = filteredItems.length;
       this.currentPage = 1;
+    },
+    selectRow(row) {
+      row = row[0];
+      this.travelAppID = row.travelapp_id;
+      this.$router.push({
+        name: "travel-request",
+        params: { travelAppID: this.travelAppID },
+      });
     },
   },
   data() {
@@ -56,7 +66,7 @@ export default {
       pageOptions: [10, 25, 50, 100],
       filter: null,
       filterOn: [],
-      sortBy: "travelapp_id",
+      sortBy: "sn",
       sortDesc: false,
       fields: [
         { key: "sn", label: "S/n", sortable: true },
@@ -75,6 +85,7 @@ export default {
         },
       ],
       sn: 1,
+      travelAppID: null,
     };
   },
 };
@@ -89,7 +100,7 @@ export default {
         @click="$router.push({ name: 'travel-authorization' })"
       >
         <i class="mdi mdi-plus mr-2"></i>
-        Submit New Request
+        New Travel Request
       </b-button>
     </div>
     <scale-loader v-if="apiBusy" />
