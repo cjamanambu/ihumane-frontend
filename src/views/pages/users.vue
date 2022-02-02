@@ -139,7 +139,7 @@ export default {
       pageOptions: [10, 25, 50, 100],
       filter: null,
       filterOn: [],
-      sortBy: "user_id",
+      sortBy: "sn",
       sortDesc: false,
       fields: [
         {
