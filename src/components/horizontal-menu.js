@@ -33,9 +33,19 @@ export const menuItems = [
       {
         id: 6,
         label: "Travel Authorization",
-        link: "/travel-authorization",
+        subItems: [
+          {
+            id: 6,
+            label: "New Travel Request",
+            link: "/travel-authorization",
+          },
+          {
+            id: 6,
+            label: "View Travel Requests",
+            link: "/travel-requests",
+          },
+        ],
       },
-
 
       {
         id: 11,
@@ -48,8 +58,6 @@ export const menuItems = [
         label: "Assess Employee",
         link: "/assess-employee",
       },
-
-
     ],
   },
 
