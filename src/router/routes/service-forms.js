@@ -22,8 +22,7 @@ export default [
     meta: {
       authRequired: true,
     },
-    component: () =>
-        import("@/views/pages/service-forms/self-assessment"),
+    component: () => import("@/views/pages/service-forms/self-assessment"),
   },
   {
     path: "/assess-employee",
@@ -31,8 +30,7 @@ export default [
     meta: {
       authRequired: true,
     },
-    component: () =>
-        import("@/views/pages/service-forms/assess-employee"),
+    component: () => import("@/views/pages/service-forms/assess-employee"),
   },
   {
     path: "/employee-assessment/:empid",
@@ -40,8 +38,7 @@ export default [
     meta: {
       authRequired: true,
     },
-    component: () =>
-        import("@/views/pages/service-forms/employee-assessment"),    
+    component: () => import("@/views/pages/service-forms/employee-assessment"),
   },
   {
     path: "/travel-authorization",
@@ -49,6 +46,18 @@ export default [
     meta: {
       authRequired: true,
     },
-    component: () => import("@/views/pages/service-forms/travel-authorization/index"),
-  }
+    component: () =>
+      import("@/views/pages/service-forms/travel-authorization/index"),
+  },
+  {
+    path: "/travel-requests",
+    name: "travel-requests",
+    meta: {
+      authRequired: true,
+    },
+    component: () =>
+      import(
+        "@/views/pages/service-forms/travel-authorization/travel-requests"
+      ),
+  },
 ];

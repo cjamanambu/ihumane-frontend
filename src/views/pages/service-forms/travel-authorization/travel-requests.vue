@@ -1,0 +1,215 @@
+<script>
+import Layout from "@/views/layouts/main";
+import PageHeader from "@/components/page-header";
+import appConfig from "@/app.config";
+import { authComputed } from "@/state/helpers";
+export default {
+  page: {
+    title: "Travel Requests",
+    meta: [{ name: "description", content: appConfig.description }],
+  },
+  computed: {
+    ...authComputed,
+  },
+  components: {
+    Layout,
+    PageHeader,
+  },
+  mounted() {
+    this.refreshTable();
+  },
+  methods: {
+    refreshTable() {
+      let employeeID = this.getEmployee.emp_id;
+      const url = `${this.ROUTES.travelApplication}/get-travel-application/${employeeID}`;
+      this.apiGet(url, "Get Travel Applications").then((res) => {
+        const { applications } = res.data;
+        this.applications = applications;
+      });
+    },
+    onFiltered(filteredItems) {
+      // Trigger pagination to update the number of buttons/pages due to filtering
+      this.totalRows = filteredItems.length;
+      this.currentPage = 1;
+    },
+  },
+  data() {
+    return {
+      title: "Travel Requests",
+      items: [
+        {
+          text: "IHUMANE",
+        },
+        {
+          text: "Dashboard",
+          href: "/",
+        },
+        {
+          text: "Travel Requests",
+          active: true,
+        },
+      ],
+      applications: [],
+      totalRows: 1,
+      currentPage: 1,
+      perPage: 10,
+      pageOptions: [10, 25, 50, 100],
+      filter: null,
+      filterOn: [],
+      sortBy: "travelapp_id",
+      sortDesc: false,
+      fields: [
+        { key: "sn", label: "S/n", sortable: true },
+        {
+          key: "travelapp_travel_cat",
+          label: "Travel Category",
+          sortable: true,
+        },
+        { key: "travelapp_start_date", label: "Start Date", sortable: true },
+        { key: "travelapp_end_date", label: "End Date", sortable: true },
+        { key: "travelapp_total_days", label: "Trip Length", sortable: true },
+        {
+          key: "travelapp_status",
+          label: "Application Status",
+          sortable: true,
+        },
+      ],
+      sn: 1,
+    };
+  },
+};
+</script>
+
+<template>
+  <Layout>
+    <PageHeader :title="title" :items="items" />
+    <div class="d-flex justify-content-end mb-3">
+      <b-button
+        class="btn btn-success"
+        @click="$router.push({ name: 'travel-authorization' })"
+      >
+        <i class="mdi mdi-plus mr-2"></i>
+        Submit New Request
+      </b-button>
+    </div>
+    <scale-loader v-if="apiBusy" />
+    <div v-else class="row">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-body">
+            <div class="row mt-4">
+              <div class="col-sm-12 col-md-6">
+                <div id="tickets-table_length" class="dataTables_length">
+                  <label class="d-inline-flex align-items-center">
+                    Show&nbsp;
+                    <b-form-select
+                      v-model="perPage"
+                      size="sm"
+                      :options="pageOptions"
+                    ></b-form-select
+                    >&nbsp;entries
+                  </label>
+                </div>
+              </div>
+              <!-- Search -->
+              <div class="col-sm-12 col-md-6">
+                <div
+                  id="tickets-table_filter"
+                  class="dataTables_filter text-md-right"
+                >
+                  <label class="d-inline-flex align-items-center">
+                    Search:
+                    <b-form-input
+                      v-model="filter"
+                      type="search"
+                      placeholder="Search..."
+                      class="form-control form-control-sm ml-2"
+                    ></b-form-input>
+                  </label>
+                </div>
+              </div>
+              <!-- End search -->
+            </div>
+            <!-- Table -->
+            <div class="table-responsive mb-0">
+              <b-table
+                ref="donor-table"
+                bordered
+                selectable
+                hover
+                :items="applications"
+                :fields="fields"
+                responsive="sm"
+                :per-page="perPage"
+                :current-page="currentPage"
+                :sort-by.sync="sortBy"
+                :sort-desc.sync="sortDesc"
+                :filter="filter"
+                :filter-included-fields="filterOn"
+                @filtered="onFiltered"
+                show-empty
+                select-mode="single"
+                @row-selected="selectRow"
+              >
+                <template #cell(sn)="">
+                  <span>{{ sn++ }}</span>
+                </template>
+                <template #cell(travelapp_travel_cat)="row">
+                  <span v-if="row.value === 1" class="text-uppercase">
+                    Official Request
+                  </span>
+                  <span class="text-uppercase" v-else> Personal Request </span>
+                </template>
+                <template #cell(travelapp_start_date)="row">
+                  <span> {{ new Date(row.value).toDateString() }}</span>
+                </template>
+                <template #cell(travelapp_end_date)="row">
+                  <span> {{ new Date(row.value).toDateString() }}</span>
+                </template>
+                <template #cell(travelapp_total_days)="row">
+                  <span> {{ row.value }} days</span>
+                </template>
+                <template #cell(travelapp_status)="row">
+                  <span
+                    v-if="row.value === 0"
+                    class="badge badge-pill badge-warning"
+                  >
+                    pending
+                  </span>
+                  <span
+                    v-else-if="row.value === 1"
+                    class="badge badge-pill badge-success"
+                  >
+                    approved
+                  </span>
+                  <span
+                    v-else-if="row.value === 2"
+                    class="badge badge-pill badge-danger"
+                  >
+                    declined
+                  </span>
+                </template>
+              </b-table>
+            </div>
+            <div class="row">
+              <div class="col">
+                <div
+                  class="dataTables_paginate paging_simple_numbers float-right"
+                >
+                  <ul class="pagination pagination-rounded mb-0">
+                    <!-- pagination -->
+                    <b-pagination
+                      v-model="currentPage"
+                      :total-rows="totalRows"
+                      :per-page="perPage"
+                    ></b-pagination>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </Layout>
+</template>
