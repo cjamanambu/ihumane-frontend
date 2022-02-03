@@ -10,7 +10,7 @@ export const menuItems = [
     id: 2,
     label: "Profile",
     icon: "ri-dashboard-line",
-    link: "/",
+    link: "/profile",
   },
 
   {
