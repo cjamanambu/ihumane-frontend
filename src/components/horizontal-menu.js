@@ -47,6 +47,15 @@ export const menuItems = [
         ],
       },
 
+
+    ],
+  },
+
+  {
+    id: 7,
+    label: "Assessment",
+    icon: "ri-user-settings-line",
+    subItems: [
       {
         id: 11,
         label: "Self Assessment",
