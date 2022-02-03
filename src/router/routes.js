@@ -4,6 +4,7 @@ import hrConfiguration from "./routes/hr-configuration";
 import employeeManagement from "./routes/employee-management"
 import misc from "./routes/misc"
 import serviceForms from "./routes/service-forms"
+import selfService from "./routes/self-service"
 
 export default [
   {
@@ -19,5 +20,6 @@ export default [
   ...hrConfiguration,
   ...employeeManagement,
   ...serviceForms,
+  ...selfService,
   ...misc,
 ];
