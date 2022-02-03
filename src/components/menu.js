@@ -207,11 +207,72 @@ export const menuItems = [
       },
     ],
   },
-
   {
     id: 29,
     label: "Employee Leaves",
     icon: "ri-user-settings-line",
     link: "/employee-leave",
+  },
+  {
+    id: 26,
+    label: "Self-Service",
+    isTitle: true,
+  },
+  {
+    id: 29,
+    label: "Leave Application",
+    icon: "ri-walk-line",
+    link: "",
+  },
+  {
+    id: 29,
+    label: "Travel Application",
+    icon: "ri-flight-takeoff-line",
+    link: "",
+  },
+  {
+    id: 29,
+    label: "Time Sheet",
+    icon: "ri-calendar-event-line",
+    link: "",
+  },
+  {
+    id: 26,
+    label: "Payroll Routine",
+    isTitle: true,
+  },
+  {
+    id: 27,
+    label: "Variations",
+    icon: "ri-device-recover-line",
+    subItems: [
+      {
+        id: 28,
+        label: "Setup Variation",
+        link: "",
+      },
+      {
+        id: 30,
+        label: "Confirm Variation",
+        link: "",
+      },
+    ],
+  },
+  {
+    id: 27,
+    label: "Process Payroll",
+    icon: " ri-exchange-funds-line",
+    subItems: [
+      {
+        id: 28,
+        label: "Process Payroll Routine",
+        link: "",
+      },
+      {
+        id: 30,
+        label: "Approve Payroll Routine",
+        link: "",
+      },
+    ],
   },
 ];

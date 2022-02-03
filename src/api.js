@@ -2,6 +2,7 @@ import axios from "axios";
 
 export const API = axios.create({
   baseURL: `https://irc-api.ihumane.net/`,
+
   // baseURL: `http://localhost:9000/`,
 
 });
@@ -28,7 +29,7 @@ export const ROUTES = {
   taxRate: `tax-rates`,
   user: `users`,
   location: `locations`,
-  publicHolidays:`public-holidays`,
+  publicHolidays: `public-holidays`,
   bank: `banks`,
   employee: `employees`,
   leaveType: `leave-types`,
@@ -48,8 +49,7 @@ export const ROUTES = {
   goalSetting: `goal-setting`,
   endOfYear: `end-year-assessment`,
   grantChart: `grant-chart`,
-  selfAssessment: 'self-assessment',
-  endYearRating: 'end-year-rating'
-
-
+  endYearRating: 'end-year-rating',
+  selfAssessment: "self-assessment",
+  travelApplication: `travel-applications`,
 };

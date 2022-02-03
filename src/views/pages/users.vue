@@ -100,8 +100,7 @@ export default {
           user_username: this.username,
           user_name: this.fullname,
           user_email: this.email,
-          user_password: this.password,
-          user_type: 1,
+          user_type: this.userType,
           user_token: this.token,
           user_status: this.userStatus,
         };
@@ -140,7 +139,7 @@ export default {
       pageOptions: [10, 25, 50, 100],
       filter: null,
       filterOn: [],
-      sortBy: "user_id",
+      sortBy: "sn",
       sortDesc: false,
       fields: [
         {
@@ -156,9 +155,8 @@ export default {
         { key: "user_status", sortable: true },
         { key: "createdAt", sortable: true },
       ],
-      userType: 1,
+      userType: 2,
       userTypes: [
-        { text: "ADMIN", value: 1 },
         { text: "MODERATOR", value: 3 },
         { text: "EMPLOYEE", value: 2 },
       ],
@@ -444,24 +442,12 @@ export default {
         </div>
         <div class="d-flex justify-content-between flex-lg-row flex-column">
           <b-form-group v-if="this.userType !== 1">
-            <label for="user_type">User Type</label><br />
-            <b-form-radio-group
-              id="user_type"
-              v-model="userType"
-              :options="userTypes"
-              button-variant="outline-success"
-              buttons
-            />
+            <label for="user_type">User Type</label>
+            <b-form-select v-model="userType" :options="userTypes" />
           </b-form-group>
           <b-form-group>
-            <label for="user_status">User Status</label><br />
-            <b-form-radio-group
-              id="user_status"
-              v-model="userStatus"
-              :options="userStatuses"
-              button-variant="outline-primary"
-              buttons
-            />
+            <label for="user_status">User Status</label>
+            <b-form-select v-model="userStatus" :options="userStatuses" />
           </b-form-group>
         </div>
         <div class="form-group">
