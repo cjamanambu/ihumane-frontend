@@ -20,8 +20,8 @@ export const menuItems = [
     subItems: [
       {
         id: 4,
-        label: "Leave Authorization",
-        link: "/new-employee",
+        label: "Leave Application",
+        link: "/leave-application",
       },
 
       {
