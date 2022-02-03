@@ -10,7 +10,7 @@ export const menuItems = [
     id: 2,
     label: "Profile",
     icon: "ri-dashboard-line",
-    link: "/",
+    link: "/profile",
   },
 
   {
@@ -20,8 +20,8 @@ export const menuItems = [
     subItems: [
       {
         id: 4,
-        label: "Leave Authorization",
-        link: "/new-employee",
+        label: "Leave Application",
+        link: "/leave-application",
       },
 
       {
@@ -47,6 +47,15 @@ export const menuItems = [
         ],
       },
 
+
+    ],
+  },
+
+  {
+    id: 7,
+    label: "Assessment",
+    icon: "ri-user-settings-line",
+    subItems: [
       {
         id: 11,
         label: "Self Assessment",
