@@ -9,10 +9,13 @@ export default {
       sum: 100,
       fields: [{ id: 0, grant: null, charge: 100 }],
       confirmTER: false,
+      donor: null,
+      donors: [{ value: null, text: "Select code", disabled: true }],
     };
   },
   mounted() {
     this.calc();
+    this.fetchDonors();
   },
   computed: {
     ...authComputed,
@@ -28,6 +31,18 @@ export default {
     },
   },
   methods: {
+    fetchDonors() {
+      this.apiGet(this.ROUTES.donor, "Get Donors Error").then((res) => {
+        const { data } = res;
+        this.donors = [{ value: null, text: "Select code", disabled: true }];
+        data.forEach((donor) => {
+          this.donors.push({
+            value: donor.donor_code,
+            text: `${donor.donor_code} (${donor.donor_description})`,
+          });
+        });
+      });
+    },
     addField() {
       this.fields[0].charge--;
       this.fields.push({ id: this.count, grant: null, charge: 1 });
@@ -93,48 +108,42 @@ export default {
       <div class="row" v-for="(field, index) in fields" :key="index">
         <div class="col-lg-6">
           <div class="form-group">
-            <label for="grant"> Grant Code (T1) </label>
-            <input id="grant" v-model="field.grant" class="form-control" />
+            <label> Grant Code (T1) </label>
+            <b-form-select v-model="field.grant" :options="donors" />
           </div>
         </div>
-        <div class="col-lg-6">
-          <div class="row">
-            <div class="col-9">
-              <div class="form-group">
-                <label> % to Charge (T1) </label>
-                <b-form-spinbutton
-                  v-model="field.charge"
-                  id="charge"
-                  min="1"
-                  max="100"
-                  @change="calc(field.charge)"
-                />
-              </div>
-            </div>
-            <div class="col-3">
-              <div class="form-group">
-                <div v-if="field.id > 0" class="form-group">
-                  <label style="visibility: hidden">hidden</label>
-                  <button
-                    type="button"
-                    class="btn btn-danger"
-                    @click="delField(index)"
-                  >
-                    DEL
-                  </button>
-                </div>
-                <div v-else class="form-group">
-                  <label style="visibility: hidden">hidden</label>
-                  <button
-                    type="button"
-                    class="btn btn-success"
-                    @click="addField"
-                  >
-                    ADD
-                  </button>
-                </div>
-              </div>
-            </div>
+        <div class="col-lg-4">
+          <div class="form-group">
+            <label> % to Charge (T1) </label>
+            <b-form-spinbutton
+              v-model="field.charge"
+              id="charge"
+              min="1"
+              max="100"
+              @change="calc(field.charge)"
+            />
+          </div>
+        </div>
+        <div class="col-lg-2">
+          <div v-if="field.id > 0" class="form-group">
+            <label style="visibility: hidden">hidden</label>
+            <button
+              type="button"
+              class="btn btn-sm btn-danger"
+              @click="delField(index)"
+            >
+              DEL
+            </button>
+          </div>
+          <div v-else class="form-group">
+            <label style="visibility: hidden">hidden</label>
+            <button
+              type="button"
+              class="btn btn-sm btn-success"
+              @click="addField"
+            >
+              ADD
+            </button>
           </div>
         </div>
       </div>

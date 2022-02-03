@@ -299,24 +299,6 @@ export default {
               <div class="row">
                 <div class="col-lg-8">
                   <div class="form-group">
-                    <label for=""> Employee's Name </label>
-                    <input
-                      type="text"
-                      class="form-control"
-                      disabled
-                      :value="getUser.user_name"
-                    />
-                  </div>
-                  <div class="form-group">
-                    <label for="">
-                      Passport No
-                      <small class="text-muted">(International Staff)</small> /
-                      Nigeria ID No
-                      <small class="text-muted">(National Staff)</small>
-                    </label>
-                    <input type="text" class="form-control" disabled />
-                  </div>
-                  <div class="form-group">
                     <label for="">
                       Purpose of Travel
                       <small class="text-muted">(Description)</small>
@@ -353,21 +335,6 @@ export default {
                   </div>
                 </div>
                 <div class="col-lg-4">
-                  <div class="form-group">
-                    <label for="">
-                      T7 Number <small class="text-muted">(Staff ID)</small>
-                    </label>
-                    <input type="text" class="form-control" disabled />
-                  </div>
-                  <div class="form-group">
-                    <label for=""> Phone Number </label>
-                    <input
-                      type="text"
-                      class="form-control"
-                      :value="this.getEmployee.emp_phone_no"
-                      disabled
-                    />
-                  </div>
                   <div class="form-group">
                     <label for="">Program / Charge Codes</label>
                     <div class="row">
@@ -407,34 +374,6 @@ export default {
                               :select-size="3"
                             />
                           </div>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="row">
-                      <div class="col-lg-3">
-                        <div class="form-group">
-                          <label class="pt-2" for="">
-                            T3 <small class="text-muted">(Sector)</small>
-                          </label>
-                        </div>
-                      </div>
-                      <div class="col-lg-9">
-                        <div class="form-group">
-                          <input type="text" class="form-control" disabled />
-                        </div>
-                      </div>
-                    </div>
-                    <div class="row">
-                      <div class="col-lg-3">
-                        <div class="form-group">
-                          <label class="pt-2" for="">
-                            T6 <small class="text-muted">(Location)</small>
-                          </label>
-                        </div>
-                      </div>
-                      <div class="col-lg-9">
-                        <div class="form-group">
-                          <input type="text" class="form-control" disabled />
                         </div>
                       </div>
                     </div>

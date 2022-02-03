@@ -27,7 +27,9 @@ export default {
     refreshTable() {
       this.apiGet(this.ROUTES.user, "Get Users Error").then((res) => {
         const { data } = res;
-        this.users = data;
+        data.forEach((user, index) => {
+          this.users[index] = { sn: ++index, ...user };
+        });
         this.totalRows = this.users.length;
       });
     },
@@ -245,9 +247,6 @@ export default {
                 select-mode="single"
                 @row-selected="selectUser"
               >
-                <template #cell(sn)>
-                  {{ sn++ }}
-                </template>
                 <template #cell(user_type)="row">
                   <p v-if="row.value === 1">ADMIN</p>
                   <p v-else-if="row.value === 3">MODERATOR</p>
