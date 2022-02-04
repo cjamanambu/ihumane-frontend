@@ -69,6 +69,8 @@ export default {
         selectable: true,
         selectMirror: true,
         dayMaxEvents: true,
+        showNonCurrentDates: false,
+        fixedWeekCount: false,
       },
       currentEvents: [],
       showModal: false,
@@ -95,12 +97,18 @@ export default {
       entryCount: 0,
       populating: false,
       timeAllocated: false,
+      publicHolidays: [],
+      showModalPH: false,
+      phName: "",
     };
   },
   methods: {
-    fetchPayrollMonthYear() {
+    async fetchPayrollMonthYear() {
       this.fetching = true;
-      this.apiGet(this.ROUTES.payrollMonthYear).then((res) => {
+      await this.apiGet(this.ROUTES.publicHolidays).then((res) => {
+        this.publicHolidays = res.data;
+      });
+      await this.apiGet(this.ROUTES.payrollMonthYear).then((res) => {
         if (res.data) {
           const { pym_year, pym_month } = res.data;
           this.pymYear = pym_year;
@@ -177,13 +185,29 @@ export default {
           this.populateOption = false;
         });
     },
-
-    dateClicked(info) {
+    async dateClicked(info) {
       this.newEventData = info;
       this.dateInfo = info;
-      this.showModal = true;
+      let isPublicHoliday = false;
+      let date = this.dateInfo.dateStr.split("-");
+      await this.publicHolidays.every((publicHoliday) => {
+        if (
+          publicHoliday.ph_year === date[0] &&
+          parseInt(publicHoliday.ph_month) === parseInt(date[1]) &&
+          parseInt(publicHoliday.ph_day) === parseInt(date[2])
+        ) {
+          this.phName = publicHoliday.ph_name;
+          isPublicHoliday = true;
+          return false;
+        }
+        return true;
+      });
+      if (!isPublicHoliday) {
+        this.showModal = true;
+      } else {
+        this.showModalPH = true;
+      }
     },
-
     fillTSE(dateInfo) {
       this.$router.push({
         name: "timesheet-entry",
@@ -305,6 +329,20 @@ export default {
           <span>Manage Timesheet Entry</span>
         </a>
       </div>
+    </b-modal>
+    <b-modal
+      v-model="showModalPH"
+      title="Timesheet Entry"
+      centered
+      title-class="text-black font-18"
+      body-class="p-3"
+      hide-footer
+    >
+      <p v-if="dateInfo" class="mb-4">
+        <strong>{{ dateInfo.date.toDateString() }}</strong> is
+        <strong class="text-capitalize"> {{ phName }} </strong>. Please select
+        another date to fill.
+      </p>
     </b-modal>
     <b-modal
       v-model="populateOption"

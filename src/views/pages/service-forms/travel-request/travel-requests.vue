@@ -24,9 +24,10 @@ export default {
       const url = `${this.ROUTES.travelApplication}/get-travel-application/${employeeID}`;
       this.apiGet(url, "Get Travel Applications").then((res) => {
         const { data } = res;
-        this.applications = data;
+        data.forEach((application, index) => {
+          this.applications[index] = { sn: ++index, ...application };
+        });
         this.totalRows = this.applications.length;
-        console.log(this.totalRows);
       });
     },
     onFiltered(filteredItems) {
@@ -162,9 +163,6 @@ export default {
                 select-mode="single"
                 @row-selected="selectRow"
               >
-                <template #cell(sn)="">
-                  <span>{{ sn++ }}</span>
-                </template>
                 <template #cell(travelapp_travel_cat)="row">
                   <span v-if="row.value === 1" class="text-uppercase">
                     Official Request
