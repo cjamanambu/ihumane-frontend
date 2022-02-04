@@ -21,7 +21,6 @@ export default {
         data.forEach((employee, index) => {
           this.employees[index] = { sn: ++index, ...employee };
         });
-        console.log(this.employees);
         this.totalRows = this.employees.length;
       });
     },
@@ -75,7 +74,7 @@ export default {
         { key: "email", label: "Email", sortable: true },
         { key: "emp_phone_no", label: "Phone", sortable: true },
         {
-          key: "sector",
+          key: "JobRole.Department",
           label: "T3 Code (Sector)",
           sortable: true,
         },
@@ -173,6 +172,18 @@ export default {
                     {{ row.item.emp_office_email }}
                   </p>
                   <small>{{ row.item.emp_personal_email }}</small>
+                </template>
+                <template #cell(JobRole.Department)="row">
+                  <p class="mb-0">
+                    {{ row.value.d_t3_code }}
+                  </p>
+                  <small>{{ row.value.department_name }}</small>
+                </template>
+                <template #cell(location)="row">
+                  <p class="mb-0">
+                    {{ row.value.l_t6_code }}
+                  </p>
+                  <small>{{ row.value.location_name }}</small>
                 </template>
               </b-table>
             </div>
