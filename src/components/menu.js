@@ -47,11 +47,6 @@ export const menuItems = [
         link: "/salary-structures",
       },
       {
-        id: 9,
-        label: "Salary Allowances",
-        link: "/salary-allowances",
-      },
-      {
         id: 10,
         label: "Payroll Setup",
         link: "/payroll-setup",
@@ -191,7 +186,7 @@ export const menuItems = [
       {
         id: 30,
         label: "Manage Employees",
-        link: "/new-employee",
+        link: "/manage-employees",
       },
 
       {
