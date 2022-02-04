@@ -18,6 +18,23 @@ export default [
   },
 
   {
+    path: "/manage-employees",
+    name: "manage-employees",
+    meta: {
+      authRequired: true,
+    },
+    component: () => import("@/views/pages/employees/manage-employees"),
+  },
+  {
+    path: "/manage-employees/:employeeID",
+    name: "manage-employee",
+    meta: {
+      authRequired: true,
+    },
+    component: () => import("@/views/pages/employees/manage-employee"),
+  },
+
+  {
     path: "/supervisors",
     name: "supervisors",
     meta: {
@@ -34,4 +51,4 @@ export default [
     },
     component: () => import("@/views/pages/employees/assign-supervisor"),
   },
-]
+];
