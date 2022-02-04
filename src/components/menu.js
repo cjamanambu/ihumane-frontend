@@ -237,6 +237,12 @@ export const menuItems = [
     link: "",
   },
   {
+    id: 29,
+    label: "Self Assessment",
+    icon: "ri-file-edit-line",
+    link: "",
+  },
+  {
     id: 26,
     label: "Payroll Routine",
     isTitle: true,

@@ -9,14 +9,14 @@ export const menuItems = [
   {
     id: 2,
     label: "Profile",
-    icon: "ri-dashboard-line",
+    icon: "ri-account-box-line",
     link: "/profile",
   },
 
   {
     id: 3,
     label: "Service Forms",
-    icon: "ri-user-settings-line",
+    icon: "ri-file-list-2-line",
     subItems: [
       {
         id: 4,
@@ -32,7 +32,7 @@ export const menuItems = [
 
       {
         id: 6,
-        label: "Travel Authorization",
+        label: "Travel Request",
         subItems: [
           {
             id: 6,
@@ -46,15 +46,13 @@ export const menuItems = [
           },
         ],
       },
-
-
     ],
   },
 
   {
     id: 7,
     label: "Assessment",
-    icon: "ri-user-settings-line",
+    icon: "ri-survey-line",
     subItems: [
       {
         id: 11,
@@ -73,12 +71,12 @@ export const menuItems = [
   {
     id: 7,
     label: "Payroll",
-    icon: "ri-user-settings-line",
+    icon: "ri-bank-card-line",
     subItems: [
       {
         id: 8,
         label: "PaySlips",
-        link: "/new-employee",
+        link: "",
       },
     ],
   },
@@ -86,12 +84,27 @@ export const menuItems = [
   {
     id: 9,
     label: "Authorizations",
-    icon: "ri-user-settings-line",
+    icon: "ri-user-follow-line",
     subItems: [
       {
         id: 10,
-        label: "PaySlips",
-        link: "/new-employee",
+        label: "Travel Authorization",
+        link: "",
+      },
+      {
+        id: 10,
+        label: "TimeSheet Authorization",
+        link: "",
+      },
+      {
+        id: 10,
+        label: "Leave Authorization",
+        link: "",
+      },
+      {
+        id: 10,
+        label: "Assessment Authorization",
+        link: "",
       },
     ],
   },
