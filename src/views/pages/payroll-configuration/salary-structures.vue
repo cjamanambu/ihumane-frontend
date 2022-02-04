@@ -2,6 +2,8 @@
 import Layout from "@/views/layouts/main";
 import PageHeader from "@/components/page-header";
 import appConfig from "@/app.config";
+import { required } from "vuelidate/lib/validators";
+
 export default {
   page: {
     title: "Salary Structures",
@@ -11,9 +13,23 @@ export default {
     Layout,
     PageHeader,
   },
+  watch: {
+    amount: function (newValue) {
+      const result = newValue
+        .replace(/\D/g, "")
+        .replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+      this.$nextTick(() => (this.amount = result));
+    },
+  },
   mounted() {
     this.refreshTable();
     this.fetchSalaryGrades();
+    this.fetchEmployees();
+  },
+  validations: {
+    salaryGrade: { required },
+    employee: { required },
+    amount: { required },
   },
   methods: {
     refreshTable() {
@@ -21,7 +37,6 @@ export default {
         this.ROUTES.salaryStructure,
         "Get Salary Structures Error"
       ).then((res) => {
-        console.log({ res });
         const { data } = res;
         data.forEach((salaryStructure, index) => {
           this.salaryStructures[index] = { sn: ++index, ...salaryStructure };
@@ -32,28 +47,74 @@ export default {
     fetchSalaryGrades() {
       this.apiGet(this.ROUTES.salaryGrade, "Get Salary Grades Error").then(
         (res) => {
-          console.log({ res });
           this.salaryGrades = [
             {
               value: null,
               text: "Please select a salary grade",
-              disable: true,
+              disabled: true,
             },
           ];
           const { data } = res;
           data.forEach((salaryGrade) => {
             this.salaryGrades.push({
               value: salaryGrade.sg_id,
-              text: salaryGrade.sg_name,
+              text: `${
+                salaryGrade.sg_name
+              } [max: ${salaryGrade.sg_maximum.toLocaleString()} - mid: ${salaryGrade.sg_midpoint.toLocaleString()} - min: ${salaryGrade.sg_minimum.toLocaleString()}]`,
             });
           });
         }
       );
     },
+    fetchEmployees() {
+      this.apiGet(this.ROUTES.employee, "Get Employees Error").then((res) => {
+        this.employees = [
+          {
+            value: null,
+            text: "Please select an employee",
+            disabled: true,
+          },
+        ];
+        const { data } = res;
+        data.forEach((employee) => {
+          this.employees.push({
+            value: employee.emp_id,
+            text: `${employee.emp_first_name} ${employee.emp_last_name} (${employee.emp_unique_id})`,
+            disabled: false,
+          });
+        });
+      });
+    },
     onFiltered(filteredItems) {
       // Trigger pagination to update the number of buttons/pages due to filtering
       this.totalRows = filteredItems.length;
       this.currentPage = 1;
+    },
+    resetForm() {
+      this.employee = null;
+      this.salaryGrade = null;
+      this.amount = null;
+      this.$v.$reset();
+    },
+    submitNew() {
+      this.submitted = true;
+      this.$v.$touch();
+      if (this.$v.$invalid) {
+        this.apiFormHandler("Invalid Salary Structure");
+      } else {
+        const data = {
+          ss_empid: this.employee,
+          ss_gross: parseFloat(this.amount.replace(/,/g, "")),
+          ss_grade: this.salaryGrade,
+        };
+        const url = `${this.ROUTES.salaryStructure}/add-salary-structure`;
+        this.apiPost(url, data, "Add Salary Structure Error").then((res) => {
+          this.apiResponseHandler(res.data, "New Salary Structure Added");
+          this.refreshTable();
+          this.$v.$reset();
+          this.$refs["add-salary-structure"].hide();
+        });
+      }
     },
   },
   data() {
@@ -84,17 +145,22 @@ export default {
       fields: [
         { key: "sn", label: "S/n", sortable: true },
         {
-          key: "ss_empid",
-          label: "Employee ID",
+          key: "employee",
+          label: "Employee",
           sortable: true,
         },
-        { key: "ss_pd", label: "Payment Definition", sortable: true },
-        { key: "ss_amount", label: "Amount", sortable: true },
+        { key: "total_amount", label: "Total Amount", sortable: true },
       ],
       salaryGrade: null,
       salaryGrades: [
-        { value: null, text: "Please select a salary grade", disable: true },
+        { value: null, text: "Please select a salary grade", disabled: true },
       ],
+      employee: null,
+      employees: [
+        { value: null, text: "Please select an employee", disabled: true },
+      ],
+      submitted: false,
+      amount: null,
     };
   },
 };
@@ -171,6 +237,17 @@ export default {
                 select-mode="single"
                 @row-selected="selectRow"
               >
+                <template #cell(employee)="row">
+                  <p class="mb-0">
+                    {{ row.value.emp_first_name }} {{ row.value.emp_last_name }}
+                  </p>
+                  <small>{{ row.value.emp_unique_id }}</small>
+                </template>
+                <template #cell(total_amount)="row">
+                  <p class="mb-0">
+                    {{ row.value.toLocaleString() }}
+                  </p>
+                </template>
               </b-table>
             </div>
             <div class="row">
@@ -204,32 +281,45 @@ export default {
       <form @submit.prevent="submitNew">
         <div class="form-group">
           <label for="code">
-            Donor Code <span class="text-danger">*</span>
+            Employee <span class="text-danger">*</span>
           </label>
-          <input
+          <b-form-select
             id="code"
-            type="text"
-            v-model="code"
-            class="form-control"
+            v-model="employee"
+            :options="employees"
             :class="{
-              'is-invalid': submitted && $v.code.$error,
+              'is-invalid': submitted && $v.employee.$error,
             }"
           />
         </div>
         <div class="form-group">
-          <label for="desc">
-            Donor Description <span class="text-danger">*</span>
+          <label for="code">
+            Salary Grade <span class="text-danger">*</span>
           </label>
-          <textarea
-            id="desc"
-            type="text"
-            v-model="description"
-            class="form-control"
+          <b-form-select
+            id="code"
+            v-model="salaryGrade"
+            :options="salaryGrades"
             :class="{
-              'is-invalid': submitted && $v.description.$error,
+              'is-invalid': submitted && $v.salaryGrade.$error,
             }"
           />
         </div>
+        <div class="form-group">
+          <label for="amount">
+            Gross Salary <span class="text-danger">*</span>
+          </label>
+          <input
+            id="amount"
+            type="text"
+            v-model="amount"
+            class="form-control"
+            :class="{
+              'is-invalid': submitted && $v.amount.$error,
+            }"
+          />
+        </div>
+
         <b-button
           v-if="!submitting"
           class="btn btn-success btn-block mt-4"
