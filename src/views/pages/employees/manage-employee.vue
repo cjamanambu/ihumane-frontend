@@ -22,6 +22,7 @@ export default {
       const url = `${this.ROUTES.employee}/get-employee/${employeeID}`;
       this.apiGet(url, "Get Employee Error").then((res) => {
         const { data } = res;
+        console.log({ data });
         if (data) {
           this.emp_first_name = data.emp_first_name;
           this.emp_last_name = data.emp_last_name;
