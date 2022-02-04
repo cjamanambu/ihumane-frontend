@@ -2,14 +2,10 @@
 import Layout from "@/views/layouts/main";
 import PageHeader from "@/components/page-header";
 import appConfig from "@/app.config";
-import { authComputed } from "@/state/helpers";
 export default {
   page: {
-    title: "Travel Requests",
+    title: "Salary Structures",
     meta: [{ name: "description", content: appConfig.description }],
-  },
-  computed: {
-    ...authComputed,
   },
   components: {
     Layout,
@@ -17,36 +13,52 @@ export default {
   },
   mounted() {
     this.refreshTable();
+    this.fetchSalaryGrades();
   },
   methods: {
     refreshTable() {
-      let employeeID = this.getEmployee.emp_id;
-      const url = `${this.ROUTES.travelApplication}/get-travel-application/${employeeID}`;
-      this.apiGet(url, "Get Travel Applications Error").then((res) => {
+      this.apiGet(
+        this.ROUTES.salaryStructure,
+        "Get Salary Structures Error"
+      ).then((res) => {
+        console.log({ res });
         const { data } = res;
-        data.forEach((application, index) => {
-          this.applications[index] = { sn: ++index, ...application };
+        data.forEach((salaryStructure, index) => {
+          this.salaryStructures[index] = { sn: ++index, ...salaryStructure };
         });
-        this.totalRows = this.applications.length;
+        this.totalRows = this.salaryStructures.length;
       });
+    },
+    fetchSalaryGrades() {
+      this.apiGet(this.ROUTES.salaryGrade, "Get Salary Grades Error").then(
+        (res) => {
+          console.log({ res });
+          this.salaryGrades = [
+            {
+              value: null,
+              text: "Please select a salary grade",
+              disable: true,
+            },
+          ];
+          const { data } = res;
+          data.forEach((salaryGrade) => {
+            this.salaryGrades.push({
+              value: salaryGrade.sg_id,
+              text: salaryGrade.sg_name,
+            });
+          });
+        }
+      );
     },
     onFiltered(filteredItems) {
       // Trigger pagination to update the number of buttons/pages due to filtering
       this.totalRows = filteredItems.length;
       this.currentPage = 1;
     },
-    selectRow(row) {
-      row = row[0];
-      this.travelAppID = row.travelapp_id;
-      this.$router.push({
-        name: "travel-request",
-        params: { travelAppID: this.travelAppID },
-      });
-    },
   },
   data() {
     return {
-      title: "Travel Requests",
+      title: "Salary Structures",
       items: [
         {
           text: "IHUMANE",
@@ -56,11 +68,11 @@ export default {
           href: "/",
         },
         {
-          text: "Travel Requests",
+          text: "Salary Structures",
           active: true,
         },
       ],
-      applications: [],
+      salaryStructures: [],
       totalRows: 1,
       currentPage: 1,
       perPage: 10,
@@ -72,21 +84,17 @@ export default {
       fields: [
         { key: "sn", label: "S/n", sortable: true },
         {
-          key: "travelapp_travel_cat",
-          label: "Travel Category",
+          key: "ss_empid",
+          label: "Employee ID",
           sortable: true,
         },
-        { key: "travelapp_start_date", label: "Start Date", sortable: true },
-        { key: "travelapp_end_date", label: "End Date", sortable: true },
-        { key: "travelapp_total_days", label: "Trip Length", sortable: true },
-        {
-          key: "travelapp_status",
-          label: "Application Status",
-          sortable: true,
-        },
+        { key: "ss_pd", label: "Payment Definition", sortable: true },
+        { key: "ss_amount", label: "Amount", sortable: true },
       ],
-      sn: 1,
-      travelAppID: null,
+      salaryGrade: null,
+      salaryGrades: [
+        { value: null, text: "Please select a salary grade", disable: true },
+      ],
     };
   },
 };
@@ -98,10 +106,10 @@ export default {
     <div class="d-flex justify-content-end mb-3">
       <b-button
         class="btn btn-success"
-        @click="$router.push({ name: 'travel-authorization' })"
+        @click="$refs['add-salary-structure'].show()"
       >
         <i class="mdi mdi-plus mr-2"></i>
-        New Travel Request
+        Add Salary Structure
       </b-button>
     </div>
     <scale-loader v-if="apiBusy" />
@@ -145,11 +153,11 @@ export default {
             <!-- Table -->
             <div class="table-responsive mb-0">
               <b-table
-                ref="donor-table"
+                ref="user-table"
                 bordered
                 selectable
                 hover
-                :items="applications"
+                :items="salaryStructures"
                 :fields="fields"
                 responsive="sm"
                 :per-page="perPage"
@@ -163,41 +171,6 @@ export default {
                 select-mode="single"
                 @row-selected="selectRow"
               >
-                <template #cell(travelapp_travel_cat)="row">
-                  <span v-if="row.value === 1" class="text-uppercase">
-                    Official Request
-                  </span>
-                  <span class="text-uppercase" v-else> Personal Request </span>
-                </template>
-                <template #cell(travelapp_start_date)="row">
-                  <span> {{ new Date(row.value).toDateString() }}</span>
-                </template>
-                <template #cell(travelapp_end_date)="row">
-                  <span> {{ new Date(row.value).toDateString() }}</span>
-                </template>
-                <template #cell(travelapp_total_days)="row">
-                  <span> {{ row.value }} days</span>
-                </template>
-                <template #cell(travelapp_status)="row">
-                  <span
-                    v-if="row.value === 0"
-                    class="badge badge-pill badge-warning"
-                  >
-                    pending
-                  </span>
-                  <span
-                    v-else-if="row.value === 1"
-                    class="badge badge-pill badge-success"
-                  >
-                    approved
-                  </span>
-                  <span
-                    v-else-if="row.value === 2"
-                    class="badge badge-pill badge-danger"
-                  >
-                    declined
-                  </span>
-                </template>
               </b-table>
             </div>
             <div class="row">
@@ -220,5 +193,59 @@ export default {
         </div>
       </div>
     </div>
+    <b-modal
+      ref="add-salary-structure"
+      title="Add Salary Structure"
+      hide-footer
+      centered
+      title-class="font-18"
+      @hidden="resetForm"
+    >
+      <form @submit.prevent="submitNew">
+        <div class="form-group">
+          <label for="code">
+            Donor Code <span class="text-danger">*</span>
+          </label>
+          <input
+            id="code"
+            type="text"
+            v-model="code"
+            class="form-control"
+            :class="{
+              'is-invalid': submitted && $v.code.$error,
+            }"
+          />
+        </div>
+        <div class="form-group">
+          <label for="desc">
+            Donor Description <span class="text-danger">*</span>
+          </label>
+          <textarea
+            id="desc"
+            type="text"
+            v-model="description"
+            class="form-control"
+            :class="{
+              'is-invalid': submitted && $v.description.$error,
+            }"
+          />
+        </div>
+        <b-button
+          v-if="!submitting"
+          class="btn btn-success btn-block mt-4"
+          type="submit"
+        >
+          Submit
+        </b-button>
+        <b-button
+          v-else
+          disabled
+          class="btn btn-success btn-block mt-4"
+          type="submit"
+        >
+          Submitting...
+        </b-button>
+      </form>
+    </b-modal>
   </Layout>
 </template>

@@ -76,7 +76,7 @@ export const menuItems = [
       {
         id: 8,
         label: "PaySlips",
-        link: "",
+        link: "/pay-slips",
       },
     ],
   },

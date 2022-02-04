@@ -3,8 +3,7 @@ import axios from "axios";
 export const API = axios.create({
   baseURL: `https://irc-api.ihumane.net/`,
 
-   //baseURL: `http://localhost:9000/`,
-
+  //baseURL: `http://localhost:9000/`,
 });
 
 export function SET_TOKEN(token) {
@@ -49,7 +48,8 @@ export const ROUTES = {
   goalSetting: `goal-setting`,
   endOfYear: `end-year-assessment`,
   grantChart: `grant-chart`,
-  endYearRating: 'end-year-rating',
+  endYearRating: "end-year-rating",
   selfAssessment: "self-assessment",
   travelApplication: `travel-applications`,
+  salaryStructure: `salary-structure`,
 };
