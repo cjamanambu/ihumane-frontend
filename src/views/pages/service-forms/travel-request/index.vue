@@ -5,7 +5,7 @@ import appConfig from "@/app.config";
 import { authComputed } from "@/state/helpers";
 export default {
   page: {
-    title: "Travel Authorization",
+    title: "Travel Request",
     meta: [{ name: "description", content: appConfig.description }],
   },
   computed: {
@@ -17,7 +17,7 @@ export default {
   },
   data() {
     return {
-      title: "Travel Authorization",
+      title: "Travel Request",
       items: [
         {
           text: "IHUMANE",
@@ -27,7 +27,7 @@ export default {
           href: "/",
         },
         {
-          text: "Travel Authorization",
+          text: "Travel Request",
           active: true,
         },
       ],

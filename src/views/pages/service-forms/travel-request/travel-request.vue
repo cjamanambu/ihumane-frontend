@@ -27,7 +27,6 @@ export default {
         this.application = application;
         this.breakdowns = breakdown;
         this.expenses = expenses;
-        console.log({ application, breakdown, expenses });
         this.fetchDonorInfo();
         this.fetchExpenses();
       });
@@ -35,7 +34,6 @@ export default {
     fetchDonorInfo() {
       const url = `${this.ROUTES.donor}/${this.application.travelapp_t1_code}`;
       this.apiGet(url, "Get Donor Error").then((res) => {
-        console.log({ res });
         const { data } = res;
         this.donor = data;
       });
