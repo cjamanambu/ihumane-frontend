@@ -59,4 +59,13 @@ export default [
     },
     component: () => import("@/views/pages/payroll-configuration/grant-charts"),
   },
+  {
+    path: "/salary-structures",
+    name: "salary-structures",
+    meta: {
+      authRequired: true,
+    },
+    component: () =>
+      import("@/views/pages/payroll-configuration/salary-structures"),
+  },
 ];
