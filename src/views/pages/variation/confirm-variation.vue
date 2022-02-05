@@ -30,23 +30,6 @@ export default {
     },
 
 
-    getVariationalPayments(){
-      const url = `${this.ROUTES.paymentDefinition}/variational-payments`
-      this.apiGet(url, "Get Variational Payment Error").then(
-          (res) => {
-            this.payments = [
-              { value: null, text: "Select Payment" },
-            ];
-            const { data } = res;
-            data.forEach((payment) => {
-              this.payments.push({
-                value: payment.pd_id,
-                text:payment.pd_payment_name,
-              });
-            });
-          }
-      );
-    },
 
     refreshPMY() {
       this.apiGet(
@@ -92,31 +75,7 @@ export default {
       })
 
     },
-    submitNew() {
-      this.submitted = true;
 
-        const data = {
-
-          employee: this.selectedEmployees,
-          payment_definition: this.payment,
-          amount: 50000,
-          month: this.month,
-          year: this.year
-
-        };
-        const url = `${this.ROUTES.variationalPayment}`;
-        this.apiPost(url, data, "Add Variational Payment").then(
-            (res) => {
-              this.apiResponseHandler(`${res.data}`, "Add Variational Payment");
-              this.submitted = false;
-              this.selectedEmployees = [ ]
-                  this.amount = 0
-                  this.payment = null
-
-            }
-        );
-
-    },
 
     selectPayment(items) {
       this.selectedPayments = items
@@ -133,6 +92,56 @@ export default {
     clearSelected() {
       this.$refs.paymentTable.clearSelected()
     },
+
+    approveSelected(){
+      this.submitted = true;
+
+      this.selectedPayments.forEach((payment) => {
+        this.paymentId.push(payment.vp_id);
+      });
+
+      const data = {
+
+        variational_payment: this.paymentId,
+        status: 1
+
+      };
+      const url = `${this.ROUTES.variationalPayment}/confirm-payment`;
+      this.apiPost(url, data, "Variational Payment Approval").then(
+          (res) => {
+            this.apiResponseHandler(`${res.data}`, "Variational Payment Approved");
+            this.selectedPayments= [ ]
+            this.paymentId = [ ]
+            this.getPayments()
+
+          }
+      );
+    },
+
+    unApproveSelected(){
+      this.submitted = true;
+
+      this.selectedPayments.forEach((payment) => {
+        this.paymentId.push(payment.vp_id);
+      });
+
+      const data = {
+
+        variational_payment: this.paymentId,
+        status: 2
+
+      };
+      const url = `${this.ROUTES.variationalPayment}/confirm-payment`;
+      this.apiPost(url, data, "Variational Payment Approval").then(
+          (res) => {
+            this.apiResponseHandler(`${res.data}`, "Variational Payment Approved");
+            this.selectedPayments= [ ]
+            this.paymentId = [ ]
+            this.getPayments()
+
+          }
+      );
+    }
   },
   data() {
     return {
@@ -174,6 +183,7 @@ export default {
 
       payments: [],
       payment: null,
+      paymentId: [],
       selectedPayments: [ ],
       employees: [ ],
       amount: 0,
@@ -299,15 +309,19 @@ export default {
 
               </b-table>
 
-              <b-button size="sm" @click="selectAllRows">Select all</b-button>
-
-              <b-button size="sm" @click="clearSelected">Clear Selection</b-button>
-
-
               <p>
-                Selected Rows:<br>
-                {{ selectedPayments }}
+                <b-button style="margin: 10px" variant="primary" size="sm" @click="selectAllRows">Select all</b-button>
+
+                <b-button style="margin: 10px" variant="warning" size="sm" @click="clearSelected">Clear Selection</b-button>
+
+                <b-button style="margin: 10px" variant="success" size="sm" @click="approveSelected">Approve Selection</b-button>
+
+                <b-button style="margin: 10px" variant="danger" size="sm" @click="unApproveSelected">Unapprove Selection</b-button>
+
+
               </p>
+
+
             </div>
             <div class="row">
               <div class="col">
