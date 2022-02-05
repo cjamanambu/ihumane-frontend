@@ -5,6 +5,7 @@ import employeeManagement from "./routes/employee-management"
 import misc from "./routes/misc"
 import serviceForms from "./routes/service-forms"
 import selfService from "./routes/self-service"
+import variation from "@/router/routes/variation";
 
 export default [
   {
@@ -22,4 +23,5 @@ export default [
   ...serviceForms,
   ...selfService,
   ...misc,
+  ...variation
 ];
