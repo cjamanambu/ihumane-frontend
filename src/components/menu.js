@@ -260,7 +260,7 @@ export const menuItems = [
       {
         id: 30,
         label: "Confirm Variation",
-        link: "",
+        link: "confirm-variation",
       },
     ],
   },

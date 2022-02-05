@@ -93,7 +93,7 @@ export default {
 
           employee: this.selectedEmployees,
           payment_definition: this.payment,
-          amount: 50000,
+          amount: this.amount,
           month: this.month,
           year: this.year
 
