@@ -104,6 +104,10 @@ export default {
   },
   methods: {
     async fetchPayrollMonthYear() {
+      /* Here, I first got public holidays and then the payroll month and year.
+       * I set the initial date on the FullCalendar as the first day of the payroll
+       * month and year.
+       * */
       this.fetching = true;
       await this.apiGet(this.ROUTES.publicHolidays).then((res) => {
         this.publicHolidays = res.data;
@@ -120,6 +124,8 @@ export default {
       });
     },
     fetchTimeAllocations() {
+      // Here, I tried to get the time allocation for the payroll month and year to see if
+      // it's been filled first.
       const employeeID = this.getEmployee.emp_id;
       const url = `${this.ROUTES.timeAllocation}/get-time-allocation/${employeeID}/${this.pymFullDate}`;
       this.apiGet(url, "Get Time Allocation Error").then((res) => {
@@ -132,6 +138,7 @@ export default {
       });
     },
     fetchTimesheetData() {
+      // Get the timesheet data for an employee for each day of the payroll month.
       const employeeID = this.getEmployee.emp_id;
       const url = `${this.ROUTES.timesheet}/get-time-sheets/${employeeID}`;
       this.apiGet(url, "Get Timesheet Error").then((res) => {

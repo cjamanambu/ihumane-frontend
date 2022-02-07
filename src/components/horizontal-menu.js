@@ -37,7 +37,7 @@ export const menuItems = [
           {
             id: 6,
             label: "New Travel Request",
-            link: "/travel-authorization",
+            link: "/travel-request",
           },
           {
             id: 6,
@@ -89,7 +89,7 @@ export const menuItems = [
       {
         id: 10,
         label: "Travel Authorization",
-        link: "",
+        link: "travel-authorization",
       },
       {
         id: 10,
