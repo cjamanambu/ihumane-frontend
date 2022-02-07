@@ -41,8 +41,8 @@ export default [
     component: () => import("@/views/pages/service-forms/employee-assessment"),
   },
   {
-    path: "/travel-authorization",
-    name: "travel-authorization",
+    path: "/travel-request",
+    name: "new-travel-request",
     meta: {
       authRequired: true,
     },

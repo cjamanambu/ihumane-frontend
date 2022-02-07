@@ -77,6 +77,7 @@ export default {
     submit() {
       this.confirmTER = false;
       const url = `${this.ROUTES.timeAllocation}/add-time-allocation`;
+      const ta_ref_no = Math.random().toString(36).slice(2);
       this.fields.forEach(async (field) => {
         const data = {
           ta_emp_id: this.getEmployee.emp_id,
@@ -84,6 +85,7 @@ export default {
           ta_year: this.pmyYear,
           ta_tcode: field.grant,
           ta_charge: field.charge,
+          ta_ref_no,
         };
         await this.apiPost(url, data, "Add Time Allocation Error").then();
       });

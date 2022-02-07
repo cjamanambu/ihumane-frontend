@@ -303,7 +303,7 @@ export default {
                       Purpose of Travel
                       <small class="text-muted">(Description)</small>
                     </label>
-                    <textarea class="form-control" v-model="purpose" />
+                    <input class="form-control" v-model="purpose" />
                   </div>
                   <div class="form-group">
                     <label for="">

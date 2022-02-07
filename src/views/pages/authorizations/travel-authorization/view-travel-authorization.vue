@@ -5,7 +5,7 @@ import appConfig from "@/app.config";
 import { authComputed } from "@/state/helpers";
 export default {
   page: {
-    title: "Travel Request",
+    title: "Travel Authorization",
     meta: [{ name: "description", content: appConfig.description }],
   },
   computed: {
@@ -18,11 +18,13 @@ export default {
   mounted() {
     this.fetchRequest();
   },
+  props: ["employee"],
   methods: {
     fetchRequest() {
       let requestID = this.$route.params.travelAppID;
       const url = `${this.ROUTES.travelApplication}/${requestID}`;
       this.apiGet(url, "Get Travel Application").then((res) => {
+        console.log({ res });
         const { application, breakdown, expenses } = res.data;
         this.application = application;
         this.breakdowns = breakdown;
@@ -53,7 +55,7 @@ export default {
   },
   data() {
     return {
-      title: "Travel Request",
+      title: "Travel Authorization",
       items: [
         {
           text: "IHUMANE",
@@ -63,7 +65,7 @@ export default {
           href: "/",
         },
         {
-          text: "Travel Request",
+          text: "Travel Authorization",
           active: true,
         },
       ],
@@ -72,6 +74,15 @@ export default {
       expenses: [],
       donor: null,
       t2Codes: [],
+      final: true,
+      official: null,
+      officials: [
+        {
+          value: null,
+          text: "Please choose the next reviewer",
+          disabled: "true",
+        },
+      ],
     };
   },
 };
@@ -83,15 +94,15 @@ export default {
     <div class="d-flex justify-content-end mb-3">
       <b-button
         class="btn btn-success"
-        @click="$router.push({ name: 'travel-requests' })"
+        @click="$router.push({ name: 'travel-authorization' })"
       >
         <i class="mdi mdi-plus mr-2"></i>
-        Travel Requests
+        Travel Authorizations
       </b-button>
     </div>
     <scale-loader v-if="apiBusy" />
     <div class="row" v-else>
-      <div class="col-12">
+      <div class="col-lg-8">
         <div class="card">
           <div class="card-body">
             <div class="p-3 bg-light mb-4 d-flex justify-content-between">
@@ -348,6 +359,79 @@ export default {
                     </b-tr>
                   </b-tbody>
                 </b-table-simple>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-4">
+        <div class="card">
+          <div class="card-body">
+            <div class="p-3 bg-light mb-4 d-flex justify-content-between">
+              <div class="d-inline mb-0">
+                <h5 class="font-size-14 mb-0">Authorization Details</h5>
+              </div>
+            </div>
+            <div class="d-flex justify-content-between mb-3">
+              <span>Employee Name</span>
+              <span>
+                {{ application.Employee.emp_first_name }}
+                {{ application.Employee.emp_first_name }}
+              </span>
+            </div>
+            <div class="d-flex justify-content-between mb-3">
+              <span>T7 Number</span>
+              <span>
+                {{ application.Employee.emp_unique_id }}
+              </span>
+            </div>
+            <div class="d-flex justify-content-between mb-3">
+              <span>T3 Code</span>
+              <span> - </span>
+            </div>
+            <div class="d-flex justify-content-between mb-3">
+              <span>T6 Code</span>
+              <span> - </span>
+            </div>
+            <b-form-group>
+              <b-form-checkbox
+                id="checkbox-1"
+                v-model="final"
+                name="checkbox-1"
+                :value="true"
+                :unchecked-value="false"
+              >
+                Mark this authorization as final
+              </b-form-checkbox>
+            </b-form-group>
+            <div v-if="final">
+              <b-form-group>
+                <b-form-textarea
+                  rows="5"
+                  no-resize
+                  placeholder="Leave your comments here.."
+                />
+              </b-form-group>
+              <div class="d-flex">
+                <button class="btn btn-success w-100 mr-3">Approve</button>
+                <button class="btn btn-danger w-100">Decline</button>
+              </div>
+            </div>
+            <div v-else>
+              <b-form-group>
+                <b-form-textarea
+                  rows="5"
+                  no-resize
+                  placeholder="Leave your comments here.."
+                />
+              </b-form-group>
+              <b-form-group>
+                <b-form-select v-model="official" :options="officials" />
+              </b-form-group>
+              <div>
+                <button class="btn btn-success w-100 mr-3">
+                  Forward Request
+                </button>
               </div>
             </div>
           </div>

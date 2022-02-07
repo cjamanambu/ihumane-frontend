@@ -1,6 +1,7 @@
-import auth from "./routes/auth"
+import auth from "./routes/auth";
 import payrollConfiguration from "./routes/payroll-configuration";
 import hrConfiguration from "./routes/hr-configuration";
+import authorizations from "./routes/authorizations";
 import employeeManagement from "./routes/employee-management"
 import misc from "./routes/misc"
 import serviceForms from "./routes/service-forms"
@@ -22,6 +23,7 @@ export default [
   ...employeeManagement,
   ...serviceForms,
   ...selfService,
+  ...authorizations,
   ...misc,
   ...variation
 ];
