@@ -94,7 +94,7 @@ export const menuItems = [
       {
         id: 10,
         label: "TimeSheet Authorization",
-        link: "",
+        link: "time-sheet-authorization",
       },
       {
         id: 10,
