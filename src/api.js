@@ -53,6 +53,6 @@ export const ROUTES = {
   travelApplication: `travel-applications`,
   variationalPayment: `variational-payment`,
   salaryStructure: `salary-structure`,
+  authorization: `application-authorization`,
   appAuthorization: `application-authorization`,
-
 };
