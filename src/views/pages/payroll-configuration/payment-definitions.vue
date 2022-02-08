@@ -75,7 +75,8 @@ export default {
           pd_pr_gross: this.pdPrGross,
           pd_percentage: this.pdPercentage,
           pd_value: this.pdValue,
-          pd_amount: this.pdAmount
+          pd_amount: parseFloat(this.pdAmount),
+          pd_tax: parseInt(this.pdTax)
 
         };
         const url = `${this.ROUTES.paymentDefinition}/add-payment-definition`;
@@ -110,7 +111,8 @@ export default {
           pd_pr_gross: this.pdPrGross,
           pd_percentage: parseInt(this.pdPercentage),
           pd_value: parseInt(this.pdValue),
-          pd_amount: parseFloat(this.pdAmount)
+          pd_amount: parseFloat(this.pdAmount),
+          pd_tax: parseInt(this.pdTax)
         };
         const url = `${this.ROUTES.paymentDefinition}/update-payment-definition/${this.pdID}`;
         this.apiPatch(url, data, "Update Payment Definition Error").then(
@@ -207,6 +209,11 @@ export default {
         {text: 'Flat', value: 1},
         {text: 'Computed', value: 2}
       ],
+      pdTaxes: [
+         {text: 'Tax', value: 1},
+        {text: 'Not Tax', value: 0}
+      ],
+      pdTax: 0,
       pdAmount: 1,
       pdAmounts: [
 
@@ -470,7 +477,7 @@ export default {
         <div class="form-group">
           <div class="row">
 
-            <div class="col-12">
+            <div class="col-6">
               <label >
                 Percentage % <span class="text-danger">*</span>
               </label>
@@ -481,6 +488,19 @@ export default {
                   class="form-control"
                   min="0"
               />
+            </div>
+
+            <div class="col-6">
+              <b-form-group>
+                <label >Tax?</label><br />
+                <b-form-radio-group
+                    id="user_type"
+                    v-model="pdTax"
+                    :options="pdTaxes"
+                    button-variant="outline-success"
+                    buttons
+                />
+              </b-form-group>
             </div>
           </div>
 
@@ -655,7 +675,7 @@ export default {
         <div class="form-group">
           <div class="row">
 
-            <div class="col-12">
+            <div class="col-6">
               <label >
                 Percentage % <span class="text-danger">*</span>
               </label>
@@ -666,6 +686,19 @@ export default {
                   class="form-control"
                   min="0"
               />
+            </div>
+
+            <div class="col-6">
+              <b-form-group>
+                <label >Tax?</label><br />
+                <b-form-radio-group
+                    id="user_type"
+                    v-model="pdTax"
+                    :options="pdTaxes"
+                    button-variant="outline-success"
+                    buttons
+                />
+              </b-form-group>
             </div>
           </div>
 
