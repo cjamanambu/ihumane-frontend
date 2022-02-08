@@ -28,6 +28,7 @@ export default {
           this.applications[index] = { sn: ++index, ...application };
         });
         this.totalRows = this.applications.length;
+        console.log(this.applications);
       });
     },
     onFiltered(filteredItems) {

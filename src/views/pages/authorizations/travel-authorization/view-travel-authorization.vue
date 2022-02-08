@@ -3,6 +3,8 @@ import Layout from "@/views/layouts/main";
 import PageHeader from "@/components/page-header";
 import appConfig from "@/app.config";
 import { authComputed } from "@/state/helpers";
+import { required } from "vuelidate/lib/validators";
+
 export default {
   page: {
     title: "Travel Authorization",
@@ -18,19 +20,25 @@ export default {
   mounted() {
     this.fetchRequest();
   },
-  props: ["employee"],
+  validations: {
+    comment: { required },
+    official: { required },
+  },
   methods: {
     fetchRequest() {
       let requestID = this.$route.params.travelAppID;
       const url = `${this.ROUTES.travelApplication}/${requestID}`;
       this.apiGet(url, "Get Travel Application").then((res) => {
         console.log({ res });
-        const { application, breakdown, expenses } = res.data;
+        const { application, breakdown, expenses, log } = res.data;
         this.application = application;
         this.breakdowns = breakdown;
         this.expenses = expenses;
+        this.log = log;
+        this.checkCurrentStatus();
         this.fetchDonorInfo();
         this.fetchExpenses();
+        this.fetchEmployees();
       });
     },
     fetchDonorInfo() {
@@ -52,6 +60,78 @@ export default {
         });
       });
     },
+    fetchEmployees() {
+      this.apiGet(this.ROUTES.employee, "Get Employees Error").then((res) => {
+        this.officials = [
+          {
+            value: null,
+            text: "Please choose the next reviewer",
+            disabled: true,
+          },
+        ];
+        const { data } = res;
+        data.forEach((employee) => {
+          if (
+            employee.emp_id !== this.application.Employee.emp_id &&
+            employee.emp_id !== this.getEmployee.emp_id
+          ) {
+            this.officials.push({
+              value: employee.emp_id,
+              text: `${employee.emp_first_name} ${employee.emp_last_name} (${employee.emp_unique_id})`,
+              disabled: false,
+            });
+          }
+        });
+      });
+    },
+    checkCurrentStatus() {
+      this.log.every((entry) => {
+        if (entry.auth_officer_id === this.getEmployee.emp_id) {
+          if (entry.auth_status > 0) {
+            this.status = entry.auth_status;
+            return false;
+          }
+        }
+        return true;
+      });
+    },
+    submit(type) {
+      this.submitted = true;
+      if (this.type === "approve") {
+        this.approving = true;
+      } else if (this.type === "decline") {
+        this.declining = true;
+      }
+      let markAsFinal;
+      this.final ? (this.official = "null") : "";
+      this.final ? (markAsFinal = 1) : (markAsFinal = 0);
+      this.$v.$touch();
+      if (this.$v.$invalid) {
+        this.apiFormHandler("Invalid Authorization");
+      } else {
+        const data = {
+          appId: this.application.travelapp_id.toString(),
+          type: 3,
+          comment: this.comment,
+          markAsFinal,
+          officer: this.getEmployee.emp_id,
+        };
+        type === "approve" || type === "forward"
+          ? (data.status = 1)
+          : (data.status = 2);
+        !this.final ? (data.nextOfficer = this.official) : "";
+        this.apiPost(this.ROUTES.authorization, data)
+          .then((res) => {
+            this.$router.push({ name: "travel-authorization" }).then(() => {
+              this.apiResponseHandler("Authorization Complete", res.data);
+            });
+          })
+          .finally(() => {
+            this.approving = false;
+            this.declining = false;
+          });
+      }
+    },
   },
   data() {
     return {
@@ -72,17 +152,23 @@ export default {
       application: null,
       breakdowns: [],
       expenses: [],
+      log: [],
       donor: null,
       t2Codes: [],
+      comment: null,
       final: true,
       official: null,
       officials: [
         {
           value: null,
           text: "Please choose the next reviewer",
-          disabled: "true",
+          disabled: true,
         },
       ],
+      submitted: false,
+      status: null,
+      approving: false,
+      declining: false,
     };
   },
 };
@@ -363,6 +449,72 @@ export default {
             </div>
           </div>
         </div>
+        <div class="card mt-4">
+          <div class="card-body">
+            <div class="p-3 bg-light mb-4 d-flex justify-content-between">
+              <div class="d-inline mb-0">
+                <h5 class="font-size-14 mb-0">Authorization Log</h5>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-12">
+                <b-table-simple striped responsive bordered outlined>
+                  <b-thead head-variant="light">
+                    <b-tr>
+                      <b-th>OFFICER</b-th>
+                      <b-th>STATUS</b-th>
+                      <b-th>COMMENT</b-th>
+                      <b-th>DATE</b-th>
+                    </b-tr>
+                  </b-thead>
+                  <b-tbody>
+                    <b-tr v-for="(logEntry, index) in log" :key="index">
+                      <b-td style="width: 25%">
+                        <span>
+                          {{ logEntry.Employee.emp_first_name }}
+                          {{ logEntry.Employee.emp_last_name }}
+                        </span>
+                      </b-td>
+                      <b-td style="width: 15%">
+                        <span
+                          v-if="logEntry.auth_status === 0"
+                          class="text-warning"
+                        >
+                          Pending
+                        </span>
+                        <span
+                          v-else-if="logEntry.auth_status === 1"
+                          class="text-success"
+                        >
+                          Approved
+                        </span>
+                        <span
+                          v-else-if="logEntry.auth_status === 2"
+                          class="text-success"
+                        >
+                          Declined
+                        </span>
+                      </b-td>
+                      <b-td style="width: 40%">
+                        <span>
+                          {{ logEntry.auth_comment }}
+                        </span>
+                      </b-td>
+                      <b-td style="width: 20%">
+                        <span>
+                          {{ new Date(logEntry.updatedAt).toDateString() }}
+                          {{
+                            new Date(logEntry.updatedAt).toLocaleTimeString()
+                          }}
+                        </span>
+                      </b-td>
+                    </b-tr>
+                  </b-tbody>
+                </b-table-simple>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
       <div class="col-lg-4">
         <div class="card">
@@ -393,45 +545,78 @@ export default {
               <span>T6 Code</span>
               <span> - </span>
             </div>
-            <b-form-group>
-              <b-form-checkbox
-                id="checkbox-1"
-                v-model="final"
-                name="checkbox-1"
-                :value="true"
-                :unchecked-value="false"
-              >
-                Mark this authorization as final
-              </b-form-checkbox>
-            </b-form-group>
-            <div v-if="final">
-              <b-form-group>
-                <b-form-textarea
-                  rows="5"
-                  no-resize
-                  placeholder="Leave your comments here.."
-                />
-              </b-form-group>
-              <div class="d-flex">
-                <button class="btn btn-success w-100 mr-3">Approve</button>
-                <button class="btn btn-danger w-100">Decline</button>
-              </div>
+            <div v-if="status" class="d-flex justify-content-between mb-3">
+              <span>Status</span>
+              <span v-if="status === 1" class="text-success">Approved</span>
+              <span v-else-if="status === 2" class="text-danger">Declined</span>
             </div>
             <div v-else>
               <b-form-group>
+                <b-form-checkbox
+                  id="checkbox-1"
+                  v-model="final"
+                  name="checkbox-1"
+                  :value="true"
+                  :unchecked-value="false"
+                >
+                  Mark this authorization as final
+                </b-form-checkbox>
+              </b-form-group>
+              <b-form-group>
                 <b-form-textarea
                   rows="5"
                   no-resize
                   placeholder="Leave your comments here.."
+                  v-model="comment"
+                  :class="{
+                    'is-invalid': submitted && $v.comment.$error,
+                  }"
                 />
               </b-form-group>
-              <b-form-group>
-                <b-form-select v-model="official" :options="officials" />
-              </b-form-group>
-              <div>
-                <button class="btn btn-success w-100 mr-3">
-                  Forward Request
+              <div class="d-flex" v-if="final">
+                <button
+                  v-if="!approving"
+                  @click="submit('approve')"
+                  class="btn btn-success w-100 mr-3"
+                >
+                  Approve
                 </button>
+                <button v-else disabled class="btn btn-success w-100 mr-3">
+                  Approving...
+                </button>
+                <button
+                  v-if="!declining"
+                  @click="submit('decline')"
+                  class="btn btn-danger w-100"
+                >
+                  Decline
+                </button>
+                <button v-else disabled class="btn btn-danger w-100">
+                  Declining...
+                </button>
+              </div>
+              <div v-else>
+                <b-form-group>
+                  <b-form-select
+                    v-model="official"
+                    :options="officials"
+                    :class="{
+                      'is-invalid': submitted && $v.official.$error,
+                    }"
+                  />
+                </b-form-group>
+                <div>
+                  <button
+                    v-if="!submitting"
+                    @click="submit('forward')"
+                    class="btn btn-success w-100 mr-3"
+                  >
+                    Forward Request
+                  </button>
+                  <button v-else disabled class="btn btn-success w-100 mr-3">
+                    Forwarding...
+                  </button>
+                </div>
               </div>
             </div>
           </div>

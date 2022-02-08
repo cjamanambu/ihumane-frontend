@@ -52,4 +52,5 @@ export const ROUTES = {
   selfAssessment: "self-assessment",
   travelApplication: `travel-applications`,
   salaryStructure: `salary-structure`,
+  authorization: `application-authorization`,
 };
