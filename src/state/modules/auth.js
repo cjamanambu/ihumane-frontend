@@ -92,6 +92,7 @@ export const actions = {
       };
       API.post(url, data)
         .then((res) => {
+          console.log({res})
           const { userData, token, employee } = res.data;
           commit("SET_TOKEN", token);
           commit("SET_USER_DATA", userData);
