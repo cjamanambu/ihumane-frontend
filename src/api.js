@@ -51,6 +51,7 @@ export const ROUTES = {
   endYearRating: "end-year-rating",
   selfAssessment: "self-assessment",
   travelApplication: `travel-applications`,
+  variationalPayment: `variational-payment`,
   salaryStructure: `salary-structure`,
   authorization: `application-authorization`,
 };

@@ -250,12 +250,12 @@ export const menuItems = [
       {
         id: 28,
         label: "Setup Variation",
-        link: "",
+        link: "/new-variation",
       },
       {
         id: 30,
         label: "Confirm Variation",
-        link: "",
+        link: "confirm-variation",
       },
     ],
   },
