@@ -23,10 +23,11 @@ export default {
       let requestID = this.$route.params.travelAppID;
       const url = `${this.ROUTES.travelApplication}/${requestID}`;
       this.apiGet(url, "Get Travel Application").then((res) => {
-        const { application, breakdown, expenses } = res.data;
+        const { application, breakdown, expenses, log } = res.data;
         this.application = application;
         this.breakdowns = breakdown;
         this.expenses = expenses;
+        this.log = log;
         this.fetchDonorInfo();
         this.fetchExpenses();
       });
@@ -72,6 +73,7 @@ export default {
       expenses: [],
       donor: null,
       t2Codes: [],
+      log: [],
     };
   },
 };
@@ -343,6 +345,72 @@ export default {
                       <b-td style="width: 20%">
                         <span v-if="application.travelapp_hotel === 1">
                           {{ application.travelapp_preferred_hotel }}
+                        </span>
+                      </b-td>
+                    </b-tr>
+                  </b-tbody>
+                </b-table-simple>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card mt-4">
+          <div class="card-body">
+            <div class="p-3 bg-light mb-4 d-flex justify-content-between">
+              <div class="d-inline mb-0">
+                <h5 class="font-size-14 mb-0">Authorization Log</h5>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-12">
+                <b-table-simple striped responsive bordered outlined>
+                  <b-thead head-variant="light">
+                    <b-tr>
+                      <b-th>OFFICER</b-th>
+                      <b-th>STATUS</b-th>
+                      <b-th>COMMENT</b-th>
+                      <b-th>DATE</b-th>
+                    </b-tr>
+                  </b-thead>
+                  <b-tbody>
+                    <b-tr v-for="(logEntry, index) in log" :key="index">
+                      <b-td style="width: 25%">
+                        <span>
+                          {{ logEntry.Employee.emp_first_name }}
+                          {{ logEntry.Employee.emp_last_name }}
+                        </span>
+                      </b-td>
+                      <b-td style="width: 15%">
+                        <span
+                          v-if="logEntry.auth_status === 0"
+                          class="text-warning"
+                        >
+                          Pending
+                        </span>
+                        <span
+                          v-else-if="logEntry.auth_status === 1"
+                          class="text-success"
+                        >
+                          Approved
+                        </span>
+                        <span
+                          v-else-if="logEntry.auth_status === 2"
+                          class="text-success"
+                        >
+                          Declined
+                        </span>
+                      </b-td>
+                      <b-td style="width: 40%">
+                        <span>
+                          {{ logEntry.auth_comment }}
+                        </span>
+                      </b-td>
+                      <b-td style="width: 20%">
+                        <span>
+                          {{ new Date(logEntry.updatedAt).toDateString() }}
+                          {{
+                            new Date(logEntry.updatedAt).toLocaleTimeString()
+                          }}
                         </span>
                       </b-td>
                     </b-tr>
