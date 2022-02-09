@@ -3,10 +3,9 @@ import Layout from "@/views/layouts/main";
 import PageHeader from "@/components/page-header";
 import appConfig from "@/app.config.json";
 import { authComputed } from "@/state/helpers";
-
 export default {
   page: {
-    title: "Travel Authorizations",
+    title: "Leave Authorizations",
     meta: [{ name: "description", content: appConfig.description }],
   },
   computed: {
@@ -21,14 +20,13 @@ export default {
   },
   methods: {
     refreshTable() {
-      const url = `${this.ROUTES.travelApplication}/authorization/supervisor/${this.getEmployee.emp_id}`;
-      this.apiGet(url, "Get Authorizations Error").then((res) => {
+      const url = `${this.ROUTES.leaveApplication}/authorization/supervisor/${this.getEmployee.emp_id}`;
+      this.apiGet(url, "Get Leave Applications Error").then((res) => {
+        console.log({ res });
         const { data } = res;
         data.forEach((application, index) => {
           this.applications[index] = { sn: ++index, ...application };
         });
-        this.totalRows = this.applications.length;
-        console.log(this.applications);
       });
     },
     onFiltered(filteredItems) {
@@ -38,16 +36,16 @@ export default {
     },
     selectRow(row) {
       row = row[0];
-      this.travelAppID = row.travelapp_id;
+      this.leaveAppID = row.leapp_id;
       this.$router.push({
-        name: "view-travel-authorization",
-        params: { travelAppID: this.travelAppID },
+        name: "view-leave-authorization",
+        params: { leaveAppID: this.leaveAppID },
       });
     },
   },
   data() {
     return {
-      title: "Travel Authorizations",
+      title: "Leave Authorizations",
       items: [
         {
           text: "IHUMANE",
@@ -57,7 +55,7 @@ export default {
           href: "/",
         },
         {
-          text: "Travel Authorizations",
+          text: "Leave Authorizations",
           active: true,
         },
       ],
@@ -72,23 +70,22 @@ export default {
       sortDesc: false,
       fields: [
         { key: "sn", label: "S/n", sortable: true },
-        { key: "Employee", label: "Employee", sortable: true },
+        { key: "employee", label: "Employee", sortable: true },
         {
-          key: "travelapp_travel_cat",
-          label: "Travel Category",
+          key: "LeaveType",
+          label: "Leave Type",
           sortable: true,
         },
-        { key: "travelapp_start_date", label: "Start Date", sortable: true },
-        { key: "travelapp_end_date", label: "End Date", sortable: true },
-        { key: "travelapp_total_days", label: "Trip Length", sortable: true },
+        { key: "leapp_start_date", label: "Start Date", sortable: true },
+        { key: "leapp_end_date", label: "End Date", sortable: true },
+        { key: "leapp_total_days", label: "Leave Length", sortable: true },
         {
-          key: "travelapp_status",
+          key: "leapp_status",
           label: "Application Status",
           sortable: true,
         },
       ],
-      sn: 1,
-      travelAppID: null,
+      leaveAppID: null,
     };
   },
 };
@@ -156,7 +153,7 @@ export default {
                 select-mode="single"
                 @row-selected="selectRow"
               >
-                <template #cell(Employee)="row">
+                <template #cell(employee)="row">
                   <p class="mb-0">
                     {{ row.value.emp_first_name }} {{ row.value.emp_last_name }}
                   </p>
@@ -164,22 +161,21 @@ export default {
                     {{ row.value.emp_unique_id }}
                   </small>
                 </template>
-                <template #cell(travelapp_travel_cat)="row">
-                  <span v-if="row.value === 1" class="text-uppercase">
-                    Official Request
-                  </span>
-                  <span class="text-uppercase" v-else> Personal Request </span>
+                <template #cell(LeaveType)="row">
+                  <p class="mb-0">
+                    {{ row.value.leave_name }}
+                  </p>
                 </template>
-                <template #cell(travelapp_start_date)="row">
+                <template #cell(leapp_start_date)="row">
                   <span> {{ new Date(row.value).toDateString() }}</span>
                 </template>
-                <template #cell(travelapp_end_date)="row">
+                <template #cell(leapp_end_date)="row">
                   <span> {{ new Date(row.value).toDateString() }}</span>
                 </template>
-                <template #cell(travelapp_total_days)="row">
+                <template #cell(leapp_total_days)="row">
                   <span> {{ row.value }} days</span>
                 </template>
-                <template #cell(travelapp_status)="row">
+                <template #cell(leapp_status)="row">
                   <span
                     v-if="row.value === 0"
                     class="badge badge-pill badge-warning"

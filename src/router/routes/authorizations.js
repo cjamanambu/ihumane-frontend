@@ -5,8 +5,7 @@ export default [
     meta: {
       authRequired: true,
     },
-    component: () =>
-      import("@/views/pages/authorizations/travel-authorization/index"),
+    component: () => import("@/views/pages/authorizations/travel/index"),
   },
   {
     path: "/travel-authorization/:travelAppID",
@@ -15,9 +14,24 @@ export default [
       authRequired: true,
     },
     component: () =>
-      import(
-        "@/views/pages/authorizations/travel-authorization/view-travel-authorization"
-      ),
+      import("@/views/pages/authorizations/travel/view-travel-authorization"),
+  },
+  {
+    path: "/leave-authorization",
+    name: "leave-authorization",
+    meta: {
+      authRequired: true,
+    },
+    component: () => import("@/views/pages/authorizations/leave/index"),
+  },
+  {
+    path: "/leave-authorization/:leaveAppID",
+    name: "view-leave-authorization",
+    meta: {
+      authRequired: true,
+    },
+    component: () =>
+      import("@/views/pages/authorizations/leave/leave-authorization"),
   },
   {
     path: "/time-sheet-authorization",
@@ -25,8 +39,7 @@ export default [
     meta: {
       authRequired: true,
     },
-    component: () =>
-        import("@/views/pages/authorizations/timesheet/index"),
+    component: () => import("@/views/pages/authorizations/timesheet/index"),
   },
   {
     path: "/view-time-sheet-authorization/:month/:year/:empId",
@@ -35,8 +48,6 @@ export default [
       authRequired: true,
     },
     component: () =>
-        import(
-            "@/views/pages/authorizations/timesheet/view-time-sheet"
-            ),
+      import("@/views/pages/authorizations/timesheet/view-time-sheet"),
   },
 ];

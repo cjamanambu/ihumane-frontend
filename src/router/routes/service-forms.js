@@ -66,4 +66,12 @@ export default [
     component: () =>
       import("@/views/pages/service-forms/travel-request/travel-request"),
   },
+  {
+    path: "/leave-application",
+    name: "leave-application",
+    meta: {
+      authRequired: true,
+    },
+    component: () => import("@/views/pages/service-forms/leave-application"),
+  },
 ];
