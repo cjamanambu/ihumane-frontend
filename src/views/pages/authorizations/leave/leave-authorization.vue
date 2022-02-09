@@ -176,6 +176,16 @@ export default {
               </span>
             </div>
             <div class="row">
+              <div class="col-12">
+                <div class="form-group">
+                  <label for=""> Leave Type </label>
+                  <p class="text-muted">
+                    {{ application.LeaveType.leave_name }}
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="row">
               <div class="col-lg-4">
                 <div class="form-group">
                   <label for=""> Start Date </label>
@@ -280,11 +290,14 @@ export default {
             </div>
             <div class="d-flex justify-content-between mb-3">
               <span>Employee Name</span>
-              <span> </span>
+              <span>
+                {{ application.employee.emp_first_name }}
+                {{ application.employee.emp_last_name }}
+              </span>
             </div>
             <div class="d-flex justify-content-between mb-3">
               <span>T7 Number</span>
-              <span> </span>
+              <span> {{ application.employee.emp_unique_id }} </span>
             </div>
             <div class="d-flex justify-content-between mb-3">
               <span>T3 Code</span>
