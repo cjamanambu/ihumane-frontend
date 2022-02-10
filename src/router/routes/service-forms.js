@@ -46,7 +46,8 @@ export default [
     meta: {
       authRequired: true,
     },
-    component: () => import("@/views/pages/service-forms/travel-request/index"),
+    component: () =>
+      import("@/views/pages/service-forms/travel-request/new-travel-request"),
   },
   {
     path: "/travel-requests",
@@ -54,8 +55,7 @@ export default [
     meta: {
       authRequired: true,
     },
-    component: () =>
-      import("@/views/pages/service-forms/travel-request/travel-requests"),
+    component: () => import("@/views/pages/service-forms/travel-request/index"),
   },
   {
     path: "/travel-requests/:travelAppID",
