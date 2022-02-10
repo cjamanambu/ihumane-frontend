@@ -21,8 +21,7 @@
         },
         methods: {
             refreshTable() {
-                const url = `${this.ROUTES.timesheet}/authorization/supervisor/2`;
-                //const url = `${this.ROUTES.timesheet}/authorization/supervisor/${this.getEmployee.emp_id}`;
+                const url = `${this.ROUTES.timesheet}/authorization/supervisor/${this.getEmployee.emp_id}`;
                 this.apiGet(url, "Get Authorizations Error").then((res) => {
                     const { data } = res;
                     data.forEach((application, index) => {

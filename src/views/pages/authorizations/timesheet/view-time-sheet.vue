@@ -17,6 +17,7 @@
         },
         mounted() {
             this.fetchRequest();
+            console.log('Just mounted');
         },
         props: ["employee"],
         methods: {
@@ -25,6 +26,7 @@
                 let year = this.$route.params.year;
                 let empId = this.$route.params.empId;
                 const url = `${this.ROUTES.timesheet}/time-sheet/${month}/${year}/${empId}`;
+
                 this.apiGet(url, "Get Time sheet authorization").then((res) => {
                     this.timeSheet = res.data.timeSheet;
                     this.allocation = res.data.timeAllocation;
@@ -36,6 +38,7 @@
                             this.my_status = this.log[i].auth_status;
                         }
                     }
+
                 });
             },
             authorizationHandler(val){
@@ -54,6 +57,7 @@
                     };
                     this.apiPost(url, data, "Authorization Error").then((res)=>{
                         this.apiResponseHandler(`${res.data}`, "Authorization action");
+                        this.fetchRequest();
 
                     })
                     .catch((error)=>{
