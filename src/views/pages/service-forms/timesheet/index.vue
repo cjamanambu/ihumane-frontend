@@ -1,36 +1,85 @@
 <script>
 import Layout from "@/views/layouts/main";
 import PageHeader from "@/components/page-header";
-import appConfig from "@/app.config.json";
-import FullCalendar from "@fullcalendar/vue";
-import dayGridPlugin from "@fullcalendar/daygrid";
-import timeGridPlugin from "@fullcalendar/timegrid";
-import interactionPlugin from "@fullcalendar/interaction";
-import bootstrapPlugin from "@fullcalendar/bootstrap";
-import listPlugin from "@fullcalendar/list";
+import appConfig from "@/app.config";
 import { authComputed } from "@/state/helpers";
-import TimeEffortForm from "./components/time-effort-form";
-
 export default {
   page: {
-    title: "TimeSheet",
+    title: "Timesheets",
     meta: [{ name: "description", content: appConfig.description }],
-  },
-  components: {
-    FullCalendar,
-    Layout,
-    PageHeader,
-    TimeEffortForm,
   },
   computed: {
     ...authComputed,
   },
+  components: {
+    Layout,
+    PageHeader,
+  },
   mounted() {
-    this.fetchPayrollMonthYear();
+    this.refreshTable();
+  },
+  methods: {
+    refreshTable() {
+      let employeeID = this.getEmployee.emp_id;
+      const url = `${this.ROUTES.timeAllocation}/get-employee-time-allocation/${employeeID}`;
+      this.apiGet(url, "Get Time Allocation Error").then((res) => {
+        let count = 0;
+        const { data } = res;
+        data.forEach((time) => {
+          let found = false;
+          if (this.timeAllocations.length === 0) {
+            this.timeAllocations.push({
+              sn: ++count,
+              ref_no: time.ta_ref_no,
+              payroll_month: time.ta_month,
+              payroll_year: time.ta_year,
+              breakdown: [{ t1code: time.ta_tcode, charge: time.ta_charge }],
+              status: time.ta_status ? time.ta_status : 0,
+            });
+          } else {
+            this.timeAllocations.every((timeAllocation) => {
+              if (time.ta_ref_no === timeAllocation.ref_no) {
+                timeAllocation.breakdown.push({
+                  t1code: time.ta_tcode,
+                  charge: time.ta_charge,
+                });
+                found = true;
+                return false;
+              }
+              return true;
+            });
+            if (!found) {
+              this.timeAllocations.push({
+                sn: ++count,
+                ref_no: time.ta_ref_no,
+                payroll_month: time.ta_month,
+                payroll_year: time.ta_year,
+                breakdown: [{ t1code: time.ta_tcode, charge: time.ta_charge }],
+                status: time.ta_status ? time.ta_status : 0,
+              });
+            }
+          }
+        });
+        this.totalRows = this.timeAllocations.length;
+      });
+    },
+    onFiltered(filteredItems) {
+      // Trigger pagination to update the number of buttons/pages due to filtering
+      this.totalRows = filteredItems.length;
+      this.currentPage = 1;
+    },
+    selectRow(row) {
+      row = row[0];
+      const payrollMY = `${row.payroll_year}-${row.payroll_month}`;
+      this.$router.push({
+        name: "view-timesheet",
+        params: { payrollMY },
+      });
+    },
   },
   data() {
     return {
-      title: "TimeSheet",
+      title: "Timesheets",
       items: [
         {
           text: "IHUMANE",
@@ -40,66 +89,39 @@ export default {
           href: "/",
         },
         {
-          text: "TimeSheet",
+          text: "Timesheets",
           active: true,
         },
       ],
-      calendarOptions: {
-        headerToolbar: {
-          left: "title",
-          center: "",
-          right: "",
+      timeAllocations: [],
+      totalRows: 1,
+      currentPage: 1,
+      perPage: 10,
+      pageOptions: [10, 25, 50, 100],
+      filter: null,
+      filterOn: [],
+      sortBy: "sn",
+      sortDesc: false,
+      fields: [
+        { key: "sn", label: "S/n", sortable: true },
+        {
+          key: "ref_no",
+          label: "Ref No",
+          sortable: true,
         },
-        plugins: [
-          dayGridPlugin,
-          timeGridPlugin,
-          interactionPlugin,
-          bootstrapPlugin,
-          listPlugin,
-        ],
-        initialView: "dayGridMonth",
-        themeSystem: "bootstrap",
-        initialDate: null,
-        initialEvents: [],
-        editable: false,
-        droppable: false,
-        eventResizableFromStart: false,
-        dateClick: this.dateClicked,
-        weekends: false,
-        selectable: true,
-        selectMirror: true,
-        dayMaxEvents: true,
-        showNonCurrentDates: false,
-        fixedWeekCount: false,
-      },
-      currentEvents: [],
-      showModal: false,
-      eventModal: false,
-      submitted: false,
-      submit: false,
-      newEventData: {},
-      edit: {},
-      deleteId: {},
-      event: {
-        title: "",
-        category: "",
-      },
-      editevent: {
-        editTitle: "",
-        editcategory: "",
-      },
-      dateInfo: null,
-      pymYear: "",
-      pymMonth: "",
-      pymFullDate: "",
-      fetching: false,
-      populateOption: false,
-      entryCount: 0,
-      populating: false,
-      timeAllocated: false,
-      publicHolidays: [],
-      showModalPH: false,
-      phName: "",
+        { key: "payroll_month", label: "Payroll Month", sortable: true },
+        { key: "payroll_year", label: "Payroll Year", sortable: true },
+        {
+          key: "breakdown",
+          label: "Percentage to Charge (T1)",
+          sortable: true,
+        },
+        {
+          key: "status",
+          label: "Status",
+          sortable: true,
+        },
+      ],
     };
   },
   methods: {
@@ -228,83 +250,122 @@ export default {
 <template>
   <Layout>
     <PageHeader :title="title" :items="items" />
-    <div v-if="timeAllocated" class="alert alert-info">
-      Your timesheet allocation for this payroll reporting period is now filled.
+    <div class="d-flex justify-content-end mb-3">
+      <b-button
+        class="btn btn-success"
+        @click="$router.push({ name: 'timesheet' })"
+      >
+        <i class="mdi mdi-plus mr-2"></i>
+        Fill Timesheet
+      </b-button>
     </div>
-    <div v-else>
-      <scale-loader class="scale-loader" v-if="this.apiBusy" />
-      <div v-else>
-        <div class="d-flex justify-content-end mb-3">
-          <b-button class="btn btn-success" @click="populateTimesheetData">
-            <i class="mdi mdi-plus mr-2"></i>
-            Populate Timesheet
-          </b-button>
-        </div>
-        <div>
-          <div class="row">
-            <div class="col-lg-7">
-              <div class="card">
-                <div class="card-body">
-                  <div class="app-calendar">
-                    <FullCalendar
-                      ref="fullCalendar"
-                      :options="calendarOptions"
-                    />
-                  </div>
+    <scale-loader v-if="apiBusy" />
+    <div v-else class="row">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-body">
+            <div class="row mt-4">
+              <div class="col-sm-12 col-md-6">
+                <div id="tickets-table_length" class="dataTables_length">
+                  <label class="d-inline-flex align-items-center">
+                    Show&nbsp;
+                    <b-form-select
+                      v-model="perPage"
+                      size="sm"
+                      :options="pageOptions"
+                    ></b-form-select
+                    >&nbsp;entries
+                  </label>
                 </div>
               </div>
+              <!-- Search -->
+              <div class="col-sm-12 col-md-6">
+                <div
+                  id="tickets-table_filter"
+                  class="dataTables_filter text-md-right"
+                >
+                  <label class="d-inline-flex align-items-center">
+                    Search:
+                    <b-form-input
+                      v-model="filter"
+                      type="search"
+                      placeholder="Search..."
+                      class="form-control form-control-sm ml-2"
+                    ></b-form-input>
+                  </label>
+                </div>
+              </div>
+              <!-- End search -->
             </div>
-            <div class="col-lg-5">
-              <div class="card mb-3">
-                <div class="card-body">
-                  <div class="p-3 bg-light mb-4">
-                    <h5 class="font-size-14 mb-0">
-                      International Rescue Committee - Overseas Staff
-                    </h5>
-                  </div>
-                  <div class="d-flex justify-content-between">
-                    <p>Payroll Reporting Period</p>
-                    <p class="font-weight-bolder">
-                      <span>
-                        {{ (parseInt(pymMonth) - 1) | getMonth }}
-                      </span>
-                      <span>{{ pymYear }}</span>
-                    </p>
-                  </div>
-                  <div class="d-flex justify-content-between">
-                    <p>Name</p>
-                    <p>
-                      {{ getUser.user_name }}
-                    </p>
-                  </div>
-                  <div class="d-flex justify-content-between">
-                    <p>T7 Code</p>
-                    <p>-</p>
-                  </div>
-                  <div class="d-flex justify-content-between">
-                    <p>Location (T5)</p>
-                    <p>-</p>
-                  </div>
-                  <div class="d-flex justify-content-between">
-                    <p>Site Code (T6)</p>
-                    <p>-</p>
-                  </div>
-                  <div class="d-flex justify-content-between">
-                    <p>Nationality</p>
-                    <p>Non-US</p>
-                  </div>
-                </div>
-              </div>
-              <div class="card">
-                <div class="card-body">
-                  <div class="p-3 bg-light mb-4">
-                    <h5 class="font-size-14 mb-0">Time & Effort Reporting</h5>
-                  </div>
-                  <TimeEffortForm
-                    :pmy-month="pymMonth"
-                    :pmy-year="pymYear"
-                    @added-ta="fetchTimeAllocations"
-                  />
+            <!-- Table -->
+            <div class="table-responsive mb-0">
+              <b-table
+                ref="donor-table"
+                bordered
+                selectable
+                hover
+                :items="timeAllocations"
+                :fields="fields"
+                responsive="sm"
+                :per-page="perPage"
+                :current-page="currentPage"
+                :sort-by.sync="sortBy"
+                :sort-desc.sync="sortDesc"
+                :filter="filter"
+                :filter-included-fields="filterOn"
+                @filtered="onFiltered"
+                show-empty
+                select-mode="single"
+                @row-selected="selectRow"
+              >
+                <template #cell(payroll_month)="row">
+                  <span>{{ (parseFloat(row.value) - 1) | getMonth }}</span>
+                </template>
+                <template #cell(breakdown)="row">
+                  <p
+                    class="mb-0"
+                    v-for="(charge, index) in row.value"
+                    :key="index"
+                  >
+                    <span class="mr-3">T1 Code: {{ charge.t1code }}</span>
+                    <span>Charge: {{ charge.charge }}%</span>
+                  </p>
+                </template>
+                <template #cell(status)="row">
+                  <span
+                    v-if="row.value === 0"
+                    class="badge badge-pill badge-warning"
+                  >
+                    pending
+                  </span>
+                  <span
+                    v-else-if="row.value === 1"
+                    class="badge badge-pill badge-success"
+                  >
+                    approved
+                  </span>
+                  <span
+                    v-else-if="row.value === 2"
+                    class="badge badge-pill badge-danger"
+                  >
+                    declined
+                  </span>
+                </template>
+              </b-table>
+            </div>
+            <div class="row">
+              <div class="col">
+                <div
+                  class="dataTables_paginate paging_simple_numbers float-right"
+                >
+                  <ul class="pagination pagination-rounded mb-0">
+                    <!-- pagination -->
+                    <b-pagination
+                      v-model="currentPage"
+                      :total-rows="totalRows"
+                      :per-page="perPage"
+                    ></b-pagination>
+                  </ul>
                 </div>
               </div>
             </div>
@@ -312,97 +373,5 @@ export default {
         </div>
       </div>
     </div>
-
-    <b-modal
-      v-model="showModal"
-      title="Timesheet Entry"
-      centered
-      title-class="text-black font-18"
-      body-class="p-3"
-      hide-footer
-    >
-      <p v-if="dateInfo" class="mb-4">
-        Manage your Time Sheet Entry for
-        <strong>{{ dateInfo.date.toDateString() }}</strong> or select another
-        date to continue.
-      </p>
-      <div class="text-center">
-        <a
-          href="javascript: void(0);"
-          class="dropdown-icon-item"
-          @click="fillTSE(dateInfo)"
-        >
-          <i class="dripicons-clock" style="font-size: 2em"></i>
-          <span>Manage Timesheet Entry</span>
-        </a>
-      </div>
-    </b-modal>
-    <b-modal
-      v-model="showModalPH"
-      title="Timesheet Entry"
-      centered
-      title-class="text-black font-18"
-      body-class="p-3"
-      hide-footer
-    >
-      <p v-if="dateInfo" class="mb-4">
-        <strong>{{ dateInfo.date.toDateString() }}</strong> is
-        <strong class="text-capitalize"> {{ phName }} </strong>. Please select
-        another date to fill.
-      </p>
-    </b-modal>
-    <b-modal
-      v-model="populateOption"
-      title="Populate Timesheet"
-      centered
-      no-close-on-esc
-      no-close-on-backdrop
-      title-class="text-black font-18"
-      body-class="p-3"
-      hide-footer
-      hide-header
-    >
-      <div class="text-center">
-        <i
-          class="mdi mdi-alert-octagon-outline text-success"
-          style="font-size: 4em"
-        />
-        <h5 class="mt-n3 text-success">Notice</h5>
-      </div>
-      <div class="alert alert-success mt-3">
-        You are about to auto-populate your timesheet for the payroll reporting
-        period
-        <strong>
-          {{ (parseInt(pymMonth) - 1) | getMonth }} {{ pymYear }}.
-        </strong>
-        This process will overwrite any manual changes.
-        <br />
-        Please note, you can modify each day's timesheet entry later before
-        submission.
-      </div>
-      <scale-loader v-if="populating" />
-      <b-row v-else>
-        <b-col lg="6">
-          <a
-            href="javascript: void(0);"
-            class="dropdown-icon-item"
-            @click="cancelPopulate"
-          >
-            <i class="dripicons-wrong" style="font-size: 2em"></i>
-            <span>Cancel Auto-Populate</span>
-          </a>
-        </b-col>
-        <b-col lg="6" class="mt-lg-0 mt-3">
-          <a
-            href="javascript: void(0);"
-            class="dropdown-icon-item"
-            @click="runTimesheetPopulate"
-          >
-            <i class="dripicons-checkmark" style="font-size: 2em"></i>
-            <span>Run Auto-Populate</span>
-          </a>
-        </b-col>
-      </b-row>
-    </b-modal>
   </Layout>
 </template>

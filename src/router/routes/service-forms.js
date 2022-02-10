@@ -1,11 +1,28 @@
 export default [
   {
+    path: "/timesheets",
+    name: "timesheets",
+    meta: {
+      authRequired: true,
+    },
+    component: () => import("@/views/pages/service-forms/timesheet/index"),
+  },
+  {
     path: "/timesheet",
     name: "timesheet",
     meta: {
       authRequired: true,
     },
-    component: () => import("@/views/pages/service-forms/timesheet/index"),
+    component: () => import("@/views/pages/service-forms/timesheet/timesheet"),
+  },
+  {
+    path: "/timesheets/:payrollMY",
+    name: "view-timesheet",
+    meta: {
+      authRequired: true,
+    },
+    component: () =>
+      import("@/views/pages/service-forms/timesheet/view-timesheet"),
   },
   {
     path: "/timesheet-entry/:date",
@@ -46,7 +63,8 @@ export default [
     meta: {
       authRequired: true,
     },
-    component: () => import("@/views/pages/service-forms/travel-request/index"),
+    component: () =>
+      import("@/views/pages/service-forms/travel-request/new-travel-request"),
   },
   {
     path: "/travel-requests",
@@ -54,8 +72,7 @@ export default [
     meta: {
       authRequired: true,
     },
-    component: () =>
-      import("@/views/pages/service-forms/travel-request/travel-requests"),
+    component: () => import("@/views/pages/service-forms/travel-request/index"),
   },
   {
     path: "/travel-requests/:travelAppID",

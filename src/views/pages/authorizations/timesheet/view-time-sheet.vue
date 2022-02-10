@@ -17,6 +17,7 @@
         },
         mounted() {
             this.fetchRequest();
+            console.log('Just mounted');
         },
         props: ["employee"],
         methods: {
@@ -25,6 +26,7 @@
                 let year = this.$route.params.year;
                 let empId = this.$route.params.empId;
                 const url = `${this.ROUTES.timesheet}/time-sheet/${month}/${year}/${empId}`;
+
                 this.apiGet(url, "Get Time sheet authorization").then((res) => {
                     this.timeSheet = res.data.timeSheet;
                     this.allocation = res.data.timeAllocation;
@@ -36,6 +38,7 @@
                             this.my_status = this.log[i].auth_status;
                         }
                     }
+
                 });
             },
             authorizationHandler(val){
@@ -54,6 +57,7 @@
                     };
                     this.apiPost(url, data, "Authorization Error").then((res)=>{
                         this.apiResponseHandler(`${res.data}`, "Authorization action");
+                        this.fetchRequest();
 
                     })
                     .catch((error)=>{
@@ -186,14 +190,14 @@
                                         <tbody>
                                         <tr class="table-light" v-for="(off, ind) in this.log" :key="ind">
                                             <th scope="row" >{{ind+1}}</th>
-                                            <td>{{off.Employee.emp_first_name}} {{off.Employee.emp_last_name}} </td>
+                                            <td>{{off.Employee.emp_first_name ? off.Employee.emp_first_name : ''  }} {{off.Employee.emp_last_name ? off.Employee.emp_last_name : '' }} </td>
                                             <td>
                                                 <small  v-if="off.auth_status === 1" class="text-success "> Approved  </small>
                                                 <small  v-else-if="off.auth_status === 2" class="text-danger "> Discarded </small>
                                                 <small  v-else class="text-warning "> Pending </small>
                                             </td>
-                                            <td>{{off.auth_comment }}</td>
-                                            <td>{{off.updatedAt}}</td>
+                                            <td>{{off.auth_comment  }}</td>
+                                            <td>{{off.updatedAt }}</td>
                                         </tr>
 
                                         </tbody>
