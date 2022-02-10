@@ -124,6 +124,127 @@ export default {
       ],
     };
   },
+  methods: {
+    async fetchPayrollMonthYear() {
+      /* Here, I first got public holidays and then the payroll month and year.
+       * I set the initial date on the FullCalendar as the first day of the payroll
+       * month and year.
+       * */
+      this.fetching = true;
+      await this.apiGet(this.ROUTES.publicHolidays).then((res) => {
+        this.publicHolidays = res.data;
+      });
+      await this.apiGet(this.ROUTES.payrollMonthYear).then((res) => {
+        if (res.data) {
+          const { pym_year, pym_month } = res.data;
+          this.pymYear = pym_year;
+          this.pymMonth = pym_month;
+          this.pymFullDate = `${pym_year}-${pym_month}-01`;
+          this.fetchTimeAllocations();
+          this.calendarOptions.initialDate = this.pymFullDate;
+        }
+      });
+    },
+    fetchTimeAllocations() {
+      // Here, I tried to get the time allocation for the payroll month and year to see if
+      // it's been filled first.
+      const employeeID = this.getEmployee.emp_id;
+      const url = `${this.ROUTES.timeAllocation}/get-time-allocation/${employeeID}/${this.pymFullDate}`;
+      this.apiGet(url, "Get Time Allocation Error").then((res) => {
+        const { data } = res;
+        console.log({res})
+        if (data) {
+          this.timeAllocated = true;
+        } else {
+          this.fetchTimesheetData();
+        }
+      });
+    },
+    fetchTimesheetData() {
+      // Get the timesheet data for an employee for each day of the payroll month.
+      const employeeID = this.getEmployee.emp_id;
+      const url = `${this.ROUTES.timesheet}/get-time-sheets/${employeeID}`;
+      this.apiGet(url, "Get Timesheet Error").then((res) => {
+        const { data } = res;
+        if (!data.length) {
+          this.populateTimesheetData();
+        } else {
+          data.forEach((entry) => {
+            let month, day, title;
+            title = `${entry.ts_start} - ${entry.ts_end} for ${entry.ts_duration} hrs`;
+            entry.ts_month.length === 1
+              ? (month = `0${entry.ts_month}`)
+              : (month = entry.ts_month);
+            entry.ts_day.length === 1
+              ? (day = `0${entry.ts_day}`)
+              : (day = entry.ts_day);
+            const date = `${entry.ts_year}-${month}-${day}`;
+            const entryObj = {
+              id: this.entryCount++,
+              title,
+              start: date,
+              end: date,
+              display: "background",
+            };
+            let calendarApi = this.$refs.fullCalendar.getApi();
+            calendarApi.addEvent(entryObj);
+          });
+        }
+      });
+      this.fetching = false;
+    },
+    populateTimesheetData() {
+      this.populateOption = true;
+    },
+    cancelPopulate() {
+      this.populateOption = false;
+    },
+    runTimesheetPopulate() {
+      this.populating = true;
+      const employeeID = this.getEmployee.emp_id;
+      const url = `${this.ROUTES.timesheet}/preload-date/${employeeID}`;
+      this.apiGet(url, "Populate Timesheet Error")
+        .then((res) => {
+          if (res.data) {
+            this.apiResponseHandler(`${res.data}`, "Timesheet Population Done");
+            this.fetchTimesheetData();
+          }
+        })
+        .finally(() => {
+          this.populating = false;
+          this.populateOption = false;
+        });
+    },
+    async dateClicked(info) {
+      this.newEventData = info;
+      this.dateInfo = info;
+      let isPublicHoliday = false;
+      let date = this.dateInfo.dateStr.split("-");
+      await this.publicHolidays.every((publicHoliday) => {
+        if (
+          publicHoliday.ph_year === date[0] &&
+          parseInt(publicHoliday.ph_month) === parseInt(date[1]) &&
+          parseInt(publicHoliday.ph_day) === parseInt(date[2])
+        ) {
+          this.phName = publicHoliday.ph_name;
+          isPublicHoliday = true;
+          return false;
+        }
+        return true;
+      });
+      if (!isPublicHoliday) {
+        this.showModal = true;
+      } else {
+        this.showModalPH = true;
+      }
+    },
+    fillTSE(dateInfo) {
+      this.$router.push({
+        name: "timesheet-entry",
+        params: { date: dateInfo.dateStr },
+      });
+    },
+  },
 };
 </script>
 
