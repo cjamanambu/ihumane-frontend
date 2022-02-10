@@ -152,8 +152,7 @@ export default {
       const url = `${this.ROUTES.timeAllocation}/get-time-allocation/${employeeID}/${this.pymFullDate}`;
       this.apiGet(url, "Get Time Allocation Error").then((res) => {
         const { data } = res;
-        console.log({res})
-        if (data) {
+        if (data.timeAllocationSum) {
           this.timeAllocated = true;
         } else {
           this.fetchTimesheetData();
