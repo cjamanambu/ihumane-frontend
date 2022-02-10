@@ -186,14 +186,14 @@
                                         <tbody>
                                         <tr class="table-light" v-for="(off, ind) in this.log" :key="ind">
                                             <th scope="row" >{{ind+1}}</th>
-                                            <td>{{off.Employee.emp_first_name}} {{off.Employee.emp_last_name}} </td>
+                                            <td>{{off.Employee.emp_first_name ? off.Employee.emp_first_name : ''  }} {{off.Employee.emp_last_name ? off.Employee.emp_last_name : '' }} </td>
                                             <td>
                                                 <small  v-if="off.auth_status === 1" class="text-success "> Approved  </small>
                                                 <small  v-else-if="off.auth_status === 2" class="text-danger "> Discarded </small>
                                                 <small  v-else class="text-warning "> Pending </small>
                                             </td>
-                                            <td>{{off.auth_comment }}</td>
-                                            <td>{{off.updatedAt}}</td>
+                                            <td>{{off.auth_comment  }}</td>
+                                            <td>{{off.updatedAt }}</td>
                                         </tr>
 
                                         </tbody>
