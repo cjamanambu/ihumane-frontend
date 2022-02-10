@@ -129,11 +129,11 @@ export default {
       const employeeID = this.getEmployee.emp_id;
       const url = `${this.ROUTES.timeAllocation}/get-time-allocation/${employeeID}/${this.pymFullDate}`;
       this.apiGet(url, "Get Time Allocation Error").then((res) => {
+        console.log({ res });
         const { data } = res;
+        this.fetchTimesheetData();
         if (data) {
           this.timeAllocated = true;
-        } else {
-          this.fetchTimesheetData();
         }
       });
     },
@@ -228,84 +228,76 @@ export default {
 <template>
   <Layout>
     <PageHeader :title="title" :items="items" />
-    <div v-if="timeAllocated" class="alert alert-info">
-      Your timesheet allocation for this payroll reporting period is now filled.
-    </div>
+    <scale-loader class="scale-loader" v-if="this.apiBusy" />
     <div v-else>
-      <scale-loader class="scale-loader" v-if="this.apiBusy" />
-      <div v-else>
-        <div class="d-flex justify-content-end mb-3">
-          <b-button class="btn btn-success" @click="populateTimesheetData">
-            <i class="mdi mdi-plus mr-2"></i>
-            Populate Timesheet
-          </b-button>
-        </div>
-        <div>
-          <div class="row">
-            <div class="col-lg-7">
-              <div class="card">
-                <div class="card-body">
-                  <div class="app-calendar">
-                    <FullCalendar
-                      ref="fullCalendar"
-                      :options="calendarOptions"
-                    />
-                  </div>
+      <div class="d-flex justify-content-end mb-3">
+        <b-button class="btn btn-success" @click="populateTimesheetData">
+          <i class="mdi mdi-plus mr-2"></i>
+          Populate Timesheet
+        </b-button>
+      </div>
+      <div>
+        <div class="row">
+          <div class="col-lg-7">
+            <div class="card">
+              <div class="card-body">
+                <div class="app-calendar">
+                  <FullCalendar ref="fullCalendar" :options="calendarOptions" />
                 </div>
               </div>
             </div>
-            <div class="col-lg-5">
-              <div class="card mb-3">
-                <div class="card-body">
-                  <div class="p-3 bg-light mb-4">
-                    <h5 class="font-size-14 mb-0">
-                      International Rescue Committee - Overseas Staff
-                    </h5>
-                  </div>
-                  <div class="d-flex justify-content-between">
-                    <p>Payroll Reporting Period</p>
-                    <p class="font-weight-bolder">
-                      <span>
-                        {{ (parseInt(pymMonth) - 1) | getMonth }}
-                      </span>
-                      <span>{{ pymYear }}</span>
-                    </p>
-                  </div>
-                  <div class="d-flex justify-content-between">
-                    <p>Name</p>
-                    <p>
-                      {{ getUser.user_name }}
-                    </p>
-                  </div>
-                  <div class="d-flex justify-content-between">
-                    <p>T7 Code</p>
-                    <p>-</p>
-                  </div>
-                  <div class="d-flex justify-content-between">
-                    <p>Location (T5)</p>
-                    <p>-</p>
-                  </div>
-                  <div class="d-flex justify-content-between">
-                    <p>Site Code (T6)</p>
-                    <p>-</p>
-                  </div>
-                  <div class="d-flex justify-content-between">
-                    <p>Nationality</p>
-                    <p>Non-US</p>
-                  </div>
+          </div>
+          <div class="col-lg-5">
+            <div class="card mb-3">
+              <div class="card-body">
+                <div class="p-3 bg-light mb-4">
+                  <h5 class="font-size-14 mb-0">
+                    International Rescue Committee - Overseas Staff
+                  </h5>
+                </div>
+                <div class="d-flex justify-content-between">
+                  <p>Payroll Reporting Period</p>
+                  <p class="font-weight-bolder">
+                    <span>
+                      {{ (parseInt(pymMonth) - 1) | getMonth }}
+                    </span>
+                    <span>{{ pymYear }}</span>
+                  </p>
+                </div>
+                <div class="d-flex justify-content-between">
+                  <p>Name</p>
+                  <p>
+                    {{ getUser.user_name }}
+                  </p>
+                </div>
+                <div class="d-flex justify-content-between">
+                  <p>T7 Code</p>
+                  <p>-</p>
+                </div>
+                <div class="d-flex justify-content-between">
+                  <p>Location (T5)</p>
+                  <p>-</p>
+                </div>
+                <div class="d-flex justify-content-between">
+                  <p>Site Code (T6)</p>
+                  <p>-</p>
+                </div>
+                <div class="d-flex justify-content-between">
+                  <p>Nationality</p>
+                  <p>Non-US</p>
                 </div>
               </div>
-              <div class="card">
-                <div class="card-body">
-                  <div class="p-3 bg-light mb-4">
-                    <h5 class="font-size-14 mb-0">Time & Effort Reporting</h5>
-                  </div>
-                  <TimeEffortForm
-                    :pmy-month="pymMonth"
-                    :pmy-year="pymYear"
-                    @added-ta="fetchTimeAllocations"
-                  />
+            </div>
+            <div class="card">
+              <div class="card-body">
+                <div class="p-3 bg-light mb-4">
+                  <h5 class="font-size-14 mb-0">Time & Effort Reporting</h5>
                 </div>
+                <TimeEffortForm
+                  :pmy-month="pymMonth"
+                  :pmy-year="pymYear"
+                  @added-ta="fetchTimeAllocations"
+                />
               </div>
             </div>
           </div>
