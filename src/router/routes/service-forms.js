@@ -1,11 +1,28 @@
 export default [
   {
+    path: "/timesheets",
+    name: "timesheets",
+    meta: {
+      authRequired: true,
+    },
+    component: () => import("@/views/pages/service-forms/timesheet/index"),
+  },
+  {
     path: "/timesheet",
     name: "timesheet",
     meta: {
       authRequired: true,
     },
-    component: () => import("@/views/pages/service-forms/timesheet/index"),
+    component: () => import("@/views/pages/service-forms/timesheet/timesheet"),
+  },
+  {
+    path: "/timesheets/:payrollMY",
+    name: "view-timesheet",
+    meta: {
+      authRequired: true,
+    },
+    component: () =>
+      import("@/views/pages/service-forms/timesheet/view-timesheet"),
   },
   {
     path: "/timesheet-entry/:date",
