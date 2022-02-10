@@ -89,22 +89,17 @@ export const menuItems = [
       {
         id: 10,
         label: "Travel Authorization",
-        link: "travel-authorization",
+        link: "/travel-authorization",
       },
       {
         id: 10,
         label: "TimeSheet Authorization",
-        link: "time-sheet-authorization",
+        link: "/time-sheet-authorization",
       },
       {
         id: 10,
         label: "Leave Authorization",
-        link: "",
-      },
-      {
-        id: 10,
-        label: "Assessment Authorization",
-        link: "",
+        link: "/leave-authorization",
       },
     ],
   },
