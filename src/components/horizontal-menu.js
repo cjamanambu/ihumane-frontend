@@ -26,25 +26,13 @@ export const menuItems = [
 
       {
         id: 5,
-        label: "TimeSheet",
-        link: "/timesheet",
+        label: "Timesheets",
+        link: "/timesheets",
       },
-
       {
         id: 6,
-        label: "Travel Request",
-        subItems: [
-          {
-            id: 6,
-            label: "New Travel Request",
-            link: "/travel-request",
-          },
-          {
-            id: 6,
-            label: "View Travel Requests",
-            link: "/travel-requests",
-          },
-        ],
+        label: "Travel Requests",
+        link: "/travel-requests",
       },
     ],
   },
