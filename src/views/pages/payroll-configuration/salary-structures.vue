@@ -32,6 +32,14 @@ export default {
     amount: { required },
   },
   methods: {
+    selectRow(salaryStructure) {
+      salaryStructure = salaryStructure[0];
+      this.employee = salaryStructure.ss_empid
+     
+      this.$refs["edit-salary-structure"].show();
+      this.$refs["salary-structure-table"].clearSelected();
+    },
+    
     refreshTable() {
       this.apiGet(
         this.ROUTES.salaryStructure,
@@ -113,6 +121,26 @@ export default {
           this.refreshTable();
           this.$v.$reset();
           this.$refs["add-salary-structure"].hide();
+        });
+      }
+    },
+
+    update() {
+      this.submitted = true;
+      this.$v.$touch();
+      if (this.$v.$invalid) {
+        this.apiFormHandler("Invalid Salary Structure");
+      } else {
+        const data = {
+          ss_gross: parseFloat(this.amount.replace(/,/g, "")),
+          ss_grade: this.salaryGrade,
+        };
+        const url = `${this.ROUTES.salaryStructure}/update-salary-structure/${this.employee}`;
+        this.apiPatch(url, data, "Update Salary Structure Error").then((res) => {
+          this.apiResponseHandler(res.data, "Salary Structure Updated");
+          this.refreshTable();
+          this.$v.$reset();
+          this.$refs["edit-salary-structure"].hide();
         });
       }
     },
@@ -219,7 +247,7 @@ export default {
             <!-- Table -->
             <div class="table-responsive mb-0">
               <b-table
-                ref="user-table"
+                ref="salary-structure-table"
                 bordered
                 selectable
                 hover
@@ -334,6 +362,75 @@ export default {
           type="submit"
         >
           Submitting...
+        </b-button>
+      </form>
+    </b-modal>
+
+    <b-modal
+        ref="edit-salary-structure"
+        title="Update Salary Structure"
+        hide-footer
+        centered
+        title-class="font-18"
+        @hidden="resetForm"
+    >
+      <form @submit.prevent="update">
+        <div class="form-group">
+          <label for="code">
+            Employee <span class="text-danger">*</span>
+          </label>
+          <b-form-select
+              id="code"
+              v-model="employee"
+              :options="employees"
+              disabled
+              :class="{
+              'is-invalid': submitted && $v.employee.$error,
+            }"
+          />
+        </div>
+        <div class="form-group">
+          <label for="code">
+            Salary Grade <span class="text-danger">*</span>
+          </label>
+          <b-form-select
+              id="code"
+              v-model="salaryGrade"
+              :options="salaryGrades"
+              :class="{
+              'is-invalid': submitted && $v.salaryGrade.$error,
+            }"
+          />
+        </div>
+        <div class="form-group">
+          <label for="amount">
+            Gross Salary <span class="text-danger">*</span>
+          </label>
+          <input
+              id="amount"
+              type="text"
+              v-model="amount"
+              class="form-control"
+              :class="{
+              'is-invalid': submitted && $v.amount.$error,
+            }"
+          />
+        </div>
+
+        <b-button
+            v-if="!submitting"
+            class="btn btn-success btn-block mt-4"
+            type="submit"
+        >
+          Update
+        </b-button>
+        <b-button
+            v-else
+            disabled
+            class="btn btn-success btn-block mt-4"
+            type="submit"
+        >
+          Updating...
         </b-button>
       </form>
     </b-modal>

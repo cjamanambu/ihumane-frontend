@@ -131,7 +131,7 @@ export default {
             <label style="visibility: hidden">hidden</label>
             <button
               type="button"
-              class="btn btn-sm btn-danger"
+              class="btn btn-danger"
               @click="delField(index)"
             >
               DEL
@@ -139,11 +139,7 @@ export default {
           </div>
           <div v-else class="form-group">
             <label style="visibility: hidden">hidden</label>
-            <button
-              type="button"
-              class="btn btn-sm btn-success"
-              @click="addField"
-            >
+            <button type="button" class="btn btn-success" @click="addField">
               ADD
             </button>
           </div>
