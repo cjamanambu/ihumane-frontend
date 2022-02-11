@@ -130,6 +130,7 @@ export default {
       const url = `${this.ROUTES.timeAllocation}/get-time-allocation/${employeeID}/${this.pymFullDate}`;
       this.apiGet(url, "Get Time Allocation Error").then((res) => {
         const { data } = res;
+        console.log({res})
         if (data) {
           this.timeAllocated = true;
         } else {
