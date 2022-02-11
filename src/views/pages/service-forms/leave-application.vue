@@ -19,8 +19,7 @@ export default {
   },
   mounted() {
     this.refreshTable();
-    this.getEmployees();
-    this.getLeaveTypes();
+    this.getLeaveAccruals();
   },
   validations: {
     leaveType: { required },
@@ -44,7 +43,6 @@ export default {
           active: true,
         },
       ],
-
       leaves: [],
       totalRows: 1,
       currentPage: 1,
@@ -92,9 +90,11 @@ export default {
       const url = `${this.ROUTES.leaveApplication}/get-employee-leave/${this.getEmployee.emp_id}`;
       this.apiGet(url, "Get Employee Leaves Error").then((res) => {
         const { data } = res;
+        // console.log({ data });
         data.forEach((leave, index) => {
           this.leaves[index] = { sn: ++index, ...leave };
         });
+        // console.log(this.leaves);
         this.totalRows = this.leaves.length;
       });
     },
@@ -151,39 +151,21 @@ export default {
         this.discarded = 1;
         this.leapp_status = "DISCARDED";
       }
-
       this.leapp_start_date = new Date(leave.leapp_start_date).toDateString();
       this.leapp_end_date = new Date(leave.leapp_end_date).toDateString();
-
       this.$refs["show-leave"].show();
       this.$refs["leave-application-table"].clearSelected();
     },
-
-    getLeaveTypes() {
-      this.apiGet(this.ROUTES.leaveType, "Get Leave Types Error").then(
-        (res) => {
-          this.leaveTypes = [
-            { value: null, text: "Please select a leave type" },
-          ];
-          const { data } = res;
-          data.forEach((leaveType) => {
-            this.leaveTypes.push({
-              value: leaveType.leave_type_id,
-              text: leaveType.leave_name,
-            });
-          });
-        }
-      );
-    },
-
-    getEmployees() {
-      this.apiGet(this.ROUTES.employee, "Get Leave Types Error").then((res) => {
-        this.employees = [{ value: null, text: "Please select an employee" }];
+    getLeaveAccruals() {
+      let url = `${this.ROUTES.leaveAccrual}/get-leave-acrruals/${this.getEmployee.emp_id}`;
+      this.apiGet(url, "Get Leave Accruals Error").then((res) => {
+        console.log({ res });
+        this.leaveTypes = [{ value: null, text: "Please select a leave type" }];
         const { data } = res;
-        data.forEach((employee) => {
-          this.employees.push({
-            value: employee.emp_id,
-            text: `${employee.emp_first_name} ${employee.emp_last_name}`,
+        data.forEach((leave) => {
+          this.leaveTypes.push({
+            value: leave.leave.leave_type_id,
+            text: `${leave.leave.leave_name} (${leave.accrual} days accrued)`,
           });
         });
       });
