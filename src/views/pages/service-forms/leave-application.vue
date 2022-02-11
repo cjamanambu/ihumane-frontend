@@ -89,12 +89,13 @@ export default {
     refreshTable() {
       const url = `${this.ROUTES.leaveApplication}/get-employee-leave/${this.getEmployee.emp_id}`;
       this.apiGet(url, "Get Employee Leaves Error").then((res) => {
+        console.log({ res });
         const { data } = res;
-        // console.log({ data });
         data.forEach((leave, index) => {
-          this.leaves[index] = { sn: ++index, ...leave };
+          if (index < data.length - 1) {
+            this.leaves[index] = { sn: ++index, ...leave };
+          }
         });
-        // console.log(this.leaves);
         this.totalRows = this.leaves.length;
       });
     },
@@ -159,7 +160,6 @@ export default {
     getLeaveAccruals() {
       let url = `${this.ROUTES.leaveAccrual}/get-leave-acrruals/${this.getEmployee.emp_id}`;
       this.apiGet(url, "Get Leave Accruals Error").then((res) => {
-        console.log({ res });
         this.leaveTypes = [{ value: null, text: "Please select a leave type" }];
         const { data } = res;
         data.forEach((leave) => {

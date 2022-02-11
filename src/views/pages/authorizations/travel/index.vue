@@ -25,7 +25,9 @@ export default {
       this.apiGet(url, "Get Travel Applications Error").then((res) => {
         const { data } = res;
         data.forEach((application, index) => {
-          this.applications[index] = { sn: ++index, ...application };
+          if (index < data.length - 1) {
+            this.applications[index] = { sn: ++index, ...application };
+          }
         });
         this.totalRows = this.applications.length;
       });
