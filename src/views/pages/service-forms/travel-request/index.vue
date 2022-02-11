@@ -23,6 +23,7 @@ export default {
       let employeeID = this.getEmployee.emp_id;
       const url = `${this.ROUTES.travelApplication}/get-travel-application/${employeeID}`;
       this.apiGet(url, "Get Travel Applications Error").then((res) => {
+        console.log({ res });
         const { data } = res;
         data.forEach((application, index) => {
           if (index < data.length - 1) {
@@ -35,12 +36,13 @@ export default {
                   innerApplication.travelapp_id ===
                   parseFloat(authorizer.auth_travelapp_id)
                 ) {
-                  innerApplication["Officer"] = authorizer.Employee;
+                  innerApplication["Officer"] = authorizer.officers;
                 }
               });
             });
           }
         });
+        console.log(this.applications);
         this.totalRows = this.applications.length;
       });
     },
