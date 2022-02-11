@@ -52,12 +52,12 @@ export default {
       pageOptions: [10, 25, 50, 100],
       filter: null,
       filterOn: [],
-      sortBy: "leapp_id",
+      sortBy: "sn",
       sortDesc: false,
       fields: [
-        { key: "leapp_id", label: "SN", sortable: true },
+        { key: "sn", label: "S/n", sortable: true },
         { key: "LeaveType.leave_name", label: "Leave Type", sortable: true },
-        { key: "leapp_total_days", label: "Days", sortable: true },
+        { key: "leapp_total_days", label: "Duration", sortable: true },
         { key: "leapp_start_date", label: "Start Date", sortable: true },
         { key: "leapp_end_date", label: "End Date", sortable: true },
         { key: "leapp_status", label: "Status", sortable: true },
@@ -92,7 +92,9 @@ export default {
       const url = `${this.ROUTES.leaveApplication}/get-employee-leave/${this.getEmployee.emp_id}`;
       this.apiGet(url, "Get Employee Leaves Error").then((res) => {
         const { data } = res;
-        this.leaves = data;
+        data.forEach((leave, index) => {
+          this.leaves[index] = { sn: ++index, ...leave };
+        });
         this.totalRows = this.leaves.length;
       });
     },
@@ -283,47 +285,32 @@ export default {
                 select-mode="single"
                 @row-selected="selectLeave"
               >
+                <template #cell(leapp_total_days)="row">
+                  <span>{{ row.value }} days</span>
+                </template>
                 <template #cell(leapp_status)="row">
                   <div
-                    class="badge badge-info badge-pill"
+                    class="badge badge-warning badge-pill"
                     v-if="row.value === 0"
                   >
                     Pending
                   </div>
-
-                  <div
-                    class="badge badge-warning badge-pill"
-                    v-if="row.value === 1"
-                  >
-                    Verified
-                  </div>
-
-                  <div
-                    class="badge badge-primary badge-pill"
-                    v-if="row.value === 2"
-                  >
-                    Recommended
-                  </div>
-
                   <div
                     class="badge badge-success badge-pill"
-                    v-if="row.value === 3"
+                    v-if="row.value === 1"
                   >
                     Approved
                   </div>
-
                   <div
                     class="badge badge-danger badge-pill"
-                    v-if="row.value === 4"
+                    v-if="row.value === 2"
                   >
-                    Disapproved
+                    Declined
                   </div>
                 </template>
-
                 <template #cell(leapp_start_date)="row">
                   {{ new Date(row.value).toDateString() }}
                 </template>
-
                 <template #cell(leapp_end_date)="row">
                   {{ new Date(row.value).toDateString() }}
                 </template>
