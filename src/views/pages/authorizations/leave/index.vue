@@ -22,11 +22,27 @@ export default {
     refreshTable() {
       const url = `${this.ROUTES.leaveApplication}/authorization/supervisor/${this.getEmployee.emp_id}`;
       this.apiGet(url, "Get Leave Applications Error").then((res) => {
-        console.log({ res });
         const { data } = res;
-        data.forEach((application, index) => {
-          this.applications[index] = { sn: ++index, ...application };
+        console.log({ data });
+        const { leave, authorizers } = data;
+        leave.forEach((leaveApp, index) => {
+          this.applications[index] = { sn: ++index, ...leaveApp };
         });
+        this.applications.forEach((application) => {
+          authorizers.forEach((authorizer) => {
+            if (
+              application.leapp_id === parseFloat(authorizer.auth_travelapp_id)
+            ) {
+              application["Officer"] = authorizer.officers;
+            }
+          });
+        });
+        console.log(this.applications);
+        // data.forEach((application, index) => {
+        //   if (index < data.length - 1) {
+        //     this.applications[index] = { sn: ++index, ...application };
+        //   }
+        // });
       });
     },
     onFiltered(filteredItems) {
@@ -79,6 +95,7 @@ export default {
         { key: "leapp_start_date", label: "Start Date", sortable: true },
         { key: "leapp_end_date", label: "End Date", sortable: true },
         { key: "leapp_total_days", label: "Leave Length", sortable: true },
+        { key: "Officer", label: "Authorization Officer", sortable: true },
         {
           key: "leapp_status",
           label: "Application Status",
@@ -174,6 +191,14 @@ export default {
                 </template>
                 <template #cell(leapp_total_days)="row">
                   <span> {{ row.value }} days</span>
+                </template>
+                <template #cell(Officer)="row">
+                  <p class="mb-0">
+                    {{ row.value.emp_first_name }} {{ row.value.emp_last_name }}
+                  </p>
+                  <small class="text-muted">
+                    {{ row.value.emp_unique_id }}
+                  </small>
                 </template>
                 <template #cell(leapp_status)="row">
                   <span
