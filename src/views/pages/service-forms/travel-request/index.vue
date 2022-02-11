@@ -25,7 +25,21 @@ export default {
       this.apiGet(url, "Get Travel Applications Error").then((res) => {
         const { data } = res;
         data.forEach((application, index) => {
-          this.applications[index] = { sn: ++index, ...application };
+          if (index < data.length - 1) {
+            this.applications[index] = { sn: ++index, ...application };
+          } else {
+            let authorizers = application;
+            this.applications.forEach((innerApplication) => {
+              authorizers.forEach((authorizer) => {
+                if (
+                  innerApplication.travelapp_id ===
+                  parseFloat(authorizer.auth_travelapp_id)
+                ) {
+                  innerApplication["Officer"] = authorizer.Employee;
+                }
+              });
+            });
+          }
         });
         this.totalRows = this.applications.length;
       });
@@ -79,6 +93,7 @@ export default {
         { key: "travelapp_start_date", label: "Start Date", sortable: true },
         { key: "travelapp_end_date", label: "End Date", sortable: true },
         { key: "travelapp_total_days", label: "Trip Length", sortable: true },
+        { key: "Officer", label: "Authorization Officer", sortable: true },
         {
           key: "travelapp_status",
           label: "Application Status",
@@ -177,6 +192,15 @@ export default {
                 </template>
                 <template #cell(travelapp_total_days)="row">
                   <span> {{ row.value }} days</span>
+                </template>
+                <template #cell(Officer)="row">
+                  <p class="mb-0">
+                    <span class="mr-1">{{ row.value.emp_first_name }}</span>
+                    <span>{{ row.value.emp_last_name }}</span>
+                  </p>
+                  <small class="text-muted">
+                    {{ row.value.emp_unique_id }}
+                  </small>
                 </template>
                 <template #cell(travelapp_status)="row">
                   <span
