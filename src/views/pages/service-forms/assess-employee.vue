@@ -5,7 +5,6 @@ import appConfig from "@/app.config";
 import { authComputed } from "@/state/helpers";
 import { required } from "vuelidate/lib/validators";
 
-
 export default {
   page: {
     title: "Assess Employee",
@@ -20,8 +19,7 @@ export default {
   },
 
   mounted() {
-   this.refreshTable()
-
+    this.refreshTable();
   },
   validations: {
     start: { required },
@@ -42,11 +40,10 @@ export default {
         {
           text: "Assess Employee",
           href: "/assess-employee",
-          active: true
+          active: true,
         },
-
       ],
-      employees: null,
+      employees: [],
       employeeId: null,
       totalRows: 1,
       currentPage: 1,
@@ -54,18 +51,16 @@ export default {
       pageOptions: [10, 25, 50, 100],
       filter: null,
       filterOn: [],
-      sortBy: "emp_id",
+      sortBy: "sn",
       sortDesc: false,
       fields: [
-        { key: "emp_id", label:"SN", sortable: true },
+        { key: "sn", label: "S/n", sortable: true },
         { key: "emp_unique_id", label: "Employee ID", sortable: true },
         { key: "emp_first_name", label: "Employee Name", sortable: true },
       ],
-
     };
   },
   methods: {
-
     onFiltered(filteredItems) {
       // Trigger pagination to update the number of buttons/pages due to filtering
       this.totalRows = filteredItems.length;
@@ -76,27 +71,25 @@ export default {
       employee = employee[0];
       this.employeeId = employee.emp_id;
       this.$router.push({
-        name: 'employee-assessment',
+        name: "employee-assessment",
         params: {
-          empid: this.employeeId
-        }
-      })
-
+          empid: this.employeeId,
+        },
+      });
     },
 
-    refreshTable(){
+    refreshTable() {
       const url = `${this.ROUTES.employee}/get-supervisor-employees/${this.getEmployee.emp_id}`;
       this.apiGet(url).then((res) => {
         const { data } = res;
         if (data) {
-          this.employees = data
+          data.forEach((employee, index) => {
+            this.employees[index] = { sn: ++index, ...employee };
+          });
           this.totalRows = this.employees.length;
         }
       });
     },
-
-
-
   },
 };
 </script>
@@ -110,7 +103,6 @@ export default {
     <PageHeader :title="title" :items="items" />
     <scale-loader v-if="apiBusy" />
     <div v-else class="row">
-
       <div class="col-12">
         <div class="card">
           <div class="card-body">
@@ -120,9 +112,9 @@ export default {
                   <label class="d-inline-flex align-items-center">
                     Show&nbsp;
                     <b-form-select
-                        v-model="perPage"
-                        size="sm"
-                        :options="pageOptions"
+                      v-model="perPage"
+                      size="sm"
+                      :options="pageOptions"
                     ></b-form-select
                     >&nbsp;entries
                   </label>
@@ -131,16 +123,16 @@ export default {
               <!-- Search -->
               <div class="col-sm-12 col-md-6">
                 <div
-                    id="tickets-table_filter"
-                    class="dataTables_filter text-md-right"
+                  id="tickets-table_filter"
+                  class="dataTables_filter text-md-right"
                 >
                   <label class="d-inline-flex align-items-center">
                     Search:
                     <b-form-input
-                        v-model="filter"
-                        type="search"
-                        placeholder="Search..."
-                        class="form-control form-control-sm ml-2"
+                      v-model="filter"
+                      type="search"
+                      placeholder="Search..."
+                      class="form-control form-control-sm ml-2"
                     ></b-form-input>
                   </label>
                 </div>
@@ -150,36 +142,36 @@ export default {
             <!-- Table -->
             <div class="table-responsive mb-0">
               <b-table
-                  bordered
-                  selectable
-                  hover
-                  :items="employees"
-                  :fields="fields"
-                  responsive="sm"
-                  :per-page="perPage"
-                  :current-page="currentPage"
-                  :sort-by.sync="sortBy"
-                  :sort-desc.sync="sortDesc"
-                  :filter="filter"
-                  :filter-included-fields="filterOn"
-                  @filtered="onFiltered"
-                  show-empty
-                  select-mode="single"
-                  @row-selected="selectEmployee"
+                bordered
+                selectable
+                hover
+                :items="employees"
+                :fields="fields"
+                responsive="sm"
+                :per-page="perPage"
+                :current-page="currentPage"
+                :sort-by.sync="sortBy"
+                :sort-desc.sync="sortDesc"
+                :filter="filter"
+                :filter-included-fields="filterOn"
+                @filtered="onFiltered"
+                show-empty
+                select-mode="single"
+                @row-selected="selectEmployee"
               >
               </b-table>
             </div>
             <div class="row">
               <div class="col">
                 <div
-                    class="dataTables_paginate paging_simple_numbers float-right"
+                  class="dataTables_paginate paging_simple_numbers float-right"
                 >
                   <ul class="pagination pagination-rounded mb-0">
                     <!-- pagination -->
                     <b-pagination
-                        v-model="currentPage"
-                        :total-rows="totalRows"
-                        :per-page="perPage"
+                      v-model="currentPage"
+                      :total-rows="totalRows"
+                      :per-page="perPage"
                     ></b-pagination>
                   </ul>
                 </div>
@@ -188,9 +180,6 @@ export default {
           </div>
         </div>
       </div>
-
-
-
     </div>
   </Layout>
 </template>
