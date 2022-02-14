@@ -23,26 +23,19 @@ export default {
       let employeeID = this.getEmployee.emp_id;
       const url = `${this.ROUTES.travelApplication}/get-travel-application/${employeeID}`;
       this.apiGet(url, "Get Travel Applications Error").then((res) => {
-        console.log({ res });
-        const { data } = res;
+        const { data, officers } = res.data;
         data.forEach((application, index) => {
-          if (index < data.length - 1) {
-            this.applications[index] = { sn: ++index, ...application };
-          } else {
-            let authorizers = application;
-            this.applications.forEach((innerApplication) => {
-              authorizers.forEach((authorizer) => {
-                if (
-                  innerApplication.travelapp_id ===
-                  parseFloat(authorizer.auth_travelapp_id)
-                ) {
-                  innerApplication["Officer"] = authorizer.officers;
-                }
-              });
-            });
-          }
+          this.applications[index] = { sn: ++index, ...application };
         });
-        console.log(this.applications);
+        this.applications.forEach((application) => {
+          officers.forEach((officer) => {
+            if (
+              application.travelapp_id === parseFloat(officer.auth_travelapp_id)
+            ) {
+              application["Officer"] = officer.officers;
+            }
+          });
+        });
         this.totalRows = this.applications.length;
       });
     },

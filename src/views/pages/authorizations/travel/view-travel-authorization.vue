@@ -72,7 +72,7 @@ export default {
         const { data } = res;
         data.forEach((employee) => {
           if (
-            employee.emp_id !== this.application.Employee.emp_id &&
+            employee.emp_id !== this.application.applicant.emp_id &&
             employee.emp_id !== this.getEmployee.emp_id
           ) {
             this.officials.push({
@@ -471,8 +471,8 @@ export default {
                     <b-tr v-for="(logEntry, index) in log" :key="index">
                       <b-td style="width: 25%">
                         <span>
-                          {{ logEntry.Employee.emp_first_name }}
-                          {{ logEntry.Employee.emp_last_name }}
+                          {{ logEntry.officers.emp_first_name }}
+                          {{ logEntry.officers.emp_last_name }}
                         </span>
                       </b-td>
                       <b-td style="width: 15%">
@@ -527,14 +527,14 @@ export default {
             <div class="d-flex justify-content-between mb-3">
               <span>Employee Name</span>
               <span>
-                {{ application.Employee.emp_first_name }}
-                {{ application.Employee.emp_first_name }}
+                {{ application.applicant.emp_first_name }}
+                {{ application.applicant.emp_first_name }}
               </span>
             </div>
             <div class="d-flex justify-content-between mb-3">
               <span>T7 Number</span>
               <span>
-                {{ application.Employee.emp_unique_id }}
+                {{ application.applicant.emp_unique_id }}
               </span>
             </div>
             <div class="d-flex justify-content-between mb-3">
