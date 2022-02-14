@@ -201,6 +201,7 @@ export default {
       data.travel_category = this.category;
       if (this.category === 1) {
         data.per_diem = per_diem;
+        data.t1_code = t1_code;
         data.t2_code = t2_code;
         data.total = total;
       }
@@ -214,14 +215,12 @@ export default {
       data.purpose = this.purpose;
       data.start_date = this.start;
       data.end_date = this.end;
-      data.t1_code = t1_code;
       data.currency = this.currency;
       data.breakdown = breakdown;
 
       const url = `${this.ROUTES.travelApplication}/new-travel-application`;
       this.confirmTA = false;
       this.apiPost(url, data, "Add Travel Application").then((res) => {
-        console.log({ res });
         const { data } = res;
         this.$router.push({ name: "travel-requests" }).then(() => {
           this.apiResponseHandler(data, "Travel Application Submitted");
@@ -335,27 +334,27 @@ export default {
                   </div>
                 </div>
                 <div class="col-lg-4">
-                  <div class="form-group">
-                    <label for="">Program / Charge Codes</label>
-                    <div class="row">
-                      <div class="col-lg-3">
-                        <div class="form-group">
-                          <label class="pt-2" for="">
-                            T1 <small class="text-muted">(Grant Code)</small>
-                          </label>
+                  <div v-if="category === 1">
+                    <div class="form-group">
+                      <label for="">Program / Charge Codes</label>
+                      <div class="row">
+                        <div class="col-lg-3">
+                          <div class="form-group">
+                            <label class="pt-2" for="">
+                              T1 <small class="text-muted">(Grant Code)</small>
+                            </label>
+                          </div>
+                        </div>
+                        <div class="col-lg-9">
+                          <div class="form-group">
+                            <b-form-select
+                              @change="getExpenses"
+                              v-model="donor"
+                              :options="donors"
+                            />
+                          </div>
                         </div>
                       </div>
-                      <div class="col-lg-9">
-                        <div class="form-group">
-                          <b-form-select
-                            @change="getExpenses"
-                            v-model="donor"
-                            :options="donors"
-                          />
-                        </div>
-                      </div>
-                    </div>
-                    <div v-if="category === 1">
                       <div class="row">
                         <div class="col-lg-3">
                           <div class="form-group">
