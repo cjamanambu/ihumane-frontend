@@ -58,6 +58,7 @@ export default {
         { key: "leapp_total_days", label: "Duration", sortable: true },
         { key: "leapp_start_date", label: "Start Date", sortable: true },
         { key: "leapp_end_date", label: "End Date", sortable: true },
+        { key: "Officer", label: "Authorization Officer", sortable: true },
         { key: "leapp_status", label: "Status", sortable: true },
       ],
       leapp_id: null,
@@ -90,12 +91,19 @@ export default {
       const url = `${this.ROUTES.leaveApplication}/get-employee-leave/${this.getEmployee.emp_id}`;
       this.apiGet(url, "Get Employee Leaves Error").then((res) => {
         console.log({ res });
-        const { data } = res;
+        const { data, officers } = res.data;
+        console.log({ officers });
         data.forEach((leave, index) => {
-          if (index < data.length - 1) {
-            this.leaves[index] = { sn: ++index, ...leave };
-          }
+          this.leaves[index] = { sn: ++index, ...leave };
         });
+        this.leaves.forEach((leave) => {
+          officers.forEach((officer) => {
+            if (leave.leapp_id === parseFloat(officer.auth_travelapp_id)) {
+              leave["Officer"] = officer.officers;
+            }
+          });
+        });
+        console.table(this.leaves);
         this.totalRows = this.leaves.length;
       });
     },
@@ -295,6 +303,15 @@ export default {
                 </template>
                 <template #cell(leapp_end_date)="row">
                   {{ new Date(row.value).toDateString() }}
+                </template>
+                <template #cell(Officer)="row">
+                  <p class="mb-0">
+                    <span class="mr-1">{{ row.value.emp_first_name }}</span>
+                    <span>{{ row.value.emp_last_name }}</span>
+                  </p>
+                  <small class="text-muted">
+                    {{ row.value.emp_unique_id }}
+                  </small>
                 </template>
               </b-table>
             </div>
