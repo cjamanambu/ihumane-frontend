@@ -177,7 +177,7 @@ export default {
               <div class="col-lg-4">
                 <div class="form-group">
                   <label for="">Program / Charge Codes</label>
-                  <div class="row">
+                  <div class="row" v-if="donor">
                     <div class="col-lg-4">
                       <div class="form-group">
                         <label class="" for="">
@@ -187,7 +187,7 @@ export default {
                     </div>
                     <div class="col-lg-8">
                       <div class="form-group">
-                        <span v-if="donor">
+                        <span>
                           {{ donor.donor_code }} ({{ donor.donor_description }})
                         </span>
                       </div>
