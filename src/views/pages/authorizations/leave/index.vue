@@ -22,27 +22,20 @@ export default {
     refreshTable() {
       const url = `${this.ROUTES.leaveApplication}/authorization/supervisor/${this.getEmployee.emp_id}`;
       this.apiGet(url, "Get Leave Applications Error").then((res) => {
-        const { data } = res;
-        console.log({ data });
-        const { leave, authorizers } = data;
-        leave.forEach((leaveApp, index) => {
-          this.applications[index] = { sn: ++index, ...leaveApp };
+        const { data, officers } = res.data;
+        data.forEach((leave, index) => {
+          this.applications[index] = { sn: ++index, ...leave };
         });
         this.applications.forEach((application) => {
-          authorizers.forEach((authorizer) => {
+          officers.forEach((officer) => {
             if (
-              application.leapp_id === parseFloat(authorizer.auth_travelapp_id)
+              application.leapp_id === parseFloat(officer.auth_travelapp_id)
             ) {
-              application["Officer"] = authorizer.officers;
+              application["Officer"] = officer.officers;
             }
           });
         });
-        console.log(this.applications);
-        // data.forEach((application, index) => {
-        //   if (index < data.length - 1) {
-        //     this.applications[index] = { sn: ++index, ...application };
-        //   }
-        // });
+        this.totalRows = this.applications.length;
       });
     },
     onFiltered(filteredItems) {
