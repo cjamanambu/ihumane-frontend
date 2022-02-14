@@ -23,11 +23,19 @@ export default {
     refreshTable() {
       const url = `${this.ROUTES.travelApplication}/authorization/supervisor/${this.getEmployee.emp_id}`;
       this.apiGet(url, "Get Travel Applications Error").then((res) => {
-        const { data } = res;
+        const { data, officers } = res.data;
+        console.log({ res });
         data.forEach((application, index) => {
-          if (index < data.length - 1) {
-            this.applications[index] = { sn: ++index, ...application };
-          }
+          this.applications[index] = { sn: ++index, ...application };
+        });
+        this.applications.forEach((application) => {
+          officers.forEach((officer) => {
+            if (
+              application.travelapp_id === parseFloat(officer.auth_travelapp_id)
+            ) {
+              application["Officer"] = officer.officers;
+            }
+          });
         });
         this.totalRows = this.applications.length;
       });
@@ -73,7 +81,7 @@ export default {
       sortDesc: false,
       fields: [
         { key: "sn", label: "S/n", sortable: true },
-        { key: "Employee", label: "Employee", sortable: true },
+        { key: "applicant", label: "Employee", sortable: true },
         {
           key: "travelapp_travel_cat",
           label: "Travel Category",
@@ -82,6 +90,7 @@ export default {
         { key: "travelapp_start_date", label: "Start Date", sortable: true },
         { key: "travelapp_end_date", label: "End Date", sortable: true },
         { key: "travelapp_total_days", label: "Trip Length", sortable: true },
+        { key: "Officer", label: "Authorization Officer", sortable: true },
         {
           key: "travelapp_status",
           label: "Application Status",
@@ -157,7 +166,7 @@ export default {
                 select-mode="single"
                 @row-selected="selectRow"
               >
-                <template #cell(Employee)="row">
+                <template #cell(applicant)="row">
                   <p class="mb-0">
                     {{ row.value.emp_first_name }} {{ row.value.emp_last_name }}
                   </p>
@@ -179,6 +188,15 @@ export default {
                 </template>
                 <template #cell(travelapp_total_days)="row">
                   <span> {{ row.value }} days</span>
+                </template>
+                <template #cell(Officer)="row">
+                  <p class="mb-0">
+                    <span class="mr-1">{{ row.value.emp_first_name }}</span>
+                    <span>{{ row.value.emp_last_name }}</span>
+                  </p>
+                  <small class="text-muted">
+                    {{ row.value.emp_unique_id }}
+                  </small>
                 </template>
                 <template #cell(travelapp_status)="row">
                   <span

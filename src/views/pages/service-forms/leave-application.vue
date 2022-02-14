@@ -90,9 +90,7 @@ export default {
     refreshTable() {
       const url = `${this.ROUTES.leaveApplication}/get-employee-leave/${this.getEmployee.emp_id}`;
       this.apiGet(url, "Get Employee Leaves Error").then((res) => {
-        console.log({ res });
         const { data, officers } = res.data;
-        console.log({ officers });
         data.forEach((leave, index) => {
           this.leaves[index] = { sn: ++index, ...leave };
         });
@@ -103,7 +101,6 @@ export default {
             }
           });
         });
-        console.table(this.leaves);
         this.totalRows = this.leaves.length;
       });
     },
