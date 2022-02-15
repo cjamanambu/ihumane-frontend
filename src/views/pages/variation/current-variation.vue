@@ -38,6 +38,7 @@ export default {
       this.empName = `${payment.employee.emp_first_name} ${payment.employee.emp_last_name}`
       this.paymentName = payment.payment.pd_payment_name
       this.paymentAmount = payment.vp_amount
+      this.paymentId = payment.vp_id
       if(parseInt(payment.vp_confirm) === 0){
         this.paymentStatus = 'Pending'
       }
@@ -131,14 +132,13 @@ export default {
         vp_amount: this.paymentAmount
 
         };
-        const url = `${this.ROUTES.variationalPayment}/update-payment/${this.paymentId}`;
+        const url = `${this.ROUTES.variationalPayment}/update-payment-amount/${this.paymentId}`;
         this.apiPatch(url, data, "Update Variational Payment").then(
             (res) => {
               this.apiResponseHandler(`${res.data}`, "Update Variational Payment");
               this.submitted = false;
               this.$refs["update-payment"].hide();
               this.getVariationalPayments();
-
             }
         );
 
@@ -189,7 +189,8 @@ export default {
       empName: null,
       paymentName: null,
       paymentAmount: null,
-      paymentStatus: null
+      paymentStatus: null,
+      paymentId: null
 
     };
   },
@@ -342,7 +343,7 @@ export default {
         title-class="font-18"
 
     >
-      <form @submit.prevent="">
+      <form @submit.prevent="updatePayment">
         <div class="form-group">
           <label for="emp-names">
             Employee Name <span class="text-danger">*</span>
@@ -394,7 +395,7 @@ export default {
           <div class="form-group">
             <label for=""> Amount </label>
             <input
-                readonly
+
                 type="text"
                 class="form-control"
                 v-model="paymentAmount"
@@ -418,6 +419,17 @@ export default {
           </b-button>
         </div>
 
+        <div v-if="paymentStatus === 'Confirmed'">
+          <div class="form-group">
+            <label for=""> Amount </label>
+            <input
+                readonly
+                type="text"
+                class="form-control"
+                v-model="paymentAmount"
+            />
+          </div>
+        </div>
 
 
       </form>
