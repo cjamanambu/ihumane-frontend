@@ -14,9 +14,10 @@ export default {
     PageHeader,
   },
   mounted() {
-    this.getVariationalPayments()
     this.refreshPMY()
-    this.getEmployees()
+    this.getVariationalPayments()
+
+
   },
 
   methods: {
@@ -31,19 +32,14 @@ export default {
 
 
     getVariationalPayments(){
-      const url = `${this.ROUTES.paymentDefinition}/variational-payments`
+      const url = `${this.ROUTES.paymentDefinition}/current-payment/${parseInt(this.year)}/${parseInt(this.month)}`
       this.apiGet(url, "Get Variational Payment Error").then(
           (res) => {
-            this.payments = [
-              { value: null, text: "Select Payment" },
-            ];
-            const { data } = res;
-            data.forEach((payment) => {
-              this.payments.push({
-                value: payment.pd_id,
-                text:payment.pd_payment_name,
-              });
-            });
+            const {data} = res;
+            if (data) {
+              this.employees = data
+              this.totalRows = this.employees.length;
+            }
           }
       );
     },
