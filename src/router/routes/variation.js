@@ -19,4 +19,14 @@ export default [
         import("@/views/pages/variation/confirm-variation"),
   },
 
+  {
+    path: "/current-variation",
+    name: "current-variation",
+    meta: {
+      authRequired: true,
+    },
+    component: () =>
+        import("@/views/pages/variation/current-variation"),
+  },
+
 ];

@@ -35,7 +35,22 @@ export default {
     selectRow(salaryStructure) {
       salaryStructure = salaryStructure[0];
       this.employee = salaryStructure.ss_empid
-     
+      this.amount = salaryStructure.total_amount
+
+      const url = `${this.ROUTES.salaryStructure}/get-salary-structure/${this.employee}`
+
+      this.apiGet(url, "Get Salary Structure Error").then(
+          (res) => {
+
+            const { data } = res;
+            this.employeeSalaryStructure = data
+
+          }
+      );
+
+
+
+
       this.$refs["edit-salary-structure"].show();
       this.$refs["salary-structure-table"].clearSelected();
     },
@@ -189,6 +204,7 @@ export default {
       ],
       submitted: false,
       amount: null,
+      employeeSalaryStructure: [ ]
     };
   },
 };
@@ -373,6 +389,7 @@ export default {
         centered
         title-class="font-18"
         @hidden="resetForm"
+        size="xl"
     >
       <form @submit.prevent="update">
         <div class="form-group">
@@ -389,6 +406,50 @@ export default {
             }"
           />
         </div>
+        <div class="form-group">
+          <div class="row">
+            <div class="col-sm-3" v-for="(field, index) in employeeSalaryStructure" :key="index">
+
+              <b-card
+                  :title="field.payment.pd_payment_name"
+
+                  tag="field.payment.pd_payment_name"
+                  style="max-width: 20rem;"
+                  class="mb-2"
+              >
+                <b-card-text>
+                  {{ field.ss_amount.toLocaleString() }}
+                </b-card-text>
+
+
+              </b-card>
+            </div>
+
+            <div class="col-sm-3">
+
+              <b-card
+                  title="Gross Salary"
+
+                  tag="field.payment.pd_payment_name"
+                  style="max-width: 20rem;"
+                  class="mb-2"
+              >
+                <b-card-text>
+                  {{ this.amount.toLocaleString() }}
+                </b-card-text>
+
+
+              </b-card>
+            </div>
+
+          </div>
+
+
+        </div>
+
+
+
+
         <div class="form-group">
           <label for="code">
             Salary Grade <span class="text-danger">*</span>
