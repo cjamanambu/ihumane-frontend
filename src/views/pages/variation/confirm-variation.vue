@@ -93,6 +93,8 @@ export default {
       this.$refs.paymentTable.clearSelected()
     },
 
+
+
     approveSelected(){
       this.submitted = true;
 
@@ -202,7 +204,7 @@ export default {
   <Layout>
     <PageHeader :title="title" :items="items" />
     <div class="d-flex justify-content-end mb-3">
-      <b-button class="btn btn-success" @click="$refs['add-leave'].show()">
+      <b-button class="btn btn-success" @click="routeCurrentVariation">
         <i class="mdi mdi-plus mr-2"></i>
         View Variational Payments
       </b-button>
