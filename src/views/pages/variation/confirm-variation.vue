@@ -120,6 +120,31 @@ export default {
       );
     },
 
+    returnSelected(){
+      this.submitted = true;
+
+      this.selectedPayments.forEach((payment) => {
+        this.paymentId.push(payment.vp_id);
+      });
+
+      const data = {
+
+        variational_payment: this.paymentId,
+        status: 3
+
+      };
+      const url = `${this.ROUTES.variationalPayment}/confirm-payment`;
+      this.apiPost(url, data, "Variational Payment Approval").then(
+          (res) => {
+            this.apiResponseHandler(`${res.data}`, "Variational Payment Returned");
+            this.selectedPayments= [ ]
+            this.paymentId = [ ]
+            this.getPayments()
+
+          }
+      );
+    },
+
     unApproveSelected(){
       this.submitted = true;
 
@@ -295,6 +320,13 @@ export default {
                     Discarded
                   </div>
 
+                  <div
+                      class="badge badge-primary badge-pill"
+                      v-if="row.value === 3"
+                  >
+                    Returned
+                  </div>
+
 
                 </template>
 
@@ -320,6 +352,7 @@ export default {
 
                 <b-button style="margin: 10px" variant="danger" size="sm" @click="unApproveSelected">Unapprove Selection</b-button>
 
+                <b-button style="margin: 10px" variant="warning" size="sm" @click="returnSelected">Return Selection</b-button>
 
               </p>
 

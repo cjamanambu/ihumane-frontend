@@ -51,6 +51,10 @@ export default {
         this.paymentStatus = 'Discarded'
       }
 
+      if(parseInt(payment.vp_confirm) === 3){
+        this.paymentStatus = 'Returned'
+      }
+
       this.$refs["update-payment"].show();
       this.$refs["supervisor-table"].clearSelected();
     },
@@ -288,6 +292,11 @@ export default {
 
                   </div>
 
+                  <div v-if="parseInt(data.item.vp_confirm) === 3">
+                    <b> Returned </b>
+
+                  </div>
+
                 </template>
               </b-table>
             </div>
@@ -392,6 +401,34 @@ export default {
 
 
         <div v-if="paymentStatus === 'Pending'">
+          <div class="form-group">
+            <label for=""> Amount </label>
+            <input
+
+                type="text"
+                class="form-control"
+                v-model="paymentAmount"
+            />
+          </div>
+
+          <b-button
+              v-if="!submitting"
+              class="btn btn-success btn-block mt-4"
+              type="submit"
+          >
+            Submit
+          </b-button>
+          <b-button
+              v-else
+              disabled
+              class="btn btn-success btn-block mt-4"
+              type="submit"
+          >
+            Submitting...
+          </b-button>
+        </div>
+
+        <div v-if="paymentStatus === 'Returned'">
           <div class="form-group">
             <label for=""> Amount </label>
             <input
