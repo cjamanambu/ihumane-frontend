@@ -211,7 +211,7 @@ export default {
             <div class="p-3 bg-light mb-4">
               <h5 class="font-size-14 mb-0">Beginning of the Year</h5>
             </div>
-            <form @submit.prevent="update">
+            <form v-if="assessments.length > 0" @submit.prevent="update">
               <div
                 class="row"
                 v-for="(field, index) in assessments"
@@ -280,7 +280,7 @@ export default {
                 </div>
               </div>
               <div class="row">
-                <div class="col-lg-9">
+                <div class="col-12">
                   <b-button
                     v-if="!submitting"
                     class="btn btn-success btn-block mt-4"
@@ -299,6 +299,13 @@ export default {
                 </div>
               </div>
             </form>
+            <div class="row" v-else>
+              <div class="col-12">
+                <div class="alert alert-warning">
+                  Employee yet to submit assessment
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>

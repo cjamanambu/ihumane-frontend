@@ -88,7 +88,7 @@ export default {
         { key: "travelapp_start_date", label: "Start Date", sortable: true },
         { key: "travelapp_end_date", label: "End Date", sortable: true },
         { key: "travelapp_total_days", label: "Trip Length", sortable: true },
-        { key: "Officer", label: "Authorization Officer", sortable: true },
+        { key: "Officer", label: "Current Desk", sortable: true },
         {
           key: "travelapp_status",
           label: "Application Status",

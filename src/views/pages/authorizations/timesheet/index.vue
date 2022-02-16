@@ -26,7 +26,7 @@ export default {
       this.apiGet(url, "Get Authorizations Error").then((res) => {
         console.log({ res });
         let count = 0;
-        const { data } = res;
+        const { data, officers } = res.data;
         data.forEach((time) => {
           let found = false;
           if (this.applications.length === 0) {
@@ -63,6 +63,13 @@ export default {
               });
             }
           }
+        });
+        this.applications.forEach((application) => {
+          officers.forEach((officer) => {
+            if (application.ref_no === officer.auth_travelapp_id) {
+              application["Officer"] = officer.officers;
+            }
+          });
         });
         console.log(this.applications);
         this.totalRows = this.applications.length;
@@ -133,6 +140,10 @@ export default {
           key: "breakdown",
           label: "Percentage to Charge (T1)",
           sortable: true,
+        },
+        {
+          key: "Officer",
+          label: "Current Desk",
         },
         {
           key: "status",
@@ -229,6 +240,15 @@ export default {
                   </p>
                 </template>
                 <template #cell(employee)="row">
+                  <p class="mb-0">
+                    {{ row.value.emp_first_name }}
+                    {{ row.value.emp_last_name }}
+                  </p>
+                  <small>
+                    {{ row.value.emp_unique_id }}
+                  </small>
+                </template>
+                <template #cell(Officer)="row">
                   <p class="mb-0">
                     {{ row.value.emp_first_name }}
                     {{ row.value.emp_last_name }}
