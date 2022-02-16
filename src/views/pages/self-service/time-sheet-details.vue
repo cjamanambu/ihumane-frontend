@@ -2,32 +2,77 @@
     import Layout from "@/views/layouts/main";
     import PageHeader from "@/components/page-header";
     import appConfig from "@/app.config";
-    import FullCalendar from "@fullcalendar/vue";
-    import dayGridPlugin from "@fullcalendar/daygrid";
-    import timeGridPlugin from "@fullcalendar/timegrid";
-    import interactionPlugin from "@fullcalendar/interaction";
-    import bootstrapPlugin from "@fullcalendar/bootstrap";
-    import listPlugin from "@fullcalendar/list";
     import { authComputed } from "@/state/helpers";
     export default {
         page: {
-            title: "Timesheet Details",
+            title: "Time Sheet Authorization",
             meta: [{ name: "description", content: appConfig.description }],
-        },
-        components: {
-            FullCalendar,
-            Layout,
-            PageHeader,
         },
         computed: {
             ...authComputed,
         },
+        components: {
+            Layout,
+            PageHeader,
+        },
         mounted() {
-            this.fetchPayroll();
+            this.fetchRequest();
+            //console.log('Just mounted');
+        },
+        props: ["employee"],
+        methods: {
+            fetchRequest() {
+
+                let month = this.$route.params.month;
+                let year = this.$route.params.year;
+                //let empId = this.$route.params.empId;
+                const url = `${this.ROUTES.timesheet}/${month}/${year}`;
+
+                this.apiGet(url, "Get Time sheet details").then((res) => {
+                    console.log({res});
+                    this.timeSheet = res.data.timeSheet;
+                    this.allocation = res.data.timeAllocation;
+                    this.log = res.data.log;
+                    this.ref_no = this.allocation.ta_ref_no;
+                    this.ta_status = this.allocation.ta_status;
+                    for(let i = 0; i<this.log.length; i++){
+                        if(this.log[i].auth_officer_id === this.getEmployee.emp_id){
+                            this.my_status = this.log[i].auth_status;
+                        }
+                    }
+
+                });
+            },
+            authorizationHandler(val){
+                if(this.comment === null){
+                    alert("Leave a comment")
+                }else{
+                    const url = `${this.ROUTES.appAuthorization}`;
+                    const data = {
+                        appId:`${this.ref_no}`,
+                        status:val,
+                        officer:this.getEmployee.emp_id,
+                        type:2,
+                        comment:this.comment,
+                        markAsFinal:this.final,
+                        nextOfficer:this.nextOfficer,
+                    };
+                    this.apiPost(url, data, "Authorization Error").then((res)=>{
+                        this.apiResponseHandler(`${res.data}`, "Authorization action");
+                        this.fetchRequest();
+
+                    })
+                        .catch((error)=>{
+                            console.log(error);
+                        });
+                    //alert("Comment: "+this.comment+" val: "+val);
+                }
+
+            },
         },
         data() {
             return {
-                title: "Timesheet Details",
+                title: "Time Sheet Details",
                 items: [
                     {
                         text: "IHUMANE",
@@ -37,118 +82,31 @@
                         href: "/",
                     },
                     {
-                        text: "Timesheet Details",
+                        text: "Time Sheet Details",
                         active: true,
                     },
                 ],
-                calendarOptions: {
-                    headerToolbar: {
-                        left: "title",
-                        center: "",
-                        right: "",
+                application: null,
+                timeSheet: [],
+                allocation: [],
+                log:[],
+                my_status:null,
+                donor: null,
+                t2Codes: [],
+                final: 1,
+                official: null,
+                comment:null,
+                allocationId:null,
+                ref_no:null,
+                ta_status:null,
+                officials: [
+                    {
+                        value: null,
+                        text: "Please choose the next reviewer",
+                        disabled: "true",
                     },
-                    plugins: [
-                        dayGridPlugin,
-                        timeGridPlugin,
-                        interactionPlugin,
-                        bootstrapPlugin,
-                        listPlugin,
-                    ],
-                    initialView: "dayGridMonth",
-                    themeSystem: "bootstrap",
-                    initialDate: null,
-                    initialEvents: [],
-                    editable: false,
-                    droppable: false,
-                    eventResizableFromStart: false,
-                    dateClick: null,
-                    weekends: false,
-                    selectable: false,
-                    selectMirror: true,
-                    dayMaxEvents: true,
-                    showNonCurrentDates: false,
-                    fixedWeekCount: false,
-                },
-                currentEvents: [],
-                showModal: false,
-                eventModal: false,
-                submitted: false,
-                submit: false,
-                newEventData: {},
-                edit: {},
-                deleteId: {},
-                event: {
-                    title: "",
-                    category: "",
-                },
-                editevent: {
-                    editTitle: "",
-                    editcategory: "",
-                },
-                dateInfo: null,
-                pymYear: "",
-                pymMonth: "",
-                pymFullDate: "",
-                fetching: false,
-                populateOption: false,
-                entryCount: 0,
-                populating: false,
-                timeAllocated: false,
-                publicHolidays: [],
-                showModalPH: false,
-                phName: "",
-                breakdown: [],
+                ],
             };
-        },
-        methods: {
-            async fetchPayroll() {
-                let month = this.$route.params.month;
-                let year = this.$route.params.year;
-                await this.fetchTimeAllocations();
-                this.calendarOptions.initialDate = this.pymFullDate;
-            },
-            fetchTimeAllocations() {
-                // Here, I tried to get the time allocation for the payroll month and year to see if
-                // it's been filled first.
-                const employeeID = this.getEmployee.emp_id;
-                const url = `${this.ROUTES.timeAllocation}/${month}/${year}`;
-                this.apiGet(url, "Get Time Allocation Error").then((res) => {
-                    const { timeAllocationBreakDown } = res.data;
-                    this.breakdown = timeAllocationBreakDown;
-                    this.fetchTimesheetData();
-                });
-            },
-            fetchTimesheetData() {
-                // Get the timesheet data for an employee for each day of the payroll month.
-                const employeeID = this.getEmployee.emp_id;
-                const url = `${this.ROUTES.timesheet}/get-time-sheet-month/${employeeID}/${this.pymFullDate}`;
-                this.apiGet(url, "Get Timesheet Error").then(async (res) => {
-                    const { data } = res;
-                    if (data.length) {
-                        await data.forEach((entry) => {
-                            let month, day, title;
-                            title = `${entry.ts_start} - ${entry.ts_end} for ${entry.ts_duration} hrs`;
-                            entry.ts_month.length === 1
-                                ? (month = `0${entry.ts_month}`)
-                                : (month = entry.ts_month);
-                            entry.ts_day.length === 1
-                                ? (day = `0${entry.ts_day}`)
-                                : (day = entry.ts_day);
-                            const date = `${entry.ts_year}-${month}-${day}`;
-                            const entryObj = {
-                                id: this.entryCount++,
-                                title,
-                                start: date,
-                                end: date,
-                                display: "background",
-                            };
-                            let calendarApi = this.$refs.fullCalendar.getApi();
-                            calendarApi.addEvent(entryObj);
-                        });
-                    }
-                });
-                this.fetching = false;
-            },
         },
     };
 </script>
@@ -158,72 +116,129 @@
         <PageHeader :title="title" :items="items" />
         <div class="d-flex justify-content-end mb-3">
             <b-button
-                    class="btn btn-success"
-                    @click="$router.push({ name: 'timesheets' })"
+                    class="btn btn-secondary"
+                    @click="$router.push({ name: 'manage-time-sheets' })"
             >
-                <i class="mdi mdi-plus mr-2"></i>
-                View Timesheets
+                <i class="mdi mdi-step-backward mr-2"></i>
+                Go Back
             </b-button>
         </div>
-        <scale-loader class="scale-loader" v-if="this.apiBusy" />
-        <div v-else>
-            <div class="row">
-                <div class="col-lg-7">
-                    <div class="card">
-                        <div class="card-body">
-                            <div class="app-calendar">
-                                <FullCalendar ref="fullCalendar" :options="calendarOptions" />
+        <scale-loader v-if="apiBusy" />
+        <div class="row" v-else>
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="p-3 bg-light mb-4 d-flex justify-content-between">
+                            <div class="d-inline mb-0">
+                                <h5>Time Sheet
+                                </h5>
+
+                            </div>
+                            <small  v-if="this.ta_status === 1" class="text-success float-right"> Approved  </small>
+                            <small  v-else-if="this.ta_status === 2" class="text-danger float-right"> Discarded </small>
+                            <small  v-else class="text-warning float-right"> Pending </small>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="table-responsive">
+                                    <table class="table mb-0">
+                                        <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Start </th>
+                                            <th>End</th>
+                                            <th>Duration</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr class="table-light" v-for="(ts, index) in this.timeSheet" :key="index">
+                                            <th scope="row" >{{index+1}}</th>
+                                            <td>{{ts.ts_start}}</td>
+                                            <td>{{ts.ts_end}}</td>
+                                            <td>{{ts.ts_duration }}</td>
+                                        </tr>
+
+                                        </tbody>
+                                    </table>
+
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="col-lg-5">
-                    <div class="card mb-3">
-                        <div class="card-body">
-                            <div class="p-3 bg-light mb-4">
-                                <h5 class="font-size-14 mb-0">
-                                    International Rescue Committee - Overseas Staff
+
+                <div class="card">
+                    <div class="card-body">
+                        <div class="p-3 bg-light mb-4 d-flex justify-content-between">
+                            <div class="d-inline mb-0">
+                                <h5>Authorization Log
                                 </h5>
+
                             </div>
-                            <div class="d-flex justify-content-between">
-                                <p>Payroll Reporting Period</p>
-                                <p class="font-weight-bolder">
-                                    <span>{{ pymFullDate }}</span>
-                                </p>
-                            </div>
-                            <div class="d-flex justify-content-between">
-                                <p>Name</p>
-                                <p>
-                                    {{ getUser.user_name }}
-                                </p>
-                            </div>
-                            <div class="d-flex justify-content-between">
-                                <p>T7 Code</p>
-                                <p>-</p>
-                            </div>
-                            <div class="d-flex justify-content-between">
-                                <p>Location (T5)</p>
-                                <p>-</p>
-                            </div>
-                            <div class="d-flex justify-content-between">
-                                <p>Site Code (T6)</p>
-                                <p>-</p>
-                            </div>
-                            <div class="d-flex justify-content-between">
-                                <p>Nationality</p>
-                                <p>Non-US</p>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="table-responsive">
+                                    <table class="table mb-0">
+                                        <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Officer </th>
+                                            <th>Status</th>
+                                            <th>Comment</th>
+                                            <th>Date</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr class="table-light" v-for="(off, ind) in this.log" :key="ind">
+                                            <th scope="row" >{{ind+1}}</th>
+                                            <td>{{off.Employee.emp_first_name ? off.Employee.emp_first_name : ''  }} {{off.Employee.emp_last_name ? off.Employee.emp_last_name : '' }} </td>
+                                            <td>
+                                                <small  v-if="off.auth_status === 1" class="text-success "> Approved  </small>
+                                                <small  v-else-if="off.auth_status === 2" class="text-danger "> Discarded </small>
+                                                <small  v-else class="text-warning "> Pending </small>
+                                            </td>
+                                            <td>{{off.auth_comment  }}</td>
+                                            <td>{{off.updatedAt }}</td>
+                                        </tr>
+
+                                        </tbody>
+                                    </table>
+
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div class="card">
-                        <div class="card-body">
-                            <div class="p-3 bg-light mb-4">
-                                <h5 class="font-size-14 mb-0">Time & Effort Reporting</h5>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="p-3 bg-light mb-4 d-flex justify-content-between">
+                            <div class="d-inline mb-0">
+                                <h5 class="font-size-14 mb-0">Employee Details</h5>
                             </div>
-                            <p v-for="(charge, index) in breakdown" :key="index">
-                                <span class="mr-4">Grant Code: {{ charge.ta_tcode }}</span>
-                                <span>Percentage Charge: {{ charge.ta_charge }}%</span>
-                            </p>
+                        </div>
+                        <div class="d-flex justify-content-between mb-3">
+                            <span>Employee Name</span>
+                            <span>
+                                {{this.allocation.Employee.emp_first_name }}
+                                {{this.allocation.Employee.emp_last_name }}
+                              </span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-3">
+                            <span>T7 Number</span>
+                            <span>
+                                {{this.allocation.Employee.emp_unique_id }}
+                              </span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-3">
+                            <span>T3 Code</span>
+                            <span> - </span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-3">
+                            <span>T6 Code</span>
+                            <span> - </span>
                         </div>
                     </div>
                 </div>

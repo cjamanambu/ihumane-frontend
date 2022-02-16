@@ -47,7 +47,7 @@ export default [
     meta: {
       authRequired: true,
     },
-    component: () => import("@/views/pages/self-service/time-sheet"),
+    component: () => import("@/views/pages/self-service/time-sheet-details"),
   },
 
   {
