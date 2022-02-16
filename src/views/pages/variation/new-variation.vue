@@ -30,7 +30,7 @@ export default {
     },
 
 
-    getVariationalPayments(){
+    getVariationalPaymentss(){
       const url = `${this.ROUTES.paymentDefinition}/variational-payments`
       this.apiGet(url, "Get Variational Payment Error").then(
           (res) => {
@@ -42,6 +42,25 @@ export default {
               this.payments.push({
                 value: payment.pd_id,
                 text:payment.pd_payment_name,
+              });
+            });
+          }
+      );
+    },
+
+
+    getVariationalPayments(){
+      const url = `${this.ROUTES.paymentDefinition}/variational-payments`
+      this.apiGet(url, "Get Variational Payment Error").then(
+          (res) => {
+            this.paymentsFields = [   ];
+            const { data } = res;
+            data.forEach((payment) => {
+              this.paymentsFields.push({
+                id: payment.pd_id,
+                paymentDefinition:payment.pd_payment_name,
+                amount: 0
+
               });
             });
           }
@@ -80,7 +99,7 @@ export default {
             data.forEach((employee) => {
               this.employees.push({
                 value: employee.emp_id,
-                text:`${employee.emp_first_name} ${employee.emp_last_name}`,
+                text:`${employee.emp_first_name} ${employee.emp_last_name} - ${employee.emp_unique_id}`,
               });
             });
           }
@@ -99,7 +118,7 @@ export default {
 
       this.paymentsFields.forEach(async (field) => {
         const data = {
-         payment_definition: field.paymentDefinition,
+         payment_definition: field.id,
           amount: field.amount
 
         };
@@ -123,7 +142,7 @@ export default {
               this.submitted = false;
               this.selectedEmployees = null
               this.count = 0
-              this.paymentsFields = [{ id: 0, paymentDefinition:null, amount: 0  }]
+              this.getVariationalPayments()
 
             }
         );
@@ -163,7 +182,7 @@ export default {
       payments: [],
       payment: null,
       filledPayments: [],
-      paymentsFields: [ { id: 0, paymentDefinition:null, amount: 0  } ],
+      paymentsFields: [  ],
       employees: [ ],
       amount: 0,
       selectedEmployees: null,
@@ -209,19 +228,35 @@ export default {
                     />
                   </div>
 
+                  <br>
+                  <br>
+                  <hr>
 
                   <div class="row" v-for="(field, index) in paymentsFields" :key="index">
-                    <div class="col-lg-5">
-                      <div class="form-group">
-                        <label>Payment Type</label>
-                        <b-form-select
+<!--                    <div class="col-lg-5">-->
+<!--                      <div class="form-group">-->
+<!--                        <label>Payment Type</label>-->
+<!--                        <b-form-select-->
 
+<!--                            v-model="field.paymentDefinition"-->
+<!--                            :options="payments"-->
+<!--                        />-->
+<!--                      </div>-->
+<!--                    </div>-->
+
+                    <div class="col-lg-6">
+                      <div class="form-group">
+                        <label for=""> Payment Definition </label>
+                        <input
+
+                            type="text"
+                            readonly
+                            class="form-control"
                             v-model="field.paymentDefinition"
-                            :options="payments"
                         />
                       </div>
                     </div>
-                    <div class="col-lg-5">
+                    <div class="col-lg-6">
                       <div class="form-group">
                         <label for=""> Amount </label>
                         <input
@@ -233,65 +268,68 @@ export default {
                         />
                       </div>
                     </div>
-                    <div class="col-lg-2">
-                      <div class="form-group">
-                        <div v-if="index > 0" class="form-group">
+<!--                    <div class="col-lg-2">-->
+<!--                      <div class="form-group">-->
+<!--                        <div v-if="index > 0" class="form-group">-->
 
 
-                          <div class="row" v-if="parseInt(index) === parseInt(count)">
-                            <div class="col-lg-6">
-                              <label style="visibility: hidden">hidden</label>
-                              <button
-                                  type="button"
-                                  class="btn btn-danger"
-                                  @click="delField(index)"
-                              >
-                                DEL
-                              </button>
-                            </div>
+<!--                          <div class="row" v-if="parseInt(index) === parseInt(count)">-->
+<!--                            <div class="col-lg-6">-->
+<!--                              <label style="visibility: hidden">hidden</label>-->
+<!--                              <button-->
+<!--                                  type="button"-->
+<!--                                  class="btn btn-danger"-->
+<!--                                  @click="delField(index)"-->
+<!--                              >-->
+<!--                                DEL-->
+<!--                              </button>-->
+<!--                            </div>-->
 
-                            <div class="col-lg-6">
-                              <label style="visibility: hidden">hidden</label>
-                              <button
-                                  type="button"
-                                  class="btn btn-success"
-                                  @click="addField"
-                              >
-                                ADD
-                              </button>
-                            </div>
-                          </div>
+<!--                            <div class="col-lg-6">-->
+<!--                              <label style="visibility: hidden">hidden</label>-->
+<!--                              <button-->
+<!--                                  type="button"-->
+<!--                                  class="btn btn-success"-->
+<!--                                  @click="addField"-->
+<!--                              >-->
+<!--                                ADD-->
+<!--                              </button>-->
+<!--                            </div>-->
+<!--                          </div>-->
 
-                          <div class="row" v-else>
-                            <div class="col-lg-12">
-                              <label style="visibility: hidden">hidden</label>
-                              <button
-                                  type="button"
-                                  class="btn btn-danger"
-                                  @click="delField(index)"
-                              >
-                                DEL
-                              </button>
-                            </div>
+<!--                          <div class="row" v-else>-->
+<!--                            <div class="col-lg-12">-->
+<!--                              <label style="visibility: hidden">hidden</label>-->
+<!--                              <button-->
+<!--                                  type="button"-->
+<!--                                  class="btn btn-danger"-->
+<!--                                  @click="delField(index)"-->
+<!--                              >-->
+<!--                                DEL-->
+<!--                              </button>-->
+<!--                            </div>-->
 
 
-                          </div>
+<!--                          </div>-->
 
-                        </div>
-                        <div v-else class="form-group">
+<!--                        </div>-->
+<!--                        <div v-else class="form-group">-->
 
-                          <label style="visibility: hidden">hidden</label>
-                          <button
-                              type="button"
-                              class="btn btn-success"
-                              @click="addField"
-                          >
-                            ADD
-                          </button>
-                        </div>
-                      </div>
-                    </div>
+<!--                          <label style="visibility: hidden">hidden</label>-->
+<!--                          <button-->
+<!--                              type="button"-->
+<!--                              class="btn btn-success"-->
+<!--                              @click="addField"-->
+<!--                          >-->
+<!--                            ADD-->
+<!--                          </button>-->
+<!--                        </div>-->
+<!--                      </div>-->
+<!--                    </div>-->
                   </div>
+                  <hr>
+                  <br>
+                  <br>
 
                   <div class="form-group">
                     <label for=""> Month </label>
