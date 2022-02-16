@@ -249,17 +249,17 @@ export const menuItems = [
     subItems: [
       {
         id: 28,
-        label: "Setup Payments",
+        label: "Setup Variation",
         link: "/new-variation",
       },
       {
         id: 28,
-        label: "Current Payments",
+        label: "Manage Variation",
         link: "/current-variation",
       },
       {
         id: 30,
-        label: "Confirm Payments",
+        label: "Confirm Variation",
         link: "confirm-variation",
       },
     ],

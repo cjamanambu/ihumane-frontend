@@ -61,7 +61,7 @@ export default {
         if (res.data) {
            this.pmySet = true;
           const {pym_year, pym_month} = res.data;
-          const url = `${this.ROUTES.variationalPayment}/current-payment/${pym_year}/${pym_month}`
+          const url = `${this.ROUTES.variationalPayment}/current-pending-payment/${pym_year}/${pym_month}`
           this.apiGet(url, "Get Payment Error").then(
 
               (res) => {
@@ -198,7 +198,7 @@ export default {
       sortBy: "vp_id",
       sortDesc: false,
       fields: [
-        'selected',
+        '#',
           { key: "vp_id", label:"SN", sortable: true },
         { key: "employee.emp_unique_id", label: "Employee ID", sortable: true },
         { key: "emp_first_name", label: "Employee Name", sortable: true },
@@ -229,16 +229,14 @@ export default {
   <Layout>
     <PageHeader :title="title" :items="items" />
     <div class="d-flex justify-content-end mb-3">
-      <b-button class="btn btn-success" @click="routeCurrentVariation">
-        <i class="mdi mdi-plus mr-2"></i>
-        View Variational Payments
-      </b-button>
+
     </div>
     <b-spinner type="grow" v-if="apiBusy" class="m-2" variant="success" />
     <div v-else class="row">
       <div class="col-12">
         <div class="card">
           <div class="card-body">
+            <h3> {{ monthName }} - {{ year }}</h3>
             <div class="row mt-4">
               <div class="col-sm-12 col-md-6">
                 <div id="tickets-table_length" class="dataTables_length">
@@ -330,7 +328,7 @@ export default {
 
                 </template>
 
-                <template #cell(selected)="{ rowSelected }">
+                <template #cell(#)="{ rowSelected }">
                   <template v-if="rowSelected">
                     <span aria-hidden="true">&check;</span>
                     <span class="sr-only">Selected</span>
@@ -348,11 +346,11 @@ export default {
 
                 <b-button style="margin: 10px" variant="warning" size="sm" @click="clearSelected">Clear Selection</b-button>
 
-                <b-button style="margin: 10px" variant="success" size="sm" @click="approveSelected">Approve Selection</b-button>
+                <b-button style="margin: 10px" variant="success" size="sm" @click="approveSelected">Approve Variation</b-button>
 
-                <b-button style="margin: 10px" variant="danger" size="sm" @click="unApproveSelected">Unapprove Selection</b-button>
+                <b-button style="margin: 10px" variant="danger" size="sm" @click="unApproveSelected">Decline Variation</b-button>
 
-                <b-button style="margin: 10px" variant="warning" size="sm" @click="returnSelected">Return Selection</b-button>
+                <b-button style="margin: 10px" variant="warning" size="sm" @click="returnSelected">Return Variation</b-button>
 
               </p>
 
