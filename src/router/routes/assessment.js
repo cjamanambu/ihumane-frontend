@@ -5,7 +5,16 @@ export default [
     meta: {
       authRequired: true,
     },
-    component: () => import("@/views/pages/assessment/self-assessment"),
+    component: () => import("@/views/pages/assessment/self-assessment/index"),
+  },
+  {
+    path: "/self-assessment/beginning-of-year",
+    name: "beginning-of-year",
+    meta: {
+      authRequired: true,
+    },
+    component: () =>
+      import("@/views/pages/assessment/self-assessment/beginning-of-year"),
   },
   {
     path: "/assess-employees",
@@ -13,7 +22,7 @@ export default [
     meta: {
       authRequired: true,
     },
-    component: () => import("@/views/pages/assessment/assess-employees"),
+    component: () => import("@/views/pages/assessment/assess-employees/index"),
   },
   {
     path: "/assess-employee/:empid",
@@ -21,6 +30,7 @@ export default [
     meta: {
       authRequired: true,
     },
-    component: () => import("@/views/pages/assessment/assess-employee"),
+    component: () =>
+      import("@/views/pages/assessment/assess-employees/assess-employee"),
   },
 ];

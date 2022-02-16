@@ -87,7 +87,6 @@ export default {
     },
     selectRow(row) {
       row = row[0];
-      console.log(row);
       this.month = row.payroll_month;
       this.year = row.payroll_year;
       this.empId = row.employee.emp_id;
