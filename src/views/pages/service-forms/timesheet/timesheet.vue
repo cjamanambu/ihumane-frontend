@@ -316,7 +316,7 @@ export default {
                   <TimeEffortForm
                     :pmy-month="pymMonth"
                     :pmy-year="pymYear"
-                    @added-ta="fetchTimeAllocations"
+                    @added-ta="viewTimesheet"
                   />
                 </div>
               </div>

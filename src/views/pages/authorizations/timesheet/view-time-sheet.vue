@@ -28,9 +28,10 @@ export default {
 
       this.apiGet(url, "Get Time sheet authorization").then((res) => {
         console.log({ res });
-        this.timeSheet = res.data.timeSheet;
-        this.allocation = res.data.timeAllocation;
-        this.log = res.data.log;
+        const { timesheet, timeAllocation, log } = res.data;
+        this.timeSheet = timesheet;
+        this.allocation = timeAllocation;
+        this.log = log;
         this.ref_no = this.allocation.ta_ref_no;
         this.ta_status = this.allocation.ta_status;
         for (let i = 0; i < this.log.length; i++) {
@@ -202,13 +203,13 @@ export default {
                         <th scope="row">{{ ind + 1 }}</th>
                         <td>
                           {{
-                            off.Employee.emp_first_name
-                              ? off.Employee.emp_first_name
+                            off.officers.emp_first_name
+                              ? off.officers.emp_first_name
                               : ""
                           }}
                           {{
-                            off.Employee.emp_last_name
-                              ? off.Employee.emp_last_name
+                            off.officers.emp_last_name
+                              ? off.officers.emp_last_name
                               : ""
                           }}
                         </td>
