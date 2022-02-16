@@ -17,6 +17,7 @@ export default {
   },
   mounted() {
     this.fetchRequest();
+    //console.log(`Month: ${this.$route.params.month} Year: ${this.$route.params.year} ID: ${this.$route.params.empId}`);
   },
   props: ["employee"],
   methods: {
@@ -27,6 +28,7 @@ export default {
       const url = `${this.ROUTES.timesheet}/time-sheet/${month}/${year}/${empId}`;
 
       this.apiGet(url, "Get Time sheet authorization").then((res) => {
+
         console.log({ res });
         const { timesheet, timeAllocation, log } = res.data;
         this.timeSheet = timesheet;
