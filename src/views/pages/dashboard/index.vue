@@ -1,16 +1,17 @@
 <script>
 import Layout from "../../layouts/main";
 import PageHeader from "@/components/page-header";
+import { authComputed } from "@/state/helpers";
 
-import Stat from "./widget";
-import RevenueAnalytics from "./revenue";
-import SalesAnalytics from "./sales-analytics";
-import EarningReport from "./earning";
-import Sources from "./sources";
-import RecentActivity from "./recent-activity";
-import RevenueLocation from "./revenue-location";
-import Chat from "./chat";
-import Transaction from "./transaction";
+// import Stat from "./widget";
+// import RevenueAnalytics from "./revenue";
+// import SalesAnalytics from "./sales-analytics";
+// import EarningReport from "./earning";
+// import Sources from "./sources";
+// import RecentActivity from "./recent-activity";
+// import RevenueLocation from "./revenue-location";
+// import Chat from "./chat";
+// import Transaction from "./transaction";
 
 /**
  * Dashboard component
@@ -19,15 +20,18 @@ export default {
   components: {
     Layout,
     PageHeader,
-    Stat,
-    RevenueAnalytics,
-    SalesAnalytics,
-    EarningReport,
-    Sources,
-    RecentActivity,
-    RevenueLocation,
-    Chat,
-    Transaction,
+    // Stat,
+    // RevenueAnalytics,
+    // SalesAnalytics,
+    // EarningReport,
+    // Sources,
+    // RecentActivity,
+    // RevenueLocation,
+    // Chat,
+    // Transaction,
+  },
+  computed: {
+    ...authComputed,
   },
   data() {
     return {
@@ -50,32 +54,42 @@ export default {
   <Layout>
     <PageHeader :title="title" :items="items" />
     <div class="row">
-      <div class="col-xl-8">
-        <Stat />
-        <RevenueAnalytics />
-      </div>
-      <div class="col-xl-4">
-        <SalesAnalytics />
-        <EarningReport />
-      </div>
-    </div>
-    <div class="row">
-      <div class="col-lg-4">
-        <Sources />
-      </div>
-      <div class="col-lg-4">
-        <RecentActivity />
-      </div>
-      <div class="col-lg-4">
-        <RevenueLocation />
-      </div>
-    </div>
-    <div class="row">
-      <div class="col-lg-4">
-        <Chat />
-      </div>
-      <div class="col-lg-8">
-        <Transaction />
+      <div class="col-5">
+        <div class="card">
+          <div class="card-body">
+            <div class="media">
+              <img
+                style="width: 30%"
+                :src="require('@/assets/images/irc-logo.png')"
+                class="mr-4"
+              />
+              <div class="media-body overflow-hidden">
+                <p class="text-truncate font-size-14 mt-4 mb-2">
+                  Welcome back,
+                </p>
+                <h4 class="mb-0 text-capitalize">
+                  {{ this.getEmployee.emp_first_name }}
+                  {{ this.getEmployee.emp_last_name }}
+                </h4>
+                <p class="text-muted">
+                  {{ this.getEmployee.emp_unique_id }}
+                </p>
+              </div>
+            </div>
+          </div>
+          <div class="card-body border-top py-2">
+            <div class="text-success d-inline-flex">
+              <a
+                href="https://www.rescue.org/country/nigeria"
+                class="d-flex align-items-center"
+                target="_blank"
+              >
+                International Rescue Committee
+                <i class="ri-arrow-right-s-line"></i>
+              </a>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </Layout>
