@@ -22,13 +22,14 @@ export default {
       const url = `${this.ROUTES.employee}/get-employee/${employeeID}`;
       this.apiGet(url, "Get Employee Error").then((res) => {
         const { data } = res;
-        console.log({ data });
+        //console.log({ data });
         if (data) {
           this.emp_first_name = data.emp_first_name;
           this.emp_last_name = data.emp_last_name;
           this.emp_other_name = data.emp_other_name;
           this.emp_qualification = data.emp_qualification;
           this.emp_account_no = data.emp_account_no;
+          this.emp_phone_no = data.emp_phone_no;
           this.emp_bank_id = data.emp_bank_id;
           this.emp_state_id = data.emp_state_id;
           this.emp_lga_id = data.emp_lga_id;
@@ -83,6 +84,7 @@ export default {
         emp_last_name: this.emp_last_name,
         emp_other_name: this.emp_other_name,
         emp_qualification: this.emp_qualification,
+        emp_phone_no: this.emp_phone_no,
         emp_account_no: this.emp_account_no,
         emp_bank_id: this.emp_bank_id,
         emp_state_id: this.emp_state_id,
@@ -126,6 +128,7 @@ export default {
       emp_last_name: null,
       emp_other_name: null,
       emp_qualification: null,
+      emp_phone_no: null,
       emp_account_no: null,
       emp_bank_id: null,
       emp_state_id: null,
@@ -203,6 +206,15 @@ export default {
                       type="text"
                       class="form-control"
                       v-model="emp_last_name"
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label for=""> Phone Number </label>
+                    <input
+
+                            type="text"
+                            class="form-control"
+                            v-model="emp_phone_no"
                     />
                   </div>
 
@@ -345,6 +357,7 @@ export default {
                 v-if="!submitted"
                 type="submit"
                 class="btn btn-success btn-block mt-4"
+                @click="updateEmployee"
               >
                 Update Employee
               </b-button>

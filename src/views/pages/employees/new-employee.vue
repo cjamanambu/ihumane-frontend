@@ -95,6 +95,7 @@ export default {
           account_no: this.account_number,
           bank: this.bank,
           phone_no: this.telephone,
+          other_name: this.other_name,
         };
         const url = `${this.ROUTES.employee}/employee-enrollment`;
         this.apiPost(url, data, "Employee Enrollment Error").then((res) => {
@@ -200,7 +201,7 @@ export default {
                     </div>
 
                     <div class="form-group row mb-3">
-                      <label class="col-md-3 col-form-label" for="otherName"
+                      <label class="col-md-3 col-form-label" for="officialEmail"
                         >Official Email</label
                       >
                       <div class="col-md-9">
@@ -211,6 +212,21 @@ export default {
                           class="form-control"
                           name="officialEmail"
                           placeholder="Official Email"
+                        />
+                      </div>
+                    </div>
+                    <div class="form-group row mb-3">
+                      <label class="col-md-3 col-form-label" for="otherName"
+                      >Other Name</label
+                      >
+                      <div class="col-md-9">
+                        <input
+                                id="otherName"
+                                type="text"
+                                class="form-control"
+                                v-model="other_name"
+                                name="other_name"
+                                placeholder="Other Name"
                         />
                       </div>
                     </div>
