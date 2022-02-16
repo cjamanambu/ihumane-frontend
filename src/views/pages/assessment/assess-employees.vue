@@ -7,7 +7,7 @@ import { required } from "vuelidate/lib/validators";
 
 export default {
   page: {
-    title: "Assess Employee",
+    title: "Assess Employees",
     meta: [{ name: "description", content: appConfig.description }],
   },
   components: {
@@ -28,7 +28,7 @@ export default {
   },
   data() {
     return {
-      title: "Assess Employee",
+      title: "Assess Employees",
       items: [
         {
           text: "IHUMANE",
@@ -38,8 +38,8 @@ export default {
           href: "/",
         },
         {
-          text: "Assess Employee",
-          href: "/assess-employee",
+          text: "Assess Employees",
+          href: "/assess-employees",
           active: true,
         },
       ],
@@ -55,8 +55,14 @@ export default {
       sortDesc: false,
       fields: [
         { key: "sn", label: "S/n", sortable: true },
-        { key: "emp_unique_id", label: "Employee ID", sortable: true },
-        { key: "emp_first_name", label: "Employee Name", sortable: true },
+        {
+          key: "emp_unique_id",
+          label: "T7 Number (Unique ID)",
+          sortable: true,
+        },
+        { key: "name", label: "Employee", sortable: true },
+        { key: "emp_office_email", label: "Email", sortable: true },
+        { key: "emp_phone_no", label: "Phone", sortable: true },
       ],
     };
   },
@@ -66,18 +72,16 @@ export default {
       this.totalRows = filteredItems.length;
       this.currentPage = 1;
     },
-
     selectEmployee(employee) {
       employee = employee[0];
       this.employeeId = employee.emp_id;
       this.$router.push({
-        name: "employee-assessment",
+        name: "assess-employee",
         params: {
           empid: this.employeeId,
         },
       });
     },
-
     refreshTable() {
       const url = `${this.ROUTES.employee}/get-supervisor-employees/${this.getEmployee.emp_id}`;
       this.apiGet(url).then((res) => {
@@ -159,6 +163,11 @@ export default {
                 select-mode="single"
                 @row-selected="selectEmployee"
               >
+                <template #cell(name)="row">
+                  <p class="mb-0">
+                    {{ row.item.emp_first_name }} {{ row.item.emp_last_name }}
+                  </p>
+                </template>
               </b-table>
             </div>
             <div class="row">

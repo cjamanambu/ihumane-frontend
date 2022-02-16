@@ -88,7 +88,7 @@ export default {
         { key: "leapp_start_date", label: "Start Date", sortable: true },
         { key: "leapp_end_date", label: "End Date", sortable: true },
         { key: "leapp_total_days", label: "Leave Length", sortable: true },
-        { key: "Officer", label: "Authorization Officer", sortable: true },
+        { key: "Officer", label: "Current Desk", sortable: true },
         {
           key: "leapp_status",
           label: "Application Status",

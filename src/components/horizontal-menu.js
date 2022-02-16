@@ -50,8 +50,8 @@ export const menuItems = [
 
       {
         id: 11,
-        label: "Assess Employee",
-        link: "/assess-employee",
+        label: "Assess Employees",
+        link: "/assess-employees",
       },
     ],
   },
