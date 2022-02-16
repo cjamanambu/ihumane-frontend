@@ -1,3 +1,4 @@
+-pl
 <script>
 import simplebar from "simplebar-vue";
 import i18n from "../i18n";
