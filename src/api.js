@@ -33,7 +33,6 @@ export const ROUTES = {
   employee: `employees`,
   leaveType: `leave-types`,
   leaveApplication: `leave-application`,
-  leaveAccrual: `leave-accrual`,
   pensionProvider: `pension-providers`,
   hmo: `hmos`,
   qualification: `qualifications`,
