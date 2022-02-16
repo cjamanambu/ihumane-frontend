@@ -17,7 +17,6 @@ export default {
   },
   mounted() {
     this.fetchRequest();
-    console.log('Just mounted');
   },
   props: ["employee"],
   methods: {
@@ -28,44 +27,43 @@ export default {
       const url = `${this.ROUTES.timesheet}/time-sheet/${month}/${year}/${empId}`;
 
       this.apiGet(url, "Get Time sheet authorization").then((res) => {
+        console.log({ res });
         this.timeSheet = res.data.timeSheet;
         this.allocation = res.data.timeAllocation;
         this.log = res.data.log;
         this.ref_no = this.allocation.ta_ref_no;
         this.ta_status = this.allocation.ta_status;
-        for(let i = 0; i<this.log.length; i++){
-          if(this.log[i].auth_officer_id === this.getEmployee.emp_id){
+        for (let i = 0; i < this.log.length; i++) {
+          if (this.log[i].auth_officer_id === this.getEmployee.emp_id) {
             this.my_status = this.log[i].auth_status;
           }
         }
-
       });
     },
-    authorizationHandler(val){
-      if(this.comment === null){
-        alert("Leave a comment")
-      }else{
+    authorizationHandler(val) {
+      if (this.comment === null) {
+        alert("Leave a comment");
+      } else {
         const url = `${this.ROUTES.appAuthorization}`;
         const data = {
-          appId:`${this.ref_no}`,
-          status:val,
-          officer:this.getEmployee.emp_id,
-          type:2,
-          comment:this.comment,
-          markAsFinal:this.final,
-          nextOfficer:this.nextOfficer,
+          appId: `${this.ref_no}`,
+          status: val,
+          officer: this.getEmployee.emp_id,
+          type: 2,
+          comment: this.comment,
+          markAsFinal: this.final,
+          nextOfficer: this.nextOfficer,
         };
-        this.apiPost(url, data, "Authorization Error").then((res)=>{
-          this.apiResponseHandler(`${res.data}`, "Authorization action");
-          this.fetchRequest();
-
-        })
-          .catch((error)=>{
+        this.apiPost(url, data, "Authorization Error")
+          .then((res) => {
+            this.apiResponseHandler(`${res.data}`, "Authorization action");
+            this.fetchRequest();
+          })
+          .catch((error) => {
             console.log(error);
           });
         //alert("Comment: "+this.comment+" val: "+val);
       }
-
     },
   },
   data() {
@@ -87,16 +85,16 @@ export default {
       application: null,
       timeSheet: [],
       allocation: [],
-      log:[],
-      my_status:null,
+      log: [],
+      my_status: null,
       donor: null,
       t2Codes: [],
       final: 1,
       official: null,
-      comment:null,
-      allocationId:null,
-      ref_no:null,
-      ta_status:null,
+      comment: null,
+      allocationId: null,
+      ref_no: null,
+      ta_status: null,
       officials: [
         {
           value: null,
@@ -128,37 +126,47 @@ export default {
           <div class="card-body">
             <div class="p-3 bg-light mb-4 d-flex justify-content-between">
               <div class="d-inline mb-0">
-                <h5>Time Sheet
-                </h5>
-
+                <h5>Time Sheet</h5>
               </div>
-              <small  v-if="this.ta_status === 1" class="text-success float-right"> Approved  </small>
-              <small  v-else-if="this.ta_status === 2" class="text-danger float-right"> Discarded </small>
-              <small  v-else class="text-warning float-right"> Pending </small>
+              <small
+                v-if="this.ta_status === 1"
+                class="text-success float-right"
+              >
+                Approved
+              </small>
+              <small
+                v-else-if="this.ta_status === 2"
+                class="text-danger float-right"
+              >
+                Discarded
+              </small>
+              <small v-else class="text-warning float-right"> Pending </small>
             </div>
             <div class="row">
               <div class="col-lg-12">
                 <div class="table-responsive">
                   <table class="table mb-0">
                     <thead>
-                    <tr>
-                      <th>#</th>
-                      <th>Start </th>
-                      <th>End</th>
-                      <th>Duration</th>
-                    </tr>
+                      <tr>
+                        <th>#</th>
+                        <th>Start</th>
+                        <th>End</th>
+                        <th>Duration</th>
+                      </tr>
                     </thead>
                     <tbody>
-                    <tr class="table-light" v-for="(ts, index) in this.timeSheet" :key="index">
-                      <th scope="row" >{{index+1}}</th>
-                      <td>{{ts.ts_start}}</td>
-                      <td>{{ts.ts_end}}</td>
-                      <td>{{ts.ts_duration }}</td>
-                    </tr>
-
+                      <tr
+                        class="table-light"
+                        v-for="(ts, index) in this.timeSheet"
+                        :key="index"
+                      >
+                        <th scope="row">{{ index + 1 }}</th>
+                        <td>{{ ts.ts_start }}</td>
+                        <td>{{ ts.ts_end }}</td>
+                        <td>{{ ts.ts_duration }}</td>
+                      </tr>
                     </tbody>
                   </table>
-
                 </div>
               </div>
             </div>
@@ -169,9 +177,7 @@ export default {
           <div class="card-body">
             <div class="p-3 bg-light mb-4 d-flex justify-content-between">
               <div class="d-inline mb-0">
-                <h5>Authorization Log
-                </h5>
-
+                <h5>Authorization Log</h5>
               </div>
             </div>
             <div class="row">
@@ -179,30 +185,53 @@ export default {
                 <div class="table-responsive">
                   <table class="table mb-0">
                     <thead>
-                    <tr>
-                      <th>#</th>
-                      <th>Officer </th>
-                      <th>Status</th>
-                      <th>Comment</th>
-                      <th>Date</th>
-                    </tr>
+                      <tr>
+                        <th>#</th>
+                        <th>Officer</th>
+                        <th>Status</th>
+                        <th>Comment</th>
+                        <th>Date</th>
+                      </tr>
                     </thead>
                     <tbody>
-                    <tr class="table-light" v-for="(off, ind) in this.log" :key="ind">
-                      <th scope="row" >{{ind+1}}</th>
-                      <td>{{off.Employee.emp_first_name ? off.Employee.emp_first_name : ''  }} {{off.Employee.emp_last_name ? off.Employee.emp_last_name : '' }} </td>
-                      <td>
-                        <small  v-if="off.auth_status === 1" class="text-success "> Approved  </small>
-                        <small  v-else-if="off.auth_status === 2" class="text-danger "> Discarded </small>
-                        <small  v-else class="text-warning "> Pending </small>
-                      </td>
-                      <td>{{off.auth_comment  }}</td>
-                      <td>{{off.updatedAt }}</td>
-                    </tr>
-
+                      <tr
+                        class="table-light"
+                        v-for="(off, ind) in this.log"
+                        :key="ind"
+                      >
+                        <th scope="row">{{ ind + 1 }}</th>
+                        <td>
+                          {{
+                            off.Employee.emp_first_name
+                              ? off.Employee.emp_first_name
+                              : ""
+                          }}
+                          {{
+                            off.Employee.emp_last_name
+                              ? off.Employee.emp_last_name
+                              : ""
+                          }}
+                        </td>
+                        <td>
+                          <small
+                            v-if="off.auth_status === 1"
+                            class="text-success"
+                          >
+                            Approved
+                          </small>
+                          <small
+                            v-else-if="off.auth_status === 2"
+                            class="text-danger"
+                          >
+                            Discarded
+                          </small>
+                          <small v-else class="text-warning"> Pending </small>
+                        </td>
+                        <td>{{ off.auth_comment }}</td>
+                        <td>{{ off.updatedAt }}</td>
+                      </tr>
                     </tbody>
                   </table>
-
                 </div>
               </div>
             </div>
@@ -220,15 +249,15 @@ export default {
             <div class="d-flex justify-content-between mb-3">
               <span>Employee Name</span>
               <span>
-                                {{this.allocation.Employee.emp_first_name }}
-                                {{this.allocation.Employee.emp_last_name }}
-                              </span>
+                {{ this.allocation.Employee.emp_first_name }}
+                {{ this.allocation.Employee.emp_last_name }}
+              </span>
             </div>
             <div class="d-flex justify-content-between mb-3">
               <span>T7 Number</span>
               <span>
-                                {{this.allocation.Employee.emp_unique_id }}
-                              </span>
+                {{ this.allocation.Employee.emp_unique_id }}
+              </span>
             </div>
             <div class="d-flex justify-content-between mb-3">
               <span>T3 Code</span>
@@ -239,7 +268,7 @@ export default {
               <span> - </span>
             </div>
             <div v-if="this.my_status === 0">
-              <b-form-group >
+              <b-form-group>
                 <b-form-checkbox
                   id="checkbox-1"
                   v-model="final"
@@ -260,8 +289,18 @@ export default {
                   />
                 </b-form-group>
                 <div class="d-flex">
-                  <button @click="authorizationHandler(1)" class="btn btn-success w-100 mr-3">Approve</button>
-                  <button @click="authorizationHandler(2)" class="btn btn-danger w-100">Decline</button>
+                  <button
+                    @click="authorizationHandler(1)"
+                    class="btn btn-success w-100 mr-3"
+                  >
+                    Approve
+                  </button>
+                  <button
+                    @click="authorizationHandler(2)"
+                    class="btn btn-danger w-100"
+                  >
+                    Decline
+                  </button>
                 </div>
               </div>
               <div v-else>
@@ -281,7 +320,6 @@ export default {
                   </button>
                 </div>
               </div>
-
             </div>
           </div>
         </div>
