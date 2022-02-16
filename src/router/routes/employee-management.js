@@ -51,4 +51,12 @@ export default [
     },
     component: () => import("@/views/pages/employees/assign-supervisor"),
   },
+  {
+    path: "/manage-leave-applications",
+    name: "manage-leave-application",
+    meta: {
+      authRequired: true,
+    },
+    component: () => import("@/views/pages/self-service/leave-application"),
+  },
 ];

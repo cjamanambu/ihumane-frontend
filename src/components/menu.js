@@ -217,7 +217,7 @@ export const menuItems = [
     id: 29,
     label: "Leave Application",
     icon: "ri-walk-line",
-    link: "",
+    link: "/manage-leave-applications",
   },
   {
     id: 29,
