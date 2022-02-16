@@ -17,20 +17,21 @@ export default {
     this.refreshTable();
   },
   validations: {
-    gs_from:{ required },
-   gs_to: { required },
+    gs_from: { required },
+    gs_to: { required },
     gs_year: { required },
-    gs_activity: { required }
-
-
-
+    gs_activity: { required },
   },
   methods: {
     refreshTable() {
       this.apiGet(this.ROUTES.goalSetting, "Get Goal Setting Error").then(
         (res) => {
           const { data } = res;
-          this.goalSettings = data;
+          if (data) {
+            data.forEach((goalSetting, index) => {
+              this.goalSettings[index] = { sn: ++index, ...goalSetting };
+            });
+          }
           this.totalRows = this.goalSettings.length;
         }
       );
@@ -41,21 +42,21 @@ export default {
       this.currentPage = 1;
     },
     resetForm() {
-      this.gs_id = null
-      this.gs_year = null
-       this.gs_activity= null
-       this.gs_from= null
-      this.gs_to = null
+      this.gs_id = null;
+      this.gs_year = null;
+      this.gs_activity = null;
+      this.gs_from = null;
+      this.gs_to = null;
       this.$v.$reset();
     },
     selectGoalSetting(goalSetting) {
       goalSetting = goalSetting[0];
-      this.gs_id = goalSetting.gs_id
-      this.gs_year = goalSetting.gs_year
-      this.gs_activity= goalSetting.gs_activity
-      this.gs_from= goalSetting.gs_from
-      this.gs_to = goalSetting.gs_to
-      this.gs_status = parseInt(goalSetting.gs_status)
+      this.gs_id = goalSetting.gs_id;
+      this.gs_year = goalSetting.gs_year;
+      this.gs_activity = goalSetting.gs_activity;
+      this.gs_from = goalSetting.gs_from;
+      this.gs_to = goalSetting.gs_to;
+      this.gs_status = parseInt(goalSetting.gs_status);
       this.$refs["update-goal-setting"].show();
       this.$refs["goal-setting-table"].clearSelected();
     },
@@ -66,22 +67,18 @@ export default {
         this.apiFormHandler("Invalid Leave Type");
       } else {
         const data = {
-
           gs_from: this.gs_from,
           gs_to: this.gs_to,
           gs_year: this.gs_year,
-          gs_activity: String(this.gs_activity)
-
+          gs_activity: String(this.gs_activity),
         };
-        const url = `${this.ROUTES.goalSetting}/add-goal-setting`
-        this.apiPost(url, data, "Add goal setting error").then(
-          (res) => {
-            this.apiResponseHandler(`${res.data}`, "New Goal Setting added");
-            this.refreshTable();
-            this.$v.$reset();
-            this.$refs["add-goal-setting"].hide();
-          }
-        );
+        const url = `${this.ROUTES.goalSetting}/add-goal-setting`;
+        this.apiPost(url, data, "Add goal setting error").then((res) => {
+          this.apiResponseHandler(`${res.data}`, "New Goal Setting added");
+          this.refreshTable();
+          this.$v.$reset();
+          this.$refs["add-goal-setting"].hide();
+        });
       }
     },
     submitUpdate() {
@@ -91,15 +88,13 @@ export default {
         this.apiFormHandler("Invalid Leave Type");
       } else {
         const data = {
-
           gs_from: this.gs_from,
           gs_to: this.gs_to,
           gs_year: this.gs_year,
           gs_activity: this.gs_activity,
-          gs_status: this.gs_status
-
+          gs_status: this.gs_status,
         };
-        const url = `${this.ROUTES.goalSetting}/close-goal-setting/${this.gs_id}`
+        const url = `${this.ROUTES.goalSetting}/close-goal-setting/${this.gs_id}`;
         this.apiPatch(url, data, "Close Goal Setting Error").then((res) => {
           this.apiResponseHandler(`${res.data}`, "Close Goal Setting");
           this.refreshTable();
@@ -133,23 +128,28 @@ export default {
       pageOptions: [10, 25, 50, 100],
       filter: null,
       filterOn: [],
-      sortBy: "gs_id",
+      sortBy: "sn",
       sortDesc: true,
       fields: [
-        { key: "gs_id", label: "SN", sortable: true },
+        { key: "sn", label: "S/n", sortable: true },
         { key: "gs_from", label: "From", sortable: true },
         { key: "gs_to", label: "To", sortable: true },
         { key: "gs_year", label: "Year", sortable: true },
         { key: "gs_activity", label: "Activity", sortable: true },
-        { key: "gs_status", label: "Status", sortable: true }
+        { key: "gs_status", label: "Status", sortable: true },
       ],
       gs_from: null,
       gs_to: null,
       gs_year: null,
       gs_activity: null,
       gs_status: 0,
-      gs_activities: [{ value: null, text: "Please select an Activity" }, { value: 1, text: "Beginning of year" }, { value: 2, text: "Mid Year Checking" }, { value: 3, text: "End of Year" }],
-         submitted: false,
+      gs_activities: [
+        { value: null, text: "Please select an Activity" },
+        { value: 1, text: "Beginning of year" },
+        { value: 2, text: "Mid Year Checking" },
+        { value: 3, text: "End of Year" },
+      ],
+      submitted: false,
     };
   },
 };
@@ -159,7 +159,10 @@ export default {
   <Layout>
     <PageHeader :title="title" :items="items" />
     <div class="d-flex justify-content-end mb-3">
-      <b-button class="btn btn-success" @click="$refs['add-goal-setting'].show()">
+      <b-button
+        class="btn btn-success"
+        @click="$refs['add-goal-setting'].show()"
+      >
         <i class="mdi mdi-plus mr-2"></i>
         Add New Activity
       </b-button>
@@ -223,47 +226,34 @@ export default {
                 select-mode="single"
                 @row-selected="selectGoalSetting"
               >
-
+                <template #cell(gs_from)="row">
+                  <span>{{ new Date(row.value).toDateString() }}</span>
+                </template>
+                <template #cell(gs_to)="row">
+                  <span>{{ new Date(row.value).toDateString() }}</span>
+                </template>
                 <template #cell(gs_activity)="row">
-                  <div
-                    v-if="parseInt(row.value) === 1"
-                  >
-                   Beginning of Year
-                  </div>
+                  <div v-if="parseInt(row.value) === 1">Beginning of Year</div>
 
-                  <div
+                  <div v-if="parseInt(row.value) === 2">Mid Year</div>
 
-                      v-if="parseInt(row.value) === 2"
-                  >
-                    Mid Year
-                  </div>
-
-                  <div
-
-                      v-if="parseInt(row.value) === 3"
-                  >
-                    End of Year
-                  </div>
-
-
+                  <div v-if="parseInt(row.value) === 3">End of Year</div>
                 </template>
 
                 <template #cell(gs_status)="row">
                   <div
-                      class="badge badge-primary badge-pill"
-                      v-if="parseInt(row.value) === 1"
+                    class="badge badge-primary badge-pill"
+                    v-if="parseInt(row.value) === 1"
                   >
                     Open
                   </div>
 
                   <div
-                      class="badge badge-warning badge-pill"
-                      v-if="parseInt(row.value) === 0"
+                    class="badge badge-warning badge-pill"
+                    v-if="parseInt(row.value) === 0"
                   >
                     Close
                   </div>
-
-
                 </template>
               </b-table>
             </div>
@@ -297,29 +287,25 @@ export default {
     >
       <form @submit.prevent="submitNew">
         <div class="form-group">
-          <label for="gs_from">
-            From <span class="text-danger">*</span>
-          </label>
+          <label for="gs_from"> From <span class="text-danger">*</span> </label>
           <input
-              id="gs_from"
-              type="date"
-              v-model="gs_from"
-              class="form-control"
-              :class="{
+            id="gs_from"
+            type="date"
+            v-model="gs_from"
+            class="form-control"
+            :class="{
               'is-invalid': submitted && $v.gs_from.$error,
             }"
           />
         </div>
         <div class="form-group">
-          <label for="gs_to">
-            To <span class="text-danger">*</span>
-          </label>
+          <label for="gs_to"> To <span class="text-danger">*</span> </label>
           <input
-              id="gs_to"
-              type="date"
-              v-model="gs_to"
-              class="form-control"
-              :class="{
+            id="gs_to"
+            type="date"
+            v-model="gs_to"
+            class="form-control"
+            :class="{
               'is-invalid': submitted && $v.gs_to.$error,
             }"
           />
@@ -329,28 +315,28 @@ export default {
             Year <span class="text-danger">*</span>
           </label>
           <input
-              id="lt-mode-add"
-              type="text"
-              v-model="gs_year"
-              class="form-control"
-              :class="{
+            id="lt-mode-add"
+            type="text"
+            v-model="gs_year"
+            class="form-control"
+            :class="{
               'is-invalid': submitted && $v.gs_year.$error,
             }"
           />
-        </div> <div class="form-group">
+        </div>
+        <div class="form-group">
           <label for="gs_activity">
             Activity Type <span class="text-danger">*</span>
           </label>
-        <b-form-select
+          <b-form-select
             id="gs_activity"
             v-model="gs_activity"
             :options="gs_activities"
             :class="{
               'is-invalid': submitted && $v.gs_activity.$error,
             }"
-        />
+          />
         </div>
-
 
         <b-button
           v-if="!submitting"
@@ -383,50 +369,47 @@ export default {
             From <span class="text-danger">*</span>
           </label>
           <input
-              id="gs_fromU"
-              type="date"
-              v-model="gs_from"
-              class="form-control"
-              disabled
-              :class="{
+            id="gs_fromU"
+            type="date"
+            v-model="gs_from"
+            class="form-control"
+            disabled
+            :class="{
               'is-invalid': submitted && $v.gs_from.$error,
             }"
           />
         </div>
         <div class="form-group">
-          <label for="gs_toU">
-            To <span class="text-danger">*</span>
-          </label>
+          <label for="gs_toU"> To <span class="text-danger">*</span> </label>
           <input
-              id="gs_toU"
-              type="date"
-              v-model="gs_to"
-              class="form-control"
-              disabled
-              :class="{
+            id="gs_toU"
+            type="date"
+            v-model="gs_to"
+            class="form-control"
+            disabled
+            :class="{
               'is-invalid': submitted && $v.gs_to.$error,
             }"
           />
         </div>
         <div class="form-group">
-          <label for="yearU">
-            Year <span class="text-danger">*</span>
-          </label>
+          <label for="yearU"> Year <span class="text-danger">*</span> </label>
           <input
-              id="yearU"
-              type="text"
-              v-model="gs_year"
-              class="form-control"
-              disabled
-              :class="{
+            id="yearU"
+            type="text"
+            v-model="gs_year"
+            class="form-control"
+            disabled
+            :class="{
               'is-invalid': submitted && $v.gs_year.$error,
             }"
           />
-        </div> <div class="form-group">
-        <label for="gs_activityU">
-          Activity Type <span class="text-danger">*</span>
-        </label>
-        <b-form-select
+        </div>
+        <div class="form-group">
+          <label for="gs_activityU">
+            Activity Type <span class="text-danger">*</span>
+          </label>
+          <b-form-select
             id="gs_activityU"
             v-model="gs_activity"
             :options="gs_activities"
@@ -434,27 +417,26 @@ export default {
             :class="{
               'is-invalid': submitted && $v.gs_activity.$error,
             }"
-        />
-      </div>
+          />
+        </div>
 
-<div v-if="gs_status">
-  <b-button
-      v-if="!submitting"
-      class="btn btn-success btn-block mt-4"
-      type="submit"
-  >
-    Close Activity
-  </b-button>
-  <b-button
-      v-else
-      disabled
-      class="btn btn-success btn-block mt-4"
-      type="submit"
-  >
-    Closing...
-  </b-button>
-</div>
-
+        <div v-if="gs_status">
+          <b-button
+            v-if="!submitting"
+            class="btn btn-danger btn-block mt-4"
+            type="submit"
+          >
+            Close Activity
+          </b-button>
+          <b-button
+            v-else
+            disabled
+            class="btn btn-success btn-block mt-4"
+            type="submit"
+          >
+            Closing...
+          </b-button>
+        </div>
       </form>
     </b-modal>
   </Layout>

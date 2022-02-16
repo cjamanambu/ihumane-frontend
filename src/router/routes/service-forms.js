@@ -51,30 +51,6 @@ export default [
   },
 
   {
-    path: "/self-assessment",
-    name: "self-assessment",
-    meta: {
-      authRequired: true,
-    },
-    component: () => import("@/views/pages/service-forms/self-assessment"),
-  },
-  {
-    path: "/assess-employee",
-    name: "assess-employee",
-    meta: {
-      authRequired: true,
-    },
-    component: () => import("@/views/pages/service-forms/assess-employee"),
-  },
-  {
-    path: "/employee-assessment/:empid",
-    name: "employee-assessment",
-    meta: {
-      authRequired: true,
-    },
-    component: () => import("@/views/pages/service-forms/employee-assessment"),
-  },
-  {
     path: "/travel-request",
     name: "new-travel-request",
     meta: {
