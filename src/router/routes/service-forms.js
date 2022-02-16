@@ -91,4 +91,5 @@ export default [
     },
     component: () => import("@/views/pages/service-forms/leave-application"),
   },
+
 ];

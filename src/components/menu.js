@@ -223,7 +223,7 @@ export const menuItems = [
     id: 29,
     label: "Travel Application",
     icon: "ri-flight-takeoff-line",
-    link: "",
+    link: "/manage-travel-applications",
   },
   {
     id: 29,
