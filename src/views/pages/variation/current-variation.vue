@@ -6,7 +6,7 @@ import appConfig from "@/app.config";
 
 export default {
   page: {
-    title: "New Variational Payments",
+    title: "Manage Variation",
     meta: [{ name: "description", content: appConfig.description }],
   },
   components: {
@@ -152,7 +152,7 @@ export default {
   data() {
     return {
       submitting: false,
-      title: `Current Month variation`,
+      title: `Manage Variation variation`,
       items: [
         {
           text: "IHUMANE",
@@ -162,7 +162,7 @@ export default {
           href: "/",
         },
         {
-          text: "New Variation",
+          text: "Manage Variation",
           active: true,
         },
       ],
@@ -217,6 +217,7 @@ export default {
 
         <div class="card">
           <div class="card-body" v-if="pmySet">
+            <h3> {{ monthName }} - {{ year }}</h3>
             <div class="row mt-4">
               <div class="col-sm-12 col-md-6">
                 <div id="tickets-table_length" class="dataTables_length">
@@ -276,28 +277,41 @@ export default {
                   <b> {{ data.item.employee.emp_first_name }} </b>,  {{ data.item.employee.emp_last_name.toUpperCase() }}
                 </template>
 
-                <template #cell(vp_confirm)="data">
-                  <div v-if="parseInt(data.item.vp_confirm) === 0">
-                    <b> pending </b>
 
+                <template #cell(vp_confirm)="row">
+                  <div
+                      class="badge badge-info badge-pill"
+                      v-if="row.value === 0"
+                  >
+                    Pending
                   </div>
 
-                  <div v-if="parseInt(data.item.vp_confirm) === 1">
-                    <b> Confirmed </b>
-
+                  <div
+                      class="badge badge-warning badge-pill"
+                      v-if="row.value === 1"
+                  >
+                    Confirmed
                   </div>
 
-                  <div v-if="parseInt(data.item.vp_confirm) === 2">
-                    <b> Discarded </b>
-
+                  <div
+                      class="badge badge-primary badge-pill"
+                      v-if="row.value === 2"
+                  >
+                    Discarded
                   </div>
 
-                  <div v-if="parseInt(data.item.vp_confirm) === 3">
-                    <b> Returned </b>
-
+                  <div
+                      class="badge badge-primary badge-pill"
+                      v-if="row.value === 3"
+                  >
+                    Returned
                   </div>
+
 
                 </template>
+
+
+
               </b-table>
             </div>
             <div class="row">
