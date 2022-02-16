@@ -34,6 +34,23 @@ export default [
       import("@/views/pages/service-forms/timesheet/timesheet-entry"),
   },
   {
+    path: "/manage-time-sheets",
+    name: "manage-time-sheets",
+    meta: {
+      authRequired: true,
+    },
+    component: () => import("@/views/pages/self-service/time-sheet"),
+  },
+  {
+    path: "/manage-time-sheet-details/:month/:year",
+    name: "manage-time-sheet-details",
+    meta: {
+      authRequired: true,
+    },
+    component: () => import("@/views/pages/self-service/time-sheet-details"),
+  },
+
+  {
     path: "/travel-request",
     name: "new-travel-request",
     meta: {

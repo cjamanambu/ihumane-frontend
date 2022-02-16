@@ -82,4 +82,5 @@ export default [
     },
     component: () => import("@/views/pages/self-service/travel-application-details"),
   },
+
 ];
