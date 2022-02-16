@@ -198,6 +198,9 @@ export default {
                 select-mode="single"
                 @row-selected="selectRow"
               >
+                <template #cell(ref_no)="row">
+                  <span class="text-uppercase">{{ row.value }}</span>
+                </template>
                 <template #cell(payroll_month)="row">
                   <span>{{ (parseFloat(row.value) - 1) | getMonth }}</span>
                 </template>

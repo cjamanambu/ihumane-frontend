@@ -23,6 +23,7 @@ export default {
       let requestID = this.$route.params.travelAppID;
       const url = `${this.ROUTES.travelApplication}/${requestID}`;
       this.apiGet(url, "Get Travel Application").then((res) => {
+        console.log({ res });
         const { application, breakdown, expenses, log } = res.data;
         this.application = application;
         this.breakdowns = breakdown;
@@ -176,7 +177,7 @@ export default {
               <div class="col-lg-4">
                 <div class="form-group">
                   <label for="">Program / Charge Codes</label>
-                  <div class="row">
+                  <div class="row" v-if="donor">
                     <div class="col-lg-4">
                       <div class="form-group">
                         <label class="" for="">
@@ -186,7 +187,7 @@ export default {
                     </div>
                     <div class="col-lg-8">
                       <div class="form-group">
-                        <span v-if="donor">
+                        <span>
                           {{ donor.donor_code }} ({{ donor.donor_description }})
                         </span>
                       </div>
@@ -376,8 +377,8 @@ export default {
                     <b-tr v-for="(logEntry, index) in log" :key="index">
                       <b-td style="width: 25%">
                         <span>
-                          {{ logEntry.Employee.emp_first_name }}
-                          {{ logEntry.Employee.emp_last_name }}
+                          {{ logEntry.officers.emp_first_name }}
+                          {{ logEntry.officers.emp_last_name }}
                         </span>
                       </b-td>
                       <b-td style="width: 15%">

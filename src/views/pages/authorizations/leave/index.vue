@@ -22,11 +22,20 @@ export default {
     refreshTable() {
       const url = `${this.ROUTES.leaveApplication}/authorization/supervisor/${this.getEmployee.emp_id}`;
       this.apiGet(url, "Get Leave Applications Error").then((res) => {
-        console.log({ res });
-        const { data } = res;
-        data.forEach((application, index) => {
-          this.applications[index] = { sn: ++index, ...application };
+        const { data, officers } = res.data;
+        data.forEach((leave, index) => {
+          this.applications[index] = { sn: ++index, ...leave };
         });
+        this.applications.forEach((application) => {
+          officers.forEach((officer) => {
+            if (
+              application.leapp_id === parseFloat(officer.auth_travelapp_id)
+            ) {
+              application["Officer"] = officer.officers;
+            }
+          });
+        });
+        this.totalRows = this.applications.length;
       });
     },
     onFiltered(filteredItems) {
@@ -79,6 +88,7 @@ export default {
         { key: "leapp_start_date", label: "Start Date", sortable: true },
         { key: "leapp_end_date", label: "End Date", sortable: true },
         { key: "leapp_total_days", label: "Leave Length", sortable: true },
+        { key: "Officer", label: "Authorization Officer", sortable: true },
         {
           key: "leapp_status",
           label: "Application Status",
@@ -174,6 +184,14 @@ export default {
                 </template>
                 <template #cell(leapp_total_days)="row">
                   <span> {{ row.value }} days</span>
+                </template>
+                <template #cell(Officer)="row">
+                  <p class="mb-0">
+                    {{ row.value.emp_first_name }} {{ row.value.emp_last_name }}
+                  </p>
+                  <small class="text-muted">
+                    {{ row.value.emp_unique_id }}
+                  </small>
                 </template>
                 <template #cell(leapp_status)="row">
                   <span

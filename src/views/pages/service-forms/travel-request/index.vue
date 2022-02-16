@@ -23,9 +23,18 @@ export default {
       let employeeID = this.getEmployee.emp_id;
       const url = `${this.ROUTES.travelApplication}/get-travel-application/${employeeID}`;
       this.apiGet(url, "Get Travel Applications Error").then((res) => {
-        const { data } = res;
+        const { data, officers } = res.data;
         data.forEach((application, index) => {
           this.applications[index] = { sn: ++index, ...application };
+        });
+        this.applications.forEach((application) => {
+          officers.forEach((officer) => {
+            if (
+              application.travelapp_id === parseFloat(officer.auth_travelapp_id)
+            ) {
+              application["Officer"] = officer.officers;
+            }
+          });
         });
         this.totalRows = this.applications.length;
       });
@@ -79,6 +88,7 @@ export default {
         { key: "travelapp_start_date", label: "Start Date", sortable: true },
         { key: "travelapp_end_date", label: "End Date", sortable: true },
         { key: "travelapp_total_days", label: "Trip Length", sortable: true },
+        { key: "Officer", label: "Authorization Officer", sortable: true },
         {
           key: "travelapp_status",
           label: "Application Status",
@@ -177,6 +187,15 @@ export default {
                 </template>
                 <template #cell(travelapp_total_days)="row">
                   <span> {{ row.value }} days</span>
+                </template>
+                <template #cell(Officer)="row">
+                  <p class="mb-0">
+                    <span class="mr-1">{{ row.value.emp_first_name }}</span>
+                    <span>{{ row.value.emp_last_name }}</span>
+                  </p>
+                  <small class="text-muted">
+                    {{ row.value.emp_unique_id }}
+                  </small>
                 </template>
                 <template #cell(travelapp_status)="row">
                   <span

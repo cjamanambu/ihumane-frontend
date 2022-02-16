@@ -19,8 +19,7 @@ export default {
   },
   mounted() {
     this.refreshTable();
-    this.getEmployees();
-    this.getLeaveTypes();
+    this.getLeaveAccruals();
   },
   validations: {
     leaveType: { required },
@@ -44,7 +43,6 @@ export default {
           active: true,
         },
       ],
-
       leaves: [],
       totalRows: 1,
       currentPage: 1,
@@ -52,14 +50,15 @@ export default {
       pageOptions: [10, 25, 50, 100],
       filter: null,
       filterOn: [],
-      sortBy: "leapp_id",
+      sortBy: "sn",
       sortDesc: false,
       fields: [
-        { key: "leapp_id", label: "SN", sortable: true },
+        { key: "sn", label: "S/n", sortable: true },
         { key: "LeaveType.leave_name", label: "Leave Type", sortable: true },
-        { key: "leapp_total_days", label: "Days", sortable: true },
+        { key: "leapp_total_days", label: "Duration", sortable: true },
         { key: "leapp_start_date", label: "Start Date", sortable: true },
         { key: "leapp_end_date", label: "End Date", sortable: true },
+        { key: "Officer", label: "Authorization Officer", sortable: true },
         { key: "leapp_status", label: "Status", sortable: true },
       ],
       leapp_id: null,
@@ -91,8 +90,17 @@ export default {
     refreshTable() {
       const url = `${this.ROUTES.leaveApplication}/get-employee-leave/${this.getEmployee.emp_id}`;
       this.apiGet(url, "Get Employee Leaves Error").then((res) => {
-        const { data } = res;
-        this.leaves = data;
+        const { data, officers } = res.data;
+        data.forEach((leave, index) => {
+          this.leaves[index] = { sn: ++index, ...leave };
+        });
+        this.leaves.forEach((leave) => {
+          officers.forEach((officer) => {
+            if (leave.leapp_id === parseFloat(officer.auth_travelapp_id)) {
+              leave["Officer"] = officer.officers;
+            }
+          });
+        });
         this.totalRows = this.leaves.length;
       });
     },
@@ -149,39 +157,20 @@ export default {
         this.discarded = 1;
         this.leapp_status = "DISCARDED";
       }
-
       this.leapp_start_date = new Date(leave.leapp_start_date).toDateString();
       this.leapp_end_date = new Date(leave.leapp_end_date).toDateString();
-
       this.$refs["show-leave"].show();
       this.$refs["leave-application-table"].clearSelected();
     },
-
-    getLeaveTypes() {
-      this.apiGet(this.ROUTES.leaveType, "Get Leave Types Error").then(
-        (res) => {
-          this.leaveTypes = [
-            { value: null, text: "Please select a leave type" },
-          ];
-          const { data } = res;
-          data.forEach((leaveType) => {
-            this.leaveTypes.push({
-              value: leaveType.leave_type_id,
-              text: leaveType.leave_name,
-            });
-          });
-        }
-      );
-    },
-
-    getEmployees() {
-      this.apiGet(this.ROUTES.employee, "Get Leave Types Error").then((res) => {
-        this.employees = [{ value: null, text: "Please select an employee" }];
+    getLeaveAccruals() {
+      let url = `${this.ROUTES.leaveAccrual}/get-leave-acrruals/${this.getEmployee.emp_id}`;
+      this.apiGet(url, "Get Leave Accruals Error").then((res) => {
+        this.leaveTypes = [{ value: null, text: "Please select a leave type" }];
         const { data } = res;
-        data.forEach((employee) => {
-          this.employees.push({
-            value: employee.emp_id,
-            text: `${employee.emp_first_name} ${employee.emp_last_name}`,
+        data.forEach((leave) => {
+          this.leaveTypes.push({
+            value: leave.leave.leave_type_id,
+            text: `${leave.leave.leave_name} (${leave.accrual} days accrued)`,
           });
         });
       });
@@ -283,49 +272,43 @@ export default {
                 select-mode="single"
                 @row-selected="selectLeave"
               >
+                <template #cell(leapp_total_days)="row">
+                  <span>{{ row.value }} days</span>
+                </template>
                 <template #cell(leapp_status)="row">
                   <div
-                    class="badge badge-info badge-pill"
+                    class="badge badge-warning badge-pill"
                     v-if="row.value === 0"
                   >
                     Pending
                   </div>
-
-                  <div
-                    class="badge badge-warning badge-pill"
-                    v-if="row.value === 1"
-                  >
-                    Verified
-                  </div>
-
-                  <div
-                    class="badge badge-primary badge-pill"
-                    v-if="row.value === 2"
-                  >
-                    Recommended
-                  </div>
-
                   <div
                     class="badge badge-success badge-pill"
-                    v-if="row.value === 3"
+                    v-if="row.value === 1"
                   >
                     Approved
                   </div>
-
                   <div
                     class="badge badge-danger badge-pill"
-                    v-if="row.value === 4"
+                    v-if="row.value === 2"
                   >
-                    Disapproved
+                    Declined
                   </div>
                 </template>
-
                 <template #cell(leapp_start_date)="row">
                   {{ new Date(row.value).toDateString() }}
                 </template>
-
                 <template #cell(leapp_end_date)="row">
                   {{ new Date(row.value).toDateString() }}
+                </template>
+                <template #cell(Officer)="row">
+                  <p class="mb-0">
+                    <span class="mr-1">{{ row.value.emp_first_name }}</span>
+                    <span>{{ row.value.emp_last_name }}</span>
+                  </p>
+                  <small class="text-muted">
+                    {{ row.value.emp_unique_id }}
+                  </small>
                 </template>
               </b-table>
             </div>

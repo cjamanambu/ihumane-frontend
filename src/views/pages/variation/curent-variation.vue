@@ -14,9 +14,10 @@ export default {
     PageHeader,
   },
   mounted() {
-    this.getVariationalPayments()
     this.refreshPMY()
-    this.getEmployees()
+    this.getVariationalPayments()
+
+
   },
 
   methods: {
@@ -31,19 +32,14 @@ export default {
 
 
     getVariationalPayments(){
-      const url = `${this.ROUTES.paymentDefinition}/variational-payments`
+      const url = `${this.ROUTES.paymentDefinition}/current-payment/${parseInt(this.year)}/${parseInt(this.month)}`
       this.apiGet(url, "Get Variational Payment Error").then(
           (res) => {
-            this.payments = [
-              { value: null, text: "Select Payment" },
-            ];
-            const { data } = res;
-            data.forEach((payment) => {
-              this.payments.push({
-                value: payment.pd_id,
-                text:payment.pd_payment_name,
-              });
-            });
+            const {data} = res;
+            if (data) {
+              this.employees = data
+              this.totalRows = this.employees.length;
+            }
           }
       );
     },
@@ -86,32 +82,14 @@ export default {
           }
       );
     },
-
-    routeCurrentVariation() {
-      this.$router.push({
-        name: 'current-variation',
-
-      })
-
-    },
     submitNew() {
-    this.submitted = true;
-
-      this.paymentsFields.forEach(async (field) => {
-        const data = {
-         payment_definition: field.paymentDefinition,
-          amount: field.amount
-
-        };
-
-        this.filledPayments.push(data)
-
-      });
+      this.submitted = true;
 
         const data = {
 
           employee: this.selectedEmployees,
-          payments: this.filledPayments,
+          payment_definition: this.payment,
+          amount: 50000,
           month: this.month,
           year: this.year
 
@@ -121,25 +99,13 @@ export default {
             (res) => {
               this.apiResponseHandler(`${res.data}`, "Add Variational Payment");
               this.submitted = false;
-              this.selectedEmployees = null
-              this.count = 0
-              this.paymentsFields = [{ id: 0, paymentDefinition:null, amount: 0  }]
+              this.selectedEmployees = [ ]
+                  this.amount = 0
+                  this.payment = null
 
             }
         );
 
-    },
-
-    addField() {
-      this.paymentsFields.push({ id: this.count++, paymentDefinition:null, amount: 0  });
-
-    },
-
-    delField(index) {
-      if (index > 0) {
-        this.paymentsFields.splice(index, 1);
-        this.count--
-      }
     },
 
   },
@@ -162,8 +128,6 @@ export default {
       ],
       payments: [],
       payment: null,
-      filledPayments: [],
-      paymentsFields: [ { id: 0, paymentDefinition:null, amount: 0  } ],
       employees: [ ],
       amount: 0,
       selectedEmployees: null,
@@ -171,8 +135,7 @@ export default {
       month: null,
       monthName: null,
       submitted: false,
-      pmySet: false,
-      count: 0
+      pmySet: false
     };
   },
 };
@@ -182,7 +145,7 @@ export default {
   <Layout>
     <PageHeader :title="title" :items="items" />
     <div class="d-flex justify-content-end mb-3">
-      <b-button class="btn btn-success" @click="routeCurrentVariation">
+      <b-button class="btn btn-success" @click="$refs['add-leave'].show()">
         <i class="mdi mdi-plus mr-2"></i>
         View Variational Payments
       </b-button>
@@ -203,95 +166,32 @@ export default {
                   <div class="form-group">
                     <label>Employee</label>
                     <b-form-select
+
                         v-model="selectedEmployees"
                         :options="employees"
-
+                        multiple :select-size="4"
                     />
                   </div>
 
+                  <div class="form-group">
+                    <label>Payment Type</label>
+                    <b-form-select
 
-                  <div class="row" v-for="(field, index) in paymentsFields" :key="index">
-                    <div class="col-lg-5">
-                      <div class="form-group">
-                        <label>Payment Type</label>
-                        <b-form-select
-
-                            v-model="field.paymentDefinition"
-                            :options="payments"
-                        />
-                      </div>
-                    </div>
-                    <div class="col-lg-5">
-                      <div class="form-group">
-                        <label for=""> Amount </label>
-                        <input
-
-                            type="text"
-
-                            class="form-control"
-                            v-model="field.amount"
-                        />
-                      </div>
-                    </div>
-                    <div class="col-lg-2">
-                      <div class="form-group">
-                        <div v-if="index > 0" class="form-group">
-
-
-                          <div class="row" v-if="parseInt(index) === parseInt(count)">
-                            <div class="col-lg-6">
-                              <label style="visibility: hidden">hidden</label>
-                              <button
-                                  type="button"
-                                  class="btn btn-danger"
-                                  @click="delField(index)"
-                              >
-                                DEL
-                              </button>
-                            </div>
-
-                            <div class="col-lg-6">
-                              <label style="visibility: hidden">hidden</label>
-                              <button
-                                  type="button"
-                                  class="btn btn-success"
-                                  @click="addField"
-                              >
-                                ADD
-                              </button>
-                            </div>
-                          </div>
-
-                          <div class="row" v-else>
-                            <div class="col-lg-12">
-                              <label style="visibility: hidden">hidden</label>
-                              <button
-                                  type="button"
-                                  class="btn btn-danger"
-                                  @click="delField(index)"
-                              >
-                                DEL
-                              </button>
-                            </div>
-
-
-                          </div>
-
-                        </div>
-                        <div v-else class="form-group">
-
-                          <label style="visibility: hidden">hidden</label>
-                          <button
-                              type="button"
-                              class="btn btn-success"
-                              @click="addField"
-                          >
-                            ADD
-                          </button>
-                        </div>
-                      </div>
-                    </div>
+                        v-model="payment"
+                        :options="payments"
+                    />
                   </div>
+                  <div class="form-group">
+                    <label for=""> Amount </label>
+                    <input
+
+                        type="text"
+
+                        class="form-control"
+                        v-model="amount"
+                    />
+                  </div>
+
 
                   <div class="form-group">
                     <label for=""> Month </label>
@@ -313,6 +213,8 @@ export default {
                         v-model="year"
                     />
                   </div>
+
+
 
                   <b-button
                       v-if="!submitted"
