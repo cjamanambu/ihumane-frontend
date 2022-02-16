@@ -217,13 +217,13 @@ export const menuItems = [
     id: 29,
     label: "Leave Application",
     icon: "ri-walk-line",
-    link: "",
+    link: "/manage-leave-applications",
   },
   {
     id: 29,
     label: "Travel Application",
     icon: "ri-flight-takeoff-line",
-    link: "",
+    link: "/manage-travel-applications",
   },
   {
     id: 29,
