@@ -22,6 +22,7 @@
         props: ["employee"],
         methods: {
             fetchRequest() {
+
                 let month = this.$route.params.month;
                 let year = this.$route.params.year;
                 let empId = this.$route.params.empId;

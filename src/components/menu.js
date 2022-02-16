@@ -229,7 +229,7 @@ export const menuItems = [
     id: 29,
     label: "Time Sheet",
     icon: "ri-calendar-event-line",
-    link: "",
+    link: "/manage-time-sheets",
   },
   {
     id: 29,
