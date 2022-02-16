@@ -3,9 +3,10 @@
     import PageHeader from "@/components/page-header";
     import appConfig from "@/app.config.json";
     import { authComputed } from "@/state/helpers";
+
     export default {
         page: {
-            title: "Leave Authorizations",
+            title: "Manage Travel Applications",
             meta: [{ name: "description", content: appConfig.description }],
         },
         computed: {
@@ -20,16 +21,17 @@
         },
         methods: {
             refreshTable() {
-                const url = `${this.ROUTES.leaveApplication}`;
-                this.apiGet(url, "Get Leave Applications Error").then((res) => {
+                const url = `${this.ROUTES.travelApplication}`;
+                this.apiGet(url, "Get Travel Applications Error").then((res) => {
                     const { data, officers } = res.data;
-                    data.forEach((leave, index) => {
-                        this.applications[index] = { sn: ++index, ...leave };
+                    //console.log({ res });
+                    data.forEach((application, index) => {
+                        this.applications[index] = { sn: ++index, ...application };
                     });
                     this.applications.forEach((application) => {
                         officers.forEach((officer) => {
                             if (
-                                application.leapp_id === parseFloat(officer.auth_travelapp_id)
+                                application.travelapp_id === parseFloat(officer.auth_travelapp_id)
                             ) {
                                 application["Officer"] = officer.officers;
                             }
@@ -45,16 +47,16 @@
             },
             selectRow(row) {
                 row = row[0];
-                this.leaveAppID = row.leapp_id;
+                this.travelAppID = row.travelapp_id;
                 this.$router.push({
-                    name: "leave-application-details",
-                    params: { leaveAppID: this.leaveAppID },
+                    name: "travel-application-details",
+                    params: { travelAppID: this.travelAppID },
                 });
             },
         },
         data() {
             return {
-                title: "Manage Leave Applications",
+                title: "Manage Travel Applications",
                 items: [
                     {
                         text: "IHUMANE",
@@ -64,7 +66,7 @@
                         href: "/",
                     },
                     {
-                        text: "Manage Leave Applications",
+                        text: "Manage Travel Applications",
                         active: true,
                     },
                 ],
@@ -79,23 +81,24 @@
                 sortDesc: false,
                 fields: [
                     { key: "sn", label: "S/n", sortable: true },
-                    { key: "employee", label: "Employee", sortable: true },
+                    { key: "applicant", label: "Employee", sortable: true },
                     {
-                        key: "LeaveType",
-                        label: "Leave Type",
+                        key: "travelapp_travel_cat",
+                        label: "Travel Category",
                         sortable: true,
                     },
-                    { key: "leapp_start_date", label: "Start Date", sortable: true },
-                    { key: "leapp_end_date", label: "End Date", sortable: true },
-                    { key: "leapp_total_days", label: "Leave Length", sortable: true },
+                    { key: "travelapp_start_date", label: "Start Date", sortable: true },
+                    { key: "travelapp_end_date", label: "End Date", sortable: true },
+                    { key: "travelapp_total_days", label: "Trip Length", sortable: true },
                     { key: "Officer", label: "Authorization Officer", sortable: true },
                     {
-                        key: "leapp_status",
+                        key: "travelapp_status",
                         label: "Application Status",
                         sortable: true,
                     },
                 ],
-                leaveAppID: null,
+                sn: 1,
+                travelAppID: null,
             };
         },
     };
@@ -163,7 +166,7 @@
                                     select-mode="single"
                                     @row-selected="selectRow"
                             >
-                                <template #cell(employee)="row">
+                                <template #cell(applicant)="row">
                                     <p class="mb-0">
                                         {{ row.value.emp_first_name }} {{ row.value.emp_last_name }}
                                     </p>
@@ -171,29 +174,31 @@
                                         {{ row.value.emp_unique_id }}
                                     </small>
                                 </template>
-                                <template #cell(LeaveType)="row">
-                                    <p class="mb-0">
-                                        {{ row.value.leave_name }}
-                                    </p>
+                                <template #cell(travelapp_travel_cat)="row">
+                  <span v-if="row.value === 1" class="text-uppercase">
+                    Official Request
+                  </span>
+                                    <span class="text-uppercase" v-else> Personal Request </span>
                                 </template>
-                                <template #cell(leapp_start_date)="row">
+                                <template #cell(travelapp_start_date)="row">
                                     <span> {{ new Date(row.value).toDateString() }}</span>
                                 </template>
-                                <template #cell(leapp_end_date)="row">
+                                <template #cell(travelapp_end_date)="row">
                                     <span> {{ new Date(row.value).toDateString() }}</span>
                                 </template>
-                                <template #cell(leapp_total_days)="row">
+                                <template #cell(travelapp_total_days)="row">
                                     <span> {{ row.value }} days</span>
                                 </template>
                                 <template #cell(Officer)="row">
                                     <p class="mb-0">
-                                        {{ row.value.emp_first_name }} {{ row.value.emp_last_name }}
+                                        <span class="mr-1">{{ row.value.emp_first_name }}</span>
+                                        <span>{{ row.value.emp_last_name }}</span>
                                     </p>
                                     <small class="text-muted">
                                         {{ row.value.emp_unique_id }}
                                     </small>
                                 </template>
-                                <template #cell(leapp_status)="row">
+                                <template #cell(travelapp_status)="row">
                   <span
                           v-if="row.value === 0"
                           class="badge badge-pill badge-warning"
