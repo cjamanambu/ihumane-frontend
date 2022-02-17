@@ -5,7 +5,7 @@ import appConfig from "@/app.config";
 import { authComputed } from "@/state/helpers";
 export default {
   page: {
-    title: "Beginning of Year Assessment",
+    title: "Mid Year Checking Assessment",
     meta: [{ name: "description", content: appConfig.description }],
   },
   components: {
@@ -24,7 +24,7 @@ export default {
   },
   data() {
     return {
-      title: "Beginning of Year Assessment",
+      title: "Mid Year Checking Assessment",
       items: [
         {
           text: "IHUMANE",
@@ -34,7 +34,7 @@ export default {
           href: "/",
         },
         {
-          text: "Beginning of Year Assessment",
+          text: "Mid Year Checking Assessment",
           active: true,
         },
       ],
@@ -142,7 +142,6 @@ export default {
       if (url) {
         await this.apiGet(url).then((res) => {
           const { data } = res;
-          console.log({ res });
           if (data) {
             this.assessments = [];
 
@@ -325,7 +324,7 @@ export default {
     <scale-loader v-if="apiBusy" />
     <div v-else class="row">
       <div
-        v-if="openGoalActivity === 1 && parseInt(checkOpenGoal) === 1"
+        v-if="openGoalActivity === 2 && parseInt(checkOpenGoal) === 1"
         class="col-lg-12"
       >
         <div class="card">
@@ -373,9 +372,13 @@ export default {
                 </a>
               </p>
             </div>
-            <div v-if="!selfAssessmentStatus">
-              <form @submit.prevent="submitNewBeginning">
-                <div class="row" v-for="(field, index) in texts" :key="index">
+            <div v-if="!prefillStatus">
+              <form @submit.prevent="submitNew">
+                <div
+                  class="row"
+                  v-for="(field, index) in prefillAssessments"
+                  :key="index"
+                >
                   <div class="col">
                     <div class="form-group">
                       <label for="goal">
@@ -399,7 +402,7 @@ export default {
                       <button
                         type="button"
                         class="btn btn-danger btn-block"
-                        @click="delField(index)"
+                        @click="delPrefillAssessment(index)"
                       >
                         DEL
                       </button>
@@ -409,7 +412,11 @@ export default {
                 <div class="alert alert-info d-flex mt-3">
                   <i class="ri-error-warning-line mr-2"></i>
                   You must submit a minimum of 3 goals.
-                  <span style="cursor: pointer" class="ml-1" @click="addField">
+                  <span
+                    style="cursor: pointer"
+                    class="ml-1"
+                    @click="addPrefillAssessment"
+                  >
                     Click here to add a new goal
                   </span>
                 </div>
@@ -459,16 +466,7 @@ export default {
                     </div>
                   </div>
                   <div class="col-1" v-if="index > 2">
-                    <div class="form-group" v-if="field.status === 0">
-                      <label style="visibility: hidden">hidden</label><br />
-                      <button
-                        type="button"
-                        class="btn btn-block btn-danger"
-                        @click="delAssessment(index)"
-                      >
-                        DEL
-                      </button>
-                    </div>
+                    <div class="form-group" v-if="field.status === 0"></div>
                     <div class="form-group" v-else>
                       <i> Reviewed By Supervisor </i>
                     </div>
@@ -511,7 +509,7 @@ export default {
       </div>
       <div v-else class="col-12">
         <div class="alert alert-info">
-          The beginning of year review period is currently closed.
+          The mid-year checking review period is currently closed.
         </div>
       </div>
     </div>

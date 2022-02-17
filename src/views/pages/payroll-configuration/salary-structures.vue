@@ -23,8 +23,6 @@ export default {
   },
   mounted() {
     this.refreshTable();
-    this.fetchSalaryGrades();
-    this.fetchEmployees();
   },
   validations: {
     salaryGrade: { required },
@@ -34,27 +32,18 @@ export default {
   methods: {
     selectRow(salaryStructure) {
       salaryStructure = salaryStructure[0];
-      this.employee = salaryStructure.ss_empid
-      this.amount = salaryStructure.total_amount
-
-      const url = `${this.ROUTES.salaryStructure}/get-salary-structure/${this.employee}`
-
-      this.apiGet(url, "Get Salary Structure Error").then(
-          (res) => {
-
-            const { data } = res;
-            this.employeeSalaryStructure = data
-
-          }
-      );
-
-
-
-
+      this.employee = salaryStructure.ss_empid;
+      this.amount = salaryStructure.total_amount.toString();
+      this.gross = salaryStructure.total_amount;
+      const url = `${this.ROUTES.salaryStructure}/get-salary-structure/${this.employee}`;
+      this.apiGet(url, "Get Salary Structure Error").then((res) => {
+        const { data } = res;
+        this.employeeSalaryStructure = data;
+      });
       this.$refs["edit-salary-structure"].show();
       this.$refs["salary-structure-table"].clearSelected();
     },
-    
+
     refreshTable() {
       this.apiGet(
         this.ROUTES.salaryStructure,
@@ -65,6 +54,8 @@ export default {
           this.salaryStructures[index] = { sn: ++index, ...salaryStructure };
         });
         this.totalRows = this.salaryStructures.length;
+        this.fetchSalaryGrades();
+        this.fetchEmployees();
       });
     },
     fetchSalaryGrades() {
@@ -151,12 +142,14 @@ export default {
           ss_grade: this.salaryGrade,
         };
         const url = `${this.ROUTES.salaryStructure}/update-salary-structure/${this.employee}`;
-        this.apiPatch(url, data, "Update Salary Structure Error").then((res) => {
-          this.apiResponseHandler(res.data, "Salary Structure Updated");
-          this.refreshTable();
-          this.$v.$reset();
-          this.$refs["edit-salary-structure"].hide();
-        });
+        this.apiPatch(url, data, "Update Salary Structure Error").then(
+          (res) => {
+            this.apiResponseHandler(res.data, "Salary Structure Updated");
+            this.refreshTable();
+            this.$v.$reset();
+            this.$refs["edit-salary-structure"].hide();
+          }
+        );
       }
     },
   },
@@ -204,7 +197,8 @@ export default {
       ],
       submitted: false,
       amount: null,
-      employeeSalaryStructure: [ ]
+      gross: null,
+      employeeSalaryStructure: [],
     };
   },
 };
@@ -381,15 +375,14 @@ export default {
         </b-button>
       </form>
     </b-modal>
-
     <b-modal
-        ref="edit-salary-structure"
-        title="Update Salary Structure"
-        hide-footer
-        centered
-        title-class="font-18"
-        @hidden="resetForm"
-        size="xl"
+      ref="edit-salary-structure"
+      title="Update Salary Structure"
+      hide-footer
+      centered
+      title-class="font-18"
+      @hidden="resetForm"
+      size="xl"
     >
       <form @submit.prevent="update">
         <div class="form-group">
@@ -397,68 +390,57 @@ export default {
             Employee <span class="text-danger">*</span>
           </label>
           <b-form-select
-              id="code"
-              v-model="employee"
-              :options="employees"
-              disabled
-              :class="{
+            id="code"
+            v-model="employee"
+            :options="employees"
+            disabled
+            :class="{
               'is-invalid': submitted && $v.employee.$error,
             }"
           />
         </div>
         <div class="form-group">
           <div class="row">
-            <div class="col-sm-3" v-for="(field, index) in employeeSalaryStructure" :key="index">
-
+            <div
+              class="col-sm-3"
+              v-for="(field, index) in employeeSalaryStructure"
+              :key="index"
+            >
               <b-card
-                  :title="field.payment.pd_payment_name"
-
-                  tag="field.payment.pd_payment_name"
-                  style="max-width: 20rem;"
-                  class="mb-2"
+                :title="field.payment.pd_payment_name"
+                tag="field.payment.pd_payment_name"
+                style="max-width: 20rem"
+                class="mb-2"
               >
                 <b-card-text>
                   {{ field.ss_amount.toLocaleString() }}
                 </b-card-text>
-
-
               </b-card>
             </div>
 
             <div class="col-sm-3">
-
               <b-card
-                  title="Gross Salary"
-
-                  tag="field.payment.pd_payment_name"
-                  style="max-width: 20rem;"
-                  class="mb-2"
+                title="Gross Salary"
+                style="max-width: 20rem"
+                class="mb-2"
               >
-                <b-card-text>
-                  {{ this.amount.toLocaleString() }}
+                <b-card-text v-if="gross">
+                  {{ gross.toLocaleString() }}
                 </b-card-text>
-
-
               </b-card>
             </div>
-
           </div>
-
-
         </div>
-
-
-
 
         <div class="form-group">
           <label for="code">
             Salary Grade <span class="text-danger">*</span>
           </label>
           <b-form-select
-              id="code"
-              v-model="salaryGrade"
-              :options="salaryGrades"
-              :class="{
+            id="code"
+            v-model="salaryGrade"
+            :options="salaryGrades"
+            :class="{
               'is-invalid': submitted && $v.salaryGrade.$error,
             }"
           />
@@ -468,28 +450,28 @@ export default {
             Gross Salary <span class="text-danger">*</span>
           </label>
           <input
-              id="amount"
-              type="text"
-              v-model="amount"
-              class="form-control"
-              :class="{
+            id="amount"
+            type="text"
+            v-model="amount"
+            class="form-control"
+            :class="{
               'is-invalid': submitted && $v.amount.$error,
             }"
           />
         </div>
 
         <b-button
-            v-if="!submitting"
-            class="btn btn-success btn-block mt-4"
-            type="submit"
+          v-if="!submitting"
+          class="btn btn-success btn-block mt-4"
+          type="submit"
         >
           Update
         </b-button>
         <b-button
-            v-else
-            disabled
-            class="btn btn-success btn-block mt-4"
-            type="submit"
+          v-else
+          disabled
+          class="btn btn-success btn-block mt-4"
+          type="submit"
         >
           Updating...
         </b-button>
