@@ -82,5 +82,13 @@ export default [
     },
     component: () => import("@/views/pages/self-service/travel-application-details"),
   },
+  {
+    path: "/manage-time-sheet-details/:month/:year",
+    name: "manage-time-sheet-details",
+    meta: {
+      authRequired: true,
+    },
+    component: () => import("@/views/pages/self-service/time-sheet-details"),
+  },
 
 ];
