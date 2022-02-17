@@ -32,6 +32,8 @@ export default {
         console.log({ res });
         const { application, log } = res.data;
         this.application = application;
+        this.getLocation(application.employee.emp_location_id);
+        this.getSector(application.employee.emp_job_role_id);
         this.log = log;
         this.fetchEmployees();
       });
@@ -56,6 +58,19 @@ export default {
             });
           }
         });
+      });
+    },
+    getLocation(locationId){
+
+      const url = `${this.ROUTES.location}/${locationId}`
+      this.apiGet(url, "Couldn't get location details").then((res)=>{
+        this.t6 = res.data.location_name;
+      });
+    },
+    getSector(sectorId){
+      const url = `${this.ROUTES.jobRole}/${sectorId}`;
+      this.apiGet(url, "Couldn't get location details").then((res)=>{
+        this.t3 = res.data.job_role;
       });
     },
     submit(type) {
@@ -98,6 +113,8 @@ export default {
   },
   data() {
     return {
+      t3:null,
+      t6:null,
       title: "Leave Authorization",
       items: [
         {
@@ -300,12 +317,24 @@ export default {
               <span> {{ application.employee.emp_unique_id }} </span>
             </div>
             <div class="d-flex justify-content-between mb-3">
+              <span>Phone No.</span>
+              <span>
+                {{ this.application.employee.emp_phone_no }}
+              </span>
+            </div>
+            <div class="d-flex justify-content-between mb-3">
+              <span>Office Email</span>
+              <span>
+                {{ this.application.employee.emp_office_email }}
+              </span>
+            </div>
+            <div class="d-flex justify-content-between mb-3">
               <span>T3 Code</span>
-              <span> - </span>
+              <span> {{ t3 }} </span>
             </div>
             <div class="d-flex justify-content-between mb-3">
               <span>T6 Code</span>
-              <span> - </span>
+              <span> {{ t6 }} </span>
             </div>
             <div v-if="status" class="d-flex justify-content-between mb-3">
               <span>Status</span>

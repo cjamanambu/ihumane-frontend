@@ -39,6 +39,8 @@ export default {
         this.fetchDonorInfo();
         this.fetchExpenses();
         this.fetchEmployees();
+        this.getLocation(application.applicant.emp_location_id);
+        this.getSector(application.applicant.emp_job_role_id);
       });
     },
     fetchDonorInfo() {
@@ -95,6 +97,19 @@ export default {
         return true;
       });
     },
+    getLocation(locationId){
+
+      const url = `${this.ROUTES.location}/${locationId}`
+      this.apiGet(url, "Couldn't get location details").then((res)=>{
+        this.t6 = res.data.location_name;
+      });
+    },
+    getSector(sectorId){
+      const url = `${this.ROUTES.jobRole}/${sectorId}`;
+      this.apiGet(url, "Couldn't get location details").then((res)=>{
+        this.t3 = res.data.job_role;
+      });
+    },
     submit(type) {
       this.submitted = true;
       if (this.type === "approve") {
@@ -149,6 +164,8 @@ export default {
           active: true,
         },
       ],
+      t3:null,
+      t6:null,
       application: null,
       breakdowns: [],
       expenses: [],
@@ -538,12 +555,24 @@ export default {
               </span>
             </div>
             <div class="d-flex justify-content-between mb-3">
+              <span>Phone No.</span>
+              <span>
+                {{ application.applicant.emp_phone_no }}
+              </span>
+            </div>
+            <div class="d-flex justify-content-between mb-3">
+              <span>Office Email</span>
+              <span>
+                {{ application.applicant.emp_office_email }}
+              </span>
+            </div>
+            <div class="d-flex justify-content-between mb-3">
               <span>T3 Code</span>
-              <span> - </span>
+              <span> {{ t3 }} </span>
             </div>
             <div class="d-flex justify-content-between mb-3">
               <span>T6 Code</span>
-              <span> - </span>
+              <span> {{ t6 }} </span>
             </div>
             <div v-if="status" class="d-flex justify-content-between mb-3">
               <span>Status</span>

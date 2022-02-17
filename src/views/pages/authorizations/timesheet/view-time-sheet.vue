@@ -29,18 +29,33 @@ export default {
 
       this.apiGet(url, "Get Time sheet authorization").then((res) => {
 
-        console.log({ res });
+        //console.log({ res });
         const { timesheet, timeAllocation, log } = res.data;
         this.timeSheet = timesheet;
         this.allocation = timeAllocation;
         this.log = log;
         this.ref_no = this.allocation.ta_ref_no;
+        this.getLocation(this.allocation.Employee.emp_location_id);
+        this.getSector(this.allocation.Employee.emp_job_role_id);
         this.ta_status = this.allocation.ta_status;
         for (let i = 0; i < this.log.length; i++) {
           if (this.log[i].auth_officer_id === this.getEmployee.emp_id) {
             this.my_status = this.log[i].auth_status;
           }
         }
+      });
+    },
+    getLocation(locationId){
+
+      const url = `${this.ROUTES.location}/${locationId}`
+      this.apiGet(url, "Couldn't get location details").then((res)=>{
+        this.t6 = res.data.location_name;
+      });
+    },
+    getSector(sectorId){
+      const url = `${this.ROUTES.jobRole}/${sectorId}`;
+      this.apiGet(url, "Couldn't get location details").then((res)=>{
+        this.t3 = res.data.job_role;
       });
     },
     authorizationHandler(val) {
@@ -72,6 +87,7 @@ export default {
   data() {
     return {
       title: "Time Sheet Authorization",
+      locationId:null,
       items: [
         {
           text: "IHUMANE",
@@ -85,6 +101,8 @@ export default {
           active: true,
         },
       ],
+      t6:null, //location
+      t3:null,
       application: null,
       timeSheet: [],
       allocation: [],
@@ -152,6 +170,7 @@ export default {
                     <thead>
                       <tr>
                         <th>#</th>
+                        <th>Day</th>
                         <th>Start</th>
                         <th>End</th>
                         <th>Duration</th>
@@ -164,6 +183,7 @@ export default {
                         :key="index"
                       >
                         <th scope="row">{{ index + 1 }}</th>
+                        <td>{{ new Date(`${ts.ts_month}-${ts.ts_day}-${ts.ts_year}`).toDateString()  }}</td>
                         <td>{{ ts.ts_start }}</td>
                         <td>{{ ts.ts_end }}</td>
                         <td>{{ ts.ts_duration }}</td>
@@ -263,12 +283,24 @@ export default {
               </span>
             </div>
             <div class="d-flex justify-content-between mb-3">
+              <span>Phone No.</span>
+              <span>
+                {{ this.allocation.Employee.emp_phone_no }}
+              </span>
+            </div>
+            <div class="d-flex justify-content-between mb-3">
+              <span>Office Email</span>
+              <span>
+                {{ this.allocation.Employee.emp_office_email }}
+              </span>
+            </div>
+            <div class="d-flex justify-content-between mb-3">
               <span>T3 Code</span>
-              <span> - </span>
+              <span> {{ t3 }} </span>
             </div>
             <div class="d-flex justify-content-between mb-3">
               <span>T6 Code</span>
-              <span> - </span>
+              <span> {{ t6 }} </span>
             </div>
             <div v-if="this.my_status === 0">
               <b-form-group>
