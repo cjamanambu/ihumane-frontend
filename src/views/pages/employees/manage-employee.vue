@@ -105,6 +105,7 @@ export default {
       this.apiResponseHandler("Process Complete", "Employee Update");
       this.fetchEmployee();
       this.submitted = false;
+      this.fetchEmployee();
     },
   },
   data() {
