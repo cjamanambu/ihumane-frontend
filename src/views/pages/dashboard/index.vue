@@ -53,8 +53,8 @@ export default {
 <template>
   <Layout>
     <PageHeader :title="title" :items="items" />
-    <div class="row">
-      <div class="col-lg-5">
+    <div v-if="panel === 'admin'" class="row">
+      <div class="col-lg-4">
         <div class="card">
           <div class="card-body">
             <div class="media">
@@ -64,15 +64,18 @@ export default {
                 class="mr-4"
               />
               <div class="media-body overflow-hidden">
-                <p class="text-truncate font-size-14 mt-4 mb-2">
+                <p class="text-truncate font-size-14 mt-3 mb-2">
                   Welcome back,
                 </p>
                 <h4 class="mb-0 text-capitalize">
                   {{ this.getEmployee.emp_first_name }}
                   {{ this.getEmployee.emp_last_name }}
                 </h4>
-                <p class="text-muted">
+                <p class="text-muted mb-1">
                   {{ this.getEmployee.emp_unique_id }}
+                </p>
+                <p class="text-muted mb-0">
+                  {{ new Date().toUTCString() }}
                 </p>
               </div>
             </div>
@@ -91,28 +94,16 @@ export default {
           </div>
         </div>
       </div>
-      <div class="col-lg-7">
+      <div class="col-lg-8">
         <div class="row">
           <div class="col-lg-4">
             <div class="card">
               <div class="card-body">
                 <div class="media">
                   <div class="media-body overflow-hidden">
-                    <p class="text-truncate font-size-14 mb-2"></p>
-                    <h4 class="mb-0"></h4>
+                    <p class="text-truncate font-size-14 mb-2">0 Total</p>
+                    <h5 class="mb-0">Users</h5>
                   </div>
-                  <div class="text-primary">
-                    <i :class="`font-size-24`"></i>
-                  </div>
-                </div>
-              </div>
-
-              <div class="card-body border-top py-3">
-                <div class="text-truncate">
-                  <span class="badge badge-soft-success font-size-11">
-                    <i class="mdi mdi-menu-up"></i>
-                  </span>
-                  <span class="text-muted ml-2">From previous period</span>
                 </div>
               </div>
             </div>
@@ -122,21 +113,9 @@ export default {
               <div class="card-body">
                 <div class="media">
                   <div class="media-body overflow-hidden">
-                    <p class="text-truncate font-size-14 mb-2"></p>
-                    <h4 class="mb-0"></h4>
+                    <p class="text-truncate font-size-14 mb-2">0 Total</p>
+                    <h5 class="mb-0">Employees</h5>
                   </div>
-                  <div class="text-primary">
-                    <i :class="`font-size-24`"></i>
-                  </div>
-                </div>
-              </div>
-
-              <div class="card-body border-top py-3">
-                <div class="text-truncate">
-                  <span class="badge badge-soft-success font-size-11">
-                    <i class="mdi mdi-menu-up"></i>
-                  </span>
-                  <span class="text-muted ml-2">From previous period</span>
                 </div>
               </div>
             </div>
@@ -146,21 +125,175 @@ export default {
               <div class="card-body">
                 <div class="media">
                   <div class="media-body overflow-hidden">
-                    <p class="text-truncate font-size-14 mb-2"></p>
-                    <h4 class="mb-0"></h4>
-                  </div>
-                  <div class="text-primary">
-                    <i :class="`font-size-24`"></i>
+                    <p class="text-truncate font-size-14 mb-2">0 Total</p>
+                    <h5 class="mb-0">Leave Applications</h5>
                   </div>
                 </div>
               </div>
-
-              <div class="card-body border-top py-3">
-                <div class="text-truncate">
-                  <span class="badge badge-soft-success font-size-11">
-                    <i class="mdi mdi-menu-up"></i>
-                  </span>
-                  <span class="text-muted ml-2">From previous period</span>
+            </div>
+          </div>
+          <div class="col-lg-4">
+            <div class="card">
+              <div class="card-body">
+                <div class="media">
+                  <div class="media-body overflow-hidden">
+                    <p class="text-truncate font-size-14 mb-2">0 Total</p>
+                    <h5 class="mb-0">Travel Applications</h5>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-4">
+            <div class="card">
+              <div class="card-body">
+                <div class="media">
+                  <div class="media-body overflow-hidden">
+                    <p class="text-truncate font-size-14 mb-2">0 Total</p>
+                    <h5 class="mb-0">Timesheets Filled</h5>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-4">
+            <div class="card">
+              <div class="card-body">
+                <div class="media">
+                  <div class="media-body overflow-hidden">
+                    <p class="text-truncate font-size-14 mb-2">0 Total</p>
+                    <h5 class="mb-0">Self Assessments Done</h5>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div v-else class="row">
+      <div class="col-lg-4">
+        <div class="card">
+          <div class="card-body">
+            <div class="media">
+              <img
+                style="width: 30%"
+                :src="require('@/assets/images/irc-logo.png')"
+                class="mr-4"
+              />
+              <div class="media-body overflow-hidden">
+                <p class="text-truncate font-size-14 mt-3 mb-2">
+                  Welcome back,
+                </p>
+                <h4 class="mb-0 text-capitalize">
+                  {{ this.getEmployee.emp_first_name }}
+                  {{ this.getEmployee.emp_last_name }}
+                </h4>
+                <p class="text-muted mb-1">
+                  {{ this.getEmployee.emp_unique_id }}
+                </p>
+                <p class="text-muted mb-0">
+                  {{ new Date().toUTCString() }}
+                </p>
+              </div>
+            </div>
+          </div>
+          <div class="card-body border-top py-2">
+            <div class="text-success d-inline-flex">
+              <a
+                href="https://www.rescue.org/country/nigeria"
+                class="d-flex align-items-center"
+                target="_blank"
+              >
+                International Rescue Committee
+                <i class="ri-arrow-right-s-line"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-8">
+        <div class="row">
+          <div class="col-lg-4">
+            <div class="card">
+              <div class="card-body">
+                <div class="media">
+                  <div class="media-body overflow-hidden">
+                    <p class="text-truncate font-size-14 mb-2">0 Pending</p>
+                    <h5 class="mb-0">Leave Applications</h5>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-4">
+            <div class="card">
+              <div class="card-body">
+                <div class="media">
+                  <div class="media-body overflow-hidden">
+                    <p class="text-truncate font-size-14 mb-2">0 Pending</p>
+                    <h5 class="mb-0">Travel Requests</h5>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-4">
+            <div class="card">
+              <div class="card-body">
+                <div class="media">
+                  <div class="media-body overflow-hidden">
+                    <p class="text-truncate font-size-14 mb-2">0 Pending</p>
+                    <h5 class="mb-0">Timesheets Filled</h5>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-4">
+            <div class="card">
+              <div class="card-body">
+                <div class="media">
+                  <div class="media-body overflow-hidden">
+                    <p class="text-truncate font-size-14 mb-2">0 Total</p>
+                    <h5 class="mb-0">Employees to Assess</h5>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-4">
+            <div class="card">
+              <div class="card-body">
+                <div class="media">
+                  <div class="media-body overflow-hidden">
+                    <p class="text-truncate font-size-14 mb-2">0 Total</p>
+                    <h5 class="mb-0">Travel Authorizations</h5>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-4">
+            <div class="card">
+              <div class="card-body">
+                <div class="media">
+                  <div class="media-body overflow-hidden">
+                    <p class="text-truncate font-size-14 mb-2">0 Total</p>
+                    <h5 class="mb-0">Leave Authorizations</h5>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-4">
+            <div class="card">
+              <div class="card-body">
+                <div class="media">
+                  <div class="media-body overflow-hidden">
+                    <p class="text-truncate font-size-14 mb-2">0 Total</p>
+                    <h5 class="mb-0">Timesheet Authorizations</h5>
+                  </div>
                 </div>
               </div>
             </div>
