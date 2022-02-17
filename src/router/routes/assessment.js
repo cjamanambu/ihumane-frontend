@@ -17,6 +17,24 @@ export default [
       import("@/views/pages/assessment/self-assessment/beginning-of-year"),
   },
   {
+    path: "/self-assessment/mid-year-checking",
+    name: "mid-year-checking",
+    meta: {
+      authRequired: true,
+    },
+    component: () =>
+      import("@/views/pages/assessment/self-assessment/mid-year-checking"),
+  },
+  {
+    path: "/self-assessment/end-of-year",
+    name: "end-of-year-assessment",
+    meta: {
+      authRequired: true,
+    },
+    component: () =>
+      import("@/views/pages/assessment/self-assessment/end-of-year"),
+  },
+  {
     path: "/assess-employees",
     name: "assess-employees",
     meta: {
