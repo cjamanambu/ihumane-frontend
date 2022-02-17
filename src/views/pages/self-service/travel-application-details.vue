@@ -193,6 +193,54 @@
                     <div class="card-body">
                         <div class="p-3 bg-light mb-4 d-flex justify-content-between">
                             <div class="d-inline mb-0">
+                                <h5 class="font-size-14 mb-0">Employee Details</h5>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between mb-3">
+                            <span>Employee Name</span>
+                            <span>
+                                {{ application.applicant.emp_first_name }}
+                                {{ application.applicant.emp_first_name }}
+                              </span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-3">
+                            <span>Phone No.</span>
+                            <span>
+                                {{ application.applicant.emp_phone_no }}
+                              </span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-3">
+                            <span>Office Email</span>
+                            <span>
+                                {{ application.applicant.emp_office_email }}
+                              </span>
+                        </div>
+
+                        <div class="d-flex justify-content-between mb-3">
+                            <span>T7 Number</span>
+                            <span>
+                {{ application.applicant.emp_unique_id }}
+              </span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-3">
+                            <span>T3 Code</span>
+                            <span> - </span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-3">
+                            <span>T6 Code</span>
+                            <span> - </span>
+                        </div>
+                        <div  class="d-flex justify-content-between mb-3">
+                            <span>Status</span>
+                            <span v-if="status === 1" class="text-success">Approved</span>
+                            <span v-else-if="status === 2" class="text-danger">Declined</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-body">
+                        <div class="p-3 bg-light mb-4 d-flex justify-content-between">
+                            <div class="d-inline mb-0">
                                 <h5
                                         class="font-size-14 mb-0"
                                         v-if="application.travelapp_travel_cat === 1"
@@ -204,12 +252,12 @@
                                 </h5>
                             </div>
                             <span class="d-inline mb-0">
-                <small
-                        v-if="application.travelapp_status === 0"
-                        class="text-warning"
-                >
-                  Application Pending
-                </small>
+                            <small
+                                    v-if="application.travelapp_status === 0"
+                                    class="text-warning"
+                            >
+                              Application Pending
+                            </small>
                 <small
                         v-else-if="application.travelapp_status === 1"
                         class="text-success"
@@ -449,7 +497,10 @@
                         </div>
                     </div>
                 </div>
-                <div class="card mt-4">
+
+            </div>
+            <div class="col-lg-4">
+                <div class="card ">
                     <div class="card-body">
                         <div class="p-3 bg-light mb-4 d-flex justify-content-between">
                             <div class="d-inline mb-0">
@@ -515,43 +566,7 @@
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="col-lg-4">
-                <div class="card">
-                    <div class="card-body">
-                        <div class="p-3 bg-light mb-4 d-flex justify-content-between">
-                            <div class="d-inline mb-0">
-                                <h5 class="font-size-14 mb-0">Authorization Details</h5>
-                            </div>
-                        </div>
-                        <div class="d-flex justify-content-between mb-3">
-                            <span>Employee Name</span>
-                            <span>
-                {{ application.applicant.emp_first_name }}
-                {{ application.applicant.emp_first_name }}
-              </span>
-                        </div>
-                        <div class="d-flex justify-content-between mb-3">
-                            <span>T7 Number</span>
-                            <span>
-                {{ application.applicant.emp_unique_id }}
-              </span>
-                        </div>
-                        <div class="d-flex justify-content-between mb-3">
-                            <span>T3 Code</span>
-                            <span> - </span>
-                        </div>
-                        <div class="d-flex justify-content-between mb-3">
-                            <span>T6 Code</span>
-                            <span> - </span>
-                        </div>
-                        <div  class="d-flex justify-content-between mb-3">
-                            <span>Status</span>
-                            <span v-if="status === 1" class="text-success">Approved</span>
-                            <span v-else-if="status === 2" class="text-danger">Declined</span>
-                        </div>
-                    </div>
-                </div>
+
             </div>
         </div>
     </Layout>
