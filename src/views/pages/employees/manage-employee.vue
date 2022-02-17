@@ -28,6 +28,7 @@ export default {
           this.emp_last_name = data.emp_last_name;
           this.emp_other_name = data.emp_other_name;
           this.emp_qualification = data.emp_qualification;
+          this.emp_location = data.location.location_name;
           this.emp_account_no = data.emp_account_no;
           this.emp_phone_no = data.emp_phone_no;
           this.emp_bank_id = data.emp_bank_id;
@@ -126,6 +127,7 @@ export default {
       ],
       submitted: false,
       emp_first_name: null,
+      emp_location: null,
       emp_last_name: null,
       emp_other_name: null,
       emp_qualification: null,
@@ -216,6 +218,15 @@ export default {
                             type="text"
                             class="form-control"
                             v-model="emp_phone_no"
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label for=""> Location </label>
+                    <input
+                            readonly
+                            type="text"
+                            class="form-control"
+                            v-model="emp_location"
                     />
                   </div>
 
