@@ -18,7 +18,7 @@ export default {
     ...authComputed,
   },
   mounted() {
-    // this.getOpenGoalSetting();
+    this.getOpenGoalSetting();
     // this.prefillAssessment();
     // this.getSelfAssessment();
     // this.finalAssessment();
@@ -49,6 +49,7 @@ export default {
       texts: [{ id: 0, goal: null }],
       endYearQuestions: [],
       openGoalActivity: null,
+      openGoalActivityYear: null,
       openGoalActivityId: null,
       goals: [],
       start: "",
@@ -221,9 +222,11 @@ export default {
       const url = `${this.ROUTES.goalSetting}/get-open-goal-setting`;
       this.apiGet(url).then((res) => {
         const { data } = res;
+        console.log({ data });
         if (data.length > 0) {
           this.openGoalActivity = parseInt(data[0].gs_activity);
           this.openGoalActivityId = parseInt(data[0].gs_id);
+          this.openGoalActivityYear = parseInt(data[0].gs_year);
           this.checkOpenGoal = 1;
         }
       });
@@ -314,23 +317,28 @@ export default {
 <template>
   <Layout>
     <PageHeader :title="title" :items="items" />
-    <div class="alert alert-info d-flex mb-4">
-      <i class="ri-error-warning-line mr-2"></i>
-      Please select the review period below to manage your self-assessment for
-      that period.
-    </div>
-
-    <div class="row">
+    <scale-loader v-if="apiBusy" />
+    <div class="row" v-else>
       <div class="col-md-4">
         <div class="card">
           <div class="card-body">
             <div class="media">
               <div class="media-body overflow-hidden">
-                <p class="text-truncate font-size-14 mb-2">Goal Setting</p>
+                <p class="text-truncate font-size-14 mb-2">
+                  Goal setting for year {{ openGoalActivityYear }}
+                </p>
                 <h4 class="mb-0">Beginning of Year</h4>
               </div>
-              <div class="text-secondary">
-                <i class="ri-calendar-event-line font-size-24"></i>
+              <div>
+                <span
+                  class="badge badge-primary badge-pill"
+                  v-if="openGoalActivity === 1"
+                >
+                  open
+                </span>
+                <span class="badge badge-pill badge-warning" v-else>
+                  closed
+                </span>
               </div>
             </div>
           </div>
@@ -351,11 +359,21 @@ export default {
           <div class="card-body">
             <div class="media">
               <div class="media-body overflow-hidden">
-                <p class="text-truncate font-size-14 mb-2">Goal Setting</p>
+                <p class="text-truncate font-size-14 mb-2">
+                  Goal setting for year {{ openGoalActivityYear }}
+                </p>
                 <h4 class="mb-0">Mid Year Checking</h4>
               </div>
               <div class="text-secondary">
-                <i class="ri-calendar-todo-line font-size-24"></i>
+                <span
+                  class="badge badge-primary badge-pill"
+                  v-if="openGoalActivity === 2"
+                >
+                  open
+                </span>
+                <span class="badge badge-pill badge-warning" v-else>
+                  closed
+                </span>
               </div>
             </div>
           </div>
@@ -363,6 +381,7 @@ export default {
             <div
               class="d-flex align-items-center text-success d-inline-flex"
               style="cursor: pointer"
+              @click="$router.push({ name: 'mid-year-checking' })"
             >
               <span class="mr-2">View more</span>
               <i class="ri-arrow-right-s-line"></i>
@@ -375,11 +394,21 @@ export default {
           <div class="card-body">
             <div class="media">
               <div class="media-body overflow-hidden">
-                <p class="text-truncate font-size-14 mb-2">Goal Setting</p>
+                <p class="text-truncate font-size-14 mb-2">
+                  Goal setting for year {{ openGoalActivityYear }}
+                </p>
                 <h4 class="mb-0">End of Year</h4>
               </div>
               <div class="text-secondary">
-                <i class="ri-calendar-check-line font-size-24"></i>
+                <span
+                  class="badge badge-primary badge-pill"
+                  v-if="openGoalActivity === 3"
+                >
+                  open
+                </span>
+                <span class="badge badge-pill badge-warning" v-else>
+                  closed
+                </span>
               </div>
             </div>
           </div>
@@ -387,6 +416,7 @@ export default {
             <div
               class="d-flex align-items-center text-success d-inline-flex"
               style="cursor: pointer"
+              @click="$router.push({ name: 'end-of-year-assessment' })"
             >
               <span class="mr-2">View more</span>
               <i class="ri-arrow-right-s-line"></i>
