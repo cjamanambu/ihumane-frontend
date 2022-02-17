@@ -67,13 +67,41 @@ export default {
                 <p class="text-truncate font-size-14 mt-3 mb-2">
                   Welcome back,
                 </p>
-                <h4 class="mb-0 text-capitalize">
-                  {{ this.getEmployee.emp_first_name }}
-                  {{ this.getEmployee.emp_last_name }}
-                </h4>
-                <p class="text-muted mb-1">
-                  {{ this.getEmployee.emp_unique_id }}
-                </p>
+                <div v-if="getUser.user_type > 1">
+                  <h4 class="mb-0 text-capitalize">
+                    {{ this.getEmployee.emp_first_name }}
+                    {{ this.getEmployee.emp_last_name }}
+                  </h4>
+                  <p class="text-muted mb-1">
+                    {{ this.getEmployee.emp_unique_id }}
+                  </p>
+                  <p v-if="this.getEmployee" class="d-flex mb-0">
+                    <span class="mr-2">Location (T6):</span>
+                    <span>
+                      {{ this.getEmployee.location.l_t6_code }}
+                      <small class="text-muted">
+                        ({{ this.getEmployee.location.location_name }})
+                      </small>
+                    </span>
+                  </p>
+                  <p v-if="this.getEmployee" class="d-flex">
+                    <span class="mr-2">Sector (T3):</span>
+                    <span>
+                      {{ this.getEmployee.JobRole.Department.d_t3_code }}
+                      <small class="text-muted">
+                        ({{
+                          this.getEmployee.JobRole.Department.department_name
+                        }})
+                      </small>
+                    </span>
+                  </p>
+                </div>
+                <div v-else>
+                  <h4 class="text-capitalize">
+                    {{ this.getUser.user_username }}
+                  </h4>
+                </div>
+
                 <p class="text-muted mb-0">
                   {{ new Date().toUTCString() }}
                 </p>
@@ -172,7 +200,7 @@ export default {
       </div>
     </div>
     <div v-else class="row">
-      <div class="col-lg-4">
+      <div class="col-lg-5">
         <div class="card">
           <div class="card-body">
             <div class="media">
@@ -191,6 +219,26 @@ export default {
                 </h4>
                 <p class="text-muted mb-1">
                   {{ this.getEmployee.emp_unique_id }}
+                </p>
+                <p class="d-flex mb-0">
+                  <span class="mr-2">Location (T6):</span>
+                  <span>
+                    {{ this.getEmployee.location.l_t6_code }}
+                    <small class="text-muted">
+                      ({{ this.getEmployee.location.location_name }})
+                    </small>
+                  </span>
+                </p>
+                <p class="d-flex">
+                  <span class="mr-2">Sector (T3):</span>
+                  <span>
+                    {{ this.getEmployee.JobRole.Department.d_t3_code }}
+                    <small class="text-muted">
+                      ({{
+                        this.getEmployee.JobRole.Department.department_name
+                      }})
+                    </small>
+                  </span>
                 </p>
                 <p class="text-muted mb-0">
                   {{ new Date().toUTCString() }}
@@ -212,7 +260,7 @@ export default {
           </div>
         </div>
       </div>
-      <div class="col-lg-8">
+      <div class="col-lg-7">
         <div class="row">
           <div class="col-lg-4">
             <div class="card">
