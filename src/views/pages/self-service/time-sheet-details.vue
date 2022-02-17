@@ -27,8 +27,8 @@
                 const url = `${this.ROUTES.timesheet}/${month}/${year}`;
 
                 this.apiGet(url, "Get Time sheet details").then((res) => {
-                    this.isApiBusy = true;
-                    //console.log( { res });
+
+                 //   console.log( { res });
                     const { timesheet, timeAllocation, log } = res.data;
                     this.timeSheet = timesheet;
                     this.allocation = timeAllocation;
@@ -40,7 +40,7 @@
                             this.my_status = this.log[i].auth_status;
                         }
                     }
-                    this.isApiBusy = false;
+
                 });
             },
             authorizationHandler(val) {
@@ -131,6 +131,48 @@
                     <div class="card-body">
                         <div class="p-3 bg-light mb-4 d-flex justify-content-between">
                             <div class="d-inline mb-0">
+                                <h5 class="font-size-14 mb-0">Employee Details</h5>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between mb-3">
+                            <span>Employee Name</span>
+                            <span>
+                            {{ this.allocation.Employee.emp_first_name }}
+                            {{ this.allocation.Employee.emp_last_name }}
+                          </span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-3">
+                            <span>Phone No.</span>
+                            <span>
+                            {{ this.allocation.Employee.emp_phone_no }}
+                          </span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-3">
+                            <span>Office Email</span>
+                            <span>
+                            {{ this.allocation.Employee.emp_office_email }}
+                          </span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-3">
+                            <span>T7 Number</span>
+                            <span>
+                            {{ this.allocation.Employee.emp_unique_id }}
+                          </span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-3">
+                            <span>T3 Code</span>
+                            <span> - </span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-3">
+                            <span>T6 Code</span>
+                            <span> - </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-body">
+                        <div class="p-3 bg-light mb-4 d-flex justify-content-between">
+                            <div class="d-inline mb-0">
                                 <h5>Time Sheet</h5>
                             </div>
                             <small
@@ -154,6 +196,7 @@
                                         <thead>
                                         <tr>
                                             <th>#</th>
+                                            <th>Day</th>
                                             <th>Start</th>
                                             <th>End</th>
                                             <th>Duration</th>
@@ -166,6 +209,7 @@
                                                 :key="index"
                                         >
                                             <th scope="row">{{ index + 1 }}</th>
+                                            <td>{{ new Date(`${ts.ts_month}-${ts.ts_day}-${ts.ts_year}`).toDateString()  }}</td>
                                             <td>{{ ts.ts_start }}</td>
                                             <td>{{ ts.ts_end }}</td>
                                             <td>{{ ts.ts_duration }}</td>
@@ -178,6 +222,9 @@
                     </div>
                 </div>
 
+
+            </div>
+            <div class="col-lg-4">
                 <div class="card">
                     <div class="card-body">
                         <div class="p-3 bg-light mb-4 d-flex justify-content-between">
@@ -239,38 +286,6 @@
                                     </table>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-4">
-                <div class="card">
-                    <div class="card-body">
-                        <div class="p-3 bg-light mb-4 d-flex justify-content-between">
-                            <div class="d-inline mb-0">
-                                <h5 class="font-size-14 mb-0">Employee Details</h5>
-                            </div>
-                        </div>
-                        <div class="d-flex justify-content-between mb-3">
-                            <span>Employee Name</span>
-                            <span>
-                {{ this.allocation.Employee.emp_first_name }}
-                {{ this.allocation.Employee.emp_last_name }}
-              </span>
-                        </div>
-                        <div class="d-flex justify-content-between mb-3">
-                            <span>T7 Number</span>
-                            <span>
-                {{ this.allocation.Employee.emp_unique_id }}
-              </span>
-                        </div>
-                        <div class="d-flex justify-content-between mb-3">
-                            <span>T3 Code</span>
-                            <span> - </span>
-                        </div>
-                        <div class="d-flex justify-content-between mb-3">
-                            <span>T6 Code</span>
-                            <span> - </span>
                         </div>
                     </div>
                 </div>
