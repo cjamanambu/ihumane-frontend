@@ -19,7 +19,6 @@ export default {
   },
   mounted() {
     this.refreshTable();
-    this.getLeaveAccruals();
   },
   validations: {
     leaveType: { required },
@@ -102,6 +101,7 @@ export default {
           });
         });
         this.totalRows = this.leaves.length;
+        this.getLeaveAccruals();
       });
     },
     onFiltered(filteredItems) {
