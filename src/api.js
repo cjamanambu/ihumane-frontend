@@ -56,4 +56,5 @@ export const ROUTES = {
   authorization: `application-authorization`,
   appAuthorization: `application-authorization`,
   leaveAccrual: `leave-accrual`,
+  salary: `salary`,
 };

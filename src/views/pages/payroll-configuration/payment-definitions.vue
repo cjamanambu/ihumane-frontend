@@ -69,15 +69,14 @@ export default {
           pd_payment_type: this.type,
           pd_payment_variant: this.variant,
           pd_payment_taxable: this.taxable,
-          pd_desc: 'null',
+          pd_desc: "null",
           pd_basic: this.basic,
-          pd_tie_number: 'null',
+          pd_tie_number: "null",
           pd_pr_gross: this.pdPrGross,
           pd_percentage: this.pdPercentage,
           pd_value: this.pdValue,
           pd_amount: parseFloat(this.pdAmount),
-          pd_tax: parseInt(this.pdTax)
-
+          pd_tax: parseInt(this.pdTax),
         };
         const url = `${this.ROUTES.paymentDefinition}/add-payment-definition`;
         this.apiPost(url, data, "Add Payment Definition Error").then((res) => {
@@ -85,7 +84,6 @@ export default {
             `${res.data.pd_payment_name} has been added successfully`,
             "New Payment Definition Added"
           );
-
           this.$v.$reset();
           this.$refs["add-payment-definition"].hide();
           this.refreshTable();
@@ -105,14 +103,14 @@ export default {
           pd_payment_type: this.type,
           pd_payment_variant: this.variant,
           pd_payment_taxable: this.taxable,
-          pd_desc: 'null',
+          pd_desc: "null",
           pd_basic: this.basic,
-          pd_tie_number: 'null',
+          pd_tie_number: "null",
           pd_pr_gross: this.pdPrGross,
           pd_percentage: parseInt(this.pdPercentage),
           pd_value: parseInt(this.pdValue),
           pd_amount: parseFloat(this.pdAmount),
-          pd_tax: parseInt(this.pdTax)
+          pd_tax: parseInt(this.pdTax),
         };
         const url = `${this.ROUTES.paymentDefinition}/update-payment-definition/${this.pdID}`;
         this.apiPatch(url, data, "Update Payment Definition Error").then(
@@ -205,22 +203,20 @@ export default {
       pdPrGross: 0,
       pdValue: 1,
       pdValues: [
-
-        {text: 'Flat', value: 1},
-        {text: 'Computed', value: 2}
+        { text: "Flat", value: 1 },
+        { text: "Computed", value: 2 },
       ],
       pdTaxes: [
-         {text: 'Tax', value: 1},
-        {text: 'Not Tax', value: 0}
+        { text: "Tax", value: 1 },
+        { text: "Not Tax", value: 0 },
       ],
       pdTax: 0,
       pdAmount: 1,
       pdAmounts: [
-
-        { text: 'Of Gross', value: 1},
-        {text: 'Of Basic', value: 2}
+        { text: "Of Gross", value: 1 },
+        { text: "Of Basic", value: 2 },
       ],
-      pdPercentage: 0
+      pdPercentage: 0,
     };
   },
 };
@@ -426,86 +422,78 @@ export default {
         <div class="form-group">
           <div class="row">
             <div class="col-12">
-              <label >
+              <label>
                 Percentage of Gross <span class="text-danger">*</span>
               </label>
               <input
-
-                  type="number"
-                  step="0.01"
-                  v-model="pdPrGross"
-                  class="form-control"
-                  min="0"
-                  :class="{
-              'is-invalid': submitted && $v.pdPrGross.$error,
-            }"
+                type="number"
+                step="0.01"
+                v-model="pdPrGross"
+                class="form-control"
+                min="0"
+                :class="{
+                  'is-invalid': submitted && $v.pdPrGross.$error,
+                }"
               />
             </div>
           </div>
         </div>
 
         <div class="form-group">
-              <div class="row">
+          <div class="row">
             <div class="col-6">
               <b-form-group>
-                <label >Payment Value</label><br />
+                <label>Payment Value</label><br />
                 <b-form-radio-group
-                    id="payment_value"
-                    v-model="pdValue"
-                    :options="pdValues"
-                    button-variant="outline-success"
-                    buttons
+                  id="payment_value"
+                  v-model="pdValue"
+                  :options="pdValues"
+                  button-variant="outline-success"
+                  buttons
                 />
               </b-form-group>
             </div>
             <div class="col-6">
               <b-form-group>
-                <label >Percentage of</label><br />
+                <label>Percentage of</label><br />
                 <b-form-radio-group
-                    id="user_type"
-                    v-model="pdAmount"
-                    :options="pdAmounts"
-                    button-variant="outline-success"
-                    buttons
+                  id="user_type"
+                  v-model="pdAmount"
+                  :options="pdAmounts"
+                  button-variant="outline-success"
+                  buttons
                 />
               </b-form-group>
             </div>
-
           </div>
-           </div>
+        </div>
 
         <div class="form-group">
           <div class="row">
-
             <div class="col-6">
-              <label >
-                Percentage % <span class="text-danger">*</span>
-              </label>
+              <label> Percentage % <span class="text-danger">*</span> </label>
               <input
-                  type="number"
-                  step="0.01"
-                  v-model="pdPercentage"
-                  class="form-control"
-                  min="0"
+                type="number"
+                step="0.01"
+                v-model="pdPercentage"
+                class="form-control"
+                min="0"
               />
             </div>
 
             <div class="col-6">
               <b-form-group>
-                <label >Tax?</label><br />
+                <label>Tax?</label><br />
                 <b-form-radio-group
-                    id="user_type"
-                    v-model="pdTax"
-                    :options="pdTaxes"
-                    button-variant="outline-success"
-                    buttons
+                  id="user_type"
+                  v-model="pdTax"
+                  :options="pdTaxes"
+                  button-variant="outline-success"
+                  buttons
                 />
               </b-form-group>
             </div>
           </div>
-
-
-
         </div>
 
         <b-button
@@ -606,37 +594,36 @@ export default {
             />
           </b-form-group>
         </div>
-<!--        <b-form-group>-->
-<!--          <label for="user_status">Description</label><br />-->
-<!--          <b-form-radio-group-->
-<!--            id="user_status"-->
-<!--            v-model="description"-->
-<!--            :options="descriptions"-->
-<!--            button-variant="outline-success"-->
-<!--            buttons-->
-<!--          />-->
-<!--        </b-form-group>-->
-<!--        <div class="form-group">-->
-<!--          <label for="token">Tie Number</label>-->
-<!--          <input id="token" type="text" v-model="tie" class="form-control" />-->
-<!--        </div>-->
+        <!--        <b-form-group>-->
+        <!--          <label for="user_status">Description</label><br />-->
+        <!--          <b-form-radio-group-->
+        <!--            id="user_status"-->
+        <!--            v-model="description"-->
+        <!--            :options="descriptions"-->
+        <!--            button-variant="outline-success"-->
+        <!--            buttons-->
+        <!--          />-->
+        <!--        </b-form-group>-->
+        <!--        <div class="form-group">-->
+        <!--          <label for="token">Tie Number</label>-->
+        <!--          <input id="token" type="text" v-model="tie" class="form-control" />-->
+        <!--        </div>-->
 
         <div class="form-group">
           <div class="row">
             <div class="col-12">
-              <label >
+              <label>
                 Percentage of Gross <span class="text-danger">*</span>
               </label>
               <input
-
-                  type="number"
-                  step="0.01"
-                  v-model="pdPrGross"
-                  class="form-control"
-                  min="0"
-                  :class="{
-              'is-invalid': submitted && $v.pdPrGross.$error,
-            }"
+                type="number"
+                step="0.01"
+                v-model="pdPrGross"
+                class="form-control"
+                min="0"
+                :class="{
+                  'is-invalid': submitted && $v.pdPrGross.$error,
+                }"
               />
             </div>
           </div>
@@ -646,64 +633,57 @@ export default {
           <div class="row">
             <div class="col-6">
               <b-form-group>
-                <label >Payment Value</label><br />
+                <label>Payment Value</label><br />
                 <b-form-radio-group
-                    id="payment_value"
-                    v-model="pdValue"
-                    :options="pdValues"
-                    button-variant="outline-success"
-                    buttons
+                  id="payment_value"
+                  v-model="pdValue"
+                  :options="pdValues"
+                  button-variant="outline-success"
+                  buttons
                 />
               </b-form-group>
             </div>
             <div class="col-6">
               <b-form-group>
-                <label >Percentage of</label><br />
+                <label>Percentage of</label><br />
                 <b-form-radio-group
-                    id="user_type"
-                    v-model="pdAmount"
-                    :options="pdAmounts"
-                    button-variant="outline-success"
-                    buttons
+                  id="user_type"
+                  v-model="pdAmount"
+                  :options="pdAmounts"
+                  button-variant="outline-success"
+                  buttons
                 />
               </b-form-group>
             </div>
-
           </div>
         </div>
 
         <div class="form-group">
           <div class="row">
-
             <div class="col-6">
-              <label >
-                Percentage % <span class="text-danger">*</span>
-              </label>
+              <label> Percentage % <span class="text-danger">*</span> </label>
               <input
-                  type="number"
-                  step="0.01"
-                  v-model="pdPercentage"
-                  class="form-control"
-                  min="0"
+                type="number"
+                step="0.01"
+                v-model="pdPercentage"
+                class="form-control"
+                min="0"
               />
             </div>
 
             <div class="col-6">
               <b-form-group>
-                <label >Tax?</label><br />
+                <label>Tax?</label><br />
                 <b-form-radio-group
-                    id="user_type"
-                    v-model="pdTax"
-                    :options="pdTaxes"
-                    button-variant="outline-success"
-                    buttons
+                  id="user_type"
+                  v-model="pdTax"
+                  :options="pdTaxes"
+                  button-variant="outline-success"
+                  buttons
                 />
               </b-form-group>
             </div>
           </div>
-
-
-
         </div>
 
         <b-button

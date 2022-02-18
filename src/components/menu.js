@@ -235,7 +235,7 @@ export const menuItems = [
     id: 29,
     label: "Self Assessment",
     icon: "ri-file-edit-line",
-    link: "",
+    link: "/manage-self-assessment",
   },
   {
     id: 26,
@@ -260,7 +260,7 @@ export const menuItems = [
       {
         id: 30,
         label: "Confirm Variation",
-        link: "confirm-variation",
+        link: "/confirm-variation",
       },
     ],
   },
@@ -272,13 +272,13 @@ export const menuItems = [
       {
         id: 28,
         label: "Process Payroll Routine",
-        link: "",
+        link: "/process-payroll",
       },
-      {
-        id: 30,
-        label: "Approve Payroll Routine",
-        link: "",
-      },
+      // {
+      //   id: 30,
+      //   label: "Approve Payroll Routine",
+      //   link: "/approve-payroll",
+      // },
     ],
   },
 ];
