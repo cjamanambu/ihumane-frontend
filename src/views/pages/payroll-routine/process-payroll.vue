@@ -42,10 +42,13 @@ export default {
       sortDesc: false,
       fields: [
         { key: "sn", label: "S/n", sortable: true },
-        { key: "employee", label: "Employee", sortable: true },
+        { key: "employeeName", label: "Employee", sortable: true },
+        { key: "employeeId", label: "T7 Number", sortable: true },
+        { key: "location", label: "Location (T6)", sortable: true },
+        { key: "sector", label: "Sector (T3)", sortable: true },
         { key: "grossSalary", label: "Gross Salary", sortable: true },
-        { key: "netSalary", label: "Net Salary", sortable: true },
         { key: "totalDeduction", label: "Total Deduction", sortable: true },
+        { key: "netSalary", label: "Net Salary", sortable: true },
       ],
     };
   },
@@ -100,6 +103,7 @@ export default {
         data.forEach((pay, index) => {
           this.pay[index] = { sn: ++index, ...pay };
         });
+        console.log(this.pay);
         this.totalRows = this.pay.length;
       });
     },
