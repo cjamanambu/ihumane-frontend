@@ -43,7 +43,7 @@ export default {
       fields: [
         { key: "sn", label: "S/n", sortable: true },
         { key: "employeeName", label: "Employee", sortable: true },
-        { key: "employeeId", label: "T7 Number", sortable: true },
+        { key: "employeeUniqueId", label: "T7 Number", sortable: true },
         { key: "location", label: "Location (T6)", sortable: true },
         { key: "sector", label: "Sector (T3)", sortable: true },
         { key: "grossSalary", label: "Gross Salary", sortable: true },
@@ -103,9 +103,19 @@ export default {
         data.forEach((pay, index) => {
           this.pay[index] = { sn: ++index, ...pay };
         });
-        console.log(this.pay);
         this.totalRows = this.pay.length;
       });
+    },
+    onFiltered(filteredItems) {
+      // Trigger pagination to update the number of buttons/pages due to filtering
+      this.totalRows = filteredItems.length;
+      this.currentPage = 1;
+    },
+    selectRow(row) {
+      row = row[0];
+      let empID = row.employeeId;
+      this.$router.push({ name: "view-payslip", params: { empID } });
+      this.$refs["payroll-summary-table"].clearSelected();
     },
   },
 };
@@ -171,7 +181,7 @@ export default {
                 <!-- Table -->
                 <div class="table-responsive mb-0">
                   <b-table
-                    ref="salary-structure-table"
+                    ref="payroll-summary-table"
                     bordered
                     selectable
                     hover
