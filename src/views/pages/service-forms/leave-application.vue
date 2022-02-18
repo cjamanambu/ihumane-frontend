@@ -83,6 +83,7 @@ export default {
       approved: null,
       discarded: null,
       submitted: false,
+      pendingLeaves:0,
     };
   },
   methods: {
@@ -92,6 +93,7 @@ export default {
         const { data, officers } = res.data;
         data.forEach((leave, index) => {
           this.leaves[index] = { sn: ++index, ...leave };
+          if(leave.leapp_status === 0){ this.pendingLeaves++}
         });
         this.leaves.forEach((leave) => {
           officers.forEach((officer) => {
@@ -341,6 +343,11 @@ export default {
       @hidden="resetForm"
     >
       <form @submit.prevent="submitNew">
+
+        <div class="alert alert-warning" v-if="pendingLeaves > 0">
+          <p>You currently have pending application. You're not due to apply for another leave while one or more is pending.</p>
+        </div>
+        <div v-else>
         <div class="form-group">
           <label for="leave-types">
             Leave Type <span class="text-danger">*</span>
@@ -384,21 +391,24 @@ export default {
             }"
           />
         </div>
-        <b-button
-          v-if="!submitting"
-          class="btn btn-success btn-block mt-4"
-          type="submit"
-        >
-          Submit
-        </b-button>
-        <b-button
-          v-else
-          disabled
-          class="btn btn-success btn-block mt-4"
-          type="submit"
-        >
-          Submitting...
-        </b-button>
+
+          <b-button
+                  v-if="!submitting "
+                  class="btn btn-success btn-block mt-4"
+                  type="submit"
+          >
+            Submit
+          </b-button>
+          <b-button
+                  v-else
+                  disabled
+                  class="btn btn-success btn-block mt-4"
+                  type="submit"
+          >
+            Submitting...
+          </b-button>
+        </div>
+
       </form>
     </b-modal>
     <b-modal
