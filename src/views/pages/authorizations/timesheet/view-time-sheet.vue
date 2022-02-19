@@ -279,7 +279,8 @@ export default {
                           <small v-else class="text-warning"> Pending </small>
                         </td>
                         <td>{{ off.auth_comment }}</td>
-                        <td>{{off.role.ar_title}}</td>
+                        <td v-if="off.role">{{off.role.ar_title}}</td>
+                        <td v-else>---</td>
                         <td>{{ new Date(off.updatedAt).toDateString() }}</td>
                       </tr>
                     </tbody>
