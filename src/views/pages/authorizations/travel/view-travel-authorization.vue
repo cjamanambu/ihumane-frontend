@@ -19,28 +19,45 @@ export default {
   },
   mounted() {
     this.fetchRequest();
+    this.getAuthorizingRoles();
   },
   validations: {
     comment: { required },
     official: { required },
+    roleId: { required },
+
   },
   methods: {
     fetchRequest() {
       let requestID = this.$route.params.travelAppID;
       const url = `${this.ROUTES.travelApplication}/${requestID}`;
       this.apiGet(url, "Get Travel Application").then((res) => {
-        console.log({ res });
+        //console.log({ res });
         const { application, breakdown, expenses, log } = res.data;
         this.application = application;
         this.breakdowns = breakdown;
         this.expenses = expenses;
         this.log = log;
+        console.log(log)
         this.checkCurrentStatus();
         this.fetchDonorInfo();
         this.fetchExpenses();
         this.fetchEmployees();
         this.getLocation(application.applicant.emp_location_id);
         this.getSector(application.applicant.emp_job_role_id);
+      });
+    },
+    getAuthorizingRoles(){
+      const url = `${this.ROUTES.authorizationRole}`;
+      this.apiGet(url, "Couldn't get authorizing roles").then((res)=>{
+        const { data} = res;
+        data.map((role) => {
+          this.roles.push({
+            value: role.ar_id,
+            text: role.ar_title,
+          });
+        });
+
       });
     },
     fetchDonorInfo() {
@@ -128,6 +145,7 @@ export default {
           appId: this.application.travelapp_id.toString(),
           type: 3,
           comment: this.comment,
+          role: this.roleId,
           markAsFinal,
           officer: this.getEmployee.emp_id,
         };
@@ -174,6 +192,12 @@ export default {
       t2Codes: [],
       comment: null,
       final: true,
+      roles:[{
+        value:null,
+        text:"Authorizing as...",
+        disabled:true,
+      }],
+      roleId:null,
       official: null,
       officials: [
         {
@@ -481,6 +505,7 @@ export default {
                       <b-th>OFFICER</b-th>
                       <b-th>STATUS</b-th>
                       <b-th>COMMENT</b-th>
+                      <b-th>Authorized As</b-th>
                       <b-th>DATE</b-th>
                     </b-tr>
                   </b-thead>
@@ -515,6 +540,11 @@ export default {
                       <b-td style="width: 40%">
                         <span>
                           {{ logEntry.auth_comment }}
+                        </span>
+                      </b-td>
+                      <b-td style="width: 40%">
+                        <span>
+                           {{ logEntry.role.ar_title }}
                         </span>
                       </b-td>
                       <b-td style="width: 20%">
@@ -602,6 +632,15 @@ export default {
                   }"
                 />
               </b-form-group>
+                <b-form-group>
+                  <b-form-select
+                          v-model="roleId"
+                          :options="roles"
+                          :class="{
+                      'is-invalid': submitted && $v.roleId.$error,
+                    }"
+                  />
+                </b-form-group>
               <div class="d-flex" v-if="final">
                 <button
                   v-if="!approving"

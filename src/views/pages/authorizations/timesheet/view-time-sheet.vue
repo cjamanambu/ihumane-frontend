@@ -3,6 +3,7 @@ import Layout from "@/views/layouts/main";
 import PageHeader from "@/components/page-header";
 import appConfig from "@/app.config";
 import { authComputed } from "@/state/helpers";
+import {required} from "vuelidate/lib/validators";
 export default {
   page: {
     title: "Time Sheet Authorization",
@@ -17,7 +18,13 @@ export default {
   },
   mounted() {
     this.fetchRequest();
-    //console.log(`Month: ${this.$route.params.month} Year: ${this.$route.params.year} ID: ${this.$route.params.empId}`);
+    this.getAuthorizingRoles();
+  },
+  validations: {
+    comment: { required },
+    official: { required },
+    roleId: { required },
+
   },
   props: ["employee"],
   methods: {
@@ -29,7 +36,7 @@ export default {
 
       this.apiGet(url, "Get Time sheet authorization").then((res) => {
 
-        //console.log({ res });
+        console.log({ res });
         const { timesheet, timeAllocation, log } = res.data;
         this.timeSheet = timesheet;
         this.allocation = timeAllocation;
@@ -58,6 +65,19 @@ export default {
         this.t3 = res.data.job_role;
       });
     },
+    getAuthorizingRoles(){
+      const url = `${this.ROUTES.authorizationRole}`;
+      this.apiGet(url, "Couldn't get authorizing roles").then((res)=>{
+        const { data} = res;
+        data.map((role) => {
+          this.roles.push({
+            value: role.ar_id,
+            text: role.ar_title,
+          });
+        });
+
+      });
+    },
     authorizationHandler(val) {
       if (this.comment === null) {
         alert("Leave a comment");
@@ -68,6 +88,7 @@ export default {
           status: val,
           officer: this.getEmployee.emp_id,
           type: 2,
+          role: this.roleId,
           comment: this.comment,
           markAsFinal: this.final,
           nextOfficer: this.nextOfficer,
@@ -116,6 +137,12 @@ export default {
       allocationId: null,
       ref_no: null,
       ta_status: null,
+      roles:[{
+        value:null,
+        text:"Authorizing as...",
+        disabled:true,
+      }],
+      roleId:null,
       officials: [
         {
           value: null,
@@ -213,6 +240,7 @@ export default {
                         <th>Officer</th>
                         <th>Status</th>
                         <th>Comment</th>
+                        <th>Authorized As</th>
                         <th>Date</th>
                       </tr>
                     </thead>
@@ -251,7 +279,8 @@ export default {
                           <small v-else class="text-warning"> Pending </small>
                         </td>
                         <td>{{ off.auth_comment }}</td>
-                        <td>{{ off.updatedAt }}</td>
+                        <td>{{off.role.ar_title}}</td>
+                        <td>{{ new Date(off.updatedAt).toDateString() }}</td>
                       </tr>
                     </tbody>
                   </table>
@@ -321,6 +350,15 @@ export default {
                     no-resize
                     placeholder="Leave your comments here.."
                     v-model="comment"
+                  />
+                </b-form-group>
+                <b-form-group>
+                  <b-form-select
+                          v-model="roleId"
+                          :options="roles"
+                          :class="{
+                      'is-invalid': submitted && $v.roleId.$error,
+                    }"
                   />
                 </b-form-group>
                 <div class="d-flex">

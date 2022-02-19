@@ -19,10 +19,12 @@ export default {
   },
   mounted() {
     this.fetchRequest();
+    this.getAuthorizingRoles();
   },
   validations: {
     comment: { required },
     official: { required },
+    roleId: { required },
   },
   methods: {
     fetchRequest() {
@@ -73,6 +75,19 @@ export default {
         this.t3 = res.data.job_role;
       });
     },
+    getAuthorizingRoles(){
+      const url = `${this.ROUTES.authorizationRole}`;
+      this.apiGet(url, "Couldn't get authorizing roles").then((res)=>{
+        const { data} = res;
+        data.map((role) => {
+          this.roles.push({
+            value: role.ar_id,
+            text: role.ar_title,
+          });
+        });
+
+      });
+    },
     submit(type) {
       this.submitted = true;
       if (this.type === "approve") {
@@ -91,6 +106,7 @@ export default {
           appId: this.application.leapp_id.toString(),
           type: 1,
           comment: this.comment,
+          role: this.roleId,
           markAsFinal,
           officer: this.getEmployee.emp_id,
         };
@@ -131,6 +147,12 @@ export default {
       ],
       application: null,
       log: [],
+      roles:[{
+        value:null,
+        text:"Authorizing as...",
+        disabled:true,
+      }],
+      roleId:null,
       comment: null,
       final: true,
       official: null,
@@ -245,6 +267,7 @@ export default {
                       <b-th>OFFICER</b-th>
                       <b-th>STATUS</b-th>
                       <b-th>COMMENT</b-th>
+                      <b-th>Authorized As</b-th>
                       <b-th>DATE</b-th>
                     </b-tr>
                   </b-thead>
@@ -279,6 +302,11 @@ export default {
                       <b-td style="width: 40%">
                         <span>
                           {{ logEntry.auth_comment }}
+                        </span>
+                      </b-td>
+                      <b-td style="width: 40%">
+                        <span>
+                           {{ logEntry.role.ar_title }}
                         </span>
                       </b-td>
                       <b-td style="width: 20%">
@@ -362,6 +390,15 @@ export default {
                   :class="{
                     'is-invalid': submitted && $v.comment.$error,
                   }"
+                />
+              </b-form-group>
+              <b-form-group>
+                <b-form-select
+                        v-model="roleId"
+                        :options="roles"
+                        :class="{
+                      'is-invalid': submitted && $v.roleId.$error,
+                    }"
                 />
               </b-form-group>
               <div class="d-flex" v-if="final">
