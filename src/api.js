@@ -54,7 +54,6 @@ export const ROUTES = {
   variationalPayment: `variational-payment`,
   salaryStructure: `salary-structure`,
   authorization: `application-authorization`,
-  authorizationRole: `authorization-roles`,
   appAuthorization: `application-authorization`,
   leaveAccrual: `leave-accrual`,
 };

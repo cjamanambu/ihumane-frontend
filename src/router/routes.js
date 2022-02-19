@@ -8,6 +8,7 @@ import serviceForms from "./routes/service-forms";
 import selfService from "./routes/self-service";
 import variation from "@/router/routes/variation";
 import assessment from "./routes/assessment";
+import payrollRoutine from "./routes/payroll-routine";
 
 export default [
   {
@@ -28,4 +29,5 @@ export default [
   ...misc,
   ...variation,
   ...assessment,
+  ...payrollRoutine,
 ];
