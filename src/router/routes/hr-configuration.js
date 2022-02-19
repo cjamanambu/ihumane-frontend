@@ -32,6 +32,14 @@ export default [
     component: () => import("@/views/pages/hr-configuration/departments"),
   },
   {
+    path: "/authorization-roles",
+    name: "authorization-roles",
+    meta: {
+      authRequired: true,
+    },
+    component: () => import("@/views/pages/hr-configuration/authorization-role"),
+  },
+  {
     path: "/grades",
     name: "grades",
     meta: {

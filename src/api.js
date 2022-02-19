@@ -3,7 +3,7 @@ import axios from "axios";
 export const API = axios.create({
   baseURL: `https://irc-api.ihumane.net/`,
 
-  // baseURL: `http://localhost:9500/`,
+  //baseURL: `http://localhost:9500/`,
 });
 
 export function SET_TOKEN(token) {
@@ -56,5 +56,4 @@ export const ROUTES = {
   authorization: `application-authorization`,
   appAuthorization: `application-authorization`,
   leaveAccrual: `leave-accrual`,
-  salary: `salary`,
 };

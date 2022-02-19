@@ -15,6 +15,7 @@ export default {
   },
   mounted() {
     this.refreshTable();
+    this.getEmployees();
   },
   validations: {
     name: { required },
@@ -24,6 +25,7 @@ export default {
     refreshTable() {
       this.apiGet(this.ROUTES.department, "Get Departments Error").then(
         (res) => {
+          //console.log({res});
           const { data } = res;
           this.depts = data;
           this.totalRows = this.depts.length;
@@ -45,8 +47,24 @@ export default {
       this.deptID = dept.department_id;
       this.name = dept.department_name;
       this.t3_code = dept.d_t3_code;
+      this.sector_lead = dept.d_selector_lead_id;
       this.$refs["update-dept"].show();
       this.$refs["dept-table"].clearSelected();
+    },
+    getEmployees(){
+      const url = `${this.ROUTES.employee}`;
+      this.apiGet(url, "Couldn't get employees").then((res)=>{
+        this.employee_list = [
+          { value: null, text: "Please select sector lead" },
+        ];
+        const { data } = res;
+        data.forEach((emp) => {
+          this.employee_list.push({
+            value: emp.emp_id,
+            text: `${emp.emp_first_name} ${emp.emp_last_name} ${emp.emp_other_name}`,
+          });
+        });
+      })
     },
     submitNew() {
       this.submitted = true;
@@ -57,6 +75,7 @@ export default {
         const data = {
           department_name: this.name,
           t3_code: this.t3_code,
+          sector_lead: this.sector_lead
         };
         this.apiPost(this.ROUTES.department, data, "Add Department Error").then(
           (res) => {
@@ -118,10 +137,13 @@ export default {
         { key: "department_id", sortable: true },
         { key: "department_name", sortable: true },
         { key: "d_t3_code", label: "T3 Code", sortable: true },
+        { key: "d_sector_lead_id", label: "Sector Lead", sortable: true },
       ],
       name: null,
       t3_code: null,
       deptID: null,
+      sector_lead:null,
+      employee_list: [{ value: null, text: "Please select a sector lead" }],
       submitted: false,
     };
   },
@@ -252,6 +274,19 @@ export default {
             class="form-control"
             :class="{
               'is-invalid': submitted && $v.t3_code.$error,
+            }"
+          />
+        </div>
+        <div class="form-group">
+          <label for="t3_code">
+            Sector Lead <span class="text-danger">*</span>
+          </label>
+          <b-form-select
+                  id="department"
+                  v-model="sector_lead"
+                  :options="employee_list"
+                  :class="{
+              'is-invalid': submitted && $v.employee_list.$error,
             }"
           />
         </div>
