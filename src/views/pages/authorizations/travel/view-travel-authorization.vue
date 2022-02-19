@@ -542,9 +542,14 @@ export default {
                           {{ logEntry.auth_comment }}
                         </span>
                       </b-td>
-                      <b-td style="width: 40%">
+                      <b-td style="width: 40%" v-if="logEntry.role">
                         <span>
-                           {{ logEntry.role.ar_title  }}
+                          {{ logEntry.role.ar_title }}
+                        </span>
+                      </b-td>
+                      <b-td style="width: 40%" v-else>
+                        <span>
+                          ---
                         </span>
                       </b-td>
                       <b-td style="width: 20%">
