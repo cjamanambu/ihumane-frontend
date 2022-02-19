@@ -25,12 +25,6 @@
                 this.apiGet(this.ROUTES.authorizationRole, "Get Authorization role Error").then(
                     (res) => {
                         const { data } = res;
-                       /* data.forEach((record, index) => {
-                            this.roles[index] = record.ar_type === 1 ? { sn: ++index, ar_type:"Leave Application", ...record } : '';
-                            this.roles[index] = record.ar_type === 2 ? { sn: ++index, ar_type:"Time sheet", ...record } : '';
-                            this.roles[index] = record.ar_type === 3 ? { sn: ++index, ar_type:"Travel Application", ...record } : '';
-                        });
-                        console.log(data);*/
                         this.roles = data;
                         this.totalRows = this.roles.length;
                     }
@@ -203,6 +197,12 @@
                                     select-mode="single"
                                     @row-selected="selectRole"
                             >
+                                <template #cell(ar_type)="row">
+                                   <span v-if="row.value === 1">Leave Application</span>
+                                   <span v-else-if="row.value === 2">Time sheet</span>
+                                   <span v-else-if="row.value === 3">Travel Application</span>
+                                </template>
+
                             </b-table>
                         </div>
                         <div class="row">
