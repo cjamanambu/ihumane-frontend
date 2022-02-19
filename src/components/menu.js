@@ -108,6 +108,11 @@ export const menuItems = [
             link: "/departments",
           },
           {
+            id: 123,
+            label: "Authorization Role",
+            link: "/authorization-roles",
+          },
+          {
             id: 17,
             label: "Job Roles",
             link: "/job-roles",
