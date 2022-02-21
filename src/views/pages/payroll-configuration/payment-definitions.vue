@@ -48,6 +48,7 @@ export default {
       this.$v.$reset();
     },
     refreshTable() {
+      this.paymentDefinitions = [];
       this.apiGet(
         this.ROUTES.paymentDefinition,
         "Get Payment Definitions Error"
@@ -90,7 +91,7 @@ export default {
         });
       }
     },
-    submitUpdate() {
+    async submitUpdate() {
       this.submitted = true;
       // stop here if form is invalid
       this.$v.$touch();
@@ -113,10 +114,9 @@ export default {
           pd_tax: parseInt(this.pdTax),
         };
         const url = `${this.ROUTES.paymentDefinition}/update-payment-definition/${this.pdID}`;
-        this.apiPatch(url, data, "Update Payment Definition Error").then(
+        await this.apiPatch(url, data, "Update Payment Definition Error").then(
           (res) => {
             this.apiResponseHandler(`${res.data}`, "Update Successful");
-            this.refreshTable();
             this.$v.$reset();
             this.$refs["edit-payment-definition"].hide();
             this.refreshTable();
