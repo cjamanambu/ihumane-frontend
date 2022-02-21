@@ -2,6 +2,7 @@
 import Layout from "@/views/layouts/main";
 import PageHeader from "@/components/page-header";
 import appConfig from "@/app.config";
+
 import { required } from "vuelidate/lib/validators";
 
 export default {
@@ -17,6 +18,7 @@ export default {
     this.refreshTable();
     this.getEmployees();
   },
+
   validations: {
     name: { required },
     t3_code: { required },
@@ -25,10 +27,24 @@ export default {
     refreshTable() {
       this.apiGet(this.ROUTES.department, "Get Departments Error").then(
         (res) => {
-          //console.log({res});
+
           const { data } = res;
-          this.depts = data;
+          this.depts = data.departments;
+          this.sectorLeads = data.sectorsLeads;
           this.totalRows = this.depts.length;
+          this.depts.forEach((dep, index)=>{
+            this.depts[index] = {sn:++index, ...dep}
+          });
+          this.depts.forEach((depart) => {
+            this.sectorLeads.forEach((lead) => {
+              if (
+                      depart.d_sector_lead_id === parseFloat(lead.emp_id)
+              ) {
+                depart["leader"] = `${lead.emp_first_name} ${lead.emp_last_name !== null ? lead.emp_last_name : ''} ${lead.emp_other_name !== null ? lead.emp_other_name : ''}`;
+              }
+            });
+          });
+          console.log(this.depts);
         }
       );
     },
@@ -61,7 +77,7 @@ export default {
         data.forEach((emp) => {
           this.employee_list.push({
             value: emp.emp_id,
-            text: `${emp.emp_first_name} ${emp.emp_last_name} ${emp.emp_other_name}`,
+            text: `${emp.emp_first_name} ${emp.emp_last_name} ${emp.emp_other_name !== null ? emp.emp_other_name : ''}`,
           });
         });
       })
@@ -96,6 +112,7 @@ export default {
         const data = {
           department_name: this.name,
           t3_code: this.t3_code,
+          sector_lead: this.sector_lead
         };
         const url = `${this.ROUTES.department}/${this.deptID}`;
         this.apiPatch(url, data, "Update Department Error").then((res) => {
@@ -125,6 +142,7 @@ export default {
         },
       ],
       depts: [],
+      sectorLeads: [],
       totalRows: 1,
       currentPage: 1,
       perPage: 10,
@@ -134,10 +152,10 @@ export default {
       sortBy: "department_id",
       sortDesc: false,
       fields: [
-        { key: "department_id", sortable: true },
+        { key: "sn", label:"S/No.", sortable: true },
         { key: "department_name", sortable: true },
         { key: "d_t3_code", label: "T3 Code", sortable: true },
-        { key: "d_sector_lead_id", label: "Sector Lead", sortable: true },
+        { key: "leader", label: "Sector Lead", sortable: true },
       ],
       name: null,
       t3_code: null,
@@ -218,6 +236,8 @@ export default {
                 select-mode="single"
                 @row-selected="selectDept"
               >
+
+
               </b-table>
             </div>
             <div class="row">
@@ -341,6 +361,19 @@ export default {
             class="form-control"
             :class="{
               'is-invalid': submitted && $v.t3_code.$error,
+            }"
+          />
+        </div>
+        <div class="form-group">
+          <label for="t3_code">
+            Sector Lead <span class="text-danger">*</span>
+          </label>
+          <b-form-select
+                  id="department"
+                  v-model="sector_lead"
+                  :options="employee_list"
+                  :class="{
+              'is-invalid': submitted && $v.employee_list.$error,
             }"
           />
         </div>
