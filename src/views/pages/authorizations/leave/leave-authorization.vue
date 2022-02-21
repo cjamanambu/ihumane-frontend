@@ -19,7 +19,7 @@ export default {
   },
   mounted() {
     this.fetchRequest();
-    this.getAuthorizingRoles();
+    this.getAuthorizingRoles(1);//leave app
   },
   validations: {
     comment: { required },
@@ -75,8 +75,8 @@ export default {
         this.t3 = res.data.job_role;
       });
     },
-    getAuthorizingRoles(){
-      const url = `${this.ROUTES.authorizationRole}`;
+    getAuthorizingRoles(type){ //1=leave,2=time sheet,3=travel
+      const url = `${this.ROUTES.authorizationRole}/${type}`;
       this.apiGet(url, "Couldn't get authorizing roles").then((res)=>{
         const { data} = res;
         data.map((role) => {
@@ -154,7 +154,7 @@ export default {
       }],
       roleId:null,
       comment: null,
-      final: true,
+      final: false,
       official: null,
       officials: [
         {
