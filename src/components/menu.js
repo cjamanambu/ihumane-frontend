@@ -4,16 +4,21 @@ export const menuItems = [
     label: "Administrative Menu",
     isTitle: true,
   },
-
   {
     id: 2,
     label: "Dashboard",
     icon: "ri-dashboard-line",
-    badge: {
-      variant: "success",
-      text: "menuitems.dashboard.badge",
-    },
+    // badge: {
+    //   variant: "success",
+    //   text: "menuitems.dashboard.badge",
+    // },
     link: "/",
+  },
+  {
+    id: 2,
+    label: "Reports",
+    icon: "ri-pie-chart-2-line",
+    link: "/reports",
   },
   {
     id: 3,
@@ -104,7 +109,7 @@ export const menuItems = [
           },
           {
             id: 16,
-            label: "Departments",
+            label: "Sectors",
             link: "/departments",
           },
           {
