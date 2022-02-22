@@ -131,7 +131,7 @@ export default {
       my_status: null,
       donor: null,
       t2Codes: [],
-      final: 1,
+      final: 0,
       official: null,
       comment: null,
       allocationId: null,
@@ -353,15 +353,7 @@ export default {
                     v-model="comment"
                   />
                 </b-form-group>
-                <b-form-group>
-                  <b-form-select
-                          v-model="roleId"
-                          :options="roles"
-                          :class="{
-                      'is-invalid': submitted && $v.roleId.$error,
-                    }"
-                  />
-                </b-form-group>
+
                 <div class="d-flex">
                   <button
                     @click="authorizationHandler(1)"
@@ -383,6 +375,15 @@ export default {
                     rows="5"
                     no-resize
                     placeholder="Leave your comments here.."
+                  />
+                </b-form-group>
+                <b-form-group>
+                  <b-form-select
+                          v-model="roleId"
+                          :options="roles"
+                          :class="{
+                      'is-invalid': submitted && $v.roleId.$error,
+                    }"
                   />
                 </b-form-group>
                 <b-form-group>
