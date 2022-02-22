@@ -47,6 +47,15 @@ export default {
       ],
     };
   },
+  mounted() {
+    this.check();
+  },
+  methods: {
+    check() {
+      const url = `${this.ROUTES.employee}/get-employee/${this.getEmployee.emp_id}`;
+      this.apiGet(url);
+    },
+  },
 };
 </script>
 
