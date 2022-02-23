@@ -28,6 +28,8 @@ export default {
         data.forEach((paymentDefinition) => {
           this.newFields.push(`${paymentDefinition.pd_payment_name}`);
         });
+        this.newFields.push("grossSalary");
+        this.newFields.push("totalDeduction");
         this.newFields.push("netSalary");
         this.newFields.forEach((newField) => {
           if (newField === "sn") {
@@ -36,6 +38,10 @@ export default {
             this.jsonFields["EMPLOYEE NAME"] = newField;
           } else if (newField === "netSalary") {
             this.jsonFields["NET SALARY"] = newField;
+          } else if (newField === "grossSalary") {
+            this.jsonFields["GROSS SALARY"] = newField;
+          } else if (newField === "totalDeduction") {
+            this.jsonFields["TOTAL DEDUCTION"] = newField;
           } else {
             this.jsonFields[newField.toUpperCase()] = newField;
           }
@@ -69,6 +75,12 @@ export default {
               deduction.amount.toFixed(2)
             ).toLocaleString();
           });
+          emolumentObj["grossSalary"] = parseFloat(
+            emolument.grossSalary.toFixed(2)
+          ).toLocaleString();
+          emolumentObj["totalDeduction"] = parseFloat(
+            emolument.totalDeduction.toFixed(2)
+          ).toLocaleString();
           emolumentObj["netSalary"] = parseFloat(
             emolument.netSalary.toFixed(2)
           ).toLocaleString();
