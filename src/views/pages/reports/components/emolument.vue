@@ -25,12 +25,13 @@ export default {
         }
       });
     },
-    generate() {
+    async generate() {
       let data, pym_month, pym_year;
       if (!this.useCurrent && !this.pmyDate) {
         this.apiFormHandler("Emolument Report");
       } else {
         if (this.useCurrent) {
+          await this.fetchPMY();
           pym_month = parseFloat(this.pmyMonth);
           pym_year = parseFloat(this.pmyYear);
           data = {
