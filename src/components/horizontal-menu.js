@@ -63,8 +63,8 @@ export const menuItems = [
     subItems: [
       {
         id: 8,
-        label: "PaySlips",
-        link: "/pay-slips",
+        label: "Payslip",
+        link: "/payslip",
       },
     ],
   },
