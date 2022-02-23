@@ -42,7 +42,6 @@ export default {
     async fetchPayslip() {
       const url = `${this.ROUTES.salary}/pull-salary-routine/${this.$route.params.empID}`;
       await this.apiGet(url, "Get Payslip Error").then((res) => {
-        console.log({ res });
         const { data } = res;
         if (data) {
           this.payslipData = data;
