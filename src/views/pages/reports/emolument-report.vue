@@ -2,6 +2,7 @@
 import Layout from "@/views/layouts/main";
 import PageHeader from "@/components/page-header";
 import appConfig from "@/app.config";
+import JsonExcel from "vue-json-excel";
 export default {
   page: {
     title: "Emolument Report",
@@ -10,6 +11,7 @@ export default {
   components: {
     Layout,
     PageHeader,
+    JsonExcel,
   },
   async mounted() {
     await this.fetchPaymentDefinitions();
@@ -27,6 +29,17 @@ export default {
           this.newFields.push(`${paymentDefinition.pd_payment_name}`);
         });
         this.newFields.push("netSalary");
+        this.newFields.forEach((newField) => {
+          if (newField === "sn") {
+            this.jsonFields["S/N"] = newField;
+          } else if (newField === "employeeName") {
+            this.jsonFields["EMPLOYEE NAME"] = newField;
+          } else if (newField === "netSalary") {
+            this.jsonFields["NET SALARY"] = newField;
+          } else {
+            this.jsonFields[newField.toUpperCase()] = newField;
+          }
+        });
         await this.refreshTable();
       });
     },
@@ -137,6 +150,7 @@ export default {
         { key: "netSalary", label: "Net Salary", sortable: true },
       ],
       newFields: ["sn", "employeeName"],
+      jsonFields: {},
     };
   },
 };
@@ -156,12 +170,22 @@ export default {
       <div class="col-12">
         <div class="card">
           <div class="card-body">
-            <div class="p-3 bg-light mb-4">
+            <div class="p-3 bg-light mb-4 d-flex justify-content-between">
               <h5 class="font-size-14 mb-0" v-if="period">
                 Emolument Report For Payroll Period:
                 {{ (parseInt(period[0]) - 1) | getMonth }}
                 {{ period[1] }}
               </h5>
+              <span class="font-size-12 text-success">
+                <JsonExcel
+                  style="cursor: pointer"
+                  :data="newEmoluments"
+                  :fields="jsonFields"
+                  name="Emolument_Report.xls"
+                >
+                  Export to Excel
+                </JsonExcel>
+              </span>
             </div>
             <div class="row mt-4">
               <div class="col-sm-12 col-md-6">
@@ -200,9 +224,9 @@ export default {
             <div class="table-responsive mb-0" v-if="newEmoluments.length">
               <b-table
                 ref="emolument-table"
-                small
                 bordered
                 hover
+                small
                 :items="newEmoluments"
                 :fields="newFields"
                 striped
