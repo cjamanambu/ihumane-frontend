@@ -59,17 +59,6 @@ export default {
           }
         });
       }
-      // if (this.useCurrent) {
-      //   console.log(parseFloat(this.pmyMonth), parseFloat(this.pmyYear));
-      //   data;
-      // } else {
-      //   if (this.pmyDate) {
-      //     console.log(this.pmyDate);
-      //     let date = this.pmyDate.split("-");
-      //     console.log({ date });
-      //   } else {
-      //   }
-      // }
     },
   },
 };
