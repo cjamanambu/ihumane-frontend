@@ -11,10 +11,25 @@ export default {
     Layout,
     PageHeader,
   },
-  mounted() {
-    this.refreshTable();
+  async mounted() {
+    await this.fetchPaymentDefinitions();
   },
   methods: {
+    fetchPaymentDefinitions() {
+      this.paymentDefinitions = [];
+      this.apiGet(
+        this.ROUTES.paymentDefinition,
+        "Get Payment Definitions Error"
+      ).then(async (res) => {
+        const { data } = res;
+        this.paymentDefinitions = data;
+        data.forEach((paymentDefinition) => {
+          this.newFields.push(`${paymentDefinition.pd_payment_name}`);
+        });
+        this.newFields.push("netSalary");
+        await this.refreshTable();
+      });
+    },
     refreshTable() {
       this.period = this.$route.params.period;
       this.period = this.period.split("-");
@@ -27,7 +42,24 @@ export default {
         const { data } = res;
         console.log({ data });
         data.forEach((emolument, index) => {
-          this.emoluments[index] = { sn: ++index, ...emolument };
+          let emolumentObj = {
+            sn: ++index,
+            employeeName: emolument.employeeName,
+          };
+          emolument.incomes.forEach((income) => {
+            emolumentObj[income.paymentName] = parseFloat(
+              income.amount.toFixed(2)
+            ).toLocaleString();
+          });
+          emolument.deductions.forEach((deduction) => {
+            emolumentObj[deduction.paymentName] = parseFloat(
+              deduction.amount.toFixed(2)
+            ).toLocaleString();
+          });
+          emolumentObj["netSalary"] = parseFloat(
+            emolument.netSalary.toFixed(2)
+          ).toLocaleString();
+          this.newEmoluments.push(emolumentObj);
         });
         this.totalRows = this.emoluments.length;
       });
@@ -36,6 +68,24 @@ export default {
       // Trigger pagination to update the number of buttons/pages due to filtering
       this.totalRows = filteredItems.length;
       this.currentPage = 1;
+    },
+    decimalPlaces(float, length) {
+      let ret = "";
+      let str = float.toString();
+      let array = str.split(".");
+      if (array.length === 2) {
+        ret += array[0] + ".";
+        for (let i = 0; i < length; i++) {
+          if (i >= array[1].length) ret += "0";
+          else ret += array[1][i];
+        }
+      } else if (array.length === 1) {
+        ret += array[0] + ".";
+        for (let i = 0; i < length; i++) {
+          ret += "0";
+        }
+      }
+      return ret;
     },
   },
   data() {
@@ -56,6 +106,8 @@ export default {
       ],
       period: null,
       emoluments: [],
+      newEmoluments: [],
+      paymentDefinitions: [],
       totalRows: 1,
       currentPage: 1,
       perPage: 10,
@@ -84,6 +136,7 @@ export default {
         },
         { key: "netSalary", label: "Net Salary", sortable: true },
       ],
+      newFields: ["sn", "employeeName"],
     };
   },
 };
@@ -144,13 +197,15 @@ export default {
               <!-- End search -->
             </div>
             <!-- Table -->
-            <div class="table-responsive mb-0" v-if="emoluments.length">
+            <div class="table-responsive mb-0" v-if="newEmoluments.length">
               <b-table
                 ref="emolument-table"
+                small
                 bordered
                 hover
-                :items="emoluments"
-                :fields="fields"
+                :items="newEmoluments"
+                :fields="newFields"
+                striped
                 responsive="sm"
                 :per-page="perPage"
                 :current-page="currentPage"
@@ -161,50 +216,23 @@ export default {
                 @filtered="onFiltered"
                 show-empty
               >
-                <template #cell(income)="row">
-                  <div
-                    class="d-flex justify-content-between"
-                    v-for="(income, index) in row.item.incomes"
-                    :key="index"
-                  >
-                    <small>{{ income.paymentName }}</small>
-                    <small class="text-muted">
-                      {{ parseFloat(income.amount).toLocaleString() }}
-                    </small>
-                  </div>
-                  <strong
-                    class="d-flex justify-content-between mt-1 text-success"
-                  >
-                    <span>Total</span>
-                    <span>
-                      {{ parseFloat(row.item.grossSalary).toLocaleString() }}
-                    </span>
-                  </strong>
+                <template #cell(sn)="row">
+                  <span>
+                    {{ row.value }}
+                  </span>
                 </template>
-                <template #cell(deduction)="row">
-                  <div
-                    class="d-flex justify-content-between"
-                    v-for="(deduction, index) in row.item.deductions"
-                    :key="index"
-                  >
-                    <small>{{ deduction.paymentName }}</small>
-                    <small class="text-muted">
-                      {{ parseFloat(deduction.amount).toLocaleString() }}
-                    </small>
-                  </div>
-                  <strong
-                    class="d-flex justify-content-between mt-1 text-danger"
-                  >
-                    <span>Total</span>
-                    <span>
-                      {{ parseFloat(row.item.totalDeduction).toLocaleString() }}
-                    </span>
-                  </strong>
+                <template #cell(employeeName)="row">
+                  <span>
+                    {{ row.value }}
+                  </span>
+                </template>
+                <template #cell()="data">
+                  <span class="float-right">{{ data.value }}</span>
                 </template>
                 <template #cell(netSalary)="row">
-                  <p class="mb-0">
-                    {{ row.value.toLocaleString() }}
-                  </p>
+                  <span class="float-right">
+                    {{ row.value }}
+                  </span>
                 </template>
               </b-table>
             </div>
