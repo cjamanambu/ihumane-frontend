@@ -48,7 +48,6 @@ export default {
         }
         const url = `${this.ROUTES.salary}/pull-emolument`;
         this.apiPost(url, data, "Generate Emolument Report").then((res) => {
-          console.log({ res });
           const { data } = res;
           if (data.length) {
             //route to new page and make request again
