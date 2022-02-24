@@ -4,6 +4,7 @@ import PageHeader from "@/components/page-header";
 import appConfig from "@/app.config";
 import { authComputed } from "@/state/helpers";
 import {required} from "vuelidate/lib/validators";
+import Multiselect from "vue-multiselect";
 export default {
   page: {
     title: "Time Sheet Authorization",
@@ -15,6 +16,7 @@ export default {
   components: {
     Layout,
     PageHeader,
+    Multiselect,
   },
   mounted() {
     this.fetchRequest();
@@ -52,6 +54,12 @@ export default {
         }
       });
     },
+    authorizingAsLabel ({ text }) {
+      return `${text}`
+    },
+    nextAuthorizingOfficer ({ text }) {
+      return `${text}`
+    },
     getLocation(locationId){
 
       const url = `${this.ROUTES.location}/${locationId}`
@@ -88,10 +96,10 @@ export default {
           status: val,
           officer: this.getEmployee.emp_id,
           type: 2,
-          role: this.roleId,
+          role: this.roleId.value,
           comment: this.comment,
           markAsFinal: this.final,
-          nextOfficer: this.nextOfficer,
+          nextOfficer: this.nextOfficer.value,
         };
         this.apiPost(url, data, "Authorization Error")
           .then((res) => {
@@ -378,16 +386,24 @@ export default {
                   />
                 </b-form-group>
                 <b-form-group>
-                  <b-form-select
+                  <multiselect
                           v-model="roleId"
                           :options="roles"
+                          :custom-label="authorizingAsLabel"
                           :class="{
                       'is-invalid': submitted && $v.roleId.$error,
                     }"
-                  />
+                  ></multiselect>
                 </b-form-group>
                 <b-form-group>
-                  <b-form-select v-model="official" :options="officials" />
+                  <multiselect
+                          v-model="official"
+                          :options="officials"
+                          :custom-label="nextAuthorizingOfficer"
+                          :class="{
+                      'is-invalid': submitted && $v.official.$error,
+                    }"
+                  ></multiselect>
                 </b-form-group>
                 <div>
                   <button class="btn btn-success w-100 mr-3">
