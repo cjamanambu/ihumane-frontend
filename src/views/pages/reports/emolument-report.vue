@@ -25,10 +25,10 @@ export default {
       ).then(async (res) => {
         const { data } = res;
         this.paymentDefinitions = data;
-        data.forEach((paymentDefinition) => {
-          this.newFields.push(`${paymentDefinition.pd_payment_name}`);
-        });
+        await this.processFields(data);
+        this.newFields.push(...this.incomeFields);
         this.newFields.push("grossSalary");
+        this.newFields.push(...this.deductionFields);
         this.newFields.push("totalDeduction");
         this.newFields.push("netSalary");
         this.newFields.forEach((newField) => {
@@ -112,6 +112,15 @@ export default {
       }
       return ret;
     },
+    async processFields(data) {
+      await data.forEach((paymentDefinition, index) => {
+        if (paymentDefinition.pd_payment_type === 1) {
+          this.incomeFields.push(data[index].pd_payment_name);
+        } else if (paymentDefinition.pd_payment_type === 2) {
+          this.deductionFields.push(data[index].pd_payment_name);
+        }
+      });
+    },
   },
   data() {
     return {
@@ -162,6 +171,8 @@ export default {
         { key: "netSalary", label: "Net Salary", sortable: true },
       ],
       newFields: ["sn", "employeeName"],
+      incomeFields: [],
+      deductionFields: [],
       jsonFields: {},
     };
   },
