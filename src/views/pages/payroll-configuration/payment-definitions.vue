@@ -52,9 +52,9 @@ export default {
       this.apiGet(
         this.ROUTES.paymentDefinition,
         "Get Payment Definitions Error"
-      ).then(async (res) => {
+      ).then((res) => {
         const { data } = res;
-        await data.forEach((paymentDefinition, index) => {
+        data.forEach((paymentDefinition, index) => {
           this.paymentDefinitions[index] = {
             sn: ++index,
             ...paymentDefinition,
