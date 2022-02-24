@@ -44,7 +44,12 @@ export default {
         "Get Location Allowances Error"
       ).then((res) => {
         const { data } = res;
-        this.locationAllowances = data;
+        data.forEach((locationAllowance, index) => {
+          this.locationAllowances[index] = {
+            sn: ++index,
+            ...locationAllowance,
+          };
+        });
         this.totalRows = this.locationAllowances.length;
       });
     },
@@ -164,10 +169,10 @@ export default {
       pageOptions: [10, 25, 50, 100],
       filter: null,
       filterOn: [],
-      sortBy: "la_id",
+      sortBy: "sn",
       sortDesc: false,
       fields: [
-        { key: "la_id", label: "ID", sortable: true },
+        { key: "sn", label: "S/n", sortable: true },
         { key: "Location", label: "Location", sortable: true },
         {
           key: "PaymentDefinition",

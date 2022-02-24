@@ -26,7 +26,9 @@ export default {
         "Get Pension Providers Error"
       ).then((res) => {
         const { data } = res;
-        this.pensionProviders = data;
+        data.forEach((pensionProvider, index) => {
+          this.pensionProviders[index] = { sn: ++index, ...pensionProvider };
+        });
         this.totalRows = this.pensionProviders.length;
       });
     },
@@ -112,10 +114,10 @@ export default {
       pageOptions: [10, 25, 50, 100],
       filter: null,
       filterOn: [],
-      sortBy: "pension_provider_id",
+      sortBy: "sn",
       sortDesc: false,
       fields: [
-        { key: "pension_provider_id", label: "ID", sortable: true },
+        { key: "sn", label: "S/n", sortable: true, thStyle: { width: "5%" } },
         { key: "provider_name", label: "Pension Provider", sortable: true },
       ],
       name: null,

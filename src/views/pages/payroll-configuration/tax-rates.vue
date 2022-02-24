@@ -22,7 +22,6 @@ export default {
     },
   },
   mounted() {
-    this.refreshMTR();
     this.refreshTable();
   },
   validations: {
@@ -48,12 +47,17 @@ export default {
         }
       });
     },
-    refreshTable() {
-      this.apiGet(this.ROUTES.taxRate, "Get Tax Rates Error").then((res) => {
-        const { data } = res;
-        this.trs = data;
-        this.totalRows = this.trs.length;
-      });
+    async refreshTable() {
+      await this.apiGet(this.ROUTES.taxRate, "Get Tax Rates Error").then(
+        (res) => {
+          const { data } = res;
+          data.forEach((tr, index) => {
+            this.trs[index] = { sn: ++index, ...tr };
+          });
+          this.totalRows = this.trs.length;
+        }
+      );
+      this.refreshMTR();
     },
     selectMTR() {
       this.mtrRate = this.mtr;
@@ -197,10 +201,10 @@ export default {
       pageOptions: [10, 25, 50, 100],
       filter: null,
       filterOn: [],
-      sortBy: "tr_id",
+      sortBy: "sn",
       sortDesc: false,
       fields: [
-        { key: "tr_id", label: "ID", sortable: true },
+        { key: "sn", label: "S/n", sortable: true },
         { key: "tr_band", label: "Band", sortable: true },
         { key: "tr_rate", label: "Rate", sortable: true },
       ],
@@ -361,7 +365,7 @@ export default {
             v-model="mtrRate"
             min="1"
             max="100"
-            step=".10"
+            step="1"
           />
         </div>
         <b-button
@@ -398,7 +402,7 @@ export default {
             v-model="mtrRate"
             min="1"
             max="100"
-            step=".10"
+            step="1"
           />
         </div>
         <b-button

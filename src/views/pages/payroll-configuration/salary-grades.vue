@@ -46,7 +46,9 @@ export default {
       this.apiGet(this.ROUTES.salaryGrade, "Get Salary Grades Error").then(
         (res) => {
           const { data } = res;
-          this.salaryGrades = data;
+          data.forEach((salaryGrade, index) => {
+            this.salaryGrades[index] = { sn: ++index, ...salaryGrade };
+          });
           this.totalRows = this.salaryGrades.length;
         }
       );
@@ -153,10 +155,10 @@ export default {
       pageOptions: [10, 25, 50, 100],
       filter: null,
       filterOn: [],
-      sortBy: "sg_id",
+      sortBy: "sn",
       sortDesc: false,
       fields: [
-        { key: "sg_id", label: "ID", sortable: true },
+        { key: "sn", label: "S/n", sortable: true },
         { key: "sg_name", label: "Salary Grade", sortable: true },
         { key: "sg_minimum", label: "Salary Grade Minimum", sortable: true },
         { key: "sg_midpoint", label: "Salary Grade Midpoint", sortable: true },
