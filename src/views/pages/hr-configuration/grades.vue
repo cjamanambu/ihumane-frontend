@@ -23,7 +23,9 @@ export default {
     refreshTable() {
       this.apiGet(this.ROUTES.grade, "Get Grades Error").then((res) => {
         const { data } = res;
-        this.grades = data;
+        data.forEach((grade, index) => {
+          this.grades[index] = { sn: ++index, ...grade };
+        });
         this.totalRows = this.grades.length;
       });
     },
@@ -103,11 +105,11 @@ export default {
       pageOptions: [10, 25, 50, 100],
       filter: null,
       filterOn: [],
-      sortBy: "grade_id",
+      sortBy: "sn",
       sortDesc: false,
       submitted: false,
       fields: [
-        { key: "grade_id", sortable: true },
+        { key: "sn", label: "S/n", sortable: true, thStyle: { width: "5%" } },
         { key: "grade_name", sortable: true },
       ],
       name: null,
