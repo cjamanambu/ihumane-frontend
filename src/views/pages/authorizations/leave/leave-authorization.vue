@@ -4,6 +4,7 @@ import PageHeader from "@/components/page-header";
 import appConfig from "@/app.config";
 import { authComputed } from "@/state/helpers";
 import { required } from "vuelidate/lib/validators";
+import Multiselect from 'vue-multiselect';
 
 export default {
   page: {
@@ -16,6 +17,7 @@ export default {
   components: {
     Layout,
     PageHeader,
+    Multiselect
   },
   mounted() {
     this.fetchRequest();
@@ -75,6 +77,12 @@ export default {
         this.t3 = res.data.job_role;
       });
     },
+    authorizingAsLabel ({ text }) {
+      return `${text}`
+    },
+    nextAuthorizingOfficer ({ text }) {
+      return `${text}`
+    },
     getAuthorizingRoles(type){ //1=leave,2=time sheet,3=travel
       const url = `${this.ROUTES.authorizationRole}/${type}`;
       this.apiGet(url, "Couldn't get authorizing roles").then((res)=>{
@@ -106,14 +114,14 @@ export default {
           appId: this.application.leapp_id.toString(),
           type: 1,
           comment: this.comment,
-          role: this.roleId,
+          role: this.roleId.value,
           markAsFinal,
           officer: this.getEmployee.emp_id,
         };
         type === "approve" || type === "forward"
           ? (data.status = 1)
           : (data.status = 2);
-        !this.final ? (data.nextOfficer = this.official) : "";
+        !this.final ? (data.nextOfficer = this.official.value) : "";
         this.apiPost(this.ROUTES.authorization, data)
           .then((res) => {
             this.$router.push({ name: "leave-authorization" }).then(() => {
@@ -398,13 +406,14 @@ export default {
                 />
               </b-form-group>
               <b-form-group>
-                <b-form-select
+                <multiselect
                         v-model="roleId"
                         :options="roles"
+                        :custom-label="authorizingAsLabel"
                         :class="{
                       'is-invalid': submitted && $v.roleId.$error,
                     }"
-                />
+                ></multiselect>
               </b-form-group>
               <div class="d-flex" v-if="final">
                 <button
@@ -430,13 +439,14 @@ export default {
               </div>
               <div v-else>
                 <b-form-group>
-                  <b-form-select
-                    v-model="official"
-                    :options="officials"
-                    :class="{
+                  <multiselect
+                          v-model="official"
+                          :options="officials"
+                          :custom-label="nextAuthorizingOfficer"
+                          :class="{
                       'is-invalid': submitted && $v.official.$error,
                     }"
-                  />
+                  ></multiselect>
                 </b-form-group>
                 <div>
                   <button

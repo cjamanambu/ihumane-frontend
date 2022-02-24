@@ -4,6 +4,7 @@ import PageHeader from "@/components/page-header";
 import appConfig from "@/app.config";
 import { authComputed } from "@/state/helpers";
 import { required } from "vuelidate/lib/validators";
+import Multiselect from 'vue-multiselect';
 
 export default {
   page: {
@@ -16,6 +17,7 @@ export default {
   components: {
     Layout,
     PageHeader,
+    Multiselect
   },
   mounted() {
     this.fetchRequest();
@@ -38,7 +40,7 @@ export default {
         this.breakdowns = breakdown;
         this.expenses = expenses;
         this.log = log;
-        console.log(log)
+        //console.log(log)
         this.checkCurrentStatus();
         this.fetchDonorInfo();
         this.fetchExpenses();
@@ -46,6 +48,12 @@ export default {
         this.getLocation(application.applicant.emp_location_id);
         this.getSector(application.applicant.emp_job_role_id);
       });
+    },
+    authorizingAsLabel ({ text }) {
+      return `${text}`
+    },
+    nextAuthorizingOfficer ({ text }) {
+      return `${text}`
     },
     getAuthorizingRoles(type){ //1=leave,2=time sheet,3=travel
       const url = `${this.ROUTES.authorizationRole}/${type}`;
@@ -128,6 +136,7 @@ export default {
       });
     },
     submit(type) {
+
       this.submitted = true;
       if (this.type === "approve") {
         this.approving = true;
@@ -145,14 +154,14 @@ export default {
           appId: this.application.travelapp_id.toString(),
           type: 3,
           comment: this.comment,
-          role: this.roleId,
+          role: this.roleId.value,
           markAsFinal,
           officer: this.getEmployee.emp_id,
         };
         type === "approve" || type === "forward"
           ? (data.status = 1)
           : (data.status = 2);
-        !this.final ? (data.nextOfficer = this.official) : "";
+        !this.final ? (data.nextOfficer = this.official.value) : "";
         this.apiPost(this.ROUTES.authorization, data)
           .then((res) => {
             this.$router.push({ name: "travel-authorization" }).then(() => {
@@ -638,13 +647,14 @@ export default {
                 />
               </b-form-group>
                 <b-form-group>
-                  <b-form-select
+                  <multiselect
                           v-model="roleId"
                           :options="roles"
+                          :custom-label="authorizingAsLabel"
                           :class="{
                       'is-invalid': submitted && $v.roleId.$error,
                     }"
-                  />
+                  ></multiselect>
                 </b-form-group>
               <div class="d-flex" v-if="final">
                 <button
@@ -670,13 +680,14 @@ export default {
               </div>
               <div v-else>
                 <b-form-group>
-                  <b-form-select
+                  <multiselect
                     v-model="official"
                     :options="officials"
+                    :custom-label="nextAuthorizingOfficer"
                     :class="{
                       'is-invalid': submitted && $v.official.$error,
                     }"
-                  />
+                  ></multiselect>
                 </b-form-group>
                 <div>
                   <button
