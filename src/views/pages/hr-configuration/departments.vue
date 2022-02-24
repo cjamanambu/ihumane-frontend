@@ -7,7 +7,7 @@ import { required } from "vuelidate/lib/validators";
 
 export default {
   page: {
-    title: "Departments",
+    title: "Sector",
     meta: [{ name: "description", content: appConfig.description }],
   },
   components: {
@@ -27,24 +27,22 @@ export default {
     refreshTable() {
       this.apiGet(this.ROUTES.department, "Get Departments Error").then(
         (res) => {
-
           const { data } = res;
           this.depts = data.departments;
           this.sectorLeads = data.sectorsLeads;
           this.totalRows = this.depts.length;
-          this.depts.forEach((dep, index)=>{
-            this.depts[index] = {sn:++index, ...dep}
+          this.depts.forEach((dep, index) => {
+            this.depts[index] = { sn: ++index, ...dep };
           });
           this.depts.forEach((depart) => {
             this.sectorLeads.forEach((lead) => {
-              if (
-                      depart.d_sector_lead_id === parseFloat(lead.emp_id)
-              ) {
-                depart["leader"] = `${lead.emp_first_name} ${lead.emp_last_name !== null ? lead.emp_last_name : ''} ${lead.emp_other_name !== null ? lead.emp_other_name : ''}`;
+              if (depart.d_sector_lead_id === parseFloat(lead.emp_id)) {
+                depart["leader"] = `${lead.emp_first_name} ${
+                  lead.emp_last_name !== null ? lead.emp_last_name : ""
+                } ${lead.emp_other_name !== null ? lead.emp_other_name : ""}`;
               }
             });
           });
-          console.log(this.depts);
         }
       );
     },
@@ -60,16 +58,17 @@ export default {
     },
     selectDept(dept) {
       dept = dept[0];
+      console.log({ dept });
       this.deptID = dept.department_id;
       this.name = dept.department_name;
       this.t3_code = dept.d_t3_code;
-      this.sector_lead = dept.d_selector_lead_id;
+      this.sector_lead = dept.d_sector_lead_id;
       this.$refs["update-dept"].show();
       this.$refs["dept-table"].clearSelected();
     },
-    getEmployees(){
+    getEmployees() {
       const url = `${this.ROUTES.employee}`;
-      this.apiGet(url, "Couldn't get employees").then((res)=>{
+      this.apiGet(url, "Couldn't get employees").then((res) => {
         this.employee_list = [
           { value: null, text: "Please select sector lead" },
         ];
@@ -77,10 +76,12 @@ export default {
         data.forEach((emp) => {
           this.employee_list.push({
             value: emp.emp_id,
-            text: `${emp.emp_first_name} ${emp.emp_last_name} ${emp.emp_other_name !== null ? emp.emp_other_name : ''}`,
+            text: `${emp.emp_first_name} ${emp.emp_last_name} ${
+              emp.emp_other_name !== null ? emp.emp_other_name : ""
+            }`,
           });
         });
-      })
+      });
     },
     submitNew() {
       this.submitted = true;
@@ -91,7 +92,7 @@ export default {
         const data = {
           department_name: this.name,
           t3_code: this.t3_code,
-          sector_lead: this.sector_lead
+          sector_lead: this.sector_lead,
         };
         this.apiPost(this.ROUTES.department, data, "Add Department Error").then(
           (res) => {
@@ -112,7 +113,7 @@ export default {
         const data = {
           department_name: this.name,
           t3_code: this.t3_code,
-          sector_lead: this.sector_lead
+          sector_lead: this.sector_lead,
         };
         const url = `${this.ROUTES.department}/${this.deptID}`;
         this.apiPatch(url, data, "Update Department Error").then((res) => {
@@ -127,7 +128,7 @@ export default {
   data() {
     return {
       submitting: false,
-      title: "Departments",
+      title: "Sectors",
       items: [
         {
           text: "IHUMANE",
@@ -137,7 +138,7 @@ export default {
           href: "/",
         },
         {
-          text: "Departments",
+          text: "Sectors",
           active: true,
         },
       ],
@@ -149,18 +150,18 @@ export default {
       pageOptions: [10, 25, 50, 100],
       filter: null,
       filterOn: [],
-      sortBy: "department_id",
+      sortBy: "sn",
       sortDesc: false,
       fields: [
-        { key: "sn", label:"S/No.", sortable: true },
-        { key: "department_name", sortable: true },
+        { key: "sn", label: "S/n", sortable: true, thStyle: { width: "5%" } },
+        { key: "department_name", label: "Sector Name", sortable: true },
         { key: "d_t3_code", label: "T3 Code", sortable: true },
         { key: "leader", label: "Sector Lead", sortable: true },
       ],
       name: null,
       t3_code: null,
       deptID: null,
-      sector_lead:null,
+      sector_lead: null,
       employee_list: [{ value: null, text: "Please select a sector lead" }],
       submitted: false,
     };
@@ -174,7 +175,7 @@ export default {
     <div class="d-flex justify-content-end mb-3">
       <b-button class="btn btn-success" @click="$refs['add-dept'].show()">
         <i class="mdi mdi-plus mr-2"></i>
-        Add Department
+        Add Sector
       </b-button>
     </div>
     <b-spinner type="grow" v-if="apiBusy" class="m-2" variant="success" />
@@ -236,8 +237,6 @@ export default {
                 select-mode="single"
                 @row-selected="selectDept"
               >
-
-
               </b-table>
             </div>
             <div class="row">
@@ -262,7 +261,7 @@ export default {
     </div>
     <b-modal
       ref="add-dept"
-      title="Add Department"
+      title="Add Sector"
       hide-footer
       centered
       title-class="font-18"
@@ -271,7 +270,7 @@ export default {
       <form @submit.prevent="submitNew">
         <div class="form-group">
           <label for="name">
-            Department Name <span class="text-danger">*</span>
+            Sector Name <span class="text-danger">*</span>
           </label>
           <input
             id="name"
@@ -302,10 +301,10 @@ export default {
             Sector Lead <span class="text-danger">*</span>
           </label>
           <b-form-select
-                  id="department"
-                  v-model="sector_lead"
-                  :options="employee_list"
-                  :class="{
+            id="department"
+            v-model="sector_lead"
+            :options="employee_list"
+            :class="{
               'is-invalid': submitted && $v.employee_list.$error,
             }"
           />
@@ -329,7 +328,7 @@ export default {
     </b-modal>
     <b-modal
       ref="update-dept"
-      title="Update Department"
+      title="Update Sector"
       hide-footer
       centered
       title-class="font-18"
@@ -338,7 +337,7 @@ export default {
       <form @submit.prevent="submitUpdate">
         <div class="form-group">
           <label for="name">
-            Department Name <span class="text-danger">*</span>
+            Sector Name <span class="text-danger">*</span>
           </label>
           <input
             id="name"
@@ -369,10 +368,10 @@ export default {
             Sector Lead <span class="text-danger">*</span>
           </label>
           <b-form-select
-                  id="department"
-                  v-model="sector_lead"
-                  :options="employee_list"
-                  :class="{
+            id="department"
+            v-model="sector_lead"
+            :options="employee_list"
+            :class="{
               'is-invalid': submitted && $v.employee_list.$error,
             }"
           />

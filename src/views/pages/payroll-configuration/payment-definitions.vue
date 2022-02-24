@@ -19,6 +19,7 @@ export default {
   validations: {
     code: { required },
     name: { required },
+    pdPrGross: { required },
   },
   methods: {
     selectPD(pd) {
@@ -48,13 +49,17 @@ export default {
       this.$v.$reset();
     },
     refreshTable() {
-      this.paymentDefinitions = [];
       this.apiGet(
         this.ROUTES.paymentDefinition,
         "Get Payment Definitions Error"
       ).then((res) => {
         const { data } = res;
-        this.paymentDefinitions = data;
+        data.forEach((paymentDefinition, index) => {
+          this.paymentDefinitions[index] = {
+            sn: ++index,
+            ...paymentDefinition,
+          };
+        });
         this.totalRows = this.paymentDefinitions.length;
       });
     },
@@ -125,7 +130,6 @@ export default {
       }
     },
     onFiltered(filteredItems) {
-      // Trigger pagination to update the number of buttons/pages due to filtering
       this.totalRows = filteredItems.length;
       this.currentPage = 1;
     },
@@ -154,16 +158,16 @@ export default {
       pageOptions: [10, 25, 50, 100],
       filter: null,
       filterOn: [],
-      sortBy: "pd_id",
+      sortBy: "sn",
       sortDesc: false,
       fields: [
-        { key: "pd_id", label: "ID", sortable: true },
+        { key: "sn", label: "S/n", sortable: true },
         { key: "pd_payment_code", label: "Payment Code", sortable: false },
         { key: "pd_payment_name", label: "Name", sortable: true },
         { key: "pd_payment_type", label: "Type", sortable: false },
         { key: "pd_payment_variant", label: "Variant", sortable: false },
         { key: "pd_payment_taxable", label: "Taxable", sortable: false },
-        { key: "pd_desc", label: "Description", sortable: false },
+        // { key: "pd_desc", label: "Description", sortable: false },
         { key: "pd_basic", label: "Basic", sortable: false },
         { key: "pd_tie_number", label: "Tie Number", sortable: false },
       ],
@@ -305,13 +309,13 @@ export default {
                   <p v-if="row.value === 1">TAXABLE</p>
                   <p v-else-if="row.value === 0">NONTAXABLE</p>
                 </template>
-                <template #cell(pd_desc)="row">
-                  <p v-if="row.value === 1">LOAN</p>
-                  <p v-else-if="row.value === 2">TAX</p>
-                  <p v-else-if="row.value === 3">PENSION</p>
-                  <p v-else-if="row.value === 4">HMO</p>
-                  <p v-else>---</p>
-                </template>
+                <!--                <template #cell(pd_desc)="row">-->
+                <!--                  <p v-if="row.value === 1">LOAN</p>-->
+                <!--                  <p v-else-if="row.value === 2">TAX</p>-->
+                <!--                  <p v-else-if="row.value === 3">PENSION</p>-->
+                <!--                  <p v-else-if="row.value === 4">HMO</p>-->
+                <!--                  <p v-else>-&#45;&#45;</p>-->
+                <!--                </template>-->
                 <template #cell(pd_basic)="row">
                   <p v-if="row.value === '1'">BASIC</p>
                   <p v-else-if="row.value === '0'">NONBASIC</p>
@@ -495,7 +499,6 @@ export default {
             </div>
           </div>
         </div>
-
         <b-button
           v-if="!submitting"
           class="btn btn-success btn-block mt-4"

@@ -24,12 +24,13 @@ export default {
     refreshTable() {
       this.apiGet(this.ROUTES.donor, "Get Donors Error").then((res) => {
         const { data } = res;
-        this.donors = data;
+        data.forEach((donor, index) => {
+          this.donors[index] = { sn: ++index, ...donor };
+        });
         this.totalRows = this.donors.length;
       });
     },
     onFiltered(filteredItems) {
-      // Trigger pagination to update the number of buttons/pages due to filtering
       this.totalRows = filteredItems.length;
       this.currentPage = 1;
     },
@@ -114,10 +115,10 @@ export default {
       pageOptions: [10, 25, 50, 100],
       filter: null,
       filterOn: [],
-      sortBy: "donor_id",
+      sortBy: "sn",
       sortDesc: false,
       fields: [
-        { key: "donor_id", label: "ID", sortable: true },
+        { key: "sn", label: "S/n", sortable: true },
         { key: "donor_code", label: "Donor Code", sortable: true },
         {
           key: "donor_description",

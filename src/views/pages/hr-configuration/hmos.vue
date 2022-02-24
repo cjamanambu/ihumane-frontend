@@ -21,7 +21,9 @@ export default {
     refreshTable() {
       this.apiGet(this.ROUTES.hmo, "Get HMOs Error").then((res) => {
         const { data } = res;
-        this.hmos = data;
+        data.forEach((hmo, index) => {
+          this.hmos[index] = { sn: ++index, ...hmo };
+        });
         this.totalRows = this.hmos.length;
       });
     },
@@ -101,11 +103,11 @@ export default {
       pageOptions: [10, 25, 50, 100],
       filter: null,
       filterOn: [],
-      sortBy: "pension_provider_id",
+      sortBy: "sn",
       sortDesc: false,
       fields: [
-        { key: "hmo_id", label: "ID", sortable: true },
-        { key: "hmo_name", label: "Pension Provider", sortable: true },
+        { key: "sn", label: "S/n", sortable: true, thStyle: { width: "5%" } },
+        { key: "hmo_name", label: "HMO", sortable: true },
       ],
       name: null,
       hmoID: null,

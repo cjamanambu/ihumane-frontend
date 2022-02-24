@@ -25,12 +25,13 @@ export default {
         }
       });
     },
-    generate() {
+    async generate() {
       let data, pym_month, pym_year;
       if (!this.useCurrent && !this.pmyDate) {
         this.apiFormHandler("Emolument Report");
       } else {
         if (this.useCurrent) {
+          await this.fetchPMY();
           pym_month = parseFloat(this.pmyMonth);
           pym_year = parseFloat(this.pmyYear);
           data = {
@@ -48,7 +49,6 @@ export default {
         }
         const url = `${this.ROUTES.salary}/pull-emolument`;
         this.apiPost(url, data, "Generate Emolument Report").then((res) => {
-          console.log({ res });
           const { data } = res;
           if (data.length) {
             //route to new page and make request again
@@ -59,17 +59,6 @@ export default {
           }
         });
       }
-      // if (this.useCurrent) {
-      //   console.log(parseFloat(this.pmyMonth), parseFloat(this.pmyYear));
-      //   data;
-      // } else {
-      //   if (this.pmyDate) {
-      //     console.log(this.pmyDate);
-      //     let date = this.pmyDate.split("-");
-      //     console.log({ date });
-      //   } else {
-      //   }
-      // }
     },
   },
 };

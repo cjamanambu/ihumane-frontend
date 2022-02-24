@@ -15,12 +15,6 @@ export const menuItems = [
     link: "/",
   },
   {
-    id: 2,
-    label: "Reports",
-    icon: "ri-pie-chart-2-line",
-    link: "/reports",
-  },
-  {
     id: 3,
     label: "Configuration",
     isTitle: true,
@@ -290,5 +284,11 @@ export const menuItems = [
       //   link: "/approve-payroll",
       // },
     ],
+  },
+  {
+    id: 2,
+    label: "Reports",
+    icon: "ri-pie-chart-2-line",
+    link: "/reports",
   },
 ];
