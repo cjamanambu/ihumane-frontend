@@ -4,12 +4,14 @@ import Layout from "@/views/layouts/main";
 import PageHeader from "@/components/page-header";
 import appConfig from "@/app.config";
 import { required } from "vuelidate/lib/validators";
+import Multiselect from 'vue-multiselect';
+
 export default {
   page: {
     title: "New Employee",
     meta: [{ name: "description", content: appConfig.description }],
   },
-  components: { Layout, PageHeader, FormWizard, TabContent },
+  components: { Layout, PageHeader, FormWizard, TabContent, Multiselect },
   mounted() {
     this.fetchLocations();
     this.fetchPositions();
@@ -29,6 +31,15 @@ export default {
     account_number: { required },
   },
   methods: {
+    positionLabel ({ text }) {
+      return `${text}`
+    },
+    bankLabel ({ text }) {
+      return `${text}`
+    },
+    locationLabel ({ text }) {
+      return `${text}`
+    },
     resetForm() {
       this.first_name = null;
       this.last_name = null;
@@ -90,10 +101,10 @@ export default {
           unique_id: this.employee_number,
           personal_email: this.personal_email,
           office_email: this.official_email,
-          location: this.location,
-          job_role: this.position,
+          location: this.location.value,
+          job_role: this.position.value,
           account_no: this.account_number,
-          bank: this.bank,
+          bank: this.bank.value,
           phone_no: this.telephone,
           other_name: this.other_name,
         };
@@ -292,14 +303,14 @@ export default {
                         >Position</label
                       >
                       <div class="col-md-9">
-                        <b-form-select
-                          id="position"
-                          v-model="position"
-                          :options="positions"
-                          :class="{
-                            'is-invalid': submitted && $v.position.$error,
-                          }"
-                        />
+                        <multiselect
+                                v-model="position"
+                                :options="positions"
+                                :custom-label="positionLabel"
+                                :class="{
+                      'is-invalid': submitted && $v.position.$error,
+                    }"
+                        ></multiselect>
                       </div>
                     </div>
 
@@ -308,14 +319,14 @@ export default {
                         >Bank</label
                       >
                       <div class="col-md-9">
-                        <b-form-select
-                          id="bank"
-                          v-model="bank"
-                          :options="banks"
-                          :class="{
-                            'is-invalid': submitted && $v.bank.$error,
-                          }"
-                        />
+                        <multiselect
+                                v-model="bank"
+                                :options="banks"
+                                :custom-label="bankLabel"
+                                :class="{
+                      'is-invalid': submitted && $v.bank.$error,
+                    }"
+                        ></multiselect>
                       </div>
                     </div>
                   </div>
@@ -326,14 +337,14 @@ export default {
                         >Location</label
                       >
                       <div class="col-md-9">
-                        <b-form-select
-                          id="location"
-                          v-model="location"
-                          :options="locations"
-                          :class="{
-                            'is-invalid': submitted && $v.location.$error,
-                          }"
-                        />
+                        <multiselect
+                                v-model="location"
+                                :options="locations"
+                                :custom-label="locationLabel"
+                                :class="{
+                      'is-invalid': submitted && $v.location.$error,
+                    }"
+                        ></multiselect>
                       </div>
                     </div>
                     <div class="form-group row mb-3">
