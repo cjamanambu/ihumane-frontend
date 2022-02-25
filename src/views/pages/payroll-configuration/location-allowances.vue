@@ -3,6 +3,7 @@ import Layout from "@/views/layouts/main";
 import PageHeader from "@/components/page-header";
 import appConfig from "@/app.config";
 import { required } from "vuelidate/lib/validators";
+import Multiselect from 'vue-multiselect';
 
 export default {
   page: {
@@ -12,6 +13,7 @@ export default {
   components: {
     Layout,
     PageHeader,
+    Multiselect
   },
   watch: {
     amount: function (newValue) {
@@ -37,6 +39,12 @@ export default {
       this.location = null;
       this.paymentDef = null;
       this.$v.$reset();
+    },
+    locationLabel ({ text }) {
+      return `${text}`
+    },
+    paymentDefsLabel ({ text }) {
+      return `${text}`
     },
     refreshTable() {
       this.apiGet(
@@ -104,8 +112,8 @@ export default {
       } else {
         this.amount = parseFloat(this.amount.replace(/,/g, ""));
         const data = {
-          la_payment_id: this.paymentDef,
-          la_location_id: this.location,
+          la_payment_id: this.paymentDef.value,
+          la_location_id: this.location.value,
           la_amount: this.amount,
         };
         const url = `${this.ROUTES.locationAllowance}/add-location-allowance`;
@@ -322,14 +330,14 @@ export default {
       <form @submit.prevent="submitNew">
         <div class="form-group">
           <label> Location <span class="text-danger">*</span> </label>
-          <b-form-select
-            id="location"
-            v-model="location"
-            :options="locations"
-            :class="{
-              'is-invalid': submitted && $v.location.$error,
-            }"
-          />
+          <multiselect
+                  v-model="location"
+                  :options="locations"
+                  :custom-label="locationLabel"
+                  :class="{
+                      'is-invalid': submitted && $v.location.$error,
+                    }"
+          ></multiselect>
           <small
             class="form-text text-muted manage"
             @click="$router.push('/locations')"
@@ -339,14 +347,15 @@ export default {
         </div>
         <div class="form-group">
           <label> Payment Definition <span class="text-danger">*</span> </label>
-          <b-form-select
-            id="payment"
-            v-model="paymentDef"
-            :options="paymentDefs"
-            :class="{
-              'is-invalid': submitted && $v.paymentDef.$error,
-            }"
-          />
+          <multiselect
+                  v-model="paymentDef"
+                  :options="paymentDefs"
+                  :custom-label="paymentDefsLabel"
+                  :class="{
+                      'is-invalid': submitted && $v.paymentDef.$error,
+                    }"
+          ></multiselect>
+
           <small
             class="form-text text-muted manage"
             @click="$router.push('/payment-definitions')"

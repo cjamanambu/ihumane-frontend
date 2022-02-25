@@ -183,40 +183,53 @@ export default {
                   <div class="d-flex justify-content-between">
                     <h6>GROSS PAY</h6>
                     <p
-                      class="text-capitalize border-top border-bottom d-inline"
-                      v-if="payslipData"
+                        class="text-capitalize border-top border-bottom d-inline"
+                        v-if="payslipData"
                     >
                       =N= {{ payslipData.grossSalary.toLocaleString() }}
                     </p>
                   </div>
-                  <div class="d-flex justify-content-between">
-                    <h6>PENSION (EMPLOYER CONTRIBUTION)</h6>
-                    <p class="text-capitalize">---</p>
-                  </div>
-                  <div class="d-flex justify-content-between">
-                    <h6>NHF</h6>
-                    <p class="text-capitalize">---</p>
-                  </div>
+
+
+                </div>
+                <div class="col-lg-6">
                   <div class="d-flex justify-content-between">
                     <h6>TOTAL DEDUCTIONS</h6>
                     <p
-                      class="text-capitalize border-top border-bottom d-inline"
-                      v-if="payslipData"
+                        class="text-capitalize border-top border-bottom d-inline"
+                        v-if="payslipData"
                     >
                       =N= {{ payslipData.totalDeduction.toLocaleString() }}
                     </p>
                   </div>
-                </div>
-                <div class="col-lg-6">
                   <div class="d-flex justify-content-between">
                     <h6>NET PAY</h6>
-                    <p
-                      class="text-capitalize border-top border-bottom d-inline"
-                      v-if="payslipData"
+                  <b>  <p
+                        class="text-capitalize border-top border-bottom d-inline"
+                        v-if="payslipData"
                     >
                       =N= {{ payslipData.netSalary.toLocaleString() }}
-                    </p>
+                  </p> </b>
                   </div>
+                </div>
+              </div>
+              <hr class="my-4" />
+
+              <div class="row">
+                <div class="col-lg-6">
+
+                  <div class="d-flex justify-content-between">
+                    <h6>PENSION (EMPLOYER CONTRIBUTION)</h6>
+                    <p class="text-capitalize">=N= {{ payslipData.pension.toLocaleString() }}</p>
+                  </div>
+                  <div class="d-flex justify-content-between">
+                    <h6>NSITF</h6>
+                    <p class="text-capitalize">=N= {{ payslipData.nsitf.toLocaleString() }}</p>
+                  </div>
+
+                </div>
+                <div class="col-lg-6">
+
                 </div>
               </div>
             </div>
@@ -350,25 +363,19 @@ export default {
                         =N= {{ payslipData.grossSalary.toLocaleString() }}
                       </p>
                     </div>
-                    <div class="d-flex justify-content-between">
-                      <h6>PENSION (EMPLOYER CONTRIBUTION)</h6>
-                      <p class="text-capitalize">---</p>
-                    </div>
-                    <div class="d-flex justify-content-between">
-                      <h6>NHF</h6>
-                      <p class="text-capitalize">---</p>
-                    </div>
-                    <div class="d-flex justify-content-between">
-                      <h6>TOTAL DEDUCTIONS</h6>
-                      <p
-                        class="text-capitalize border-top border-bottom d-inline"
-                        v-if="payslipData"
-                      >
-                        =N= {{ payslipData.totalDeduction.toLocaleString() }}
-                      </p>
-                    </div>
+
+
                   </div>
                   <div class="col-lg-6">
+                    <div class="d-flex justify-content-between">
+                      <h6>TOTAL DEDUCTIONS</h6>
+                      <b>  <p
+                          class="text-capitalize border-top border-bottom d-inline"
+                          v-if="payslipData"
+                      >
+                        =N= {{ payslipData.netSalary.toLocaleString() }}
+                      </p> </b>
+                    </div>
                     <div class="d-flex justify-content-between">
                       <h6>NET PAY</h6>
                       <p
@@ -378,6 +385,25 @@ export default {
                         =N= {{ payslipData.netSalary.toLocaleString() }}
                       </p>
                     </div>
+                  </div>
+                </div>
+                <hr class="my-4" />
+
+                <div class="row">
+                  <div class="col-lg-6">
+
+                    <div class="d-flex justify-content-between">
+                      <h6>PENSION (EMPLOYER CONTRIBUTION)</h6>
+                      <p class="text-capitalize">=N= {{ payslipData.pension.toLocaleString() }}</p>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                      <h6>NSITF</h6>
+                      <p class="text-capitalize">=N= {{ payslipData.nsitf.toLocaleString() }}</p>
+                    </div>
+
+                  </div>
+                  <div class="col-lg-6">
+
                   </div>
                 </div>
                 <div class="d-flex flex-column mt-5">

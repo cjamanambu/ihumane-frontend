@@ -3,6 +3,7 @@ import Layout from "@/views/layouts/main";
 import PageHeader from "@/components/page-header";
 import appConfig from "@/app.config";
 import { required } from "vuelidate/lib/validators";
+import Multiselect from 'vue-multiselect';
 
 export default {
   page: {
@@ -12,6 +13,7 @@ export default {
   components: {
     Layout,
     PageHeader,
+    Multiselect,
   },
   watch: {
     amount: function (newValue) {
@@ -43,7 +45,9 @@ export default {
       this.$refs["edit-salary-structure"].show();
       this.$refs["salary-structure-table"].clearSelected();
     },
-
+    employeeLabel ({ text }) {
+      return `${text}`
+    },
     refreshTable() {
       this.apiGet(
         this.ROUTES.salaryStructure,
@@ -117,7 +121,7 @@ export default {
         this.apiFormHandler("Invalid Salary Structure");
       } else {
         const data = {
-          ss_empid: this.employee,
+          ss_empid: this.employee.value,
           ss_gross: parseFloat(this.amount.replace(/,/g, "")),
           ss_grade: this.salaryGrade,
         };
@@ -321,14 +325,14 @@ export default {
           <label for="code">
             Employee <span class="text-danger">*</span>
           </label>
-          <b-form-select
-            id="code"
-            v-model="employee"
-            :options="employees"
-            :class="{
-              'is-invalid': submitted && $v.employee.$error,
-            }"
-          />
+          <multiselect
+                  v-model="employee"
+                  :options="employees"
+                  :custom-label="employeeLabel"
+                  :class="{
+                      'is-invalid': submitted && $v.employee.$error,
+                    }"
+          ></multiselect>
         </div>
         <div class="form-group">
           <label for="code">

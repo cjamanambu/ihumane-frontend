@@ -3,6 +3,7 @@ import Layout from "@/views/layouts/main";
 import PageHeader from "@/components/page-header";
 import appConfig from "@/app.config";
 import { required } from "vuelidate/lib/validators";
+import Multiselect from 'vue-multiselect';
 
 export default {
   page: {
@@ -12,6 +13,7 @@ export default {
   components: {
     Layout,
     PageHeader,
+    Multiselect,
   },
   mounted() {
     this.refreshTable();
@@ -23,6 +25,9 @@ export default {
     t6_code: { required },
   },
   methods: {
+    locationLabel ({ text }) {
+      return `${text}`
+    },
     refreshTable() {
       this.apiGet(this.ROUTES.location, "Get Locations Error").then((res) => {
         const { data } = res;
@@ -50,7 +55,7 @@ export default {
       } else {
         const data = {
           location_name: this.name,
-          location_state: this.state,
+          location_state: this.state.value,
           location_t6_code: this.t6_code,
         };
         this.apiPost(this.ROUTES.location, data, "New Location Error").then(
@@ -71,7 +76,7 @@ export default {
       } else {
         const data = {
           location_name: this.name,
-          location_state: this.state,
+          location_state: this.state.value,
           location_t6_code: this.t6_code,
         };
         const url = `${this.ROUTES.location}/${this.locationID}`;
@@ -267,14 +272,15 @@ export default {
         </div>
         <div class="form-group">
           <label for="state"> State <span class="text-danger">*</span> </label>
-          <b-form-select
-            id="state"
-            v-model="state"
-            :options="states"
-            :class="{
-              'is-invalid': submitted && $v.state.$error,
-            }"
-          />
+          <multiselect
+                  v-model="state"
+                  :options="states"
+                  :custom-label="locationLabel"
+                  :class="{
+                      'is-invalid': submitted && $v.state.$error,
+                    }"
+          ></multiselect>
+
           <small
             class="form-text text-muted manage"
             @click="$router.push('/states')"
@@ -338,14 +344,14 @@ export default {
         </div>
         <div class="form-group">
           <label for="state"> State <span class="text-danger">*</span> </label>
-          <b-form-select
-            id="state"
-            v-model="state"
-            :options="states"
-            :class="{
-              'is-invalid': submitted && $v.state.$error,
-            }"
-          />
+          <multiselect
+                  v-model="state"
+                  :options="states"
+                  :custom-label="locationLabel"
+                  :class="{
+                      'is-invalid': submitted && $v.state.$error,
+                    }"
+          ></multiselect>
           <small
             class="form-text text-muted manage"
             @click="$router.push('/states')"
