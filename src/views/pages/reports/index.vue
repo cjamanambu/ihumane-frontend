@@ -3,6 +3,8 @@ import Layout from "@/views/layouts/main";
 import PageHeader from "@/components/page-header";
 import appConfig from "@/app.config";
 import Emolument from "./components/emolument";
+import Deduction from "./components/deduction";
+import Variation from "./components/variation";
 export default {
   page: {
     title: "Reports",
@@ -12,6 +14,8 @@ export default {
     Layout,
     PageHeader,
     Emolument,
+    Deduction,
+    Variation,
   },
   data() {
     return {
@@ -41,6 +45,12 @@ export default {
     <div v-else class="row">
       <div class="col-md-4">
         <Emolument />
+      </div>
+      <div class="col-md-4">
+        <Deduction />
+      </div>
+      <div class="col-md-4">
+        <Variation />
       </div>
     </div>
   </Layout>
