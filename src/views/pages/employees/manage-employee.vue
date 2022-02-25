@@ -2,6 +2,8 @@
 import Layout from "@/views/layouts/main";
 import PageHeader from "@/components/page-header";
 import appConfig from "@/app.config";
+import Multiselect from 'vue-multiselect';
+
 export default {
   page: {
     title: "Manage Employee",
@@ -10,6 +12,7 @@ export default {
   components: {
     Layout,
     PageHeader,
+    Multiselect,
   },
   async mounted() {
     this.fetchEmployee();
@@ -17,6 +20,15 @@ export default {
     await this.getBanks();
   },
   methods: {
+    positionLabel ({ text }) {
+      return `${text}`
+    },
+    bankLabel ({ text }) {
+      return `${text}`
+    },
+    locationLabel ({ text }) {
+      return `${text}`
+    },
     fetchEmployee() {
       let employeeID = this.$route.params.employeeID;
       const url = `${this.ROUTES.employee}/get-employee/${employeeID}`;
@@ -88,7 +100,7 @@ export default {
         emp_phone_no: this.emp_phone_no,
         emp_account_no: this.emp_account_no,
         emp_bank_id: this.emp_bank_id,
-        emp_state_id: this.emp_state_id,
+        emp_state_id: this.emp_state_id.value,
         emp_lga_id: this.emp_lga_id,
         emp_marital_status: this.emp_marital_status,
         emp_spouse_name: this.emp_spouse_name,
@@ -241,7 +253,15 @@ export default {
 
                   <div class="form-group">
                     <label>State Of Origin</label>
-                    <b-form-select v-model="emp_state_id" :options="states" />
+                    <multiselect
+                            v-model="emp_state_id"
+                            :options="states"
+                            :custom-label="locationLabel"
+                            :class="{
+                      'is-invalid': submitted && $v.emp_state_id.$error,
+                    }"
+                    ></multiselect>
+
                   </div>
                   <div class="p-3 bg-light mb-4">
                     <h5 class="font-size-14 mb-0">
@@ -250,7 +270,14 @@ export default {
                   </div>
                   <div class="form-group">
                     <label>Bank</label>
-                    <b-form-select v-model="emp_bank_id" :options="banks" />
+                    <multiselect
+                            v-model="emp_bank_id"
+                            :options="banks"
+                            :custom-label="bankLabel"
+                            :class="{
+                      'is-invalid': submitted && $v.emp_bank_id.$error,
+                    }"
+                    ></multiselect>
                   </div>
 
                   <div class="form-group">
