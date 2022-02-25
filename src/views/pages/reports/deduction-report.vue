@@ -5,7 +5,7 @@ import appConfig from "@/app.config";
 import JsonExcel from "vue-json-excel";
 export default {
   page: {
-    title: "Emolument Report",
+    title: "Deduction Report",
     meta: [{ name: "description", content: appConfig.description }],
   },
   components: {
@@ -26,11 +26,8 @@ export default {
         const { data } = res;
         this.paymentDefinitions = data;
         await this.processFields(data);
-        this.newFields.push(...this.incomeFields);
-        this.newFields.push("grossSalary");
         this.newFields.push(...this.deductionFields);
         this.newFields.push("totalDeduction");
-        this.newFields.push("netSalary");
         this.newFields.forEach((newField) => {
           if (newField === "sn") {
             this.jsonFields["S/N"] = newField;
@@ -56,37 +53,25 @@ export default {
         pym_month: parseFloat(this.period[0]),
         pym_year: parseFloat(this.period[1]),
       };
-      const url = `${this.ROUTES.salary}/pull-emolument`;
-      this.apiPost(url, data, "Generate Emolument Report").then((res) => {
+      const url = `${this.ROUTES.salary}/deduction-report`;
+      this.apiPost(url, data, "Generate Deduction Report").then((res) => {
         const { data } = res;
-        console.log({ data });
-        data.forEach((emolument, index) => {
-          let emolumentObj = {
+        data.forEach((deduction, index) => {
+          let deductionObj = {
             sn: ++index,
-            employeeName: emolument.employeeName,
+            employeeName: deduction.employeeName,
           };
-          emolument.incomes.forEach((income) => {
-            emolumentObj[income.paymentName] = parseFloat(
-              income.amount.toFixed(2)
-            ).toLocaleString();
-          });
-          emolument.deductions.forEach((deduction) => {
-            emolumentObj[deduction.paymentName] = parseFloat(
+          deduction.deductions.forEach((deduction) => {
+            deductionObj[deduction.paymentName] = parseFloat(
               deduction.amount.toFixed(2)
             ).toLocaleString();
           });
-          emolumentObj["grossSalary"] = parseFloat(
-            emolument.grossSalary.toFixed(2)
+          deductionObj["totalDeduction"] = parseFloat(
+            deduction.totalDeduction.toFixed(2)
           ).toLocaleString();
-          emolumentObj["totalDeduction"] = parseFloat(
-            emolument.totalDeduction.toFixed(2)
-          ).toLocaleString();
-          emolumentObj["netSalary"] = parseFloat(
-            emolument.netSalary.toFixed(2)
-          ).toLocaleString();
-          this.newEmoluments.push(emolumentObj);
+          this.deductions.push(deductionObj);
         });
-        this.totalRows = this.newEmoluments.length;
+        this.totalRows = this.deductions.length;
       });
     },
     onFiltered(filteredItems) {
@@ -124,7 +109,7 @@ export default {
   },
   data() {
     return {
-      title: "Emolument Report",
+      title: "Deduction Report",
       items: [
         {
           text: "IHUMANE",
@@ -134,13 +119,14 @@ export default {
           href: "/",
         },
         {
-          text: "Emolument Report",
+          text: "Deduction Report",
           active: true,
         },
       ],
       period: null,
       emoluments: [],
       newEmoluments: [],
+      deductions: [],
       paymentDefinitions: [],
       totalRows: 1,
       currentPage: 1,
@@ -195,16 +181,16 @@ export default {
           <div class="card-body">
             <div class="p-3 bg-light mb-4 d-flex justify-content-between">
               <h5 class="font-size-14 mb-0" v-if="period">
-                Emolument Report For Payroll Period:
+                Deduction Report For Payroll Period:
                 {{ (parseInt(period[0]) - 1) | getMonth }}
                 {{ period[1] }}
               </h5>
               <span class="font-size-12 text-success">
                 <JsonExcel
                   style="cursor: pointer"
-                  :data="newEmoluments"
+                  :data="deductions"
                   :fields="jsonFields"
-                  :name="`Emolument_Report(${period[0]}-${period[1]}).xls`"
+                  :name="`Deduction_Report(${period[0]}-${period[1]}).xls`"
                 >
                   Export to Excel
                 </JsonExcel>
@@ -244,13 +230,13 @@ export default {
               <!-- End search -->
             </div>
             <!-- Table -->
-            <div class="table-responsive mb-0" v-if="newEmoluments.length">
+            <div class="table-responsive mb-0" v-if="deductions.length">
               <b-table
-                ref="emolument-table"
+                ref="deduction-table"
                 bordered
                 hover
                 small
-                :items="newEmoluments"
+                :items="deductions"
                 :fields="newFields"
                 striped
                 responsive="sm"
@@ -276,11 +262,11 @@ export default {
                 <template #cell()="data">
                   <span class="float-right">{{ data.value }}</span>
                 </template>
-                <template #cell(netSalary)="row">
-                  <span class="float-right">
-                    {{ row.value }}
-                  </span>
-                </template>
+                <!--                <template #cell(netSalary)="row">-->
+                <!--                  <span class="float-right">-->
+                <!--                    {{ row.value }}-->
+                <!--                  </span>-->
+                <!--                </template>-->
               </b-table>
             </div>
             <div class="row">

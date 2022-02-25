@@ -15,4 +15,20 @@ export default [
     },
     component: () => import("@/views/pages/reports/emolument-report"),
   },
+  {
+    path: "/reports/deduction/:period",
+    name: "deduction-report",
+    meta: {
+      authRequired: true,
+    },
+    component: () => import("@/views/pages/reports/deduction-report"),
+  },
+  {
+    path: "/reports/variation/:period",
+    name: "variation-report",
+    meta: {
+      authRequired: true,
+    },
+    component: () => import("@/views/pages/reports/variation-report"),
+  },
 ];
