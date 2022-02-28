@@ -292,15 +292,15 @@ export default {
                   </div>
                   <div class="d-flex justify-content-between">
                     <p>T7 Code</p>
-                    <p>-</p>
+                    <p>{{ getEmployee.emp_unique_id }}</p>
                   </div>
                   <div class="d-flex justify-content-between">
-                    <p>Location (T5)</p>
-                    <p>-</p>
+                    <p>Location (T6)</p>
+                    <p>{{ getEmployee.location.l_t6_code }}</p>
                   </div>
                   <div class="d-flex justify-content-between">
-                    <p>Site Code (T6)</p>
-                    <p>-</p>
+                    <p>Site Code (T3)</p>
+                    <p>{{ getEmployee.JobRole.Department.d_t3_code }}</p>
                   </div>
                   <div class="d-flex justify-content-between">
                     <p>Nationality</p>
