@@ -86,7 +86,60 @@ export default {
 
       });
     },
-    authorizationHandler(val) {
+    submit(type) {
+      this.submitted = true;
+      if (this.type === "approve") {
+        this.approving = true;
+      } else if (this.type === "decline") {
+        this.declining = true;
+      }
+      let markAsFinal;
+      this.final ? (this.official = "null") : "";
+      this.final ? (markAsFinal = 1) : (markAsFinal = 0);
+      this.$v.$touch();
+      if (this.$v.$invalid) {
+        this.apiFormHandler("Invalid Authorization");
+      } else {
+        const val = type === 'approve' ? 1 : 2;
+/*
+        const data = {
+          appId: this.application.leapp_id.toString(),
+          type: 1,
+          comment: this.comment,
+          role: this.roleId.value,
+          markAsFinal,
+          officer: this.getEmployee.emp_id,
+        };
+*/
+        const data = {
+          appId: `${this.ref_no}`,
+          status: val,
+          officer: this.getEmployee.emp_id,
+          type: 2,
+          role: this.roleId.value,
+          comment: this.comment,
+          markAsFinal
+          //nextOfficer: this.nextOfficer.value,
+        };
+
+        type === "approve" || type === "forward"
+                ? (data.status = 1)
+                : (data.status = 2);
+        !this.final ? (data.nextOfficer = this.official.value) : "";
+
+        this.apiPost(this.ROUTES.authorization, data)
+                .then((res) => {
+                  this.$router.push({ name: "time-sheet-authorization" }).then(() => {
+                    this.apiResponseHandler("Authorization Complete", res.data);
+                  });
+                })
+                .finally(() => {
+                  this.approving = false;
+                  this.declining = false;
+                });
+      }
+    },
+    /*authorizationHandler(val) {
       if (this.comment === null) {
         alert("Leave a comment");
       } else {
@@ -111,7 +164,7 @@ export default {
           });
         //alert("Comment: "+this.comment+" val: "+val);
       }
-    },
+    },*/
   },
   data() {
     return {
@@ -150,6 +203,11 @@ export default {
         text:"Authorizing as...",
         disabled:true,
       }],
+      type:null,
+      submitted: false,
+      status: null,
+      approving: false,
+      declining: false,
       roleId:null,
       officials: [
         {
@@ -361,16 +419,26 @@ export default {
                     v-model="comment"
                   />
                 </b-form-group>
+                <b-form-group>
+                  <multiselect
+                          v-model="roleId"
+                          :options="roles"
+                          :custom-label="authorizingAsLabel"
+                          :class="{
+                      'is-invalid': submitted && $v.roleId.$error,
+                    }"
+                  ></multiselect>
+                </b-form-group>
 
                 <div class="d-flex">
                   <button
-                    @click="authorizationHandler(1)"
+                    @click="submit('approve')"
                     class="btn btn-success w-100 mr-3"
                   >
                     Approve
                   </button>
                   <button
-                    @click="authorizationHandler(2)"
+                    @click="submit('decline')"
                     class="btn btn-danger w-100"
                   >
                     Decline
