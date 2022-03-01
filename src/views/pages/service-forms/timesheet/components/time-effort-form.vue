@@ -11,11 +11,13 @@ export default {
       confirmTER: false,
       donor: null,
       donors: [{ value: null, text: "Select code", disabled: true }],
+      refNo: null,
     };
   },
   mounted() {
     this.calc();
     this.fetchDonors();
+    this.populateFields();
   },
   computed: {
     ...authComputed,
@@ -28,6 +30,10 @@ export default {
     pmyYear: {
       type: String,
       required: true,
+    },
+    breakdown: {
+      type: Array,
+      required: false,
     },
   },
   methods: {
@@ -76,8 +82,14 @@ export default {
     },
     submit() {
       this.confirmTER = false;
-      const url = `${this.ROUTES.timeAllocation}/add-time-allocation`;
-      const ta_ref_no = Math.random().toString(36).slice(2);
+      let ta_ref_no, url;
+      if (this.refNo) {
+        ta_ref_no = this.refNo;
+        url = `${this.ROUTES.timeAllocation}/update-time-allocation`;
+      } else {
+        ta_ref_no = Math.random().toString(36).slice(2);
+        url = `${this.ROUTES.timeAllocation}/add-time-allocation`;
+      }
       this.fields.forEach(async (field) => {
         const data = {
           ta_emp_id: this.getEmployee.emp_id,
@@ -87,10 +99,23 @@ export default {
           ta_charge: field.charge,
           ta_ref_no,
         };
-        await this.apiPost(url, data, "Add Time Allocation Error").then();
+        await this.apiPost(url, data, "Time Allocation Error").then();
       });
       this.$emit("added-ta");
       this.apiResponseHandler("Process Complete", "Time Allocation Added");
+    },
+    populateFields() {
+      if (this.breakdown && this.breakdown.length) {
+        this.fields = [];
+        this.refNo = this.breakdown[0].ta_ref_no;
+        this.breakdown.forEach((entry, index) => {
+          this.fields.push({
+            id: index,
+            grant: entry.ta_tcode,
+            charge: entry.ta_charge,
+          });
+        });
+      }
     },
   },
 };

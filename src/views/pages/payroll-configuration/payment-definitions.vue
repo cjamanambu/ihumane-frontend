@@ -226,6 +226,8 @@ export default {
 };
 </script>
 
+<style></style>
+
 <template>
   <Layout>
     <PageHeader :title="title" :items="items" />
@@ -348,37 +350,62 @@ export default {
       hide-footer
       centered
       title-class="font-18"
+      size="lg"
       @hidden="resetForm"
     >
       <form @submit.prevent="submitNew">
-        <div class="form-group">
-          <label for="username">
-            Payment Code <span class="text-danger">*</span>
-          </label>
-          <input
-            id="username"
-            type="text"
-            v-model="code"
-            class="form-control"
-            :class="{
-              'is-invalid': submitted && $v.code.$error,
-            }"
-          />
+        <h5
+          style="
+            display: inline-block;
+            background-color: #ffffff;
+            margin-left: 2em;
+            padding-left: 0.5em;
+            padding-right: 0.5em;
+            position: absolute;
+            top: 2.5%;
+          "
+        >
+          Payment Information
+        </h5>
+        <div
+          style="
+            border: 1px solid #ced4da;
+            border-radius: 10px;
+            padding: 2em;
+            margin-top: 1em;
+            margin-bottom: 1em;
+          "
+        >
+          <div class="form-group">
+            <label for="username">
+              Payment Code <span class="text-danger">*</span>
+            </label>
+            <input
+              id="username"
+              type="text"
+              v-model="code"
+              class="form-control"
+              :class="{
+                'is-invalid': submitted && $v.code.$error,
+              }"
+            />
+          </div>
+          <div class="form-group">
+            <label for="fullname">
+              Payment Name <span class="text-danger">*</span>
+            </label>
+            <input
+              id="fullname"
+              type="text"
+              v-model="name"
+              class="form-control"
+              :class="{
+                'is-invalid': submitted && $v.name.$error,
+              }"
+            />
+          </div>
         </div>
-        <div class="form-group">
-          <label for="fullname">
-            Payment Name <span class="text-danger">*</span>
-          </label>
-          <input
-            id="fullname"
-            type="text"
-            v-model="name"
-            class="form-control"
-            :class="{
-              'is-invalid': submitted && $v.name.$error,
-            }"
-          />
-        </div>
+
         <div class="d-flex justify-content-between flex-lg-row flex-column">
           <b-form-group>
             <label for="user_type">Payment Type</label><br />
