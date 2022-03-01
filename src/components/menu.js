@@ -266,6 +266,11 @@ export const menuItems = [
         label: "Confirm Variation",
         link: "/confirm-variation",
       },
+      {
+        id: 31,
+        label: "Default Charges",
+        link: "/default-charges",
+      },
     ],
   },
   {
