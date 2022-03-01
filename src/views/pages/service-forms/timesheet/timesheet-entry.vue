@@ -75,6 +75,9 @@ export default {
           this.start = data.ts_start;
           this.end = data.ts_end;
           this.duration = data.ts_duration;
+          data.ts_is_present
+            ? (this.isPresent = true)
+            : (this.isPresent = false);
         }
       });
     },
@@ -127,6 +130,20 @@ export default {
         });
       }
     },
+    tConvert(time) {
+      // Check correct time format and split into components
+      time = time
+        .toString()
+        .match(/^([01]\d|2[0-3])(:)([0-5]\d)(:[0-5]\d)?$/) || [time];
+
+      if (time.length > 1) {
+        // If time format correct
+        time = time.slice(1); // Remove full string match value
+        time[5] = +time[0] < 12 ? " AM" : " PM"; // Set AM/PM
+        time[0] = +time[0] % 12 || 12; // Adjust hours
+      }
+      return time.join(""); // return adjusted time or original string
+    },
   },
 };
 </script>
@@ -148,7 +165,8 @@ export default {
       </b-button>
     </div>
     <div class="alert alert-warning" v-if="!isPresent">
-      Please note, you will be marked as absent for this timesheet entry.
+      Please note, you will be marked as absent for the timesheet entry on
+      {{ timesheetDate.toDateString() }}
     </div>
     <scale-loader v-if="apiBusy" />
     <div v-else class="row">
@@ -302,7 +320,7 @@ export default {
               >
                 WEEKEND
               </p>
-              <p v-else>{{ start }}</p>
+              <p v-else>{{ this.tConvert(start) }}</p>
             </div>
             <div class="d-flex justify-content-between">
               <p>Finish Time</p>
@@ -313,7 +331,7 @@ export default {
               >
                 WEEKEND
               </p>
-              <p v-else>{{ end }}</p>
+              <p v-else>{{ this.tConvert(end) }}</p>
             </div>
             <div class="d-flex justify-content-between">
               <p>Break Hours</p>
