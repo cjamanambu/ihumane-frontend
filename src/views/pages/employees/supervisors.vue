@@ -3,6 +3,7 @@ import Layout from "@/views/layouts/main";
 import PageHeader from "@/components/page-header";
 import appConfig from "@/app.config";
 import { required } from "vuelidate/lib/validators";
+import Multiselect from 'vue-multiselect';
 
 export default {
   page: {
@@ -12,6 +13,7 @@ export default {
   components: {
     Layout,
     PageHeader,
+    Multiselect,
   },
   mounted() {
     this.refreshTable();
@@ -21,6 +23,9 @@ export default {
     nonSupervisor: { required },
   },
   methods: {
+    selectionLabel ({ text }) {
+      return `${text}`
+    },
     refreshTable() {
       const url = `${this.ROUTES.employee}/get-supervisor`;
       this.apiGet(url, "Get Supervisors Error").then(
@@ -64,7 +69,7 @@ export default {
             data.forEach((employee) => {
               this.nonSupervisors.push({
                 value: employee.emp_id,
-                text:`${employee.emp_first_name} ${employee.emp_last_name}`,
+                text:`${employee.emp_first_name} ${employee.emp_last_name} (${employee.emp_unique_id})`,
               });
             });
           }
@@ -78,7 +83,7 @@ export default {
       } else {
         const data = {
 
-          emp_id: this.nonSupervisor,
+          emp_id: this.nonSupervisor.value,
           emp_supervisor_status: 1,
 
 
@@ -237,7 +242,7 @@ export default {
               >
 
                 <template #cell(emp_first_name)="data">
-                  <b> {{ data.item.emp_first_name }} </b>,  {{ data.item.emp_last_name.toUpperCase() }}
+                  <b> {{ data.item.emp_first_name }} </b>,  {{ data.item.emp_last_name.toUpperCase() }} ({{data.item.emp_unique_id}})
                 </template>
 
               </b-table>
@@ -275,14 +280,14 @@ export default {
           <label for="">
             Employee <span class="text-danger">*</span>
           </label>
-          <b-form-select
-              id="employee"
-              v-model="nonSupervisor"
-              :options="nonSupervisors"
-              :class="{
-              'is-invalid': submitted && $v.nonSupervisor.$error,
-            }"
-          />
+          <multiselect
+                  v-model="nonSupervisor"
+                  :options="nonSupervisors"
+                  :custom-label="selectionLabel"
+                  :class="{
+                      'is-invalid': submitted && $v.nonSupervisor.$error,
+                    }"
+          ></multiselect>
         </div>
 
 
