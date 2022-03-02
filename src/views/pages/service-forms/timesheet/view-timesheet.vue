@@ -312,7 +312,7 @@ export default {
           <div class="card">
             <div class="card-body">
               <div class="p-3 bg-light mb-4">
-                <h5 class="font-size-14 mb-0">Time & Effort Reporting</h5>
+                <h5 class="font-size-14 mb-0">Time Allocation</h5>
               </div>
               <div v-if="status">
                 <p v-for="(charge, index) in breakdown" :key="index">
