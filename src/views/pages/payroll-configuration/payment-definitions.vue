@@ -35,6 +35,10 @@ export default {
       this.pdValue = pd.pd_value;
       this.pdAmount = pd.pd_amount;
       this.pdPrGross = pd.pd_pr_gross;
+      this.sum = pd.pd_total_gross;
+      this.tax = pd.pd_tax;
+      this.taxable = pd.pd_payment_taxable;
+      this.welfare = pd.pd_welfare || 0;
       this.$refs["edit-payment-definition"].show();
       this.$refs["pd-table"].clearSelected();
     },
@@ -74,16 +78,24 @@ export default {
           pd_payment_name: this.name,
           pd_payment_type: this.type,
           pd_payment_variant: this.variant,
-          pd_payment_taxable: this.taxable,
           pd_desc: "null",
-          pd_basic: this.basic,
           pd_tie_number: "null",
           pd_pr_gross: this.pdPrGross,
-          pd_percentage: this.pdPercentage,
           pd_value: this.pdValue,
-          pd_amount: parseFloat(this.pdAmount),
-          pd_tax: parseInt(this.pdTax),
+          pd_percentage: this.pdPercentage,
+          pd_total_gross: this.sum,
         };
+        this.type === 1
+          ? (data.pd_payment_taxable = this.taxable)
+          : (data.pd_payment_taxable = 0);
+        this.type === 1 ? (data.pd_basic = this.basic) : (data.pd_basic = 0);
+        this.type === 2 ? (data.pd_tax = this.pdTax) : (data.pd_tax = 0);
+        this.type === 2
+          ? (data.pd_welfare = this.welfare)
+          : (data.pd_welfare = 0);
+        this.pdValue === 2
+          ? (data.pd_amount = this.pdAmount)
+          : (data.pd_amount = 0);
         const url = `${this.ROUTES.paymentDefinition}/add-payment-definition`;
         this.apiPost(url, data, "Add Payment Definition Error").then((res) => {
           this.apiResponseHandler(
@@ -108,16 +120,24 @@ export default {
           pd_payment_name: this.name,
           pd_payment_type: this.type,
           pd_payment_variant: this.variant,
-          pd_payment_taxable: this.taxable,
           pd_desc: "null",
-          pd_basic: this.basic,
           pd_tie_number: "null",
           pd_pr_gross: this.pdPrGross,
-          pd_percentage: parseInt(this.pdPercentage),
-          pd_value: parseInt(this.pdValue),
-          pd_amount: parseFloat(this.pdAmount),
-          pd_tax: parseInt(this.pdTax),
+          pd_value: this.pdValue,
+          pd_percentage: this.pdPercentage,
+          pd_total_gross: this.sum,
         };
+        this.type === 1
+          ? (data.pd_payment_taxable = this.taxable)
+          : (data.pd_payment_taxable = 0);
+        this.type === 1 ? (data.pd_basic = this.basic) : (data.pd_basic = 0);
+        this.type === 2 ? (data.pd_tax = this.pdTax) : (data.pd_tax = 0);
+        this.type === 2
+          ? (data.pd_welfare = this.welfare)
+          : (data.pd_welfare = 0);
+        this.pdValue === 2
+          ? (data.pd_amount = this.pdAmount)
+          : (data.pd_amount = 0);
         const url = `${this.ROUTES.paymentDefinition}/update-payment-definition/${this.pdID}`;
         await this.apiPatch(url, data, "Update Payment Definition Error").then(
           (res) => {
@@ -161,15 +181,24 @@ export default {
       sortBy: "sn",
       sortDesc: false,
       fields: [
-        { key: "sn", label: "S/n", sortable: true },
-        { key: "pd_payment_code", label: "Payment Code", sortable: false },
+        { key: "sn", label: "S/n", sortable: true, thStyle: { width: "5%" } },
+        {
+          key: "pd_payment_code",
+          label: "Payment Code",
+          sortable: false,
+          thStyle: { width: "5%" },
+        },
         { key: "pd_payment_name", label: "Name", sortable: true },
-        { key: "pd_payment_type", label: "Type", sortable: false },
-        { key: "pd_payment_variant", label: "Variant", sortable: false },
-        { key: "pd_payment_taxable", label: "Taxable", sortable: false },
-        // { key: "pd_desc", label: "Description", sortable: false },
-        { key: "pd_basic", label: "Basic", sortable: false },
-        { key: "pd_tie_number", label: "Tie Number", sortable: false },
+        { key: "pd_payment_type", label: "Type", sortable: true },
+        { key: "pd_payment_variant", label: "Variant", sortable: true },
+        { key: "pd_payment_taxable", label: "Taxable?", sortable: true },
+        { key: "pd_basic", label: "Basic?", sortable: true },
+        { key: "pd_tax", label: "Tax?", sortable: true },
+        { key: "pd_welfare", label: "Welfare?", sortable: true },
+        { key: "pd_value", label: "Payment Value", sortable: true },
+        { key: "pd_amount", label: "% Of", sortable: true },
+        { key: "pd_percentage", label: "% Value", sortable: true },
+        { key: "pd_total_gross", label: "Sum up to Gross?", sortable: true },
       ],
       submitted: false,
       code: null,
@@ -186,8 +215,8 @@ export default {
       ],
       taxable: 1,
       taxables: [
-        { text: "TAXABLE", value: 1 },
-        { text: "NONTAXABLE", value: 0 },
+        { text: "YES", value: 1 },
+        { text: "NO", value: 2 },
       ],
       description: 1,
       descriptions: [
@@ -198,8 +227,8 @@ export default {
       ],
       basic: 1,
       basics: [
-        { text: "BASIC", value: 1 },
-        { text: "NONBASIC", value: 0 },
+        { text: "YES", value: 1 },
+        { text: "NO", value: 0 },
       ],
 
       tie: null,
@@ -207,18 +236,29 @@ export default {
       pdPrGross: 0,
       pdValue: 1,
       pdValues: [
-        { text: "Flat", value: 1 },
-        { text: "Computed", value: 2 },
-      ],
-      pdTaxes: [
-        { text: "Tax", value: 1 },
-        { text: "Not Tax", value: 0 },
+        { text: "FLAT", value: 1 },
+        { text: "COMPUTED", value: 2 },
       ],
       pdTax: 0,
+      pdTaxes: [
+        { text: "YES", value: 1 },
+        { text: "NO", value: 0 },
+      ],
+      welfare: 0,
+      welfares: [
+        { text: "YES", value: 1 },
+        { text: "NO", value: 0 },
+      ],
       pdAmount: 1,
       pdAmounts: [
-        { text: "Of Gross", value: 1 },
-        { text: "Of Basic", value: 2 },
+        { text: "A. GROSS", value: 1 },
+        { text: "A. BASIC", value: 2 },
+        { text: "F. GROSS", value: 3 },
+      ],
+      sum: 1,
+      sums: [
+        { text: "YES", value: 1 },
+        { text: "NO", value: 0 },
       ],
       pdPercentage: 0,
     };
@@ -226,7 +266,24 @@ export default {
 };
 </script>
 
-<style></style>
+<style>
+.ff-wrapper {
+  position: relative;
+}
+.ff-header {
+  display: inline-block;
+  background-color: #ffffff;
+  margin-left: 2em;
+  padding-left: 0.5em;
+  padding-right: 0.5em;
+  position: absolute;
+}
+.ff-content {
+  border: 1px solid #ced4da;
+  border-radius: 10px;
+  padding: 2em 2em 1em 2em;
+}
+</style>
 
 <template>
   <Layout>
@@ -308,19 +365,37 @@ export default {
                   <p v-else-if="row.value === 2">VARIATIONAL</p>
                 </template>
                 <template #cell(pd_payment_taxable)="row">
-                  <p v-if="row.value === 1">TAXABLE</p>
-                  <p v-else-if="row.value === 0">NONTAXABLE</p>
+                  <p v-if="row.value === 1">YES</p>
+                  <p v-else>NO</p>
                 </template>
-                <!--                <template #cell(pd_desc)="row">-->
-                <!--                  <p v-if="row.value === 1">LOAN</p>-->
-                <!--                  <p v-else-if="row.value === 2">TAX</p>-->
-                <!--                  <p v-else-if="row.value === 3">PENSION</p>-->
-                <!--                  <p v-else-if="row.value === 4">HMO</p>-->
-                <!--                  <p v-else>-&#45;&#45;</p>-->
-                <!--                </template>-->
                 <template #cell(pd_basic)="row">
-                  <p v-if="row.value === '1'">BASIC</p>
-                  <p v-else-if="row.value === '0'">NONBASIC</p>
+                  <p v-if="row.value === 1">YES</p>
+                  <p v-else>NO</p>
+                </template>
+                <template #cell(pd_tax)="row">
+                  <p v-if="row.value === 1">YES</p>
+                  <p v-else>NO</p>
+                </template>
+                <template #cell(pd_welfare)="row">
+                  <p v-if="row.value === 1">YES</p>
+                  <p v-else>NO</p>
+                </template>
+                <template #cell(pd_value)="row">
+                  <p v-if="row.value === 1">FLAT</p>
+                  <p v-else>COMPUTED</p>
+                </template>
+                <template #cell(pd_amount)="row">
+                  <p v-if="row.value === 1">A. GROSS</p>
+                  <p v-else-if="row.value === 2">A. BASIC</p>
+                  <p v-else-if="row.value === 3">F. GROSS</p>
+                  <p v-else>-</p>
+                </template>
+                <template #cell(pd_percentage)="row">
+                  <p>{{ row.value }} %</p>
+                </template>
+                <template #cell(pd_total_gross)="row">
+                  <p v-if="row.value === 1">YES</p>
+                  <p v-else>NO</p>
                 </template>
               </b-table>
             </div>
@@ -354,181 +429,208 @@ export default {
       @hidden="resetForm"
     >
       <form @submit.prevent="submitNew">
-        <h5
-          style="
-            display: inline-block;
-            background-color: #ffffff;
-            margin-left: 2em;
-            padding-left: 0.5em;
-            padding-right: 0.5em;
-            position: absolute;
-            top: 2.5%;
-          "
-        >
-          Payment Information
-        </h5>
-        <div
-          style="
-            border: 1px solid #ced4da;
-            border-radius: 10px;
-            padding: 2em;
-            margin-top: 1em;
-            margin-bottom: 1em;
-          "
-        >
-          <div class="form-group">
-            <label for="username">
-              Payment Code <span class="text-danger">*</span>
-            </label>
-            <input
-              id="username"
-              type="text"
-              v-model="code"
-              class="form-control"
-              :class="{
-                'is-invalid': submitted && $v.code.$error,
-              }"
-            />
-          </div>
-          <div class="form-group">
-            <label for="fullname">
-              Payment Name <span class="text-danger">*</span>
-            </label>
-            <input
-              id="fullname"
-              type="text"
-              v-model="name"
-              class="form-control"
-              :class="{
-                'is-invalid': submitted && $v.name.$error,
-              }"
-            />
-          </div>
-        </div>
-
-        <div class="d-flex justify-content-between flex-lg-row flex-column">
-          <b-form-group>
-            <label for="user_type">Payment Type</label><br />
-            <b-form-radio-group
-              id="user_type"
-              v-model="type"
-              :options="types"
-              button-variant="outline-success"
-              buttons
-            />
-          </b-form-group>
-          <b-form-group>
-            <label for="user_status">Payment Variant</label><br />
-            <b-form-radio-group
-              id="user_status"
-              v-model="variant"
-              :options="variants"
-              button-variant="outline-success"
-              buttons
-            />
-          </b-form-group>
-        </div>
-        <div class="d-flex justify-content-between flex-lg-row flex-column">
-          <b-form-group>
-            <label for="user_type">Payment Taxable</label><br />
-            <b-form-radio-group
-              id="user_type"
-              v-model="taxable"
-              :options="taxables"
-              button-variant="outline-success"
-              buttons
-            />
-          </b-form-group>
-          <b-form-group>
-            <label for="user_status">Basic</label><br />
-            <b-form-radio-group
-              id="user_status"
-              v-model="basic"
-              :options="basics"
-              button-variant="outline-success"
-              buttons
-            />
-          </b-form-group>
-        </div>
-        <div class="form-group">
-          <div class="row">
-            <div class="col-12">
-              <label>
-                Percentage of Gross <span class="text-danger">*</span>
-              </label>
-              <input
-                type="number"
-                step="0.01"
-                v-model="pdPrGross"
-                class="form-control"
-                min="0"
-                :class="{
-                  'is-invalid': submitted && $v.pdPrGross.$error,
-                }"
-              />
+        <div class="ff-wrapper mt-3">
+          <h5 class="ff-header" style="bottom: 86%">Payment Information</h5>
+          <div class="ff-content">
+            <div class="row">
+              <div class="col-lg-6">
+                <div class="form-group">
+                  <label for="username">
+                    Payment Code <span class="text-danger">*</span>
+                  </label>
+                  <input
+                    id="username"
+                    type="text"
+                    v-model="code"
+                    class="form-control"
+                    :class="{
+                      'is-invalid': submitted && $v.code.$error,
+                    }"
+                  />
+                </div>
+              </div>
+              <div class="col-lg-6">
+                <div class="form-group">
+                  <label for="fullname">
+                    Payment Name <span class="text-danger">*</span>
+                  </label>
+                  <input
+                    id="fullname"
+                    type="text"
+                    v-model="name"
+                    class="form-control"
+                    :class="{
+                      'is-invalid': submitted && $v.name.$error,
+                    }"
+                  />
+                </div>
+              </div>
             </div>
           </div>
         </div>
-
-        <div class="form-group">
-          <div class="row">
-            <div class="col-6">
-              <b-form-group>
-                <label>Payment Value</label><br />
-                <b-form-radio-group
-                  id="payment_value"
-                  v-model="pdValue"
-                  :options="pdValues"
-                  button-variant="outline-success"
-                  buttons
-                />
-              </b-form-group>
-            </div>
-            <div class="col-6">
-              <b-form-group>
-                <label>Percentage of</label><br />
-                <b-form-radio-group
-                  id="user_type"
-                  v-model="pdAmount"
-                  :options="pdAmounts"
-                  button-variant="outline-success"
-                  buttons
-                />
-              </b-form-group>
+        <div class="ff-wrapper mt-5">
+          <h5 class="ff-header" style="bottom: 90%">Payment Type</h5>
+          <div class="ff-content">
+            <div class="row">
+              <div class="col-lg-6">
+                <b-form-group>
+                  <label for="user_type">Type</label><br />
+                  <b-form-radio-group
+                    id="user_type"
+                    v-model="type"
+                    :options="types"
+                    button-variant="outline-success"
+                    buttons
+                  />
+                </b-form-group>
+              </div>
+              <div class="col-lg-6">
+                <b-form-group>
+                  <label for="user_status">Variant</label><br />
+                  <b-form-radio-group
+                    id="user_status"
+                    v-model="variant"
+                    :options="variants"
+                    button-variant="outline-success"
+                    buttons
+                  />
+                </b-form-group>
+              </div>
+              <div class="col-lg-6" v-if="type === 1">
+                <b-form-group>
+                  <label for="user_type">Taxable?</label><br />
+                  <b-form-radio-group
+                    id="user_type"
+                    v-model="taxable"
+                    :options="taxables"
+                    button-variant="outline-success"
+                    buttons
+                  />
+                </b-form-group>
+              </div>
+              <div class="col-lg-6" v-if="type === 1">
+                <b-form-group>
+                  <label for="user_status">Basic?</label><br />
+                  <b-form-radio-group
+                    id="user_status"
+                    v-model="basic"
+                    :options="basics"
+                    button-variant="outline-success"
+                    buttons
+                  />
+                </b-form-group>
+              </div>
+              <div class="col-lg-6" v-if="type === 2">
+                <b-form-group>
+                  <label>Tax?</label><br />
+                  <b-form-radio-group
+                    id="user_type"
+                    v-model="pdTax"
+                    :options="pdTaxes"
+                    button-variant="outline-success"
+                    buttons
+                  />
+                </b-form-group>
+              </div>
+              <div class="col-lg-6" v-if="type === 2">
+                <b-form-group>
+                  <label>Welfare?</label><br />
+                  <b-form-radio-group
+                    id="user_type"
+                    v-model="welfare"
+                    :options="welfares"
+                    button-variant="outline-success"
+                    buttons
+                  />
+                </b-form-group>
+              </div>
             </div>
           </div>
         </div>
-
-        <div class="form-group">
-          <div class="row">
-            <div class="col-6">
-              <label> Percentage % <span class="text-danger">*</span> </label>
-              <input
-                type="number"
-                step="0.01"
-                v-model="pdPercentage"
-                class="form-control"
-                min="0"
-              />
+        <div class="ff-wrapper mt-5">
+          <h5 class="ff-header" style="bottom: 87% !important">
+            Apportionment
+          </h5>
+          <div class="ff-content">
+            <div class="form-group">
+              <div class="row">
+                <div class="col-lg-6">
+                  <label> % of Gross <span class="text-danger">*</span> </label>
+                  <input
+                    type="number"
+                    v-model="pdPrGross"
+                    class="form-control"
+                    min="0"
+                    max="100"
+                    :class="{
+                      'is-invalid': submitted && $v.pdPrGross.$error,
+                    }"
+                  />
+                </div>
+              </div>
             </div>
-
-            <div class="col-6">
-              <b-form-group>
-                <label>Tax?</label><br />
-                <b-form-radio-group
-                  id="user_type"
-                  v-model="pdTax"
-                  :options="pdTaxes"
-                  button-variant="outline-success"
-                  buttons
-                />
-              </b-form-group>
+          </div>
+        </div>
+        <div class="ff-wrapper mt-5">
+          <h5 class="ff-header" style="bottom: 92.3% !important">Value</h5>
+          <div class="ff-content">
+            <div class="form-group">
+              <div class="row">
+                <div class="col-lg-6">
+                  <b-form-group>
+                    <label>Payment Value</label><br />
+                    <b-form-radio-group
+                      id="payment_value"
+                      v-model="pdValue"
+                      :options="pdValues"
+                      button-variant="outline-success"
+                      buttons
+                    />
+                  </b-form-group>
+                </div>
+                <div class="col-lg-6" v-if="pdValue === 2">
+                  <b-form-group>
+                    <label>% of</label><br />
+                    <b-form-radio-group
+                      id="user_type"
+                      v-model="pdAmount"
+                      :options="pdAmounts"
+                      button-variant="outline-success"
+                      buttons
+                    />
+                  </b-form-group>
+                </div>
+                <div class="col-lg-6" v-if="pdValue === 2">
+                  <b-form-group>
+                    <label> % Value <span class="text-danger">*</span> </label>
+                    <input
+                      type="number"
+                      v-model="pdPercentage"
+                      class="form-control"
+                      min="0"
+                      max="100"
+                    />
+                  </b-form-group>
+                </div>
+                <div class="col-lg-6">
+                  <b-form-group>
+                    <label>Sum up to gross?</label><br />
+                    <b-form-radio-group
+                      id="user_type"
+                      v-model="sum"
+                      :options="sums"
+                      button-variant="outline-success"
+                      buttons
+                    />
+                  </b-form-group>
+                </div>
+              </div>
             </div>
           </div>
         </div>
         <b-button
           v-if="!submitting"
-          class="btn btn-success btn-block mt-4"
+          class="btn btn-success btn-block mt-5"
           type="submit"
         >
           Submit
@@ -536,7 +638,7 @@ export default {
         <b-button
           v-else
           disabled
-          class="btn btn-success btn-block mt-4"
+          class="btn btn-success btn-block mt-5"
           type="submit"
         >
           Submitting...
@@ -549,176 +651,212 @@ export default {
       hide-footer
       centered
       title-class="font-18"
+      size="lg"
       @hidden="resetForm"
     >
       <form @submit.prevent="submitUpdate">
-        <div class="form-group">
-          <label for="username">
-            Payment Code <span class="text-danger">*</span>
-          </label>
-          <input
-            id="username"
-            type="text"
-            v-model="code"
-            class="form-control"
-            :class="{
-              'is-invalid': submitted && $v.code.$error,
-            }"
-          />
-        </div>
-        <div class="form-group">
-          <label for="fullname">
-            Payment Name <span class="text-danger">*</span>
-          </label>
-          <input
-            id="fullname"
-            type="text"
-            v-model="name"
-            class="form-control"
-            :class="{
-              'is-invalid': submitted && $v.name.$error,
-            }"
-          />
-        </div>
-        <div class="d-flex justify-content-between flex-lg-row flex-column">
-          <b-form-group>
-            <label for="user_type">Payment Type</label><br />
-            <b-form-radio-group
-              id="user_type"
-              v-model="type"
-              :options="types"
-              button-variant="outline-success"
-              buttons
-            />
-          </b-form-group>
-          <b-form-group>
-            <label for="user_status">Payment Variant</label><br />
-            <b-form-radio-group
-              id="user_status"
-              v-model="variant"
-              :options="variants"
-              button-variant="outline-success"
-              buttons
-            />
-          </b-form-group>
-        </div>
-        <div class="d-flex justify-content-between flex-lg-row flex-column">
-          <b-form-group>
-            <label for="user_type">Payment Taxable</label><br />
-            <b-form-radio-group
-              id="user_type"
-              v-model="taxable"
-              :options="taxables"
-              button-variant="outline-success"
-              buttons
-            />
-          </b-form-group>
-          <b-form-group>
-            <label for="user_status">Basic</label><br />
-            <b-form-radio-group
-              id="user_status"
-              v-model="basic"
-              :options="basics"
-              button-variant="outline-success"
-              buttons
-            />
-          </b-form-group>
-        </div>
-        <!--        <b-form-group>-->
-        <!--          <label for="user_status">Description</label><br />-->
-        <!--          <b-form-radio-group-->
-        <!--            id="user_status"-->
-        <!--            v-model="description"-->
-        <!--            :options="descriptions"-->
-        <!--            button-variant="outline-success"-->
-        <!--            buttons-->
-        <!--          />-->
-        <!--        </b-form-group>-->
-        <!--        <div class="form-group">-->
-        <!--          <label for="token">Tie Number</label>-->
-        <!--          <input id="token" type="text" v-model="tie" class="form-control" />-->
-        <!--        </div>-->
-
-        <div class="form-group">
-          <div class="row">
-            <div class="col-12">
-              <label>
-                Percentage of Gross <span class="text-danger">*</span>
-              </label>
-              <input
-                type="number"
-                step="0.01"
-                v-model="pdPrGross"
-                class="form-control"
-                min="0"
-                :class="{
-                  'is-invalid': submitted && $v.pdPrGross.$error,
-                }"
-              />
+        <div class="ff-wrapper mt-3">
+          <h5 class="ff-header" style="bottom: 86%">Payment Information</h5>
+          <div class="ff-content">
+            <div class="row">
+              <div class="col-lg-6">
+                <div class="form-group">
+                  <label for="username">
+                    Payment Code <span class="text-danger">*</span>
+                  </label>
+                  <input
+                    id="username"
+                    type="text"
+                    v-model="code"
+                    class="form-control"
+                    :class="{
+                      'is-invalid': submitted && $v.code.$error,
+                    }"
+                  />
+                </div>
+              </div>
+              <div class="col-lg-6">
+                <div class="form-group">
+                  <label for="fullname">
+                    Payment Name <span class="text-danger">*</span>
+                  </label>
+                  <input
+                    id="fullname"
+                    type="text"
+                    v-model="name"
+                    class="form-control"
+                    :class="{
+                      'is-invalid': submitted && $v.name.$error,
+                    }"
+                  />
+                </div>
+              </div>
             </div>
           </div>
         </div>
-
-        <div class="form-group">
-          <div class="row">
-            <div class="col-6">
-              <b-form-group>
-                <label>Payment Value</label><br />
-                <b-form-radio-group
-                  id="payment_value"
-                  v-model="pdValue"
-                  :options="pdValues"
-                  button-variant="outline-success"
-                  buttons
-                />
-              </b-form-group>
-            </div>
-            <div class="col-6">
-              <b-form-group>
-                <label>Percentage of</label><br />
-                <b-form-radio-group
-                  id="user_type"
-                  v-model="pdAmount"
-                  :options="pdAmounts"
-                  button-variant="outline-success"
-                  buttons
-                />
-              </b-form-group>
+        <div class="ff-wrapper mt-5">
+          <h5 class="ff-header" style="bottom: 90%">Payment Type</h5>
+          <div class="ff-content">
+            <div class="row">
+              <div class="col-lg-6">
+                <b-form-group>
+                  <label for="user_type">Type</label><br />
+                  <b-form-radio-group
+                    id="user_type"
+                    v-model="type"
+                    :options="types"
+                    button-variant="outline-success"
+                    buttons
+                  />
+                </b-form-group>
+              </div>
+              <div class="col-lg-6">
+                <b-form-group>
+                  <label for="user_status">Variant</label><br />
+                  <b-form-radio-group
+                    id="user_status"
+                    v-model="variant"
+                    :options="variants"
+                    button-variant="outline-success"
+                    buttons
+                  />
+                </b-form-group>
+              </div>
+              <div class="col-lg-6" v-if="type === 1">
+                <b-form-group>
+                  <label for="user_type">Taxable?</label><br />
+                  <b-form-radio-group
+                    id="user_type"
+                    v-model="taxable"
+                    :options="taxables"
+                    button-variant="outline-success"
+                    buttons
+                  />
+                </b-form-group>
+              </div>
+              <div class="col-lg-6" v-if="type === 1">
+                <b-form-group>
+                  <label for="user_status">Basic?</label><br />
+                  <b-form-radio-group
+                    id="user_status"
+                    v-model="basic"
+                    :options="basics"
+                    button-variant="outline-success"
+                    buttons
+                  />
+                </b-form-group>
+              </div>
+              <div class="col-lg-6" v-if="type === 2">
+                <b-form-group>
+                  <label>Tax?</label><br />
+                  <b-form-radio-group
+                    id="user_type"
+                    v-model="pdTax"
+                    :options="pdTaxes"
+                    button-variant="outline-success"
+                    buttons
+                  />
+                </b-form-group>
+              </div>
+              <div class="col-lg-6" v-if="type === 2">
+                <b-form-group>
+                  <label>Welfare?</label><br />
+                  <b-form-radio-group
+                    id="user_type"
+                    v-model="welfare"
+                    :options="welfares"
+                    button-variant="outline-success"
+                    buttons
+                  />
+                </b-form-group>
+              </div>
             </div>
           </div>
         </div>
-
-        <div class="form-group">
-          <div class="row">
-            <div class="col-6">
-              <label> Percentage % <span class="text-danger">*</span> </label>
-              <input
-                type="number"
-                step="0.01"
-                v-model="pdPercentage"
-                class="form-control"
-                min="0"
-              />
-            </div>
-
-            <div class="col-6">
-              <b-form-group>
-                <label>Tax?</label><br />
-                <b-form-radio-group
-                  id="user_type"
-                  v-model="pdTax"
-                  :options="pdTaxes"
-                  button-variant="outline-success"
-                  buttons
-                />
-              </b-form-group>
+        <div class="ff-wrapper mt-5">
+          <h5 class="ff-header" style="bottom: 87% !important">
+            Apportionment
+          </h5>
+          <div class="ff-content">
+            <div class="form-group">
+              <div class="row">
+                <div class="col-lg-6">
+                  <label> % of Gross <span class="text-danger">*</span> </label>
+                  <input
+                    type="number"
+                    v-model="pdPrGross"
+                    class="form-control"
+                    min="0"
+                    max="100"
+                    :class="{
+                      'is-invalid': submitted && $v.pdPrGross.$error,
+                    }"
+                  />
+                </div>
+              </div>
             </div>
           </div>
         </div>
-
+        <div class="ff-wrapper mt-5">
+          <h5 class="ff-header" style="bottom: 92.3% !important">Value</h5>
+          <div class="ff-content">
+            <div class="form-group">
+              <div class="row">
+                <div class="col-lg-6">
+                  <b-form-group>
+                    <label>Payment Value</label><br />
+                    <b-form-radio-group
+                      id="payment_value"
+                      v-model="pdValue"
+                      :options="pdValues"
+                      button-variant="outline-success"
+                      buttons
+                    />
+                  </b-form-group>
+                </div>
+                <div class="col-lg-6" v-if="pdValue === 2">
+                  <b-form-group>
+                    <label>% of</label><br />
+                    <b-form-radio-group
+                      id="user_type"
+                      v-model="pdAmount"
+                      :options="pdAmounts"
+                      button-variant="outline-success"
+                      buttons
+                    />
+                  </b-form-group>
+                </div>
+                <div class="col-lg-6" v-if="pdValue === 2">
+                  <b-form-group>
+                    <label> % Value <span class="text-danger">*</span> </label>
+                    <input
+                      type="number"
+                      v-model="pdPercentage"
+                      class="form-control"
+                      min="0"
+                      max="100"
+                    />
+                  </b-form-group>
+                </div>
+                <div class="col-lg-6">
+                  <b-form-group>
+                    <label>Sum up to gross?</label><br />
+                    <b-form-radio-group
+                      id="user_type"
+                      v-model="sum"
+                      :options="sums"
+                      button-variant="outline-success"
+                      buttons
+                    />
+                  </b-form-group>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
         <b-button
           v-if="!submitting"
-          class="btn btn-success btn-block mt-4"
+          class="btn btn-success btn-block mt-5"
           type="submit"
         >
           Submit
@@ -726,7 +864,7 @@ export default {
         <b-button
           v-else
           disabled
-          class="btn btn-success btn-block mt-4"
+          class="btn btn-success btn-block mt-5"
           type="submit"
         >
           Submitting...
