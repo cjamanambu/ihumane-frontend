@@ -51,11 +51,18 @@ export default {
       end: "",
       duration: 0,
       submitted: false,
+      isPresent: true,
     };
   },
   methods: {
     setTimesheetDate() {
       this.timesheetDate = new Date(this.$route.params.date);
+    },
+    setPresent() {
+      this.isPresent = true;
+    },
+    setAbsent() {
+      this.isPresent = false;
     },
     getTimesheetData() {
       const employeeID = this.getEmployee.emp_id;
@@ -63,28 +70,55 @@ export default {
       const url = `${this.ROUTES.timesheet}/get-time-sheet/${employeeID}/${date}`;
       this.apiGet(url).then((res) => {
         const { data } = res;
+        console.log({ data });
         if (data) {
           this.start = data.ts_start;
           this.end = data.ts_end;
           this.duration = data.ts_duration;
+          data.ts_is_present
+            ? (this.isPresent = true)
+            : (this.isPresent = false);
         }
       });
     },
     submit() {
-      this.submitted = true;
-      this.$v.$touch();
-      if (this.$v.$invalid) {
-        this.apiFormHandler("Invalid Timesheet Entry");
+      const url = `${this.ROUTES.timesheet}/add-time-sheet`;
+
+      if (this.isPresent) {
+        this.submitted = true;
+        this.$v.$touch();
+        if (this.$v.$invalid) {
+          this.apiFormHandler("Invalid Timesheet Entry");
+        } else {
+          const data = {
+            ts_emp_id: this.getEmployee.emp_id,
+            ts_month: `${this.timesheetDate.getMonth() + 1}`,
+            ts_year: `${this.timesheetDate.getFullYear()}`,
+            ts_day: `${this.timesheetDate.getDate()}`,
+            ts_start: this.start,
+            ts_end: this.end,
+            ts_duration: this.duration,
+            ts_is_present: 1,
+          };
+          this.apiPost(url, data, "Add Timesheet Error").then((res) => {
+            const { data } = res;
+            if (data) {
+              this.apiResponseHandler(data, "Modified Timesheet Entry");
+            }
+            this.$v.$reset();
+            this.getTimesheetData();
+          });
+        }
       } else {
-        const url = `${this.ROUTES.timesheet}/add-time-sheet`;
         const data = {
           ts_emp_id: this.getEmployee.emp_id,
           ts_month: `${this.timesheetDate.getMonth() + 1}`,
           ts_year: `${this.timesheetDate.getFullYear()}`,
           ts_day: `${this.timesheetDate.getDate()}`,
-          ts_start: this.start,
-          ts_end: this.end,
-          ts_duration: this.duration,
+          ts_start: "0",
+          ts_end: "0",
+          ts_duration: 0,
+          ts_is_present: 0,
         };
         this.apiPost(url, data, "Add Timesheet Error").then((res) => {
           const { data } = res;
@@ -95,6 +129,20 @@ export default {
           this.getTimesheetData();
         });
       }
+    },
+    tConvert(time) {
+      // Check correct time format and split into components
+      time = time
+        .toString()
+        .match(/^([01]\d|2[0-3])(:)([0-5]\d)(:[0-5]\d)?$/) || [time];
+
+      if (time.length > 1) {
+        // If time format correct
+        time = time.slice(1); // Remove full string match value
+        time[5] = +time[0] < 12 ? " AM" : " PM"; // Set AM/PM
+        time[0] = +time[0] % 12 || 12; // Adjust hours
+      }
+      return time.join(""); // return adjusted time or original string
     },
   },
 };
@@ -107,6 +155,19 @@ export default {
 <template>
   <Layout>
     <PageHeader :title="title" :items="items" />
+    <div class="d-flex justify-content-end mb-3">
+      <b-button
+        class="btn btn-success"
+        @click="$router.push({ name: 'timesheet' })"
+      >
+        <i class="mdi mdi-plus mr-2"></i>
+        View Timesheet
+      </b-button>
+    </div>
+    <div class="alert alert-warning" v-if="!isPresent">
+      Please note, you will be marked as absent for the timesheet entry on
+      {{ timesheetDate.toDateString() }}
+    </div>
     <scale-loader v-if="apiBusy" />
     <div v-else class="row">
       <div class="col-lg-7">
@@ -125,6 +186,7 @@ export default {
                     <input
                       id="start"
                       type="time"
+                      :disabled="!isPresent"
                       v-model="start"
                       class="form-control"
                       :class="{
@@ -149,6 +211,7 @@ export default {
                     <input
                       id="end"
                       type="time"
+                      :disabled="!isPresent"
                       class="form-control"
                       v-model="end"
                       :class="{
@@ -174,6 +237,7 @@ export default {
                       id="duration"
                       type="number"
                       class="form-control"
+                      :disabled="!isPresent"
                       step=".01"
                       v-model="duration"
                       :class="{
@@ -218,8 +282,15 @@ export default {
             <div class="p-3 bg-light mb-4">
               <h5 class="font-size-14 mb-0 d-flex justify-content-between">
                 Timesheet Data
-                <span class="back text-danger" @click="$router.back()">
-                  Go Back
+                <span
+                  v-if="isPresent"
+                  class="back text-danger"
+                  @click="setAbsent"
+                >
+                  Set Absent
+                </span>
+                <span v-else class="back text-success" @click="setPresent">
+                  Set Present
                 </span>
               </h5>
             </div>
@@ -249,7 +320,7 @@ export default {
               >
                 WEEKEND
               </p>
-              <p v-else>{{ start }}</p>
+              <p v-else>{{ this.tConvert(start) }}</p>
             </div>
             <div class="d-flex justify-content-between">
               <p>Finish Time</p>
@@ -260,7 +331,7 @@ export default {
               >
                 WEEKEND
               </p>
-              <p v-else>{{ end }}</p>
+              <p v-else>{{ this.tConvert(end) }}</p>
             </div>
             <div class="d-flex justify-content-between">
               <p>Break Hours</p>
