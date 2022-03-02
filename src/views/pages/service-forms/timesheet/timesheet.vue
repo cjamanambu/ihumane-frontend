@@ -251,7 +251,11 @@ export default {
   },
 };
 </script>
-
+<style>
+.fc-event-title {
+  color: #000000;
+}
+</style>
 <template>
   <Layout>
     <PageHeader :title="title" :items="items" />

@@ -31,6 +31,8 @@ export default {
         this.newFields.forEach((newField) => {
           if (newField === "sn") {
             this.jsonFields["S/N"] = newField;
+          } else if (newField === "t7_number") {
+            this.jsonFields["T7 NUMBER"] = "employeeUniqueId";
           } else if (newField === "employeeName") {
             this.jsonFields["EMPLOYEE NAME"] = newField;
           } else if (newField === "netSalary") {
@@ -61,6 +63,7 @@ export default {
           let variationObj = {
             sn: ++index,
             employeeName: variation.employeeName,
+            employeeUniqueId: variation.employeeUniqueId,
           };
           variation.incomes.forEach((income) => {
             variationObj[income.paymentName] = parseFloat(
@@ -161,7 +164,7 @@ export default {
         },
         { key: "netSalary", label: "Net Salary", sortable: true },
       ],
-      newFields: ["sn", "employeeName"],
+      newFields: ["sn", "employeeName", "t7_number"],
       incomeFields: [],
       deductionFields: [],
       jsonFields: {},
@@ -244,7 +247,7 @@ export default {
                 :items="variations"
                 :fields="newFields"
                 striped
-                responsive="sm"
+                responsive="lg"
                 :per-page="perPage"
                 :current-page="currentPage"
                 :sort-by.sync="sortBy"
@@ -262,6 +265,11 @@ export default {
                 <template #cell(employeeName)="row">
                   <span>
                     {{ row.value }}
+                  </span>
+                </template>
+                <template #cell(t7_number)="row">
+                  <span>
+                    {{ row.item.employeeUniqueId }}
                   </span>
                 </template>
                 <template #cell()="data">
