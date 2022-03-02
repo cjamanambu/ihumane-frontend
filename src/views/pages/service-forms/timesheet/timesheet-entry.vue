@@ -52,6 +52,7 @@ export default {
       duration: 0,
       submitted: false,
       isPresent: true,
+      update: false,
     };
   },
   methods: {
@@ -60,9 +61,14 @@ export default {
     },
     setPresent() {
       this.isPresent = true;
+      this.update = true;
     },
     setAbsent() {
       this.isPresent = false;
+      this.start = "";
+      this.end = "";
+      this.duration = "";
+      this.update = true;
     },
     getTimesheetData() {
       const employeeID = this.getEmployee.emp_id;
@@ -156,6 +162,16 @@ export default {
   <Layout>
     <PageHeader :title="title" :items="items" />
     <div class="d-flex justify-content-end mb-3">
+      <b-button
+        v-if="isPresent"
+        class="btn btn-warning mr-3"
+        @click="setAbsent"
+      >
+        Set Absent
+      </b-button>
+      <b-button v-else class="btn btn-info mr-3" @click="setPresent">
+        Set Present
+      </b-button>
       <b-button
         class="btn btn-success"
         @click="$router.push({ name: 'timesheet' })"
@@ -261,7 +277,8 @@ export default {
                   class="btn btn-success btn-block mt-4"
                   type="submit"
                 >
-                  Submit
+                  <span v-if="update">Update</span>
+                  <span v-else> Submit </span>
                 </b-button>
                 <b-button
                   v-else
@@ -269,7 +286,8 @@ export default {
                   class="btn btn-success btn-block mt-4"
                   type="submit"
                 >
-                  Submitting...
+                  <span v-if="update">Updating...</span>
+                  <span v-else>Submitting...</span>
                 </b-button>
               </div>
             </form>
@@ -280,19 +298,7 @@ export default {
         <div class="card">
           <div class="card-body">
             <div class="p-3 bg-light mb-4">
-              <h5 class="font-size-14 mb-0 d-flex justify-content-between">
-                Timesheet Data
-                <span
-                  v-if="isPresent"
-                  class="back text-danger"
-                  @click="setAbsent"
-                >
-                  Set Absent
-                </span>
-                <span v-else class="back text-success" @click="setPresent">
-                  Set Present
-                </span>
-              </h5>
+              <h5 class="font-size-14 mb-0">Timesheet Data</h5>
             </div>
 
             <div class="d-flex justify-content-between">
