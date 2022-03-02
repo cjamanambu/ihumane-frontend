@@ -43,7 +43,7 @@ export default {
               if (depart.d_sector_lead_id === parseFloat(lead.emp_id)) {
                 depart["leader"] = `${lead.emp_first_name} ${
                   lead.emp_last_name !== null ? lead.emp_last_name : ""
-                } ${lead.emp_other_name !== null ? lead.emp_other_name : ""}`;
+                } ${lead.emp_other_name !== null ? lead.emp_other_name : ""} (${lead.emp_unique_id})`;
               }
             });
           });
@@ -82,7 +82,7 @@ export default {
             value: emp.emp_id,
             text: `${emp.emp_first_name} ${emp.emp_last_name} ${
               emp.emp_other_name !== null ? emp.emp_other_name : ""
-            }`,
+            } (${emp.emp_unique_id})`,
           });
         });
       });

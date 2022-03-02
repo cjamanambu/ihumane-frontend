@@ -3,6 +3,7 @@ import Layout from "@/views/layouts/main";
 import PageHeader from "@/components/page-header";
 import appConfig from "@/app.config";
 import { required } from "vuelidate/lib/validators";
+import Multiselect from 'vue-multiselect';
 
 export default {
   page: {
@@ -12,6 +13,7 @@ export default {
   components: {
     Layout,
     PageHeader,
+    Multiselect,
   },
   mounted() {
     this.refreshTable();
@@ -21,6 +23,9 @@ export default {
     supervisor: { required },
   },
   methods: {
+    selectionLabel ({ text }) {
+      return `${text}`
+    },
     refreshTable() {
       const url = `${this.ROUTES.employee}`;
       this.apiGet(url, "Get Employees Error").then(
@@ -59,7 +64,7 @@ export default {
             data.forEach((supervisor) => {
               this.supervisors.push({
                 value: supervisor.emp_id,
-                text:`${supervisor.emp_first_name} ${supervisor.emp_last_name}`,
+                text:`${supervisor.emp_first_name} ${supervisor.emp_last_name} (${supervisor.emp_unique_id})`,
               });
             });
           }
@@ -77,7 +82,7 @@ export default {
         const data = {
 
           sa_emp_id: this.emp_id,
-          sa_supervisor_id: this.supervisor,
+          sa_supervisor_id: this.supervisor.value,
 
 
         };
@@ -205,12 +210,12 @@ export default {
               >
 
                 <template #cell(emp_first_name)="data">
-                  <b> {{ data.item.emp_first_name }} </b>,  {{ data.item.emp_last_name.toUpperCase() }}
+                  <b> {{ data.item.emp_first_name }} </b>,  {{ data.item.emp_last_name.toUpperCase() }} ({{ data.item.emp_unique_id}})
                 </template>
 
                 <template #cell(supervisor)="data">
               <div v-if="data.item.supervisor !== null">
-                <b > {{ data.item.supervisor.emp_first_name }} </b>,  {{ data.item.supervisor.emp_last_name.toUpperCase() }}
+                <b > {{ data.item.supervisor.emp_first_name }} </b>,  {{ data.item.supervisor.emp_last_name.toUpperCase() }} ({{ data.item.supervisor.emp_unique_id}})
 
               </div>
                   <div v-if="data.item.supervisor == null">
@@ -268,14 +273,15 @@ export default {
           <label for="">
            Supervisors <span class="text-danger">*</span>
           </label>
-          <b-form-select
-              id="employee"
-              v-model="supervisor"
-              :options="supervisors"
-              :class="{
-              'is-invalid': submitted && $v.supervisor.$error,
-            }"
-          />
+          <multiselect
+                  v-model="supervisor"
+                  :options="supervisors"
+                  :custom-label="selectionLabel"
+                  :class="{
+                      'is-invalid': submitted && $v.supervisor.$error,
+                    }"
+          ></multiselect>
+
         </div>
 
 
