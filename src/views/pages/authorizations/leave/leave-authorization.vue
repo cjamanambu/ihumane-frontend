@@ -122,6 +122,7 @@ export default {
           ? (data.status = 1)
           : (data.status = 2);
         !this.final ? (data.nextOfficer = this.official.value) : "";
+
         this.apiPost(this.ROUTES.authorization, data)
           .then((res) => {
             this.$router.push({ name: "leave-authorization" }).then(() => {
