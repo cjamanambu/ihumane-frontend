@@ -31,6 +31,8 @@ export default {
         this.newFields.forEach((newField) => {
           if (newField === "sn") {
             this.jsonFields["S/N"] = newField;
+          } else if (newField === "t7_number") {
+            this.jsonFields["T7 NUMBER"] = "employeeUniqueId";
           } else if (newField === "employeeName") {
             this.jsonFields["EMPLOYEE NAME"] = newField;
           } else if (newField === "netSalary") {
@@ -60,6 +62,7 @@ export default {
           let deductionObj = {
             sn: ++index,
             employeeName: deduction.employeeName,
+            employeeUniqueId: deduction.employeeUniqueId,
           };
           deduction.deductions.forEach((deduction) => {
             deductionObj[deduction.paymentName] = parseFloat(
@@ -136,27 +139,7 @@ export default {
       filterOn: [],
       sortBy: "sn",
       sortDesc: false,
-      fields: [
-        { key: "sn", label: "S/n", sortable: true },
-        { key: "employeeName", label: "Employee", sortable: true },
-        { key: "employeeUniqueId", label: "T7 Number", sortable: true },
-        { key: "location", label: "Location (T6)", sortable: true },
-        { key: "sector", label: "Sector (T3)", sortable: true },
-        {
-          key: "income",
-          label: "Entitlements",
-          sortable: true,
-          thStyle: { width: "20%" },
-        },
-        {
-          key: "deduction",
-          label: "Deductions",
-          sortable: true,
-          thStyle: { width: "20%" },
-        },
-        { key: "netSalary", label: "Net Salary", sortable: true },
-      ],
-      newFields: ["sn", "employeeName"],
+      newFields: ["sn", "employeeName", "t7_number"],
       incomeFields: [],
       deductionFields: [],
       jsonFields: {},
@@ -239,7 +222,7 @@ export default {
                 :items="deductions"
                 :fields="newFields"
                 striped
-                responsive="sm"
+                responsive="lg"
                 :per-page="perPage"
                 :current-page="currentPage"
                 :sort-by.sync="sortBy"
@@ -257,6 +240,11 @@ export default {
                 <template #cell(employeeName)="row">
                   <span>
                     {{ row.value }}
+                  </span>
+                </template>
+                <template #cell(t7_number)="row">
+                  <span>
+                    {{ row.item.employeeUniqueId }}
                   </span>
                 </template>
                 <template #cell()="data">
