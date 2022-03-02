@@ -147,8 +147,7 @@ export default {
           this.populateTimesheetData();
         } else {
           data.forEach((entry) => {
-            let month, day, title;
-            title = `${entry.ts_start} - ${entry.ts_end} for ${entry.ts_duration} hrs`;
+            let month, day;
             entry.ts_month.length === 1
               ? (month = `0${entry.ts_month}`)
               : (month = entry.ts_month);
@@ -158,11 +157,18 @@ export default {
             const date = `${entry.ts_year}-${month}-${day}`;
             const entryObj = {
               id: this.entryCount++,
-              title,
               start: date,
               end: date,
               display: "background",
             };
+            if (entry.ts_is_present) {
+              entryObj.title = `${this.tConvert(
+                entry.ts_start
+              )} - ${this.tConvert(entry.ts_end)} for ${entry.ts_duration} hrs`;
+            } else {
+              entryObj.title = `ABSENT`;
+              entryObj.display = "block";
+            }
             let calendarApi = this.$refs.fullCalendar.getApi();
             calendarApi.addEvent(entryObj);
           });
@@ -228,6 +234,20 @@ export default {
         params: { payrollMY },
       });
     },
+    tConvert(time) {
+      // Check correct time format and split into components
+      time = time
+        .toString()
+        .match(/^([01]\d|2[0-3])(:)([0-5]\d)(:[0-5]\d)?$/) || [time];
+
+      if (time.length > 1) {
+        // If time format correct
+        time = time.slice(1); // Remove full string match value
+        time[5] = +time[0] < 12 ? " AM" : " PM"; // Set AM/PM
+        time[0] = +time[0] % 12 || 12; // Adjust hours
+      }
+      return time.join(""); // return adjusted time or original string
+    },
   },
 };
 </script>
@@ -292,15 +312,15 @@ export default {
                   </div>
                   <div class="d-flex justify-content-between">
                     <p>T7 Code</p>
-                    <p>-</p>
+                    <p>{{ getEmployee.emp_unique_id }}</p>
                   </div>
                   <div class="d-flex justify-content-between">
-                    <p>Location (T5)</p>
-                    <p>-</p>
+                    <p>Location (T6)</p>
+                    <p>{{ getEmployee.location.l_t6_code }}</p>
                   </div>
                   <div class="d-flex justify-content-between">
-                    <p>Site Code (T6)</p>
-                    <p>-</p>
+                    <p>Site Code (T3)</p>
+                    <p>{{ getEmployee.JobRole.Department.d_t3_code }}</p>
                   </div>
                   <div class="d-flex justify-content-between">
                     <p>Nationality</p>
