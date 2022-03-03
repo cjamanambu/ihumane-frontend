@@ -44,7 +44,7 @@
                     this.charges.forEach((charge) => {
                         this.employees.forEach((officer) => {
                             if (charge.tsp_emp_id === officer.emp_id) {
-                                charge["emp"] = `${officer.emp_first_name} ${officer.emp_last_name}`;
+                                charge["emp"] = `${officer.emp_first_name} ${officer.emp_last_name} (${officer.emp_unique_id})`;
                             }
                         });
                     });
