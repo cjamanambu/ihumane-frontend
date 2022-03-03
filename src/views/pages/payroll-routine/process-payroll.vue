@@ -161,6 +161,12 @@ export default {
           <div class="col-12">
             <div class="card">
               <div class="card-body">
+                <div class="p-3 bg-light mb-4 d-flex justify-content-between">
+                  <h5 class="font-size-14 mb-0">
+                    Payroll Summary For Payroll Period:
+                    {{ (parseInt(pmyMonth) - 1) | getMonth }} {{ pmyYear }}
+                  </h5>
+                </div>
                 <div class="row mt-4">
                   <div class="col-sm-12 col-md-6">
                     <div id="tickets-table_length" class="dataTables_length">
