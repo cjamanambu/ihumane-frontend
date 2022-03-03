@@ -109,17 +109,7 @@ export default {
       if (this.$v.$invalid) {
         this.apiFormHandler("Invalid Authorization");
       } else {
-        const val = type === 'approve' ? 1 : 2;
-/*
-        const data = {
-          appId: this.application.leapp_id.toString(),
-          type: 1,
-          comment: this.comment,
-          role: this.roleId.value,
-          markAsFinal,
-          officer: this.getEmployee.emp_id,
-        };
-*/
+        const val = type === "approve" ? 1 : 2;
         const data = {
           appId: `${this.ref_no}`,
           status: val,
@@ -127,25 +117,24 @@ export default {
           type: 2,
           role: this.roleId.value,
           comment: this.comment,
-          markAsFinal
-          //nextOfficer: this.nextOfficer.value,
+          markAsFinal,
         };
 
         type === "approve" || type === "forward"
-                ? (data.status = 1)
-                : (data.status = 2);
+          ? (data.status = 1)
+          : (data.status = 2);
         !this.final ? (data.nextOfficer = this.official.value) : "";
 
         this.apiPost(this.ROUTES.authorization, data)
-                .then((res) => {
-                  this.$router.push({ name: "time-sheet-authorization" }).then(() => {
-                    this.apiResponseHandler("Authorization Complete", res.data);
-                  });
-                })
-                .finally(() => {
-                  this.approving = false;
-                  this.declining = false;
-                });
+          .then((res) => {
+            this.$router.push({ name: "time-sheet-authorization" }).then(() => {
+              this.apiResponseHandler("Authorization Complete", res.data);
+            });
+          })
+          .finally(() => {
+            this.approving = false;
+            this.declining = false;
+          });
       }
     },
     /*authorizationHandler(val) {
@@ -221,17 +210,19 @@ export default {
       allocationId: null,
       ref_no: null,
       ta_status: null,
-      roles:[{
-        value:null,
-        text:"Authorizing as...",
-        disabled:true,
-      }],
-      type:null,
+      roles: [
+        {
+          value: null,
+          text: "Authorizing as...",
+          disabled: true,
+        },
+      ],
+      type: null,
       submitted: false,
       status: null,
       approving: false,
       declining: false,
-      roleId:null,
+      roleId: null,
       officials: [
         {
           value: null,
@@ -505,10 +496,10 @@ export default {
                 </b-form-group>
                 <b-form-group>
                   <multiselect
-                          v-model="roleId"
-                          :options="roles"
-                          :custom-label="authorizingAsLabel"
-                          :class="{
+                    v-model="roleId"
+                    :options="roles"
+                    :custom-label="authorizingAsLabel"
+                    :class="{
                       'is-invalid': submitted && $v.roleId.$error,
                     }"
                   ></multiselect>
