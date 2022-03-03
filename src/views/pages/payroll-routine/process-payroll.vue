@@ -11,8 +11,9 @@ export default {
     Layout,
     PageHeader,
   },
-  mounted() {
-    this.fetchPayrollRoutine();
+  async mounted() {
+    this.fetchPMY();
+    await this.fetchPayrollRoutine();
   },
   data() {
     return {
@@ -50,6 +51,8 @@ export default {
         { key: "totalDeduction", label: "Total Deduction", sortable: true },
         { key: "netSalary", label: "Net Salary", sortable: true },
       ],
+      pmyMonth: null,
+      pmyYear: null,
     };
   },
   methods: {
@@ -95,15 +98,28 @@ export default {
         }
       });
     },
-    fetchPayrollRoutine() {
+    async fetchPayrollRoutine() {
       let url = `${this.ROUTES.salary}/pull-salary-routine`;
-      this.apiGet(url, "Fetch Payroll Routine Error").then((res) => {
+      await this.apiGet(url, "Fetch Payroll Routine Error").then((res) => {
         this.routineRun = true;
         const { data } = res;
         data.forEach((pay, index) => {
           this.pay[index] = { sn: ++index, ...pay };
         });
         this.totalRows = this.pay.length;
+      });
+    },
+    fetchPMY() {
+      this.apiGet(
+        this.ROUTES.payrollMonthYear,
+        "Get Payroll Month & Year Error"
+      ).then((res) => {
+        if (res.data) {
+          console.log(res.data);
+          const { pym_year, pym_month } = res.data;
+          this.pmyMonth = pym_month;
+          this.pmyYear = pym_year;
+        }
       });
     },
     onFiltered(filteredItems) {
@@ -145,6 +161,12 @@ export default {
           <div class="col-12">
             <div class="card">
               <div class="card-body">
+                <div class="p-3 bg-light mb-4 d-flex justify-content-between">
+                  <h5 class="font-size-14 mb-0">
+                    Payroll Summary For Payroll Period:
+                    {{ (parseInt(pmyMonth) - 1) | getMonth }} {{ pmyYear }}
+                  </h5>
+                </div>
                 <div class="row mt-4">
                   <div class="col-sm-12 col-md-6">
                     <div id="tickets-table_length" class="dataTables_length">
@@ -238,7 +260,9 @@ export default {
         </div>
       </div>
       <div v-else class="alert alert-info">
-        The payroll routine for this payroll period hasn't been run.
+        The payroll routine for this payroll period
+        <b> ({{ (parseInt(pmyMonth) - 1) | getMonth }} {{ pmyYear }})</b> hasn't
+        been run.
         <span
           @click="runRoutine"
           style="
