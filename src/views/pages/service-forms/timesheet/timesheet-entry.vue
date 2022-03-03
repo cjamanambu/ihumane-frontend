@@ -163,16 +163,6 @@ export default {
     <PageHeader :title="title" :items="items" />
     <div class="d-flex justify-content-end mb-3">
       <b-button
-        v-if="isPresent"
-        class="btn btn-warning mr-3"
-        @click="setAbsent"
-      >
-        Set Absent
-      </b-button>
-      <b-button v-else class="btn btn-info mr-3" @click="setPresent">
-        Set Present
-      </b-button>
-      <b-button
         class="btn btn-success"
         @click="$router.push({ name: 'timesheet' })"
       >
@@ -189,8 +179,20 @@ export default {
       <div class="col-lg-7">
         <div class="card">
           <div class="card-body">
-            <div class="p-3 bg-light mb-4">
+            <div
+              class="p-3 bg-light mb-4 d-flex align-items-center justify-content-between"
+            >
               <h5 class="font-size-14 mb-0">File Entry</h5>
+              <b-button
+                v-if="isPresent"
+                class="btn btn-warning mr-3"
+                @click="setAbsent"
+              >
+                Set Absent
+              </b-button>
+              <b-button v-else class="btn btn-info mr-3" @click="setPresent">
+                Set Present
+              </b-button>
             </div>
             <form @submit.prevent="submit">
               <div class="row">
