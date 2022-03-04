@@ -54,6 +54,7 @@ export default {
         "Get Salary Structures Error"
       ).then((res) => {
         const { data } = res;
+        console.log(data);
         data.forEach((salaryStructure, index) => {
           this.salaryStructures[index] = { sn: ++index, grade: salaryStructure.salary_grade.sg_name,...salaryStructure };
         });
