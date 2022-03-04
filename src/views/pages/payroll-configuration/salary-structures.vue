@@ -54,6 +54,7 @@ export default {
         "Get Salary Structures Error"
       ).then((res) => {
         const { data } = res;
+        console.log(data);
         data.forEach((salaryStructure, index) => {
           this.salaryStructures[index] = { sn: ++index, ...salaryStructure };
         });
@@ -189,7 +190,12 @@ export default {
           label: "Employee",
           sortable: true,
         },
-        { key: "total_amount", label: "Total Amount", sortable: true },
+        {
+          key:"grade",
+          label: "Grade",
+          sortable: true
+        },
+        { key: "total_amount", label: "Gross", sortable: true },
       ],
       salaryGrade: null,
       salaryGrades: [
