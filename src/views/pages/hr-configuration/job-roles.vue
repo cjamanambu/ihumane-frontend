@@ -43,10 +43,10 @@ export default {
       });
     },
     fetchDepartments() {
-      this.apiGet(this.ROUTES.department, "Get Departments Error").then(
+      this.apiGet(this.ROUTES.department, "Get Sector Error").then(
         (res) => {
           this.departments = [
-            { value: null, text: "Please select a department" },
+            { value: null, text: "Please select a sector" },
           ];
           const { data } = res;
           data.forEach((department) => {
@@ -282,7 +282,7 @@ export default {
         </div>
         <div class="form-group">
           <label for="department">
-            Department <span class="text-danger">*</span>
+            Sector <span class="text-danger">*</span>
           </label>
           <multiselect
                   v-model="department"
@@ -296,7 +296,7 @@ export default {
             class="form-text text-muted manage"
             @click="$router.push('/departments')"
           >
-            Manage Departments
+            Manage Sectors
           </small>
         </div>
         <div class="form-group">
@@ -354,7 +354,7 @@ export default {
         </div>
         <div class="form-group">
           <label for="department">
-            Department <span class="text-danger">*</span>
+            Sector <span class="text-danger">*</span>
           </label>
           <multiselect
                   v-model="department"
@@ -369,7 +369,7 @@ export default {
             class="form-text text-muted manage"
             @click="$router.push('/departments')"
           >
-            Manage Departments
+            Manage Sectors
           </small>
         </div>
         <div class="form-group">

@@ -56,7 +56,7 @@ export default {
         const { data } = res;
         console.log(data);
         data.forEach((salaryStructure, index) => {
-          this.salaryStructures[index] = { sn: ++index, ...salaryStructure };
+          this.salaryStructures[index] = { sn: ++index, grade: salaryStructure.salary_grade.sg_name,...salaryStructure };
         });
         this.totalRows = this.salaryStructures.length;
         this.fetchSalaryGrades();
@@ -195,6 +195,7 @@ export default {
           label: "Grade",
           sortable: true
         },
+        { key: "grade", label: "Grade", sortable: true },
         { key: "total_amount", label: "Gross", sortable: true },
       ],
       salaryGrade: null,

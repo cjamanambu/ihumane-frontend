@@ -2,6 +2,7 @@
 import Layout from "@/views/layouts/main";
 import PageHeader from "@/components/page-header";
 import appConfig from "@/app.config";
+import Multiselect from 'vue-multiselect';
 
 export default {
   page: {
@@ -11,6 +12,7 @@ export default {
   components: {
     Layout,
     PageHeader,
+    Multiselect
   },
   mounted() {
     this.getVariationalPayments();
@@ -32,6 +34,9 @@ export default {
       this.leapp_start_date = null;
       this.leapp_end_date = null;
       this.$v.$reset();
+    },
+    selectionLabel ({ text }) {
+      return `${text}`
     },
 
     getVariationalPaymentss() {
@@ -102,7 +107,7 @@ export default {
         data.forEach((employee) => {
           this.employees.push({
             value: employee.emp_id,
-            text: `${employee.emp_first_name} ${employee.emp_last_name} - ${employee.emp_unique_id}`,
+            text: `${employee.emp_first_name} ${employee.emp_last_name}  (${employee.emp_unique_id})`,
           });
         });
       });
@@ -126,7 +131,7 @@ export default {
       });
 
       const data = {
-        employee: this.selectedEmployees,
+        employee: this.selectedEmployees.value,
         payments: this.filledPayments,
         month: this.month,
         year: this.year,
@@ -210,10 +215,15 @@ export default {
                 <div class="col-lg-6">
                   <div class="form-group">
                     <label>Employee</label>
-                    <b-form-select
-                      v-model="selectedEmployees"
-                      :options="employees"
-                    />
+                    <multiselect
+                            v-model="selectedEmployees"
+                            :options="employees"
+                            :custom-label="selectionLabel"
+                            :class="{
+                      'is-invalid': submitted && $v.selectedEmployees.$error,
+                    }"
+                    ></multiselect>
+
                   </div>
 
                   <br />

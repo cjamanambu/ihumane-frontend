@@ -3,6 +3,7 @@ import Layout from "@/views/layouts/main";
 import PageHeader from "@/components/page-header";
 import appConfig from "@/app.config";
 import Multiselect from 'vue-multiselect';
+import {required} from "vuelidate/lib/validators";
 
 export default {
   page: {
@@ -18,6 +19,36 @@ export default {
     this.fetchEmployee();
     await this.getStates();
     await this.getBanks();
+  },
+
+  /*: null,
+
+  : null,
+  emp_spouse_name: null,
+  emp_spouse_phone_no: null,
+  emp_next_of_kin_name: null,
+  emp_next_of_kin_address: null,
+  emp_next_of_kin_phone_no: null,
+  emp_ailments: null,
+  emp_blood_group: null,
+  emp_genotype: null,
+  emp_emergency_name: null,
+  emp_emergency_contact: null,
+  emp_hire_date: null,
+  emp_contract_end_date: null,
+  */
+  validations: {
+    emp_first_name: { required },
+    emp_location: { required },
+    emp_last_name: { required },
+    emp_phone_no: { required },
+    emp_state_id: { required },
+    emp_lga_id: { required },
+
+    emp_bank_id: { required },
+    emp_account_no: { required },
+    emp_marital_status: { required },
+    //account_number: { required },
   },
   methods: {
     positionLabel ({ text }) {
@@ -113,6 +144,8 @@ export default {
         emp_genotype: this.emp_genotype,
         emp_emergency_name: this.emp_emergency_name,
         emp_emergency_contact: this.emp_emergency_contact,
+        emp_contract_end_date: this.emp_contract_end_date,
+        emp_hire_date: this.emp_hire_date,
       };
       this.apiPatch(url, data, "Update Employee Error").then();
       this.apiResponseHandler("Process Complete", "Employee Update");
@@ -159,6 +192,8 @@ export default {
       emp_genotype: null,
       emp_emergency_name: null,
       emp_emergency_contact: null,
+      emp_hire_date: null,
+      emp_contract_end_date: null,
       maritalStatus: [
         { value: null, text: "select marital Status" },
         { value: 1, text: "Married" },
@@ -228,6 +263,7 @@ export default {
                     <input
 
                             type="text"
+                            required
                             class="form-control"
                             v-model="emp_phone_no"
                     />
@@ -389,8 +425,30 @@ export default {
                       v-model="emp_emergency_contact"
                     />
                   </div>
+
+                  <div class="p-3 bg-light mb-4">
+                    <h5 class="font-size-14 mb-0">Contract Details</h5>
+                  </div>
+                  <div class="form-group">
+                    <label for=""> Hire Date </label>
+                    <input
+                            type="date"
+                            class="form-control"
+                            v-model="emp_hire_date"
+                    />
+                  </div>
+
+                  <div class="form-group">
+                    <label for=""> Contract End Date </label>
+                    <input
+                            type="date"
+                            class="form-control"
+                            v-model="emp_contract_end_date"
+                    />
+                  </div>
                 </div>
               </div>
+
 
               <b-button
                 v-if="!submitted"

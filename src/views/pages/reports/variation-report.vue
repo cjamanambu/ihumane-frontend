@@ -31,6 +31,8 @@ export default {
         this.newFields.forEach((newField) => {
           if (newField === "sn") {
             this.jsonFields["S/N"] = newField;
+          } else if (newField === "t7_number") {
+            this.jsonFields["T7 NUMBER"] = "employeeUniqueId";
           } else if (newField === "employeeName") {
             this.jsonFields["EMPLOYEE NAME"] = newField;
           } else if (newField === "netSalary") {
@@ -56,11 +58,12 @@ export default {
       const url = `${this.ROUTES.salary}/variation-report`;
       this.apiPost(url, data, "Generate Variation Report").then((res) => {
         const { data } = res;
-        console.log({ data });
         data.forEach((variation, index) => {
           let variationObj = {
             sn: ++index,
+            employeeUniqueId: variation.employeeUniqueId,
             employeeName: variation.employeeName,
+            location: variation.location,
           };
           variation.incomes.forEach((income) => {
             variationObj[income.paymentName] = parseFloat(
@@ -74,12 +77,14 @@ export default {
           });
           this.variations.push(variationObj);
         });
+        this.filtered = this.variations;
         this.totalRows = this.variations.length;
       });
     },
     onFiltered(filteredItems) {
       // Trigger pagination to update the number of buttons/pages due to filtering
       this.totalRows = filteredItems.length;
+      this.filtered = filteredItems;
       this.currentPage = 1;
     },
     decimalPlaces(float, length) {
@@ -129,8 +134,7 @@ export default {
         },
       ],
       period: null,
-      emoluments: [],
-      newEmoluments: [],
+      filtered: [],
       variations: [],
       paymentDefinitions: [],
       totalRows: 1,
@@ -161,7 +165,7 @@ export default {
         },
         { key: "netSalary", label: "Net Salary", sortable: true },
       ],
-      newFields: ["sn", "employeeName"],
+      newFields: ["sn", "t7_number", "employeeName", "location"],
       incomeFields: [],
       deductionFields: [],
       jsonFields: {},
@@ -193,7 +197,7 @@ export default {
               <span class="font-size-12 text-success">
                 <JsonExcel
                   style="cursor: pointer"
-                  :data="variations"
+                  :data="filtered"
                   :fields="jsonFields"
                   :name="`Variation_Report(${period[0]}-${period[1]}).xls`"
                 >
@@ -215,8 +219,26 @@ export default {
                   </label>
                 </div>
               </div>
+              <div class="col-sm-12 col-md-3 text-md-right">
+                <b-form-group
+                  label="Filter On"
+                  label-cols-sm="8"
+                  label-align-sm="right"
+                  label-size="sm"
+                  class="mb-0"
+                  v-slot="{ ariaDescribedby }"
+                >
+                  <b-form-checkbox-group
+                    v-model="filterOn"
+                    :aria-describedby="ariaDescribedby"
+                    class="mt-1"
+                  >
+                    <b-form-checkbox value="location">Location</b-form-checkbox>
+                  </b-form-checkbox-group>
+                </b-form-group>
+              </div>
               <!-- Search -->
-              <div class="col-sm-12 col-md-6">
+              <div class="col-sm-12 col-md-3">
                 <div
                   id="tickets-table_filter"
                   class="dataTables_filter text-md-right"
@@ -244,7 +266,7 @@ export default {
                 :items="variations"
                 :fields="newFields"
                 striped
-                responsive="sm"
+                responsive="lg"
                 :per-page="perPage"
                 :current-page="currentPage"
                 :sort-by.sync="sortBy"
@@ -259,8 +281,23 @@ export default {
                     {{ row.value }}
                   </span>
                 </template>
+                <template #cell(t7_number)="row">
+                  <span>
+                    {{ row.item.employeeUniqueId }}
+                  </span>
+                </template>
                 <template #cell(employeeName)="row">
                   <span>
+                    {{ row.value }}
+                  </span>
+                </template>
+                <template #cell(employeeName)="row">
+                  <span class="text-nowrap">
+                    {{ row.value }}
+                  </span>
+                </template>
+                <template #cell(location)="row">
+                  <span class="text-nowrap">
                     {{ row.value }}
                   </span>
                 </template>
