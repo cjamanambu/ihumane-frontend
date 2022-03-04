@@ -2,6 +2,7 @@
     import Layout from "@/views/layouts/main";
     import PageHeader from "@/components/page-header";
     import appConfig from "@/app.config";
+    import Multiselect from 'vue-multiselect';
 
 
     export default {
@@ -12,14 +13,19 @@
         components: {
             Layout,
             PageHeader,
+            Multiselect,
         },
         mounted() {
             this.refreshPMY()
             this.getPayments()
+            this.getVariationalPayments()
 
         },
 
         methods: {
+            selectLabel ({ text }) {
+                return `${text}`
+            },
 
             resetForm() {
                 this.leapp_empid = null;
@@ -29,14 +35,27 @@
                 this.$v.$reset();
             },
 
+            getVariationalPayments() {
+                const url = `${this.ROUTES.paymentDefinition}/variational-payments`;
+                this.apiGet(url, "Get Variational Payment Error").then((res) => {
+                    this.paymentsFields = [];
+                    const { data } = res;
+                    console.log(data);
+                    data.forEach((payment) => {
+                        this.paymentsFields.push({
+                            value: payment.pd_id,
+                            text: payment.pd_payment_name,
+                        });
+                    });
 
+                });
+            },
 
             refreshPMY() {
                 this.apiGet(
                     this.ROUTES.timeSheetPenalty,
                     "Default Charges Error"
                 ).then((res) => {
-                    console.log(res);
                     const { defaultCharges, employees } = res.data;
                     this.charges = defaultCharges;
                     this.employees = employees;
@@ -77,15 +96,59 @@
             },
 
 
-            selectPayment(items) {
-                this.selectedPayments = items
+            selectCharge(charge) {
+                charge = charge[0];
+                this.chargeEmployee = charge.emp;
+                this.chargeEmployeeId = charge.tsp_emp_id;
+                this.chargeYear = charge.tsp_year;
+                this.chargeMonth = charge.tsp_month;
+                this.chargeAmount = charge.tsp_amount.toLocaleString();
+                this.chargePeriod = `${this.chargeMonth}/${this.chargeYear}`;
+
+                this.$refs["update-charge"].show();
+
             },
             onFiltered(filteredItems) {
                 // Trigger pagination to update the number of buttons/pages due to filtering
                 this.totalRows = filteredItems.length;
                 this.currentPage = 1;
             },
+            submitNew() {
+                this.submitted = true;
+                const data = {
+                    employee: this.chargeEmployeeId,
+                    default_id: this.payment_type.value,
+                    month: this.chargeMonth,
+                    year: this.chargeYear,
+                    amount:this.chargeAmount,
+                };
+                const url = `${this.ROUTES.variationalPayment}/single-payment`;
+                this.apiPost(url, data, "Add Variational Payment").then((res) => {
+                    this.apiResponseHandler(`${res.data}`, "Add Variational Payment");
+                    this.submitted = false;
+                    this.chargeEmployee = null;
+                    this.count = 0;
+                    this.getVariationalPayments();
+                });
+            },
+            updateCharge() {
+                this.submitted = true;
 
+                const data = {
+                    vp_amount: this.paymentAmount
+
+                };
+                const url = `${this.ROUTES.variationalPayment}/update-payment-amount/${this.paymentId}`;
+                this.apiPatch(url, data, "Update Variational Payment").then(
+                    (res) => {
+                        this.apiResponseHandler(`${res.data}`, "Update Variational Payment");
+                        this.submitted = false;
+                        this.$refs["update-payment"].hide();
+                        this.getVariationalPayments();
+                    }
+                );
+
+            },
 
         },
         data() {
@@ -137,7 +200,17 @@
                 month: null,
                 monthName: null,
                 submitted: false,
-                pmySet: false
+                pmySet: false,
+
+                chargeMonth:null,
+                chargeYear:null,
+                chargePeriod:null,
+                chargeEmployee:null,
+                chargeEmployeeId:null,
+                chargeAmount:null,
+                paymentsFields:[],
+                payment_type:null,
+
             };
         },
     };
@@ -207,7 +280,7 @@
                                     @filtered="onFiltered"
                                     show-empty
                                     select-mode="multi"
-                                    @row-selected="selectPayment"
+                                    @row-selected="selectCharge"
 
                             >
 
@@ -243,6 +316,106 @@
                 </div>
             </div>
         </div>
+        <b-modal
+                ref="update-charge"
+                title="Penalty Details"
+                hide-footer
+                centered
+                title-class="font-18"
 
+        >
+            <form @submit.prevent="submitNew">
+                <div class="form-group">
+                    <label for="emp-names">
+                        Employee Name <span class="text-danger">*</span>
+                    </label>
+                    <input
+                            id="emp-names"
+                            type="text"
+                            v-model="chargeEmployee"
+                            class="form-control"
+                            readonly
+                    />
+                </div>
+                <div class="form-group">
+                    <label for=""> Period </label>
+                    <b-input
+                            readonly
+                            type="text"
+
+                            class="form-control"
+                            v-model="chargePeriod"
+                    />
+                </div>
+                <div class="form-group">
+                    <label for=""> Amount </label>
+                    <input
+                            readonly
+                            type="text"
+
+                            class="form-control"
+                            v-model="chargeAmount"
+                    />
+                </div>
+
+                <div class="form-group">
+                    <label for=""> Pay Type </label>
+                    <multiselect
+                            v-model="payment_type"
+                            :options="paymentsFields"
+                            :custom-label="selectLabel"
+                            :class="{
+                      'is-invalid': submitted && $v.payment_type.$error,
+                    }"
+                    ></multiselect>
+                </div>
+
+                <div v-if="paymentStatus === 'Pending'">
+                    <div class="form-group">
+                        <label for=""> Amount </label>
+                        <input
+
+                                type="text"
+                                class="form-control"
+                                v-model="paymentAmount"
+                        />
+                    </div>
+
+                    <b-button
+                            v-if="!submitting"
+                            class="btn btn-success btn-block mt-4"
+                            type="submit"
+                    >
+                        Submit
+                    </b-button>
+                    <b-button
+                            v-else
+                            disabled
+                            class="btn btn-success btn-block mt-4"
+                            type="submit"
+                    >
+                        Submitting...
+                    </b-button>
+                </div>
+                    <b-button
+                            v-if="!submitting"
+                            class="btn btn-success btn-block mt-4"
+                            type="submit"
+                    >
+                        Submit to Variation
+                    </b-button>
+                    <b-button
+                            v-else
+                            disabled
+                            class="btn btn-success btn-block mt-4"
+                            type="submit"
+                    >
+                        Submitting...
+                    </b-button>
+
+
+
+            </form>
+        </b-modal>
     </Layout>
 </template>
