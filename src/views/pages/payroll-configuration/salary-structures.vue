@@ -190,6 +190,11 @@ export default {
           label: "Employee",
           sortable: true,
         },
+        {
+          key:"grade",
+          label: "Grade",
+          sortable: true
+        },
         { key: "grade", label: "Grade", sortable: true },
         { key: "total_amount", label: "Gross", sortable: true },
       ],

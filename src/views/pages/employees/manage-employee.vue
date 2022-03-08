@@ -19,6 +19,8 @@ export default {
     this.fetchEmployee();
     await this.getStates();
     await this.getBanks();
+
+
   },
 
   /*: null,
@@ -51,6 +53,10 @@ export default {
     //account_number: { required },
   },
   methods: {
+    toggleSelected(val){
+      //let {text, value } = val;
+     console.log(val);
+    },
     positionLabel ({ text }) {
       return `${text}`
     },
@@ -74,8 +80,8 @@ export default {
           this.emp_location = data.location.location_name;
           this.emp_account_no = data.emp_account_no;
           this.emp_phone_no = data.emp_phone_no;
-          this.emp_bank_id = data.emp_bank_id;
-          this.emp_state_id = data.emp_state_id;
+          this.emp_bank_id_val = data.emp_bank_id;
+          this.emp_state_id_val = data.emp_state_id;
           this.emp_lga_id = data.emp_lga_id;
           this.emp_marital_status = data.emp_marital_status;
           this.emp_spouse_name = data.emp_spouse_name;
@@ -89,18 +95,27 @@ export default {
           this.emp_emergency_name = data.emp_emergency_name;
           this.emp_emergency_contact = data.emp_emergency_contact;
         }
+
       });
     },
     async getBanks() {
       const url = `${this.ROUTES.bank}`;
       await this.apiGet(url).then((res) => {
         const { data } = res;
+        //let selectedObj = [];
         this.banks = [{ value: null, text: "Please select a leave type" }];
         data.forEach(async (datum) => {
           const dat = {
             value: datum.bank_id,
-            text: datum.bank_name,
+            text: datum.bank_name
           };
+          if(datum.bank_id === this.emp_bank_id_val){
+             const val = {
+               value: datum.bank_id,
+               text: datum.bank_name
+             }
+             this.emp_bank_id.push(val);
+          }
           this.banks.push(dat);
         });
       });
@@ -115,7 +130,15 @@ export default {
             value: datum.s_id,
             text: datum.s_name,
           };
+          if(datum.s_id === this.emp_state_id_val){
+            const val = {
+              value: datum.s_id,
+              text: datum.s_name
+            }
+            this.emp_state_id.push(val);
+          }
           this.states.push(dat);
+          //console.log("EMP; "+this.emp_state_id);
         });
       });
     },
@@ -130,8 +153,10 @@ export default {
         emp_qualification: this.emp_qualification,
         emp_phone_no: this.emp_phone_no,
         emp_account_no: this.emp_account_no,
-        emp_bank_id: this.emp_bank_id,
+
+        emp_bank_id: this.emp_bank_id.value,
         emp_state_id: this.emp_state_id.value,
+
         emp_lga_id: this.emp_lga_id,
         emp_marital_status: this.emp_marital_status,
         emp_spouse_name: this.emp_spouse_name,
@@ -153,6 +178,9 @@ export default {
       this.submitted = false;
       this.fetchEmployee();
     },
+    test() {
+      console.log(this.bank)
+    }
   },
   data() {
     return {
@@ -178,8 +206,11 @@ export default {
       emp_qualification: null,
       emp_phone_no: null,
       emp_account_no: null,
-      emp_bank_id: null,
-      emp_state_id: null,
+      emp_bank_id: [],
+      emp_bank_id_val: null,
+      emp_state_id_val: null,
+      emp_state_id: [],
+
       emp_lga_id: null,
       emp_marital_status: null,
       emp_spouse_name: null,
@@ -199,7 +230,9 @@ export default {
         { value: 1, text: "Married" },
         { value: 2, text: "Not Married" },
       ],
+      bank: null,
       banks: [],
+      state: null,
       states: [],
     };
   },
@@ -310,10 +343,13 @@ export default {
                             v-model="emp_bank_id"
                             :options="banks"
                             :custom-label="bankLabel"
+                            @select="toggleSelected"
                             :class="{
                       'is-invalid': submitted && $v.emp_bank_id.$error,
                     }"
-                    ></multiselect>
+                    >
+
+                    </multiselect>
                   </div>
 
                   <div class="form-group">
