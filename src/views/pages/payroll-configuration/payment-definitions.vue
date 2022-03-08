@@ -36,6 +36,8 @@ export default {
       this.pdAmount = pd.pd_amount;
       this.pdPrGross = pd.pd_pr_gross;
       this.sum = pd.pd_total_gross;
+      this.sumII = pd.pd_total_gross_ii;
+      this.validateSum();
       this.tax = pd.pd_tax;
       this.taxable = pd.pd_payment_taxable;
       this.welfare = pd.pd_welfare || 0;
@@ -84,6 +86,7 @@ export default {
           pd_value: this.pdValue,
           pd_percentage: this.pdPercentage,
           pd_total_gross: this.sum,
+          pd_total_gross_ii: this.sumII,
         };
         this.type === 1
           ? (data.pd_payment_taxable = this.taxable)
@@ -126,6 +129,7 @@ export default {
           pd_value: this.pdValue,
           pd_percentage: this.pdPercentage,
           pd_total_gross: this.sum,
+          pd_total_gross_ii: this.sumII,
         };
         this.type === 1
           ? (data.pd_payment_taxable = this.taxable)
@@ -152,6 +156,15 @@ export default {
     onFiltered(filteredItems) {
       this.totalRows = filteredItems.length;
       this.currentPage = 1;
+    },
+    validateSum() {
+      if (this.sum === 0) {
+        this.sumII = 0;
+        this.sumIIDisabled = true;
+      } else if (this.sum === 1) {
+        this.sumII = 1;
+        this.sumIIDisabled = false;
+      }
     },
   },
   data() {
@@ -181,24 +194,49 @@ export default {
       sortBy: "sn",
       sortDesc: false,
       fields: [
-        { key: "sn", label: "S/n", sortable: true, thStyle: { width: "5%" } },
+        {
+          key: "sn",
+          label: "S/n",
+          sortable: true,
+          thStyle: { width: "5%" },
+        },
         {
           key: "pd_payment_code",
           label: "Payment Code",
           sortable: false,
-          thStyle: { width: "5%" },
+          thClass: "text-nowrap",
         },
-        { key: "pd_payment_name", label: "Name", sortable: true },
+        {
+          key: "pd_payment_name",
+          label: "Name",
+          sortable: true,
+        },
         { key: "pd_payment_type", label: "Type", sortable: true },
         { key: "pd_payment_variant", label: "Variant", sortable: true },
         { key: "pd_payment_taxable", label: "Taxable?", sortable: true },
         { key: "pd_basic", label: "Basic?", sortable: true },
         { key: "pd_tax", label: "Tax?", sortable: true },
         { key: "pd_welfare", label: "Welfare?", sortable: true },
-        { key: "pd_value", label: "Payment Value", sortable: true },
+        {
+          key: "pd_value",
+          label: "Payment Value",
+          sortable: true,
+          thClass: "text-nowrap",
+        },
         { key: "pd_amount", label: "% Of", sortable: true },
         { key: "pd_percentage", label: "% Value", sortable: true },
-        { key: "pd_total_gross", label: "Sum up to Gross?", sortable: true },
+        {
+          key: "pd_total_gross",
+          label: "Sum up to Gross I?",
+          sortable: true,
+          thClass: "text-nowrap",
+        },
+        {
+          key: "pd_total_gross_ii",
+          label: "Sum up to Gross II?",
+          sortable: true,
+          thClass: "text-nowrap",
+        },
       ],
       submitted: false,
       code: null,
@@ -251,15 +289,22 @@ export default {
       ],
       pdAmount: 1,
       pdAmounts: [
-        { text: "A. GROSS", value: 1 },
-        { text: "A. BASIC", value: 2 },
-        { text: "F. GROSS", value: 3 },
+        { text: "Adjusted GROSS I", value: 1 },
+        { text: "Adjusted GROSS II", value: 5 },
+        { text: "Adjusted BASIC", value: 2 },
+        { text: "Full GROSS", value: 3 },
       ],
       sum: 1,
       sums: [
         { text: "YES", value: 1 },
         { text: "NO", value: 0 },
       ],
+      sumII: 1,
+      sumsII: [
+        { text: "YES", value: 1 },
+        { text: "NO", value: 0 },
+      ],
+      sumIIDisabled: false,
       pdPercentage: 0,
     };
   },
@@ -344,7 +389,7 @@ export default {
                 hover
                 :items="paymentDefinitions"
                 :fields="fields"
-                responsive="sm"
+                responsive="lg"
                 :per-page="perPage"
                 :current-page="currentPage"
                 :sort-by.sync="sortBy"
@@ -356,13 +401,20 @@ export default {
                 select-mode="single"
                 @row-selected="selectPD"
               >
+                <template #cell(pd_payment_name)="row">
+                  <p class="text-nowrap">{{ row.value }}</p>
+                </template>
                 <template #cell(pd_payment_type)="row">
-                  <p v-if="row.value === 1">INCOME</p>
-                  <p v-else-if="row.value === 2">DEDUCTION</p>
+                  <p class="text-nowrap" v-if="row.value === 1">INCOME</p>
+                  <p class="text-nowrap" v-else-if="row.value === 2">
+                    DEDUCTION
+                  </p>
                 </template>
                 <template #cell(pd_payment_variant)="row">
-                  <p v-if="row.value === 1">STANDARD</p>
-                  <p v-else-if="row.value === 2">VARIATIONAL</p>
+                  <p class="text-nowrap" v-if="row.value === 1">STANDARD</p>
+                  <p class="text-nowrap" v-else-if="row.value === 2">
+                    VARIATIONAL
+                  </p>
                 </template>
                 <template #cell(pd_payment_taxable)="row">
                   <p v-if="row.value === 1">YES</p>
@@ -385,15 +437,28 @@ export default {
                   <p v-else>COMPUTED</p>
                 </template>
                 <template #cell(pd_amount)="row">
-                  <p v-if="row.value === 1">A. GROSS</p>
-                  <p v-else-if="row.value === 2">A. BASIC</p>
-                  <p v-else-if="row.value === 3">F. GROSS</p>
-                  <p v-else>-</p>
+                  <p class="mb-0 text-nowrap" v-if="row.value === 1">
+                    Adjusted GROSS I
+                  </p>
+                  <p class="mb-0 text-nowrap" v-else-if="row.value === 2">
+                    Adjusted BASIC
+                  </p>
+                  <p class="mb-0 text-nowrap" v-else-if="row.value === 3">
+                    Full GROSS
+                  </p>
+                  <p class="mb-0 text-nowrap" v-else-if="row.value === 5">
+                    Adjusted GROSS II
+                  </p>
+                  <p class="mb-0" v-else>-</p>
                 </template>
                 <template #cell(pd_percentage)="row">
                   <p>{{ row.value }} %</p>
                 </template>
                 <template #cell(pd_total_gross)="row">
+                  <p v-if="row.value === 1">YES</p>
+                  <p v-else>NO</p>
+                </template>
+                <template #cell(pd_total_gross_ii)="row">
                   <p v-if="row.value === 1">YES</p>
                   <p v-else>NO</p>
                 </template>
@@ -613,16 +678,34 @@ export default {
                   </b-form-group>
                 </div>
                 <div class="col-lg-6">
-                  <b-form-group>
-                    <label>Sum up to gross?</label><br />
-                    <b-form-radio-group
-                      id="user_type"
-                      v-model="sum"
-                      :options="sums"
-                      button-variant="outline-success"
-                      buttons
-                    />
-                  </b-form-group>
+                  <div class="row">
+                    <div class="col-lg-6">
+                      <b-form-group>
+                        <label>Sum up to Gross I?</label><br />
+                        <b-form-radio-group
+                          id="user_type"
+                          v-model="sum"
+                          :options="sums"
+                          button-variant="outline-success"
+                          buttons
+                          @change="validateSum"
+                        />
+                      </b-form-group>
+                    </div>
+                    <div class="col-lg-6">
+                      <b-form-group>
+                        <label>Sum up to Gross II?</label><br />
+                        <b-form-radio-group
+                          id="user_type"
+                          v-model="sumII"
+                          :options="sumsII"
+                          :disabled="sumIIDisabled"
+                          button-variant="outline-success"
+                          buttons
+                        />
+                      </b-form-group>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -839,16 +922,34 @@ export default {
                   </b-form-group>
                 </div>
                 <div class="col-lg-6">
-                  <b-form-group>
-                    <label>Sum up to gross?</label><br />
-                    <b-form-radio-group
-                      id="user_type"
-                      v-model="sum"
-                      :options="sums"
-                      button-variant="outline-success"
-                      buttons
-                    />
-                  </b-form-group>
+                  <div class="row">
+                    <div class="col-lg-6">
+                      <b-form-group>
+                        <label>Sum up to Gross I?</label><br />
+                        <b-form-radio-group
+                          id="user_type"
+                          v-model="sum"
+                          :options="sums"
+                          button-variant="outline-success"
+                          buttons
+                          @change="validateSum"
+                        />
+                      </b-form-group>
+                    </div>
+                    <div class="col-lg-6">
+                      <b-form-group>
+                        <label>Sum up to Gross II?</label><br />
+                        <b-form-radio-group
+                          id="user_type"
+                          v-model="sumII"
+                          :options="sumsII"
+                          :disabled="sumIIDisabled"
+                          button-variant="outline-success"
+                          buttons
+                        />
+                      </b-form-group>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
