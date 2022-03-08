@@ -120,7 +120,7 @@
                     default_id: this.payment_type.value,
                     month: this.chargeMonth,
                     year: this.chargeYear,
-                    amount:this.chargeAmount,
+                    amount:parseFloat(this.chargeAmount.replace(/,/g, '')),
                 };
                 const url = `${this.ROUTES.variationalPayment}/single-payment`;
                 this.apiPost(url, data, "Add Variational Payment").then((res) => {
