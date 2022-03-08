@@ -49,12 +49,13 @@ export default {
             { value: null, text: "Please select a sector" },
           ];
           const { data } = res;
-          data.forEach((department) => {
+           data.departments.forEach((department) => {
             this.departments.push({
               value: department.department_id,
               text: department.department_name,
             });
           });
+
         }
       );
     },
