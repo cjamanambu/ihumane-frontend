@@ -37,7 +37,6 @@ export default {
       this.pdPrGross = pd.pd_pr_gross;
       this.sum = pd.pd_total_gross;
       this.sumII = pd.pd_total_gross_ii;
-      this.validateSum();
       this.tax = pd.pd_tax;
       this.taxable = pd.pd_payment_taxable;
       this.welfare = pd.pd_welfare || 0;
@@ -156,15 +155,6 @@ export default {
     onFiltered(filteredItems) {
       this.totalRows = filteredItems.length;
       this.currentPage = 1;
-    },
-    validateSum() {
-      if (this.sum === 0) {
-        this.sumII = 0;
-        this.sumIIDisabled = true;
-      } else if (this.sum === 1) {
-        this.sumII = 1;
-        this.sumIIDisabled = false;
-      }
     },
   },
   data() {
@@ -688,7 +678,6 @@ export default {
                           :options="sums"
                           button-variant="outline-success"
                           buttons
-                          @change="validateSum"
                         />
                       </b-form-group>
                     </div>
@@ -932,7 +921,6 @@ export default {
                           :options="sums"
                           button-variant="outline-success"
                           buttons
-                          @change="validateSum"
                         />
                       </b-form-group>
                     </div>
