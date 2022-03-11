@@ -17,9 +17,7 @@
         },
         validations: {
             public_name: { required },
-            public_day: { required },
-            public_month: { required },
-            public_year: { required },
+            public_date_to: { required },
             public_date: { required },
         },
         data() {
@@ -54,10 +52,13 @@
                 public_month:"",
                 public_year:"",
                 public_date:"",
+                public_date_to:"",
+                public_date_update:"",
                 ph_id:"",
                 fields: [
                     { key: "ph_name", label:"Holiday Name", sortable: true },
-                    { key: "ph_day", label: "Date", sortable: true }
+                    { key: "ph_day", label: "From", sortable: true },
+                    { key: "ph_day_to", label: "To", sortable: true }
                 ],
 
             };
@@ -67,6 +68,7 @@
                 this.apiGet(this.ROUTES.publicHolidays, "Error getting public holidays").then((res) => {
                     const { data } = res;
                     this.holidays = data;
+                    console.log(data);
                     this.totalRows = this.holidays.length;
                 });
             },
@@ -82,8 +84,11 @@
                 this.public_day = ph.ph_day;
                 this.public_month = ph.ph_month;
                 this.public_year = ph.ph_year;
+                this.public_date = new Date(parseInt(ph.ph_year), parseInt(ph.ph_month)-1,parseInt(ph.ph_day)+1).toISOString().split("T")[0];
+                this.public_date_to = ph.ph_day ? new Date() : new Date(parseInt(ph.ph_to_year), parseInt(ph.ph_to_month)-1,parseInt(ph.ph_to_day)+1).toISOString().split("T")[0];
                 this.$refs["update-ph"].show();
                 this.$refs["ph-table"].clearSelected();
+
             },
             updatePublicHoliday() {
                 this.submitted = false;
@@ -92,12 +97,11 @@
                     this.apiFormHandler("Invalid Entry");
                 } else {
                     const url = `${this.ROUTES.publicHolidays}/${this.ph_id}`;
-                    const data = {
-                        public_name: this.public_name,
-                        public_day: this.public_day,
-                        public_month: this.public_month,
-                        public_year: this.public_year,
-                    };
+                  const data = {
+                    public_name: this.public_name,
+                    public_date: this.public_date,
+                    public_date_to: this.public_date_to,
+                  };
                     this.apiPatch(url, data, "Error updating public holiday").then((res) => {
                         this.apiResponseHandler(`${res.data}`, "Update Successful");
                         this.refreshTable();
@@ -115,8 +119,7 @@
                     const data = {
                         public_name: this.public_name,
                         public_date: this.public_date,
-                        /*public_month: this.public_month,
-                        public_year: this.public_year,*/
+                        public_date_to: this.public_date_to,
                     };
                     this.apiPost(`${this.ROUTES.publicHolidays}/add-public-holiday`, data, "Add New Public Holiday error").then((res) => {
                         this.apiResponseHandler(`${res.data}`, "New Public Holiday added successfully.");
@@ -209,6 +212,9 @@
                               <template #cell(ph_day)="row">
                                 <span>{{ new Date(`${row.item.ph_month}-${row.item.ph_day}-${row.item.ph_year}`).toDateString()    }}</span>
                               </template>
+                              <template #cell(ph_day_to)="row">
+                                <span>{{ new Date(`${row.item.ph_to_month}-${row.item.ph_to_day}-${row.item.ph_to_year}`).toDateString()    }}</span>
+                              </template>
 
                             </b-table>
                         </div>
@@ -258,8 +264,8 @@
                     />
                 </div>
                 <div class="form-group">
-                    <label for="public_name">
-                        Day <span class="text-danger">*</span>
+                    <label for="public_date">
+                        From Date <span class="text-danger">*</span>
                     </label>
                     <input
                             id="public_date"
@@ -273,6 +279,22 @@
                         }"
                     />
                 </div>
+              <div class="form-group">
+                <label for="public_date">
+                  To Date <span class="text-danger">*</span>
+                </label>
+                <input
+                  id="public_date_to"
+                  type="date"
+                  max="31"
+                  v-model="public_date_to"
+                  class="form-control"
+                  placeholder="Day"
+                  :class="{
+                          'is-invalid': submitted && $v.public_date_to.$error,
+                        }"
+                />
+              </div>
                 <b-button
                         v-if="!submitting"
                         class="btn btn-success btn-block mt-4"
@@ -314,52 +336,37 @@
                         }"
                     />
                 </div>
-                <div class="form-group">
-                    <label for="public_name">
-                        Day <span class="text-danger">*</span>
+              <div class="form-group">
+                    <label for="">
+                        From Date <span class="text-danger">*</span>
                     </label>
                     <input
-                            id="public_day"
-                            type="number"
-                            max="31"
-                            v-model="public_day"
-                            class="form-control"
-                            placeholder="Day"
-                            :class="{
-                          'is-invalid': submitted && $v.public_day.$error,
-                        }"
-                    />
-                </div>
-                <div class="form-group">
-                    <label for="public_month">
-                        Month <span class="text-danger">*</span>
-                    </label>
-                    <input
-                            id="public_month"
-                            type="number"
-                            v-model="public_month"
-                            class="form-control"
-                            placeholder="Month"
-                            :class="{
-                          'is-invalid': submitted && $v.public_month.$error,
-                        }"
-                    />
-                </div>
-                <div class="form-group">
-                    <label for="public_year">
-                        Year <span class="text-danger">*</span>
-                    </label>
-                    <input
-                            id="public_year"
-                            type="number"
-                            v-model="public_year"
+                            id="public_date_u"
+                            type="date"
+                            v-model="public_date"
                             class="form-control"
                             placeholder="Year"
                             :class="{
-                          'is-invalid': submitted && $v.public_year.$error,
+                          'is-invalid': submitted && $v.public_date.$error,
                         }"
                     />
                 </div>
+              <div class="form-group">
+                <label for="public_date">
+                  To Date <span class="text-danger">*</span>
+                </label>
+                <input
+                  id=""
+                  type="date"
+                  max="31"
+                  v-model="public_date_to"
+                  class="form-control"
+                  placeholder="Day"
+                  :class="{
+                          'is-invalid': submitted && $v.public_date_to.$error,
+                        }"
+                />
+              </div>
                 <b-button
                         v-if="!submitting"
                         class="btn btn-success btn-block mt-4"
