@@ -20,6 +20,7 @@
             public_day: { required },
             public_month: { required },
             public_year: { required },
+            public_date: { required },
         },
         data() {
             return {
@@ -52,12 +53,11 @@
                 public_day:"",
                 public_month:"",
                 public_year:"",
+                public_date:"",
                 ph_id:"",
                 fields: [
                     { key: "ph_name", label:"Holiday Name", sortable: true },
-                    { key: "ph_day", label: "Day", sortable: true },
-                    { key: "ph_month", label: "Month", sortable: true },
-                    { key: "ph_year", label: "Year", sortable: true },
+                    { key: "ph_day", label: "Date", sortable: true }
                 ],
 
             };
@@ -75,7 +75,7 @@
                 this.$v.$reset();
             },
             selectPublicHoliday(ph) {
-                console.log(ph);
+                //console.log(ph);
                 ph = ph[0];
                 this.ph_id = ph.ph_id;
                 this.public_name = ph.ph_name;
@@ -114,9 +114,9 @@
                 } else {
                     const data = {
                         public_name: this.public_name,
-                        public_day: this.public_day,
-                        public_month: this.public_month,
-                        public_year: this.public_year,
+                        public_date: this.public_date,
+                        /*public_month: this.public_month,
+                        public_year: this.public_year,*/
                     };
                     this.apiPost(`${this.ROUTES.publicHolidays}/add-public-holiday`, data, "Add New Public Holiday error").then((res) => {
                         this.apiResponseHandler(`${res.data}`, "New Public Holiday added successfully.");
@@ -206,6 +206,10 @@
                                     select-mode="single"
                                     @row-selected="selectPublicHoliday"
                             >
+                              <template #cell(ph_day)="row">
+                                <span>{{ new Date(`${row.item.ph_month}-${row.item.ph_day}-${row.item.ph_year}`).toDateString()    }}</span>
+                              </template>
+
                             </b-table>
                         </div>
                         <div class="row">
@@ -258,44 +262,14 @@
                         Day <span class="text-danger">*</span>
                     </label>
                     <input
-                            id="public_day"
-                            type="number"
+                            id="public_date"
+                            type="date"
                             max="31"
-                            v-model="public_day"
+                            v-model="public_date"
                             class="form-control"
                             placeholder="Day"
                             :class="{
-                          'is-invalid': submitted && $v.public_day.$error,
-                        }"
-                    />
-                </div>
-                <div class="form-group">
-                    <label for="public_month">
-                        Month <span class="text-danger">*</span>
-                    </label>
-                    <input
-                            id="public_month"
-                            type="number"
-                            v-model="public_month"
-                            class="form-control"
-                            placeholder="Month"
-                            :class="{
-                          'is-invalid': submitted && $v.public_month.$error,
-                        }"
-                    />
-                </div>
-                <div class="form-group">
-                    <label for="public_year">
-                        Year <span class="text-danger">*</span>
-                    </label>
-                    <input
-                            id="public_year"
-                            type="number"
-                            v-model="public_year"
-                            class="form-control"
-                            placeholder="Year"
-                            :class="{
-                          'is-invalid': submitted && $v.public_year.$error,
+                          'is-invalid': submitted && $v.public_date.$error,
                         }"
                     />
                 </div>
@@ -330,7 +304,7 @@
                         Holiday Name <span class="text-danger">*</span>
                     </label>
                     <input
-                            id="public_name"
+                            id="public_name_"
                             type="text"
                             v-model="public_name"
                             class="form-control"
