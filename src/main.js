@@ -17,6 +17,7 @@ import i18n from "./i18n";
 import apiService from "@/services/api.service";
 import getMonth from "@/filters/get-month";
 import getDay from "@/filters/get-day";
+import getFileSize from "@/filters/get-file-size";
 import ScaleLoader from "vue-spinner/src/ScaleLoader";
 
 import "@/assets/scss/app.scss";
@@ -47,6 +48,7 @@ import "vue-select/dist/vue-select.css";
 Vue.mixin(apiService);
 Vue.filter("getMonth", getMonth);
 Vue.filter("getDay", getDay);
+Vue.filter("getFileSize", getFileSize);
 
 new Vue({
   router,

@@ -2,8 +2,8 @@
 import Layout from "@/views/layouts/main";
 import PageHeader from "@/components/page-header";
 import appConfig from "@/app.config";
-import Multiselect from 'vue-multiselect';
-import {required} from "vuelidate/lib/validators";
+import Multiselect from "vue-multiselect";
+import { required } from "vuelidate/lib/validators";
 
 export default {
   page: {
@@ -19,8 +19,6 @@ export default {
     this.fetchEmployee();
     await this.getStates();
     await this.getBanks();
-
-
   },
 
   /*: null,
@@ -53,18 +51,18 @@ export default {
     //account_number: { required },
   },
   methods: {
-    toggleSelected(val){
+    toggleSelected(val) {
       //let {text, value } = val;
-     console.log(val);
+      console.log(val);
     },
-    positionLabel ({ text }) {
-      return `${text}`
+    positionLabel({ text }) {
+      return `${text}`;
     },
-    bankLabel ({ text }) {
-      return `${text}`
+    bankLabel({ text }) {
+      return `${text}`;
     },
-    locationLabel ({ text }) {
-      return `${text}`
+    locationLabel({ text }) {
+      return `${text}`;
     },
     fetchEmployee() {
       let employeeID = this.$route.params.employeeID;
@@ -95,7 +93,6 @@ export default {
           this.emp_emergency_name = data.emp_emergency_name;
           this.emp_emergency_contact = data.emp_emergency_contact;
         }
-
       });
     },
     async getBanks() {
@@ -107,14 +104,14 @@ export default {
         data.forEach(async (datum) => {
           const dat = {
             value: datum.bank_id,
-            text: datum.bank_name
+            text: datum.bank_name,
           };
-          if(datum.bank_id === this.emp_bank_id_val){
-             const val = {
-               value: datum.bank_id,
-               text: datum.bank_name
-             }
-             this.emp_bank_id.push(val);
+          if (datum.bank_id === this.emp_bank_id_val) {
+            const val = {
+              value: datum.bank_id,
+              text: datum.bank_name,
+            };
+            this.emp_bank_id.push(val);
           }
           this.banks.push(dat);
         });
@@ -130,11 +127,11 @@ export default {
             value: datum.s_id,
             text: datum.s_name,
           };
-          if(datum.s_id === this.emp_state_id_val){
+          if (datum.s_id === this.emp_state_id_val) {
             const val = {
               value: datum.s_id,
-              text: datum.s_name
-            }
+              text: datum.s_name,
+            };
             this.emp_state_id.push(val);
           }
           this.states.push(dat);
@@ -179,8 +176,8 @@ export default {
       this.fetchEmployee();
     },
     test() {
-      console.log(this.bank)
-    }
+      console.log(this.bank);
+    },
   },
   data() {
     return {
@@ -244,11 +241,23 @@ export default {
     <PageHeader :title="title" :items="items" />
     <div class="d-flex justify-content-end mb-3">
       <b-button
-        class="btn btn-success"
+        class="btn btn-success mr-3"
         @click="$router.push({ name: 'manage-employees' })"
       >
         <i class="mdi mdi-plus mr-2"></i>
         Manage Employees
+      </b-button>
+      <b-button
+        class="btn btn-primary"
+        @click="
+          $router.push({
+            name: 'employee-documents',
+            params: { employeeID: $route.params.employeeID },
+          })
+        "
+      >
+        <i class="mdi mdi-plus mr-2"></i>
+        Manage Documents
       </b-button>
     </div>
     <scale-loader v-if="apiBusy" />
@@ -294,20 +303,19 @@ export default {
                   <div class="form-group">
                     <label for=""> Phone Number </label>
                     <input
-
-                            type="text"
-                            required
-                            class="form-control"
-                            v-model="emp_phone_no"
+                      type="text"
+                      required
+                      class="form-control"
+                      v-model="emp_phone_no"
                     />
                   </div>
                   <div class="form-group">
                     <label for=""> Location </label>
                     <input
-                            readonly
-                            type="text"
-                            class="form-control"
-                            v-model="emp_location"
+                      readonly
+                      type="text"
+                      class="form-control"
+                      v-model="emp_location"
                     />
                   </div>
 
@@ -323,14 +331,13 @@ export default {
                   <div class="form-group">
                     <label>State Of Origin</label>
                     <multiselect
-                            v-model="emp_state_id"
-                            :options="states"
-                            :custom-label="locationLabel"
-                            :class="{
-                      'is-invalid': submitted && $v.emp_state_id.$error,
-                    }"
+                      v-model="emp_state_id"
+                      :options="states"
+                      :custom-label="locationLabel"
+                      :class="{
+                        'is-invalid': submitted && $v.emp_state_id.$error,
+                      }"
                     ></multiselect>
-
                   </div>
                   <div class="p-3 bg-light mb-4">
                     <h5 class="font-size-14 mb-0">
@@ -340,15 +347,14 @@ export default {
                   <div class="form-group">
                     <label>Bank</label>
                     <multiselect
-                            v-model="emp_bank_id"
-                            :options="banks"
-                            :custom-label="bankLabel"
-                            @select="toggleSelected"
-                            :class="{
-                      'is-invalid': submitted && $v.emp_bank_id.$error,
-                    }"
+                      v-model="emp_bank_id"
+                      :options="banks"
+                      :custom-label="bankLabel"
+                      @select="toggleSelected"
+                      :class="{
+                        'is-invalid': submitted && $v.emp_bank_id.$error,
+                      }"
                     >
-
                     </multiselect>
                   </div>
 
@@ -468,23 +474,22 @@ export default {
                   <div class="form-group">
                     <label for=""> Hire Date </label>
                     <input
-                            type="date"
-                            class="form-control"
-                            v-model="emp_hire_date"
+                      type="date"
+                      class="form-control"
+                      v-model="emp_hire_date"
                     />
                   </div>
 
                   <div class="form-group">
                     <label for=""> Contract End Date </label>
                     <input
-                            type="date"
-                            class="form-control"
-                            v-model="emp_contract_end_date"
+                      type="date"
+                      class="form-control"
+                      v-model="emp_contract_end_date"
                     />
                   </div>
                 </div>
               </div>
-
 
               <b-button
                 v-if="!submitted"
