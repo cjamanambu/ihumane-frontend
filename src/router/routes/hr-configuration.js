@@ -96,6 +96,14 @@ export default [
     component: () => import("@/views/pages/hr-configuration/public-holidays"),
   },
   {
+    path: "/public-holidays-calendar",
+    name: "public-hoildays-calendar",
+    meta: {
+      authRequired: true,
+    },
+    component: () => import("@/views/pages/hr-configuration/public-holidays-calendar"),
+  },
+  {
     path: "/leave-types",
     name: "leave-types",
     meta: {
