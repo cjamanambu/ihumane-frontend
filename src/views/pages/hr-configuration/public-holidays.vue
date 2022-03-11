@@ -210,10 +210,10 @@
                                     @row-selected="selectPublicHoliday"
                             >
                               <template #cell(ph_day)="row">
-                                <span>{{ new Date(`${row.item.ph_month}-${row.item.ph_day}-${row.item.ph_year}`).toDateString()    }}</span>
+                                <span>{{ new Date(`${parseInt(row.item.ph_month)}-${parseInt(row.item.ph_day)}-${parseInt(row.item.ph_year)}`).toDateString()    }}</span>
                               </template>
                               <template #cell(ph_day_to)="row">
-                                <span>{{ new Date(`${row.item.ph_to_month}-${row.item.ph_to_day}-${row.item.ph_to_year}`).toDateString()    }}</span>
+                                <span>{{ new Date(`${parseInt(row.item.ph_to_month)}-${parseInt(row.item.ph_to_day)}-${parseInt(row.item.ph_to_year)}`).toDateString()    }}</span>
                               </template>
 
                             </b-table>
