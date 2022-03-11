@@ -130,6 +130,9 @@ export const actions = {
   setPanel({ commit }, { panel }) {
     commit("SET_PANEL", panel);
   },
+  setEmployee({ commit }, { employee }) {
+    commit("SET_EMPLOYEE", employee);
+  },
 
   // Logs out the current user.
   logOut({ commit }) {

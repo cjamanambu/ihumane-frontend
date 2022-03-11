@@ -382,7 +382,7 @@ export default {
           <template v-slot:button-content>
             <img
               class="rounded-circle header-profile-user"
-              src="@/assets/images/users/avatar-svgrepo-com.svg"
+              :src="getEmployee.emp_passport"
               alt="Header Avatar"
             />
             <span class="d-none d-xl-inline-block ml-1">
