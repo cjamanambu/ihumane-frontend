@@ -17,18 +17,21 @@ export default {
     this.refreshTable();
   },
   validations: {
-    leave_name:{ required },
-   lt_rate: { required },
-    lt_mode: { required }
-
-
+    leave_name: { required },
+    lt_rate: { required },
+    lt_mode: { required },
   },
   methods: {
     refreshTable() {
       this.apiGet(this.ROUTES.leaveType, "Get Leave Types Error").then(
         (res) => {
           const { data } = res;
-          this.leaveTypes = data;
+          data.forEach((leaveType, index) => {
+            this.leaveTypes[index] = {
+              sn: ++index,
+              ...leaveType,
+            };
+          });
           this.totalRows = this.leaveTypes.length;
         }
       );
@@ -39,10 +42,11 @@ export default {
       this.currentPage = 1;
     },
     resetForm() {
-      this.lt_id = null
-      this.leave_name = null
-       this.lt_rate= null
-       this.lt_mode= null
+      this.lt_id = null;
+      this.leave_name = null;
+      this.lt_rate = null;
+      this.lt_mode = 1;
+      this.lt_accrue = 1;
       this.$v.$reset();
     },
     selectLeaveType(leaveType) {
@@ -51,6 +55,7 @@ export default {
       this.leave_name = leaveType.leave_name;
       this.lt_rate = leaveType.lt_rate;
       this.lt_mode = leaveType.lt_mode;
+      this.lt_accrue = leaveType.lt_accrue;
       this.$refs["update-leave-type"].show();
       this.$refs["leave-type-table"].clearSelected();
     },
@@ -61,12 +66,11 @@ export default {
         this.apiFormHandler("Invalid Leave Type");
       } else {
         const data = {
-
           leave_name: this.leave_name,
           leave_mode: this.lt_mode,
           leave_rate: this.lt_rate,
           leave_duration: 5,
-
+          leave_accrue: this.lt_accrue,
         };
         this.apiPost(this.ROUTES.leaveType, data, "Add Leave Type Error").then(
           (res) => {
@@ -89,6 +93,7 @@ export default {
           leave_mode: this.lt_mode,
           leave_rate: this.lt_rate,
           leave_duration: 5,
+          leave_accrue: this.lt_accrue,
         };
         const url = `${this.ROUTES.leaveType}/${this.lt_id}`;
         this.apiPatch(url, data, "Update Leave Type Error").then((res) => {
@@ -124,18 +129,43 @@ export default {
       pageOptions: [10, 25, 50, 100],
       filter: null,
       filterOn: [],
-      sortBy: "lt_id",
+      sortBy: "sn",
       sortDesc: false,
       fields: [
-        { key: "leave_type_id", label: "SN", sortable: true },
+        { key: "sn", label: "S/n", sortable: true, thStyle: { width: "5%" } },
         { key: "leave_name", label: "Leave Type", sortable: true },
-        { key: "lt_rate", label: "Rate(Days)", sortable: true },
-        { key: "lt_mode", label: "Mode", sortable: true },
+        {
+          key: "lt_rate",
+          label: "Rate(Days)",
+          sortable: true,
+          thStyle: { width: "5%" },
+        },
+        {
+          key: "lt_mode",
+          label: "Mode",
+          sortable: true,
+          thStyle: { width: "10%" },
+        },
+        {
+          key: "lt_accrue",
+          label: "Accrued?",
+          sortable: true,
+          thStyle: { width: "5%" },
+        },
       ],
       lt_id: null,
       leave_name: null,
       lt_rate: null,
-      lt_mode: null,
+      lt_mode: 1,
+      lt_modes: [
+        { text: "Monthly", value: 1 },
+        { text: "Yearly", value: 2 },
+      ],
+      lt_accrue: 1,
+      lt_accrues: [
+        { text: "Yes", value: 1 },
+        { text: "No", value: 0 },
+      ],
       submitted: false,
     };
   },
@@ -192,7 +222,7 @@ export default {
             <!-- Table -->
             <div class="table-responsive mb-0">
               <b-table
-                ref="dept-table"
+                ref="leave-type-table"
                 bordered
                 selectable
                 hover
@@ -210,23 +240,24 @@ export default {
                 select-mode="single"
                 @row-selected="selectLeaveType"
               >
-
                 <template #cell(lt_mode)="row">
                   <div
-                      class="badge badge-info badge-pill"
-                      v-if="row.value === 1"
+                    class="badge badge-info badge-pill"
+                    v-if="row.value === 1"
                   >
                     Monthly
                   </div>
 
                   <div
-                      class="badge badge-warning badge-pill"
-                      v-if="row.value === 2"
+                    class="badge badge-warning badge-pill"
+                    v-if="row.value === 2"
                   >
                     Yearly
                   </div>
-
-
+                </template>
+                <template #cell(lt_accrue)="row">
+                  <span v-if="row.value === 1"> Yes </span>
+                  <span v-else> No </span>
                 </template>
               </b-table>
             </div>
@@ -252,7 +283,7 @@ export default {
     </div>
     <b-modal
       ref="add-leave-type"
-      title="Add Department"
+      title="Add Leave Type"
       hide-footer
       centered
       title-class="font-18"
@@ -264,11 +295,11 @@ export default {
             Leave Type <span class="text-danger">*</span>
           </label>
           <input
-              id="lt-name-add"
-              type="text"
-              v-model="leave_name"
-              class="form-control"
-              :class="{
+            id="lt-name-add"
+            type="text"
+            v-model="leave_name"
+            class="form-control"
+            :class="{
               'is-invalid': submitted && $v.leave_name.$error,
             }"
           />
@@ -278,11 +309,11 @@ export default {
             Rate <span class="text-danger">*</span>
           </label>
           <input
-              id="lt-rate-add"
-              type="text"
-              v-model="lt_rate"
-              class="form-control"
-              :class="{
+            id="lt-rate-add"
+            type="text"
+            v-model="lt_rate"
+            class="form-control"
+            :class="{
               'is-invalid': submitted && $v.lt_rate.$error,
             }"
           />
@@ -291,14 +322,23 @@ export default {
           <label for="lt-mode-add">
             Mode <span class="text-danger">*</span>
           </label>
-          <input
-              id="lt-mode-add"
-              type="text"
-              v-model="lt_mode"
-              class="form-control"
-              :class="{
-              'is-invalid': submitted && $v.lt_mode.$error,
-            }"
+          <br />
+          <b-form-radio-group
+            id="lt-mode-add"
+            v-model="lt_mode"
+            :options="lt_modes"
+            button-variant="outline-success"
+            buttons
+          />
+        </div>
+        <div class="form-group">
+          <label for="lt-mode-add"> Accrued? </label> <br />
+          <b-form-radio-group
+            id="lt-mode-add"
+            v-model="lt_accrue"
+            :options="lt_accrues"
+            button-variant="outline-success"
+            buttons
           />
         </div>
         <b-button
@@ -342,9 +382,7 @@ export default {
           />
         </div>
         <div class="form-group">
-          <label for="lt-rate">
-            Rate <span class="text-danger">*</span>
-          </label>
+          <label for="lt-rate"> Rate <span class="text-danger">*</span> </label>
           <input
             id="lt-rate"
             type="text"
@@ -356,17 +394,26 @@ export default {
           />
         </div>
         <div class="form-group">
-          <label for="lt-mode">
+          <label for="lt-mode-add">
             Mode <span class="text-danger">*</span>
           </label>
-          <input
-              id="lt-mode"
-              type="text"
-              v-model="lt_mode"
-              class="form-control"
-              :class="{
-              'is-invalid': submitted && $v.lt_mode.$error,
-            }"
+          <br />
+          <b-form-radio-group
+            id="lt-mode-add"
+            v-model="lt_mode"
+            :options="lt_modes"
+            button-variant="outline-success"
+            buttons
+          />
+        </div>
+        <div class="form-group">
+          <label for="lt-mode-add"> Accrued? </label> <br />
+          <b-form-radio-group
+            id="lt-mode-add"
+            v-model="lt_accrue"
+            :options="lt_accrues"
+            button-variant="outline-success"
+            buttons
           />
         </div>
         <b-button
