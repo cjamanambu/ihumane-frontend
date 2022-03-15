@@ -45,20 +45,235 @@ export default {
           active: true,
         },
       ],
+      users: 0,
+      employees: 0,
+      leaves: 0,
+      travels: 0,
+      timeAllocations: [],
+      timeAllocations1: [],
+      times: 0,
+      leaveApps: 0,
+      travelReqs: 0,
+      timesheets: 0,
+      assessEmployees: 0,
+      travelAuth: 0,
+      leaveAuth: 0,
+      timeAuth: 0,
+      applications: [],
     };
   },
   mounted() {
-    this.check();
+    this.loadAdminDashboard();
+    this.loadSelfServiceDashboard();
   },
   methods: {
-    check() {
-      const url = `${this.ROUTES.employee}/get-employee/${this.getEmployee.emp_id}`;
-      this.apiGet(url);
+    async loadAdminDashboard() {
+      await this.apiGet(this.ROUTES.user, "Get Users Error").then((res) => {
+        const { data } = res;
+        this.users = data.length;
+      });
+      await this.apiGet(this.ROUTES.employee, "Get Employees Error").then(
+        (res) => {
+          const { data } = res;
+          this.employees = data.length;
+        }
+      );
+      await this.apiGet(
+        this.ROUTES.leaveApplication,
+        "Get Leave Applications Error"
+      ).then((res) => {
+        const { data } = res.data;
+        this.leaves = data.length;
+      });
+      await this.apiGet(
+        this.ROUTES.travelApplication,
+        "Get Travel Applications Error"
+      ).then((res) => {
+        const { data } = res.data;
+        this.travels = data.length;
+      });
+      this.apiGet(this.ROUTES.timeAllocation, "Get Time Allocation Error").then(
+        (res) => {
+          let count = 0;
+          const { data } = res;
+          data.forEach((time) => {
+            let found = false;
+            if (this.timeAllocations1.length === 0) {
+              this.timeAllocations1.push({
+                sn: ++count,
+                ref_no: time.ta_ref_no,
+                payroll_month: time.ta_month,
+                payroll_year: time.ta_year,
+                breakdown: [{ t1code: time.ta_tcode, charge: time.ta_charge }],
+                status: time.ta_status ? time.ta_status : 0,
+              });
+            } else {
+              this.timeAllocations1.every((timeAllocation) => {
+                if (time.ta_ref_no === timeAllocation.ref_no) {
+                  timeAllocation.breakdown.push({
+                    t1code: time.ta_tcode,
+                    charge: time.ta_charge,
+                  });
+                  found = true;
+                  return false;
+                }
+                return true;
+              });
+              if (!found) {
+                this.timeAllocations1.push({
+                  sn: ++count,
+                  ref_no: time.ta_ref_no,
+                  payroll_month: time.ta_month,
+                  payroll_year: time.ta_year,
+                  breakdown: [
+                    { t1code: time.ta_tcode, charge: time.ta_charge },
+                  ],
+                  status: time.ta_status ? time.ta_status : 0,
+                });
+              }
+            }
+          });
+          this.times = this.timeAllocations1.length;
+        }
+      );
+    },
+    async loadSelfServiceDashboard() {
+      this.leaveApps = 0;
+      this.travelReqs = 0;
+      const employeeID = this.getEmployee.emp_id;
+      let url = `${this.ROUTES.leaveApplication}/get-employee-leave/${employeeID}`;
+      await this.apiGet(url, "Get Employee Leaves Error").then((res) => {
+        const { data } = res.data;
+        data.forEach((leave) => {
+          if (leave.leapp_status === 0) {
+            this.leaveApps++;
+          }
+        });
+      });
+      url = `${this.ROUTES.travelApplication}/get-travel-application/${employeeID}`;
+      await this.apiGet(url, "Get Travel Applications Error").then((res) => {
+        const { data } = res.data;
+        data.forEach((travel) => {
+          if (travel.travelapp_status === 0) {
+            this.travelReqs++;
+          }
+        });
+      });
+      url = `${this.ROUTES.timeAllocation}/get-employee-time-allocation/${employeeID}`;
+      this.apiGet(url, "Get Time Allocation Error").then((res) => {
+        let count = 0;
+        const { data } = res;
+        data.forEach((time) => {
+          let found = false;
+          if (this.timeAllocations.length === 0) {
+            this.timeAllocations.push({
+              sn: ++count,
+              ref_no: time.ta_ref_no,
+              payroll_month: time.ta_month,
+              payroll_year: time.ta_year,
+              breakdown: [{ t1code: time.ta_tcode, charge: time.ta_charge }],
+              status: time.ta_status ? time.ta_status : 0,
+            });
+          } else {
+            this.timeAllocations.every((timeAllocation) => {
+              if (time.ta_ref_no === timeAllocation.ref_no) {
+                timeAllocation.breakdown.push({
+                  t1code: time.ta_tcode,
+                  charge: time.ta_charge,
+                });
+                found = true;
+                return false;
+              }
+              return true;
+            });
+            if (!found) {
+              this.timeAllocations.push({
+                sn: ++count,
+                ref_no: time.ta_ref_no,
+                payroll_month: time.ta_month,
+                payroll_year: time.ta_year,
+                breakdown: [{ t1code: time.ta_tcode, charge: time.ta_charge }],
+                status: time.ta_status ? time.ta_status : 0,
+              });
+            }
+          }
+        });
+        this.timesheets = this.timeAllocations.length;
+      });
+      url = `${this.ROUTES.employee}/get-supervisor-employees/${employeeID}`;
+      this.apiGet(url).then((res) => {
+        const { data } = res;
+        this.assessEmployees = data.length;
+      });
+      url = `${this.ROUTES.travelApplication}/authorization/supervisor/${employeeID}`;
+      this.apiGet(url, "Get Travel Applications Error").then((res) => {
+        const { data } = res.data;
+        this.travelAuth = data.length;
+      });
+      url = `${this.ROUTES.leaveApplication}/authorization/supervisor/${this.getEmployee.emp_id}`;
+      this.apiGet(url, "Get Leave Applications Error").then((res) => {
+        const { data } = res.data;
+        this.leaveAuth = data.length;
+      });
+      url = `${this.ROUTES.timeAllocation}/authorization/${this.getEmployee.emp_id}`;
+      this.apiGet(url, "Get Authorizations Error").then((res) => {
+        let count = 0;
+        const { data, officers } = res.data;
+        data.forEach((time) => {
+          let found = false;
+          if (this.applications.length === 0) {
+            this.applications.push({
+              sn: ++count,
+              ref_no: time.ta_ref_no,
+              payroll_month: time.ta_month,
+              payroll_year: time.ta_year,
+              breakdown: [{ t1code: time.ta_tcode, charge: time.ta_charge }],
+              status: time.ta_status ? time.ta_status : 0,
+              employee: time.Employee,
+            });
+          } else {
+            this.applications.every((application) => {
+              if (time.ta_ref_no === application.ref_no) {
+                application.breakdown.push({
+                  t1code: time.ta_tcode,
+                  charge: time.ta_charge,
+                });
+                found = true;
+                return false;
+              }
+              return true;
+            });
+            if (!found) {
+              this.applications.push({
+                sn: ++count,
+                ref_no: time.ta_ref_no,
+                payroll_month: time.ta_month,
+                payroll_year: time.ta_year,
+                breakdown: [{ t1code: time.ta_tcode, charge: time.ta_charge }],
+                status: time.ta_status ? time.ta_status : 0,
+                employee: time.Employee,
+              });
+            }
+          }
+        });
+        this.applications.forEach((application) => {
+          officers.forEach((officer) => {
+            if (application.ref_no === officer.auth_travelapp_id) {
+              application["Officer"] = officer.officers;
+            }
+          });
+        });
+        this.timeAuth = this.applications.length;
+      });
     },
   },
 };
 </script>
-
+<style>
+.cursor-pointer {
+  cursor: pointer;
+}
+</style>
 <template>
   <Layout>
     <PageHeader :title="title" :items="items" />
@@ -134,11 +349,13 @@ export default {
       <div class="col-lg-8">
         <div class="row">
           <div class="col-lg-4">
-            <div class="card">
+            <div class="card cursor-pointer" @click="$router.push('/users')">
               <div class="card-body">
                 <div class="media">
                   <div class="media-body overflow-hidden">
-                    <p class="text-truncate font-size-14 mb-2">0 Total</p>
+                    <p class="text-truncate font-size-14 mb-2">
+                      {{ users }} Total
+                    </p>
                     <h5 class="mb-0">Users</h5>
                   </div>
                 </div>
@@ -146,11 +363,16 @@ export default {
             </div>
           </div>
           <div class="col-lg-4">
-            <div class="card">
+            <div
+              class="card cursor-pointer"
+              @click="$router.push('/manage-employees')"
+            >
               <div class="card-body">
                 <div class="media">
                   <div class="media-body overflow-hidden">
-                    <p class="text-truncate font-size-14 mb-2">0 Total</p>
+                    <p class="text-truncate font-size-14 mb-2">
+                      {{ employees }} Total
+                    </p>
                     <h5 class="mb-0">Employees</h5>
                   </div>
                 </div>
@@ -158,11 +380,16 @@ export default {
             </div>
           </div>
           <div class="col-lg-4">
-            <div class="card">
+            <div
+              class="card cursor-pointer"
+              @click="$router.push('/manage-leave-applications')"
+            >
               <div class="card-body">
                 <div class="media">
                   <div class="media-body overflow-hidden">
-                    <p class="text-truncate font-size-14 mb-2">0 Total</p>
+                    <p class="text-truncate font-size-14 mb-2">
+                      {{ leaves }} Total
+                    </p>
                     <h5 class="mb-0">Leave Applications</h5>
                   </div>
                 </div>
@@ -170,11 +397,16 @@ export default {
             </div>
           </div>
           <div class="col-lg-4">
-            <div class="card">
+            <div
+              class="card cursor-pointer"
+              @click="$router.push('/manage-travel-applications')"
+            >
               <div class="card-body">
                 <div class="media">
                   <div class="media-body overflow-hidden">
-                    <p class="text-truncate font-size-14 mb-2">0 Total</p>
+                    <p class="text-truncate font-size-14 mb-2">
+                      {{ travels }} Total
+                    </p>
                     <h5 class="mb-0">Travel Applications</h5>
                   </div>
                 </div>
@@ -182,11 +414,16 @@ export default {
             </div>
           </div>
           <div class="col-lg-4">
-            <div class="card">
+            <div
+              class="card cursor-pointer"
+              @click="$router.push('/manage-time-sheets')"
+            >
               <div class="card-body">
                 <div class="media">
                   <div class="media-body overflow-hidden">
-                    <p class="text-truncate font-size-14 mb-2">0 Total</p>
+                    <p class="text-truncate font-size-14 mb-2">
+                      {{ times }} Total
+                    </p>
                     <h5 class="mb-0">Timesheets Filled</h5>
                   </div>
                 </div>
@@ -209,7 +446,7 @@ export default {
       </div>
     </div>
     <div v-else class="row">
-      <div class="col-lg-5">
+      <div class="col-lg-4">
         <div class="card">
           <div class="card-body">
             <div class="media">
@@ -269,14 +506,19 @@ export default {
           </div>
         </div>
       </div>
-      <div class="col-lg-7">
+      <div class="col-lg-8">
         <div class="row">
           <div class="col-lg-4">
-            <div class="card">
+            <div
+              class="card cursor-pointer"
+              @click="$router.push('/leave-application')"
+            >
               <div class="card-body">
                 <div class="media">
                   <div class="media-body overflow-hidden">
-                    <p class="text-truncate font-size-14 mb-2">0 Pending</p>
+                    <p class="text-truncate font-size-14 mb-2">
+                      {{ leaveApps }} Pending
+                    </p>
                     <h5 class="mb-0">Leave Applications</h5>
                   </div>
                 </div>
@@ -284,11 +526,16 @@ export default {
             </div>
           </div>
           <div class="col-lg-4">
-            <div class="card">
+            <div
+              class="card cursor-pointer"
+              @click="$router.push('/travel-requests')"
+            >
               <div class="card-body">
                 <div class="media">
                   <div class="media-body overflow-hidden">
-                    <p class="text-truncate font-size-14 mb-2">0 Pending</p>
+                    <p class="text-truncate font-size-14 mb-2">
+                      {{ travelReqs }} Pending
+                    </p>
                     <h5 class="mb-0">Travel Requests</h5>
                   </div>
                 </div>
@@ -296,11 +543,16 @@ export default {
             </div>
           </div>
           <div class="col-lg-4">
-            <div class="card">
+            <div
+              class="card cursor-pointer"
+              @click="$router.push('/timesheets')"
+            >
               <div class="card-body">
                 <div class="media">
                   <div class="media-body overflow-hidden">
-                    <p class="text-truncate font-size-14 mb-2">0 Pending</p>
+                    <p class="text-truncate font-size-14 mb-2">
+                      {{ timesheets }} Pending
+                    </p>
                     <h5 class="mb-0">Timesheets Filled</h5>
                   </div>
                 </div>
@@ -308,11 +560,16 @@ export default {
             </div>
           </div>
           <div class="col-lg-4">
-            <div class="card">
+            <div
+              class="card cursor-pointer"
+              @click="$router.push('/assess-employees')"
+            >
               <div class="card-body">
                 <div class="media">
                   <div class="media-body overflow-hidden">
-                    <p class="text-truncate font-size-14 mb-2">0 Total</p>
+                    <p class="text-truncate font-size-14 mb-2">
+                      {{ assessEmployees }} Total
+                    </p>
                     <h5 class="mb-0">Employees to Assess</h5>
                   </div>
                 </div>
@@ -320,11 +577,16 @@ export default {
             </div>
           </div>
           <div class="col-lg-4">
-            <div class="card">
+            <div
+              class="card cursor-pointer"
+              @click="$router.push('/travel-authorization')"
+            >
               <div class="card-body">
                 <div class="media">
                   <div class="media-body overflow-hidden">
-                    <p class="text-truncate font-size-14 mb-2">0 Total</p>
+                    <p class="text-truncate font-size-14 mb-2">
+                      {{ travelAuth }} Total
+                    </p>
                     <h5 class="mb-0">Travel Authorizations</h5>
                   </div>
                 </div>
@@ -332,11 +594,16 @@ export default {
             </div>
           </div>
           <div class="col-lg-4">
-            <div class="card">
+            <div
+              class="card cursor-pointer"
+              @click="$router.push('/leave-authorization')"
+            >
               <div class="card-body">
                 <div class="media">
                   <div class="media-body overflow-hidden">
-                    <p class="text-truncate font-size-14 mb-2">0 Total</p>
+                    <p class="text-truncate font-size-14 mb-2">
+                      {{ leaveAuth }} Total
+                    </p>
                     <h5 class="mb-0">Leave Authorizations</h5>
                   </div>
                 </div>
@@ -344,11 +611,16 @@ export default {
             </div>
           </div>
           <div class="col-lg-4">
-            <div class="card">
+            <div
+              class="card cursor-pointer"
+              @click="$router.push('/time-sheet-authorization')"
+            >
               <div class="card-body">
                 <div class="media">
                   <div class="media-body overflow-hidden">
-                    <p class="text-truncate font-size-14 mb-2">0 Total</p>
+                    <p class="text-truncate font-size-14 mb-2">
+                      {{ timeAuth }} Total
+                    </p>
                     <h5 class="mb-0">Timesheet Authorizations</h5>
                   </div>
                 </div>
