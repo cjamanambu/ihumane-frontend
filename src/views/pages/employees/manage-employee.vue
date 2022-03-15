@@ -196,7 +196,6 @@ export default {
 
     test() {
       console.log(this.bank);
-
     },
   },
   data() {
@@ -263,39 +262,39 @@ export default {
 <template>
   <Layout>
     <PageHeader :title="title" :items="items" />
-    <div class="d-flex justify-content-end mb-3">
-      <b-button
-        class="btn btn-success mr-3"
-        @click="$router.push({ name: 'manage-employees' })"
-      >
-        <i class="mdi mdi-plus mr-2"></i>
-        Manage Employees
-      </b-button>
-
-
-      <b-button
+    <div class="d-flex justify-content-between mb-3">
+      <div>
+        <b-button
           class="btn btn-danger"
           @click="$refs['deactivate-employee'].show()"
-      >
-        <i class="mdi mdi-minus mr-2"></i>
-       Deactivate Employee
-       </b-button>
+        >
+          <i class="mdi mdi-minus mr-2"></i>
+          Deactivate Employee
+        </b-button>
+      </div>
+      <div class="d-flex">
+        <b-button
+          class="btn btn-success mr-3"
+          @click="$router.push({ name: 'manage-employees' })"
+        >
+          <i class="mdi mdi-plus mr-2"></i>
+          Manage Employees
+        </b-button>
 
-      <b-button
-        class="btn btn-primary"
-        @click="
-          $router.push({
-            name: 'employee-documents',
-            params: { employeeID: $route.params.employeeID },
-          })
-        "
-      >
-        <i class="mdi mdi-plus mr-2"></i>
-        Manage Documents
-
-      </b-button>
+        <b-button
+          class="btn btn-primary"
+          @click="
+            $router.push({
+              name: 'employee-documents',
+              params: { employeeID: $route.params.employeeID },
+            })
+          "
+        >
+          <i class="mdi mdi-plus mr-2"></i>
+          Upload Documents
+        </b-button>
+      </div>
     </div>
-
 
     <scale-loader v-if="apiBusy" />
     <div v-else class="row">
@@ -546,12 +545,12 @@ export default {
     </div>
 
     <b-modal
-        ref="deactivate-employee"
-        title="Deactivate Employee"
-        hide-footer
-        centered
-        title-class="font-18"
-        @hidden="resetForm"
+      ref="deactivate-employee"
+      title="Deactivate Employee"
+      hide-footer
+      centered
+      title-class="font-18"
+      @hidden="resetForm"
     >
       <form @submit.prevent="suspendEmployee">
         <div class="form-group">
@@ -559,26 +558,25 @@ export default {
             Suspension Reason <span class="text-danger">*</span>
           </label>
           <textarea
-              id="suspensionReason"
-              type="text"
-              v-model="emp_suspension_reason"
-              class="form-control"
-
+            id="suspensionReason"
+            type="text"
+            v-model="emp_suspension_reason"
+            class="form-control"
           />
         </div>
 
         <b-button
-            v-if="!submitting"
-            class="btn btn-success btn-block mt-4"
-            type="submit"
+          v-if="!submitting"
+          class="btn btn-success btn-block mt-4"
+          type="submit"
         >
           Submit
         </b-button>
         <b-button
-            v-else
-            disabled
-            class="btn btn-success btn-block mt-4"
-            type="submit"
+          v-else
+          disabled
+          class="btn btn-success btn-block mt-4"
+          type="submit"
         >
           Submitting...
         </b-button>
