@@ -96,11 +96,11 @@ export const menuItems = [
             label: "HMOs",
             link: "/hmos",
           },
-          {
+          /*{
             id: 15,
             label: "Grades",
             link: "/grades",
-          },
+          },*/
           {
             id: 16,
             label: "Sectors",
@@ -265,6 +265,11 @@ export const menuItems = [
         id: 30,
         label: "Confirm Variation",
         link: "/confirm-variation",
+      },
+      {
+        id: 31,
+        label: "Default Charges",
+        link: "/default-charges",
       },
     ],
   },

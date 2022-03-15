@@ -32,6 +32,7 @@ export const authMethods = mapActions("auth", [
   "toggleLockedScreen",
   "unlockScreen",
   "setPanel",
+  "setEmployee",
 ]);
 
 export const layoutMethods = mapActions("layout", [

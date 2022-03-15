@@ -3,6 +3,7 @@ import Layout from "@/views/layouts/main";
 import PageHeader from "@/components/page-header";
 import appConfig from "@/app.config";
 import { required } from "vuelidate/lib/validators";
+import Multiselect from 'vue-multiselect';
 
 export default {
   page: {
@@ -12,6 +13,7 @@ export default {
   components: {
     Layout,
     PageHeader,
+    Multiselect,
   },
   watch: {
     amount: function (newValue) {
@@ -43,15 +45,18 @@ export default {
       this.$refs["edit-salary-structure"].show();
       this.$refs["salary-structure-table"].clearSelected();
     },
-
+    employeeLabel ({ text }) {
+      return `${text}`
+    },
     refreshTable() {
       this.apiGet(
         this.ROUTES.salaryStructure,
         "Get Salary Structures Error"
       ).then((res) => {
         const { data } = res;
+        //console.log(data);
         data.forEach((salaryStructure, index) => {
-          this.salaryStructures[index] = { sn: ++index, ...salaryStructure };
+          this.salaryStructures[index] = { sn: ++index, grade: salaryStructure.salary_grade.sg_name,...salaryStructure };
         });
         this.totalRows = this.salaryStructures.length;
         this.fetchSalaryGrades();
@@ -117,7 +122,7 @@ export default {
         this.apiFormHandler("Invalid Salary Structure");
       } else {
         const data = {
-          ss_empid: this.employee,
+          ss_empid: this.employee.value,
           ss_gross: parseFloat(this.amount.replace(/,/g, "")),
           ss_grade: this.salaryGrade,
         };
@@ -185,7 +190,13 @@ export default {
           label: "Employee",
           sortable: true,
         },
-        { key: "total_amount", label: "Total Amount", sortable: true },
+        {
+          key:"grade",
+          label: "Grade",
+          sortable: true
+        },
+        { key: "grade", label: "Grade", sortable: true },
+        { key: "total_amount", label: "Gross", sortable: true },
       ],
       salaryGrade: null,
       salaryGrades: [
@@ -321,14 +332,14 @@ export default {
           <label for="code">
             Employee <span class="text-danger">*</span>
           </label>
-          <b-form-select
-            id="code"
-            v-model="employee"
-            :options="employees"
-            :class="{
-              'is-invalid': submitted && $v.employee.$error,
-            }"
-          />
+          <multiselect
+                  v-model="employee"
+                  :options="employees"
+                  :custom-label="employeeLabel"
+                  :class="{
+                      'is-invalid': submitted && $v.employee.$error,
+                    }"
+          ></multiselect>
         </div>
         <div class="form-group">
           <label for="code">

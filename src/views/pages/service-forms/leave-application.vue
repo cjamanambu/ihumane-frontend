@@ -74,6 +74,8 @@ export default {
       leapp_approve_date: null,
       leapp_recommend_by: null,
       leapp_recommend_date: null,
+      leapp_alt_email: null,
+      leapp_alt_phone: null,
       leaveTypes: [],
       leaveType: null,
       employees: [],
@@ -83,7 +85,7 @@ export default {
       approved: null,
       discarded: null,
       submitted: false,
-      pendingLeaves:0,
+      pendingLeaves: 0,
     };
   },
   methods: {
@@ -93,7 +95,9 @@ export default {
         const { data, officers } = res.data;
         data.forEach((leave, index) => {
           this.leaves[index] = { sn: ++index, ...leave };
-          if(leave.leapp_status === 0){ this.pendingLeaves++}
+          if (leave.leapp_status === 0) {
+            this.pendingLeaves++;
+          }
         });
         this.leaves.forEach((leave) => {
           officers.forEach((officer) => {
@@ -188,6 +192,8 @@ export default {
           leapp_leave_type: this.leaveType,
           leapp_start_date: this.leapp_start_date,
           leapp_end_date: this.leapp_end_date,
+          leapp_alt_email: this.leapp_alt_email,
+          leapp_alt_phone: this.leapp_alt_phone,
         };
         const url = `${this.ROUTES.leaveApplication}/add-leave-application`;
         this.apiPost(url, data, "Add Leave Application").then((res) => {
@@ -343,72 +349,86 @@ export default {
       @hidden="resetForm"
     >
       <form @submit.prevent="submitNew">
-
         <div class="alert alert-warning" v-if="pendingLeaves > 0">
-          <p>You currently have pending application. You're not due to apply for another leave while one or more is pending.</p>
+          You currently have pending application. You're not due to apply for
+          another leave while one or more is pending.
         </div>
         <div v-else>
-        <div class="form-group">
-          <label for="leave-types">
-            Leave Type <span class="text-danger">*</span>
-          </label>
-          <b-form-select
-            id="leave-types"
-            v-model="leaveType"
-            :options="leaveTypes"
-            :class="{
-              'is-invalid': submitted && $v.leaveType.$error,
-            }"
-          />
-        </div>
-
-        <div class="form-group">
-          <label for="start-date">
-            Start Date <span class="text-danger">*</span>
-          </label>
-          <input
-            id="start-date"
-            type="date"
-            v-model="leapp_start_date"
-            class="form-control"
-            :class="{
-              'is-invalid': submitted && $v.leapp_start_date.$error,
-            }"
-          />
-        </div>
-
-        <div class="form-group">
-          <label for="end-dates">
-            End Date <span class="text-danger">*</span>
-          </label>
-          <input
-            id="end-date"
-            type="date"
-            v-model="leapp_end_date"
-            class="form-control"
-            :class="{
-              'is-invalid': submitted && $v.leapp_end_date.$error,
-            }"
-          />
-        </div>
-
+          <div class="form-group">
+            <label for="leave-types">
+              Leave Type <span class="text-danger">*</span>
+            </label>
+            <b-form-select
+              id="leave-types"
+              v-model="leaveType"
+              :options="leaveTypes"
+              :class="{
+                'is-invalid': submitted && $v.leaveType.$error,
+              }"
+            />
+          </div>
+          <div class="form-group">
+            <label for="start-date">
+              Start Date <span class="text-danger">*</span>
+            </label>
+            <input
+              id="start-date"
+              type="date"
+              v-model="leapp_start_date"
+              class="form-control"
+              :class="{
+                'is-invalid': submitted && $v.leapp_start_date.$error,
+              }"
+            />
+          </div>
+          <div class="form-group">
+            <label for="end-dates">
+              End Date <span class="text-danger">*</span>
+            </label>
+            <input
+              id="end-date"
+              type="date"
+              v-model="leapp_end_date"
+              class="form-control"
+              :class="{
+                'is-invalid': submitted && $v.leapp_end_date.$error,
+              }"
+            />
+          </div>
+          <div class="form-group">
+            <label for="alt-email"> Alternate Email Address </label>
+            <input
+              id="alt-email"
+              type="email"
+              v-model="leapp_alt_email"
+              class="form-control"
+            />
+          </div>
+          <div class="form-group">
+            <label for="alt-email"> Alternate Phone Number </label>
+            <input
+              id="alt-email"
+              type="text"
+              v-model="leapp_alt_phone"
+              class="form-control"
+            />
+          </div>
           <b-button
-                  v-if="!submitting "
-                  class="btn btn-success btn-block mt-4"
-                  type="submit"
+            v-if="!submitting"
+            class="btn btn-success btn-block mt-4"
+            type="submit"
           >
             Submit
           </b-button>
           <b-button
-                  v-else
-                  disabled
-                  class="btn btn-success btn-block mt-4"
-                  type="submit"
+            v-else
+            disabled
+            class="btn btn-success btn-block mt-4"
+            type="submit"
           >
             Submitting...
           </b-button>
         </div>
-
       </form>
     </b-modal>
     <b-modal

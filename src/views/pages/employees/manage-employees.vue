@@ -165,7 +165,8 @@ export default {
                   <span>
                     {{ row.item.emp_first_name }}
                     {{ row.item.emp_last_name }}
-                  </span>
+                  </span> <br>
+                  <small>{{ row.item.emp_unique_id }}</small>
                 </template>
                 <template #cell(email)="row">
                   <p class="mb-0">

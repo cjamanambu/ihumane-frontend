@@ -2,7 +2,7 @@
 import Layout from "@/views/layouts/main";
 import PageHeader from "@/components/page-header";
 import appConfig from "@/app.config";
-
+import Multiselect from 'vue-multiselect';
 import { required } from "vuelidate/lib/validators";
 
 export default {
@@ -13,6 +13,7 @@ export default {
   components: {
     Layout,
     PageHeader,
+    Multiselect,
   },
   mounted() {
     this.refreshTable();
@@ -24,6 +25,9 @@ export default {
     t3_code: { required },
   },
   methods: {
+    employeeLabel ({ text }) {
+      return `${text}`
+    },
     refreshTable() {
       this.apiGet(this.ROUTES.department, "Get Departments Error").then(
         (res) => {
@@ -39,7 +43,7 @@ export default {
               if (depart.d_sector_lead_id === parseFloat(lead.emp_id)) {
                 depart["leader"] = `${lead.emp_first_name} ${
                   lead.emp_last_name !== null ? lead.emp_last_name : ""
-                } ${lead.emp_other_name !== null ? lead.emp_other_name : ""}`;
+                } ${lead.emp_other_name !== null ? lead.emp_other_name : ""} (${lead.emp_unique_id})`;
               }
             });
           });
@@ -78,7 +82,7 @@ export default {
             value: emp.emp_id,
             text: `${emp.emp_first_name} ${emp.emp_last_name} ${
               emp.emp_other_name !== null ? emp.emp_other_name : ""
-            }`,
+            } (${emp.emp_unique_id})`,
           });
         });
       });
@@ -92,7 +96,7 @@ export default {
         const data = {
           department_name: this.name,
           t3_code: this.t3_code,
-          sector_lead: this.sector_lead,
+          sector_lead: this.sector_lead.value,
         };
         this.apiPost(this.ROUTES.department, data, "Add Department Error").then(
           (res) => {
@@ -113,7 +117,7 @@ export default {
         const data = {
           department_name: this.name,
           t3_code: this.t3_code,
-          sector_lead: this.sector_lead,
+          sector_lead: this.sector_lead.value,
         };
         const url = `${this.ROUTES.department}/${this.deptID}`;
         this.apiPatch(url, data, "Update Department Error").then((res) => {
@@ -300,14 +304,14 @@ export default {
           <label for="t3_code">
             Sector Lead <span class="text-danger">*</span>
           </label>
-          <b-form-select
-            id="department"
-            v-model="sector_lead"
-            :options="employee_list"
-            :class="{
-              'is-invalid': submitted && $v.employee_list.$error,
-            }"
-          />
+          <multiselect
+                  v-model="sector_lead"
+                  :options="employee_list"
+                  :custom-label="employeeLabel"
+                  :class="{
+                      'is-invalid': submitted && $v.employee_list.$error,
+                    }"
+          ></multiselect>
         </div>
         <b-button
           v-if="!submitting"
@@ -367,14 +371,14 @@ export default {
           <label for="t3_code">
             Sector Lead <span class="text-danger">*</span>
           </label>
-          <b-form-select
-            id="department"
-            v-model="sector_lead"
-            :options="employee_list"
-            :class="{
-              'is-invalid': submitted && $v.employee_list.$error,
-            }"
-          />
+          <multiselect
+                  v-model="sector_lead"
+                  :options="employee_list"
+                  :custom-label="employeeLabel"
+                  :class="{
+                      'is-invalid': submitted && $v.employee_list.$error,
+                    }"
+          ></multiselect>
         </div>
         <b-button
           v-if="!submitting"

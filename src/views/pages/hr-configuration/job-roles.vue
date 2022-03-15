@@ -3,6 +3,7 @@ import Layout from "@/views/layouts/main";
 import PageHeader from "@/components/page-header";
 import appConfig from "@/app.config";
 import { required } from "vuelidate/lib/validators";
+import Multiselect from 'vue-multiselect';
 
 export default {
   page: {
@@ -12,6 +13,7 @@ export default {
   components: {
     Layout,
     PageHeader,
+    Multiselect,
   },
   mounted() {
     this.refreshTable();
@@ -23,6 +25,9 @@ export default {
     description: { required },
   },
   methods: {
+    departmentLabel ({ text }) {
+      return `${text}`
+    },
     resetForm() {
       this.role = null;
       this.department = null;
@@ -38,18 +43,19 @@ export default {
       });
     },
     fetchDepartments() {
-      this.apiGet(this.ROUTES.department, "Get Departments Error").then(
+      this.apiGet(this.ROUTES.department, "Get Sector Error").then(
         (res) => {
           this.departments = [
-            { value: null, text: "Please select a department" },
+            { value: null, text: "Please select a sector" },
           ];
           const { data } = res;
-          data.forEach((department) => {
+           data.departments.forEach((department) => {
             this.departments.push({
               value: department.department_id,
               text: department.department_name,
             });
           });
+
         }
       );
     },
@@ -75,7 +81,7 @@ export default {
       } else {
         const data = {
           job_role: this.role,
-          department_id: this.department,
+          department_id: this.department.value,
           description: this.description,
         };
         this.apiPost(this.ROUTES.jobRole, data, "Add Job Role Error").then(
@@ -97,7 +103,7 @@ export default {
         const url = `${this.ROUTES.jobRole}/${this.jobRoleID}`;
         const data = {
           job_role: this.role,
-          department_id: this.department,
+          department_id: this.department.value,
           description: this.description,
         };
         this.apiPatch(url, data, "Update Job Role Error").then((res) => {
@@ -277,21 +283,21 @@ export default {
         </div>
         <div class="form-group">
           <label for="department">
-            Department <span class="text-danger">*</span>
+            Sector <span class="text-danger">*</span>
           </label>
-          <b-form-select
-            id="department"
-            v-model="department"
-            :options="departments"
-            :class="{
-              'is-invalid': submitted && $v.department.$error,
-            }"
-          />
+          <multiselect
+                  v-model="department"
+                  :options="departments"
+                  :custom-label="departmentLabel"
+                  :class="{
+                      'is-invalid': submitted && $v.department.$error,
+                    }"
+          ></multiselect>
           <small
             class="form-text text-muted manage"
             @click="$router.push('/departments')"
           >
-            Manage Departments
+            Manage Sectors
           </small>
         </div>
         <div class="form-group">
@@ -349,21 +355,22 @@ export default {
         </div>
         <div class="form-group">
           <label for="department">
-            Department <span class="text-danger">*</span>
+            Sector <span class="text-danger">*</span>
           </label>
-          <b-form-select
-            id="department"
-            v-model="department"
-            :options="departments"
-            :class="{
-              'is-invalid': submitted && $v.department.$error,
-            }"
-          />
+          <multiselect
+                  v-model="department"
+                  :options="departments"
+                  :custom-label="departmentLabel"
+                  :class="{
+                      'is-invalid': submitted && $v.department.$error,
+                    }"
+          ></multiselect>
+
           <small
             class="form-text text-muted manage"
             @click="$router.push('/departments')"
           >
-            Manage Departments
+            Manage Sectors
           </small>
         </div>
         <div class="form-group">

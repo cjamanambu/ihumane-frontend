@@ -3,6 +3,7 @@ import Layout from "@/views/layouts/main";
 import PageHeader from "@/components/page-header";
 import appConfig from "@/app.config";
 import { required } from "vuelidate/lib/validators";
+import Multiselect from 'vue-multiselect';
 
 export default {
   page: {
@@ -12,6 +13,7 @@ export default {
   components: {
     Layout,
     PageHeader,
+    Multiselect,
   },
   mounted() {
     this.refreshTable();
@@ -25,6 +27,9 @@ export default {
     leapp_end_date: { required }
   },
   methods: {
+    selectionLabel ({ text }) {
+      return `${text}`
+    },
     refreshTable() {
       this.apiGet(this.ROUTES.leaveApplication, "Get Employee Leaves Error").then(
           (res) => {
@@ -126,7 +131,7 @@ export default {
             data.forEach((employee) => {
               this.employees.push({
                 value: employee.emp_id,
-                text:`${employee.emp_first_name} ${employee.emp_last_name}`,
+                text:`${employee.emp_first_name} ${employee.emp_last_name} (${employee.emp_unique_id})`,
               });
             });
           }
@@ -140,7 +145,7 @@ export default {
       } else {
         const data = {
 
-          leapp_empid: this.employee,
+          leapp_empid: this.employee.value,
           leapp_leave_type: this.leaveType,
           leapp_start_date: this.leapp_start_date,
           leapp_end_date: this.leapp_end_date,
@@ -367,14 +372,15 @@ export default {
           <label for="employee">
             Employee <span class="text-danger">*</span>
           </label>
-          <b-form-select
-              id="employee"
-              v-model="employee"
-              :options="employees"
-              :class="{
-              'is-invalid': submitted && $v.employee.$error,
-            }"
-          />
+          <multiselect
+                  v-model="employee"
+                  :options="employees"
+                  :custom-label="selectionLabel"
+                  :class="{
+                      'is-invalid': submitted && $v.employee.$error,
+                    }"
+          ></multiselect>
+
         </div>
         <div class="form-group">
           <label for="leave-types">

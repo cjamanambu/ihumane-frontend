@@ -59,4 +59,12 @@ export default [
     },
     component: () => import("@/views/pages/self-service/leave-application"),
   },
+  {
+    path: "/employee-documents/:employeeID",
+    name: "employee-documents",
+    meta: {
+      authRequired: true,
+    },
+    component: () => import("@/views/pages/employees/manage-documents"),
+  },
 ];

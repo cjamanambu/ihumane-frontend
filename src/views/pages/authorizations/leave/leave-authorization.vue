@@ -4,7 +4,7 @@ import PageHeader from "@/components/page-header";
 import appConfig from "@/app.config";
 import { authComputed } from "@/state/helpers";
 import { required } from "vuelidate/lib/validators";
-import Multiselect from 'vue-multiselect';
+import Multiselect from "vue-multiselect";
 
 export default {
   page: {
@@ -17,11 +17,11 @@ export default {
   components: {
     Layout,
     PageHeader,
-    Multiselect
+    Multiselect,
   },
   mounted() {
     this.fetchRequest();
-    this.getAuthorizingRoles(1);//leave app
+    this.getAuthorizingRoles(1); //leave app
   },
   validations: {
     comment: { required },
@@ -64,36 +64,35 @@ export default {
         });
       });
     },
-    getLocation(locationId){
-
-      const url = `${this.ROUTES.location}/${locationId}`
-      this.apiGet(url, "Couldn't get location details").then((res)=>{
+    getLocation(locationId) {
+      const url = `${this.ROUTES.location}/${locationId}`;
+      this.apiGet(url, "Couldn't get location details").then((res) => {
         this.t6 = res.data.location_name;
       });
     },
-    getSector(sectorId){
+    getSector(sectorId) {
       const url = `${this.ROUTES.jobRole}/${sectorId}`;
-      this.apiGet(url, "Couldn't get location details").then((res)=>{
+      this.apiGet(url, "Couldn't get location details").then((res) => {
         this.t3 = res.data.job_role;
       });
     },
-    authorizingAsLabel ({ text }) {
-      return `${text}`
+    authorizingAsLabel({ text }) {
+      return `${text}`;
     },
-    nextAuthorizingOfficer ({ text }) {
-      return `${text}`
+    nextAuthorizingOfficer({ text }) {
+      return `${text}`;
     },
-    getAuthorizingRoles(type){ //1=leave,2=time sheet,3=travel
+    getAuthorizingRoles(type) {
+      //1=leave,2=time sheet,3=travel
       const url = `${this.ROUTES.authorizationRole}/${type}`;
-      this.apiGet(url, "Couldn't get authorizing roles").then((res)=>{
-        const { data} = res;
+      this.apiGet(url, "Couldn't get authorizing roles").then((res) => {
+        const { data } = res;
         data.map((role) => {
           this.roles.push({
             value: role.ar_id,
             text: role.ar_title,
           });
         });
-
       });
     },
     submit(type) {
@@ -122,6 +121,7 @@ export default {
           ? (data.status = 1)
           : (data.status = 2);
         !this.final ? (data.nextOfficer = this.official.value) : "";
+
         this.apiPost(this.ROUTES.authorization, data)
           .then((res) => {
             this.$router.push({ name: "leave-authorization" }).then(() => {
@@ -137,8 +137,8 @@ export default {
   },
   data() {
     return {
-      t3:null,
-      t6:null,
+      t3: null,
+      t6: null,
       title: "Leave Authorization",
       items: [
         {
@@ -155,12 +155,14 @@ export default {
       ],
       application: null,
       log: [],
-      roles:[{
-        value:null,
-        text:"Authorizing as...",
-        disabled:true,
-      }],
-      roleId:null,
+      roles: [
+        {
+          value: null,
+          text: "Authorizing as...",
+          disabled: true,
+        },
+      ],
+      roleId: null,
       comment: null,
       final: false,
       official: null,
@@ -223,12 +225,30 @@ export default {
               </span>
             </div>
             <div class="row">
-              <div class="col-12">
+              <div class="col-lg-4">
                 <div class="form-group">
                   <label for=""> Leave Type </label>
                   <p class="text-muted">
                     {{ application.LeaveType.leave_name }}
                   </p>
+                </div>
+              </div>
+              <div class="col-lg-4">
+                <div class="form-group">
+                  <label for=""> Alternate Email Address </label>
+                  <p class="text-muted" v-if="application.leapp_alt_email">
+                    {{ application.leapp_alt_email }}
+                  </p>
+                  <p v-else>---</p>
+                </div>
+              </div>
+              <div class="col-lg-4">
+                <div class="form-group">
+                  <label for=""> Alternate Phone Number </label>
+                  <p class="text-muted" v-if="application.leapp_alt_phone">
+                    {{ application.leapp_alt_phone }}
+                  </p>
+                  <p v-else>---</p>
                 </div>
               </div>
             </div>
@@ -318,9 +338,7 @@ export default {
                         </span>
                       </b-td>
                       <b-td style="width: 40%" v-else>
-                        <span>
-                          ---
-                        </span>
+                        <span> --- </span>
                       </b-td>
                       <b-td style="width: 20%">
                         <span>
@@ -407,12 +425,12 @@ export default {
               </b-form-group>
               <b-form-group>
                 <multiselect
-                        v-model="roleId"
-                        :options="roles"
-                        :custom-label="authorizingAsLabel"
-                        :class="{
-                      'is-invalid': submitted && $v.roleId.$error,
-                    }"
+                  v-model="roleId"
+                  :options="roles"
+                  :custom-label="authorizingAsLabel"
+                  :class="{
+                    'is-invalid': submitted && $v.roleId.$error,
+                  }"
                 ></multiselect>
               </b-form-group>
               <div class="d-flex" v-if="final">
@@ -440,10 +458,10 @@ export default {
               <div v-else>
                 <b-form-group>
                   <multiselect
-                          v-model="official"
-                          :options="officials"
-                          :custom-label="nextAuthorizingOfficer"
-                          :class="{
+                    v-model="official"
+                    :options="officials"
+                    :custom-label="nextAuthorizingOfficer"
+                    :class="{
                       'is-invalid': submitted && $v.official.$error,
                     }"
                   ></multiselect>

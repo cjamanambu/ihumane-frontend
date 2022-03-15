@@ -3,7 +3,7 @@ import Layout from "@/views/layouts/main";
 import PageHeader from "@/components/page-header";
 import appConfig from "@/app.config";
 import { authComputed } from "@/state/helpers";
-import {required} from "vuelidate/lib/validators";
+import { required } from "vuelidate/lib/validators";
 import Multiselect from "vue-multiselect";
 export default {
   page: {
@@ -26,7 +26,6 @@ export default {
     comment: { required },
     official: { required },
     roleId: { required },
-
   },
   props: ["employee"],
   methods: {
@@ -36,12 +35,23 @@ export default {
       let empId = this.$route.params.empId;
       const url = `${this.ROUTES.timesheet}/time-sheet/${month}/${year}/${empId}`;
 
-      this.apiGet(url, "Get Time sheet authorization").then((res) => {
-
+      this.apiGet(url, "Get Time sheet authorization").then(async (res) => {
         console.log({ res });
         const { timesheet, timeAllocation, log } = res.data;
         this.timeSheet = timesheet;
-        this.allocation = timeAllocation;
+        this.numAbsents = 0;
+        await this.timeSheet.forEach((timesheet) => {
+          if (!timesheet.ts_is_present) {
+            this.numAbsents++;
+          }
+        });
+        if (this.numAbsents > 0) {
+          this.currentEmployee = timeAllocation[0].Employee;
+          this.defaultCharge =
+            (parseInt(this.currentEmployee.emp_gross) / 22) * this.numAbsents;
+        }
+        this.breakdown = timeAllocation;
+        this.allocation = timeAllocation[0];
         this.log = log;
         this.ref_no = this.allocation.ta_ref_no;
         this.getLocation(this.allocation.Employee.emp_location_id);
@@ -54,39 +64,80 @@ export default {
         }
       });
     },
-    authorizingAsLabel ({ text }) {
-      return `${text}`
+    authorizingAsLabel({ text }) {
+      return `${text}`;
     },
-    nextAuthorizingOfficer ({ text }) {
-      return `${text}`
+    nextAuthorizingOfficer({ text }) {
+      return `${text}`;
     },
-    getLocation(locationId){
-
-      const url = `${this.ROUTES.location}/${locationId}`
-      this.apiGet(url, "Couldn't get location details").then((res)=>{
+    getLocation(locationId) {
+      const url = `${this.ROUTES.location}/${locationId}`;
+      this.apiGet(url, "Couldn't get location details").then((res) => {
         this.t6 = res.data.location_name;
       });
     },
-    getSector(sectorId){
+    getSector(sectorId) {
       const url = `${this.ROUTES.jobRole}/${sectorId}`;
-      this.apiGet(url, "Couldn't get location details").then((res)=>{
+      this.apiGet(url, "Couldn't get location details").then((res) => {
         this.t3 = res.data.job_role;
       });
     },
-    getAuthorizingRoles(type){ //1=leave,2=time sheet,3=travel
+    getAuthorizingRoles(type) {
+      //1=leave,2=time sheet,3=travel
       const url = `${this.ROUTES.authorizationRole}/${type}`;
-      this.apiGet(url, "Couldn't get authorizing roles").then((res)=>{
-        const { data} = res;
+      this.apiGet(url, "Couldn't get authorizing roles").then((res) => {
+        const { data } = res;
         data.map((role) => {
           this.roles.push({
             value: role.ar_id,
             text: role.ar_title,
           });
         });
-
       });
     },
-    authorizationHandler(val) {
+    submit(type) {
+      this.submitted = true;
+      if (this.type === "approve") {
+        this.approving = true;
+      } else if (this.type === "decline") {
+        this.declining = true;
+      }
+      let markAsFinal;
+      this.final ? (this.official = "null") : "";
+      this.final ? (markAsFinal = 1) : (markAsFinal = 0);
+      this.$v.$touch();
+      if (this.$v.$invalid) {
+        this.apiFormHandler("Invalid Authorization");
+      } else {
+        const val = type === "approve" ? 1 : 2;
+        const data = {
+          appId: `${this.ref_no}`,
+          status: val,
+          officer: this.getEmployee.emp_id,
+          type: 2,
+          role: this.roleId.value,
+          comment: this.comment,
+          markAsFinal,
+        };
+
+        type === "approve" || type === "forward"
+          ? (data.status = 1)
+          : (data.status = 2);
+        !this.final ? (data.nextOfficer = this.official.value) : "";
+
+        this.apiPost(this.ROUTES.authorization, data)
+          .then((res) => {
+            this.$router.push({ name: "time-sheet-authorization" }).then(() => {
+              this.apiResponseHandler("Authorization Complete", res.data);
+            });
+          })
+          .finally(() => {
+            this.approving = false;
+            this.declining = false;
+          });
+      }
+    },
+    /*authorizationHandler(val) {
       if (this.comment === null) {
         alert("Leave a comment");
       } else {
@@ -111,12 +162,26 @@ export default {
           });
         //alert("Comment: "+this.comment+" val: "+val);
       }
+    },*/
+    tConvert(time) {
+      // Check correct time format and split into components
+      time = time
+        .toString()
+        .match(/^([01]\d|2[0-3])(:)([0-5]\d)(:[0-5]\d)?$/) || [time];
+
+      if (time.length > 1) {
+        // If time format correct
+        time = time.slice(1); // Remove full string match value
+        time[5] = +time[0] < 12 ? " AM" : " PM"; // Set AM/PM
+        time[0] = +time[0] % 12 || 12; // Adjust hours
+      }
+      return time.join(""); // return adjusted time or original string
     },
   },
   data() {
     return {
       title: "Time Sheet Authorization",
-      locationId:null,
+      locationId: null,
       items: [
         {
           text: "IHUMANE",
@@ -130,8 +195,8 @@ export default {
           active: true,
         },
       ],
-      t6:null, //location
-      t3:null,
+      t6: null, //location
+      t3: null,
       application: null,
       timeSheet: [],
       allocation: [],
@@ -145,12 +210,19 @@ export default {
       allocationId: null,
       ref_no: null,
       ta_status: null,
-      roles:[{
-        value:null,
-        text:"Authorizing as...",
-        disabled:true,
-      }],
-      roleId:null,
+      roles: [
+        {
+          value: null,
+          text: "Authorizing as...",
+          disabled: true,
+        },
+      ],
+      type: null,
+      submitted: false,
+      status: null,
+      approving: false,
+      declining: false,
+      roleId: null,
       officials: [
         {
           value: null,
@@ -158,6 +230,10 @@ export default {
           disabled: "true",
         },
       ],
+      breakdown: [],
+      currentEmployee: null,
+      numAbsents: 0,
+      defaultCharge: 0,
     };
   },
 };
@@ -209,6 +285,7 @@ export default {
                         <th>Start</th>
                         <th>End</th>
                         <th>Duration</th>
+                        <th>Attendance</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -218,10 +295,37 @@ export default {
                         :key="index"
                       >
                         <th scope="row">{{ index + 1 }}</th>
-                        <td>{{ new Date(`${ts.ts_month}-${ts.ts_day}-${ts.ts_year}`).toDateString()  }}</td>
-                        <td>{{ ts.ts_start }}</td>
-                        <td>{{ ts.ts_end }}</td>
-                        <td>{{ ts.ts_duration }}</td>
+                        <td>
+                          {{
+                            new Date(
+                              `${ts.ts_month}-${ts.ts_day}-${ts.ts_year}`
+                            ).toDateString()
+                          }}
+                        </td>
+                        <td>
+                          <span v-if="ts.ts_is_present">{{
+                            tConvert(ts.ts_start)
+                          }}</span>
+                          <span v-else>-</span>
+                        </td>
+                        <td>
+                          <span v-if="ts.ts_is_present">{{
+                            tConvert(ts.ts_end)
+                          }}</span>
+                          <span v-else>-</span>
+                        </td>
+                        <td>
+                          <span v-if="ts.ts_is_present">
+                            {{ ts.ts_duration }} hrs
+                          </span>
+                          <span v-else>-</span>
+                        </td>
+                        <td style="width: 10%">
+                          <small class="text-success" v-if="ts.ts_is_present">
+                            PRESENT
+                          </small>
+                          <small class="text-danger" v-else>ABSENT</small>
+                        </td>
                       </tr>
                     </tbody>
                   </table>
@@ -287,7 +391,7 @@ export default {
                           <small v-else class="text-warning"> Pending </small>
                         </td>
                         <td>{{ off.auth_comment }}</td>
-                        <td v-if="off.role">{{off.role.ar_title}}</td>
+                        <td v-if="off.role">{{ off.role.ar_title }}</td>
                         <td v-else>---</td>
                         <td>{{ new Date(off.updatedAt).toDateString() }}</td>
                       </tr>
@@ -301,6 +405,35 @@ export default {
       </div>
       <div class="col-lg-4">
         <div class="card">
+          <div class="card-body">
+            <div class="p-3 bg-light mb-4 d-flex justify-content-between">
+              <div class="d-inline mb-0">
+                <h5 class="font-size-14 mb-0">Time Allocation</h5>
+              </div>
+            </div>
+            <div
+              class="d-flex justify-content-between mb-2"
+              v-for="(charge, index) in breakdown"
+              :key="index"
+            >
+              <span>Grant Code: {{ charge.ta_tcode }}</span>
+              <span>Percentage Charge: {{ charge.ta_charge }}%</span>
+            </div>
+            <hr />
+            <div
+              class="text-danger d-flex justify-content-between mt-3"
+              v-if="defaultCharge > 0"
+            >
+              <strong class="d-inline-block">
+                Default Charge - {{ numAbsents }} absence(s)</strong
+              >
+              <strong>{{
+                parseFloat(defaultCharge.toFixed(2)).toLocaleString()
+              }}</strong>
+            </div>
+          </div>
+        </div>
+        <div class="card mt-3">
           <div class="card-body">
             <div class="p-3 bg-light mb-4 d-flex justify-content-between">
               <div class="d-inline mb-0">
@@ -361,16 +494,26 @@ export default {
                     v-model="comment"
                   />
                 </b-form-group>
+                <b-form-group>
+                  <multiselect
+                    v-model="roleId"
+                    :options="roles"
+                    :custom-label="authorizingAsLabel"
+                    :class="{
+                      'is-invalid': submitted && $v.roleId.$error,
+                    }"
+                  ></multiselect>
+                </b-form-group>
 
                 <div class="d-flex">
                   <button
-                    @click="authorizationHandler(1)"
+                    @click="submit('approve')"
                     class="btn btn-success w-100 mr-3"
                   >
                     Approve
                   </button>
                   <button
-                    @click="authorizationHandler(2)"
+                    @click="submit('decline')"
                     class="btn btn-danger w-100"
                   >
                     Decline
@@ -387,20 +530,20 @@ export default {
                 </b-form-group>
                 <b-form-group>
                   <multiselect
-                          v-model="roleId"
-                          :options="roles"
-                          :custom-label="authorizingAsLabel"
-                          :class="{
+                    v-model="roleId"
+                    :options="roles"
+                    :custom-label="authorizingAsLabel"
+                    :class="{
                       'is-invalid': submitted && $v.roleId.$error,
                     }"
                   ></multiselect>
                 </b-form-group>
                 <b-form-group>
                   <multiselect
-                          v-model="official"
-                          :options="officials"
-                          :custom-label="nextAuthorizingOfficer"
-                          :class="{
+                    v-model="official"
+                    :options="officials"
+                    :custom-label="nextAuthorizingOfficer"
+                    :class="{
                       'is-invalid': submitted && $v.official.$error,
                     }"
                   ></multiselect>
