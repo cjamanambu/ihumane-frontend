@@ -192,7 +192,7 @@ export default {
     },
     resetForm() {
       this.emp_suspension_reason = null;
-
+    },
 
     test() {
       console.log(this.bank);
