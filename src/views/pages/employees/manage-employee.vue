@@ -108,6 +108,24 @@ export default {
       this.submitted = false;
       this.fetchEmployee();
     },
+    async suspendEmployee() {
+      this.submitted = true;
+      let employeeID = this.$route.params.employeeID;
+      const url = `${this.ROUTES.employee}/suspend-employee/${employeeID}`;
+      const data = {
+        emp_suspension_reason: this.emp_suspension_reason,
+      };
+      this.apiPatch(url, data, "Suspend Employee Error").then();
+      this.apiResponseHandler("Process Complete", "Employee Suspended");
+      this.$refs["deactivate-employee"].hide();
+      this.fetchEmployee();
+      this.submitted = false;
+      this.fetchEmployee();
+    },
+    resetForm() {
+      this.emp_suspension_reason = null;
+
+    },
   },
   data() {
     return {
@@ -147,6 +165,7 @@ export default {
       emp_genotype: null,
       emp_emergency_name: null,
       emp_emergency_contact: null,
+      emp_suspension_reason: null,
       maritalStatus: [
         { value: null, text: "select marital Status" },
         { value: 1, text: "Married" },
@@ -170,7 +189,17 @@ export default {
         <i class="mdi mdi-plus mr-2"></i>
         Manage Employees
       </b-button>
+
+      <b-button
+          class="btn btn-danger"
+          @click="$refs['deactivate-employee'].show()"
+      >
+        <i class="mdi mdi-minus mr-2"></i>
+       Deactivate Employee
+      </b-button>
     </div>
+
+
     <scale-loader v-if="apiBusy" />
     <div v-else class="row">
       <div class="col-12">
@@ -381,5 +410,45 @@ export default {
         </div>
       </div>
     </div>
+
+    <b-modal
+        ref="deactivate-employee"
+        title="Deactivate Employee"
+        hide-footer
+        centered
+        title-class="font-18"
+        @hidden="resetForm"
+    >
+      <form @submit.prevent="suspendEmployee">
+        <div class="form-group">
+          <label for="suspensionReason">
+            Suspension Reason <span class="text-danger">*</span>
+          </label>
+          <textarea
+              id="suspensionReason"
+              type="text"
+              v-model="emp_suspension_reason"
+              class="form-control"
+
+          />
+        </div>
+
+        <b-button
+            v-if="!submitting"
+            class="btn btn-success btn-block mt-4"
+            type="submit"
+        >
+          Submit
+        </b-button>
+        <b-button
+            v-else
+            disabled
+            class="btn btn-success btn-block mt-4"
+            type="submit"
+        >
+          Submitting...
+        </b-button>
+      </form>
+    </b-modal>
   </Layout>
 </template>
