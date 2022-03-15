@@ -235,12 +235,12 @@ export const menuItems = [
     icon: "ri-calendar-event-line",
     link: "/manage-time-sheets",
   },
-  {
-    id: 29,
-    label: "Self Assessment",
-    icon: "ri-file-edit-line",
-    link: "/manage-self-assessment",
-  },
+  // {
+  //   id: 29,
+  //   label: "Self Assessment",
+  //   icon: "ri-file-edit-line",
+  //   link: "/manage-self-assessment",
+  // },
   {
     id: 26,
     label: "Payroll Routine",
