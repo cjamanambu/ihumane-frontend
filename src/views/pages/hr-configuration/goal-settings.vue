@@ -509,14 +509,7 @@ export default {
       <form @submit.prevent="submitGSY">
         <div class="form-group">
           <label> Goal Setting Year <span class="text-danger">*</span> </label>
-          <input
-            id="pmy"
-            v-model="gsy"
-            class="form-control"
-            :class="{
-              'is-invalid': submitted && $v.gsy.$error,
-            }"
-          />
+          <input id="pmy" v-model="gsy" class="form-control" />
         </div>
         <b-button
           v-if="!submitting"
