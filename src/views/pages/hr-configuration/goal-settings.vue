@@ -159,6 +159,26 @@ export default {
   <Layout>
     <PageHeader :title="title" :items="items" />
     <div class="d-flex justify-content-end mb-3">
+      <!--      <div-->
+      <!--        class="d-flex justify-content-between align-items-start mb-3 flex-lg-row flex-column"-->
+      <!--      >-->
+      <!--        <b-card-->
+      <!--          header-class="bg-transparent border-success"-->
+      <!--          class="border border-success d-inline-block"-->
+      <!--        >-->
+      <!--          <template v-slot:header>-->
+      <!--            <h5 class="my-0 text-success">-->
+      <!--              <i class="mdi mdi-calendar-sync mr-3"></i>-->
+      <!--              Payroll Month & Year-->
+      <!--            </h5>-->
+      <!--          </template>-->
+      <!--          <h5 class="card-title mt-0">-->
+      <!--            {{ (parseInt(this.pmyMonth) - 1) | getMonth }} {{ this.pmyYear }}-->
+      <!--          </h5>-->
+      <!--          <p class="card-text update-mtr">Update PMY</p>-->
+      <!--          &lt;!&ndash;          <p v-else class="card-text update-mtr" @click="selectPMY">Set PMY</p>&ndash;&gt;-->
+      <!--        </b-card>-->
+      <!--      </div>-->
       <b-button
         class="btn btn-success"
         @click="$refs['add-goal-setting'].show()"
