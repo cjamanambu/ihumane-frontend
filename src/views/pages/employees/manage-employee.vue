@@ -16,9 +16,11 @@ export default {
     Multiselect,
   },
   async mounted() {
-    this.fetchEmployee();
+    await this.fetchEmployee();
     await this.getStates();
     await this.getBanks();
+    await this.getJobRoles();
+    await this.getLocalGovernmentAreasByStateId();
   },
 
   /*: null,
@@ -64,12 +66,18 @@ export default {
     locationLabel({ text }) {
       return `${text}`;
     },
-    fetchEmployee() {
+    stateOfOriginLabel({ text }) {
+      return `${text}`;
+    },
+    lGALabel({ text }) {
+
+      return `${text}`;
+    },
+    async fetchEmployee() {
       let employeeID = this.$route.params.employeeID;
       const url = `${this.ROUTES.employee}/get-employee/${employeeID}`;
       this.apiGet(url, "Get Employee Error").then((res) => {
         const { data } = res;
-        //console.log({ data });
         if (data) {
           this.emp_first_name = data.emp_first_name;
           this.emp_last_name = data.emp_last_name;
@@ -92,15 +100,40 @@ export default {
           this.emp_genotype = data.emp_genotype;
           this.emp_emergency_name = data.emp_emergency_name;
           this.emp_emergency_contact = data.emp_emergency_contact;
+          this.job_role_id = data.emp_job_role_id;
+          this.gender = data.emp_sex;
+          this.birth_date = new Date(data.emp_dob).toISOString().slice(0,10);
+          this.emp_contract_end_date = new Date(data.emp_contract_end_date).toISOString().slice(0,10);
+          this.emp_hire_date = new Date(data.emp_hire_date).toISOString().slice(0,10);
         }
+      });
+    },
+    async getJobRoles() {
+      this.apiGet(this.ROUTES.jobRole, "Get Job Roles Error").then((res) => {
+        const { data } = res;
+        data.forEach(async (datum) => {
+          const dat = {
+            value: datum.job_role_id,
+            text: datum.job_role,
+          };
+          if (datum.job_role_id === this.job_role_id) {
+            const val = {
+              value: datum.job_role_id,
+              text: datum.job_role,
+            };
+            this.job_role.push(val);
+          }
+          this.job_roles.push(dat);
+        });
+
+        //this.jrs = data;
       });
     },
     async getBanks() {
       const url = `${this.ROUTES.bank}`;
       await this.apiGet(url).then((res) => {
         const { data } = res;
-        //let selectedObj = [];
-        this.banks = [{ value: null, text: "Please select a leave type" }];
+        this.banks = [{ value: null, text: "Please select from the list" }];
         data.forEach(async (datum) => {
           const dat = {
             value: datum.bank_id,
@@ -135,14 +168,37 @@ export default {
             this.emp_state_id.push(val);
           }
           this.states.push(dat);
-          //console.log("EMP; "+this.emp_state_id);
+        });
+      });
+    },
+    async getLocalGovernmentAreasByStateId() {
+      let stateId = this.emp_state_id.value;
+      const url = `${this.ROUTES.localGovernment}/${stateId}`;
+      await this.apiGet(url).then((res) => {
+        const { data } = res;
+        //console.log(data);
+       this.lgas = [{ value: null, text: "Please select LGA" }];
+        data.forEach(async (datum) => {
+          const dat = {
+            value: datum.lg_id,
+            text: datum.lg_name,
+          };
+          if (datum.lg_id === this.emp_lga_id) {
+            const val = {
+              value: datum.lg_id,
+              text: datum.lg_name,
+            };
+            this.lga.push(val);
+          }
+          this.lgas.push(dat);
+
         });
       });
     },
     async updateEmployee() {
       this.submitted = true;
-      let employeeID = this.$route.params.employeeID;
-      const url = `${this.ROUTES.employee}/update-employee/${employeeID}`;
+      //let employeeID = this.$route.params.employeeID;
+      //const url = `${this.ROUTES.employee}/update-employee-backoffice/${employeeID}`;
       const data = {
         emp_first_name: this.emp_first_name,
         emp_last_name: this.emp_last_name,
@@ -151,10 +207,12 @@ export default {
         emp_phone_no: this.emp_phone_no,
         emp_account_no: this.emp_account_no,
 
-        emp_bank_id: this.emp_bank_id.value,
-        emp_state_id: this.emp_state_id.value,
+        emp_bank_id: this.emp_bank_id[0].value,
+        //emp_state_id: this.emp_state_id.value,
+        //emp_job_role_id:this.job_role[0].value,
+        emp_lga_id:this.lga[0].value,
+        emp_religion:this.religion,
 
-        emp_lga_id: this.emp_lga_id,
         emp_marital_status: this.emp_marital_status,
         emp_spouse_name: this.emp_spouse_name,
         emp_spouse_phone_no: this.emp_spouse_phone_no,
@@ -168,12 +226,19 @@ export default {
         emp_emergency_contact: this.emp_emergency_contact,
         emp_contract_end_date: this.emp_contract_end_date,
         emp_hire_date: this.emp_hire_date,
+        emp_dob:this.birth_date,
+
+
+        emp_sex : this.gender,
+
+
       };
-      this.apiPatch(url, data, "Update Employee Error").then();
+      console.log({data})
+      /*this.apiPatch(url, data, "Update Employee Error").then();
       this.apiResponseHandler("Process Complete", "Employee Update");
       this.fetchEmployee();
-      this.submitted = false;
-      this.fetchEmployee();
+      this.submitted = false;*/
+      //this.fetchEmployee();
     },
 
     async suspendEmployee() {
@@ -227,6 +292,9 @@ export default {
       emp_bank_id_val: null,
       emp_state_id_val: null,
       emp_state_id: [],
+      job_role: [],
+      job_roles: [],
+      job_role_id:null,
 
       emp_lga_id: null,
       emp_marital_status: null,
@@ -251,10 +319,30 @@ export default {
         { value: 1, text: "Married" },
         { value: 2, text: "Not Married" },
       ],
+      gender_options: [
+        { value: null, text: 'Please select gender' },
+        { value: '1', text: 'Male' },
+        { value: '2', text: 'Female' }
+      ],
+      gender:null,
+      religion_options: [
+        { value: null, text: 'Please select religion' },
+        { value: '1', text: 'Christianity' },
+        { value: '2', text: 'Islam' },
+        { value: '3', text: 'Hinduism' },
+        { value: '3', text: 'Buddhism' },
+      ],
+      religion:null,
       bank: null,
       banks: [],
       state: null,
       states: [],
+      lgas:[],
+      jrs: [],
+      lga:[],
+      stateId:null,
+      birth_date:null,
+      selectedStateId:null,
     };
   },
 };
@@ -292,6 +380,32 @@ export default {
       >
         <i class="mdi mdi-plus mr-2"></i>
         Manage Documents
+
+      </b-button>
+      <b-button
+        class="btn btn-info"
+        @click="
+          $router.push({
+            name: 'employee-work-experience',
+            params: { employeeID: $route.params.employeeID },
+          })
+        "
+      >
+        <i class="mdi mdi-briefcase mr-2"></i>
+        Work Experience
+
+      </b-button>
+      <b-button
+        class="btn btn-warning"
+        @click="
+          $router.push({
+            name: 'employee-education',
+            params: { employeeID: $route.params.employeeID },
+          })
+        "
+      >
+        <i class="mdi mdi-book mr-2"></i>
+        Education
 
       </b-button>
     </div>
@@ -338,6 +452,14 @@ export default {
                     />
                   </div>
                   <div class="form-group">
+                    <label for=""> Date of Birth </label>
+                    <input
+                      type="date"
+                      class="form-control"
+                      v-model="birth_date"
+                    />
+                  </div>
+                  <div class="form-group">
                     <label for=""> Phone Number </label>
                     <input
                       type="text"
@@ -364,13 +486,55 @@ export default {
                       v-model="emp_qualification"
                     />
                   </div>
-
+                  <div class="form-group">
+                    <label>Gender</label>
+                    <b-select
+                      v-model="gender"
+                      :options="gender_options"
+                      :class="{
+                        'is-invalid': submitted && $v.gender.$error,
+                      }"
+                    ></b-select>
+                  </div>
+                  <div class="form-group">
+                    <label>Religion</label>
+                    <b-select
+                      v-model="religion"
+                      :options="religion_options"
+                      :class="{
+                        'is-invalid': submitted && $v.religion.$error,
+                      }"
+                    ></b-select>
+                  </div>
+                  <div class="form-group">
+                    <label>Job Role</label>
+                    <multiselect
+                      v-model="job_role"
+                      :options="job_roles"
+                      :custom-label="locationLabel"
+                      :class="{
+                        'is-invalid': submitted && $v.job_role.$error,
+                      }"
+                    ></multiselect>
+                  </div>
                   <div class="form-group">
                     <label>State Of Origin</label>
                     <multiselect
                       v-model="emp_state_id"
                       :options="states"
-                      :custom-label="locationLabel"
+                      :custom-label="stateOfOriginLabel"
+                      @input="getLocalGovernmentAreasByStateId"
+                      :class="{
+                        'is-invalid': submitted && $v.emp_state_id.$error,
+                      }"
+                    ></multiselect>
+                  </div>
+                  <div class="form-group">
+                    <label>LGA</label>
+                    <multiselect
+                      v-model="lga"
+                      :options="lgas"
+                      :custom-label="lGALabel"
                       :class="{
                         'is-invalid': submitted && $v.emp_state_id.$error,
                       }"

@@ -122,6 +122,11 @@ export const menuItems = [
             link: "/states",
           },
           {
+            id: 188,
+            label: "LGAs",
+            link: "/local-government-areas",
+          },
+          {
             id: 19,
             label: "Locations",
             link: "/locations",

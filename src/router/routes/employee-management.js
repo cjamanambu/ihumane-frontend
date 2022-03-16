@@ -67,4 +67,20 @@ export default [
     },
     component: () => import("@/views/pages/employees/manage-documents"),
   },
+  {
+    path: "/employee-education/:employeeID",
+    name: "employee-education",
+    meta: {
+      authRequired: true,
+    },
+    component: () => import("@/views/pages/employees/employee-education"),
+  },
+  {
+    path: "/employee-work-experience/:employeeID",
+    name: "employee-work-experience",
+    meta: {
+      authRequired: true,
+    },
+    component: () => import("@/views/pages/employees/employee-work-experience"),
+  },
 ];
