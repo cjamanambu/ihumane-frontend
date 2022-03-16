@@ -19,7 +19,6 @@ export default {
   validations: {
     gs_from: { required },
     gs_to: { required },
-    gs_year: { required },
     gs_activity: { required },
   },
   methods: {
@@ -27,6 +26,7 @@ export default {
       await this.apiGet(this.ROUTES.goalSetting, "Get Goal Setting Error").then(
         (res) => {
           const { data } = res;
+          console.log({ data });
           if (data) {
             data.forEach((goalSetting, index) => {
               this.goalSettings[index] = { sn: ++index, ...goalSetting };
@@ -52,11 +52,11 @@ export default {
       this.currentPage = 1;
     },
     resetForm() {
-      this.gs_id = null;
-      this.gs_year = null;
-      this.gs_activity = null;
-      this.gs_from = null;
-      this.gs_to = null;
+      // this.gs_id = null;
+      // this.gs_year = null;
+      // this.gs_activity = null;
+      // this.gs_from = null;
+      // this.gs_to = null;
       this.$v.$reset();
     },
     selectGoalSetting(goalSetting) {
@@ -74,12 +74,12 @@ export default {
       this.submitted = true;
       this.$v.$touch();
       if (this.$v.$invalid) {
-        this.apiFormHandler("Invalid Leave Type");
+        this.apiFormHandler("Invalid Goal Setting");
       } else {
         const data = {
           gs_from: this.gs_from,
           gs_to: this.gs_to,
-          gs_year: this.currentGSY,
+          // gs_year: this.currentGSY,
           gs_activity: String(this.gs_activity),
         };
         const url = `${this.ROUTES.goalSetting}/add-goal-setting`;
@@ -95,12 +95,12 @@ export default {
       this.submitted = true;
       this.$v.$touch();
       if (this.$v.$invalid) {
-        this.apiFormHandler("Invalid Leave Type");
+        this.apiFormHandler("Invalid Goal Setting");
       } else {
         const data = {
           gs_from: this.gs_from,
           gs_to: this.gs_to,
-          gs_year: this.currentGSY,
+          // gs_year: this.currentGSY,
           gs_activity: this.gs_activity,
           gs_status: this.gs_status,
         };
@@ -132,10 +132,6 @@ export default {
           this.setGSY = false;
         }
       });
-      // this.gs_from = null;
-      // this.gs_to = null;
-      // this.gs_year = null;
-      // this.gs_activity = null;
     },
   },
   data() {
@@ -361,9 +357,6 @@ export default {
             type="date"
             v-model="gs_from"
             class="form-control"
-            :class="{
-              'is-invalid': submitted && $v.gs_from.$error,
-            }"
           />
         </div>
         <div class="form-group">
@@ -388,9 +381,6 @@ export default {
             v-model="currentGSY"
             disabled
             class="form-control"
-            :class="{
-              'is-invalid': submitted && $v.currentGSY.$error,
-            }"
           />
         </div>
         <div class="form-group">
@@ -471,9 +461,6 @@ export default {
             v-model="currentGSY"
             class="form-control"
             disabled
-            :class="{
-              'is-invalid': submitted && $v.currentGSY.$error,
-            }"
           />
         </div>
         <div class="form-group">
