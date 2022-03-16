@@ -206,12 +206,12 @@ export const menuItems = [
       },
     ],
   },
-  {
-    id: 29,
-    label: "Employee Leaves",
-    icon: "ri-user-settings-line",
-    link: "/employee-leave",
-  },
+  // {
+  //   id: 29,
+  //   label: "Employee Leaves",
+  //   icon: "ri-user-settings-line",
+  //   link: "/employee-leave",
+  // },
   {
     id: 26,
     label: "Self-Service",
