@@ -396,7 +396,7 @@ export default {
             />
           </div>
           <div class="form-group">
-            <label for="alt-email"> Alternate Email Address </label>
+            <label for="alt-email"> Emergency Email Address </label>
             <input
               id="alt-email"
               type="email"
@@ -405,7 +405,7 @@ export default {
             />
           </div>
           <div class="form-group">
-            <label for="alt-email"> Alternate Phone Number </label>
+            <label for="alt-email"> Emergency Phone Number </label>
             <input
               id="alt-email"
               type="text"

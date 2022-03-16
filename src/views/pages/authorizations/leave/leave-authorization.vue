@@ -235,7 +235,7 @@ export default {
               </div>
               <div class="col-lg-4">
                 <div class="form-group">
-                  <label for=""> Alternate Email Address </label>
+                  <label for=""> Emergency Email Address </label>
                   <p class="text-muted" v-if="application.leapp_alt_email">
                     {{ application.leapp_alt_email }}
                   </p>
@@ -244,7 +244,7 @@ export default {
               </div>
               <div class="col-lg-4">
                 <div class="form-group">
-                  <label for=""> Alternate Phone Number </label>
+                  <label for=""> Emergency Phone Number </label>
                   <p class="text-muted" v-if="application.leapp_alt_phone">
                     {{ application.leapp_alt_phone }}
                   </p>
