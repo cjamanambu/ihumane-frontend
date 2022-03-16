@@ -59,4 +59,5 @@ export const ROUTES = {
   timeSheetPenalty: `time-sheet-penalty`,
   leaveAccrual: `leave-accrual`,
   salary: `salary`,
+  goalSettingYear: `goal-setting-year`,
 };
