@@ -219,6 +219,23 @@ export const menuItems = [
   },
   {
     id: 26,
+    label: "Communication",
+    isTitle: true,
+  },
+  {
+    id: 299,
+    label: "Announcement",
+    icon: "ri-team-line",
+    link: "/manage-announcements",
+  },
+  {
+    id: 209,
+    label: "Query",
+    icon: "ri-pages-line",
+    link: "/query",
+  },
+  {
+    id: 26,
     label: "Self-Service",
     isTitle: true,
   },

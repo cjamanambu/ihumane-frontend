@@ -62,4 +62,5 @@ export const ROUTES = {
   localGovernment: `local-government`,
   education: `education`,
   workExperience: `work-experience`,
+  announcement: `announcements`,
 };

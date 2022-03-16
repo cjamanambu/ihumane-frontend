@@ -33,6 +33,14 @@ export default [
     },
     component: () => import("@/views/pages/employees/manage-employee"),
   },
+  {
+    path: "/manage-announcements",
+    name: "manage-announcements",
+    meta: {
+      authRequired: true,
+    },
+    component: () => import("@/views/pages/communication/manage-announcement"),
+  },
 
   {
     path: "/supervisors",
