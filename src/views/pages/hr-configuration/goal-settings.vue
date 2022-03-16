@@ -79,7 +79,7 @@ export default {
         const data = {
           gs_from: this.gs_from,
           gs_to: this.gs_to,
-          gs_year: this.gs_year,
+          gs_year: this.currentGSY,
           gs_activity: String(this.gs_activity),
         };
         const url = `${this.ROUTES.goalSetting}/add-goal-setting`;
@@ -100,7 +100,7 @@ export default {
         const data = {
           gs_from: this.gs_from,
           gs_to: this.gs_to,
-          gs_year: this.gs_year,
+          gs_year: this.currentGSY,
           gs_activity: this.gs_activity,
           gs_status: this.gs_status,
         };
