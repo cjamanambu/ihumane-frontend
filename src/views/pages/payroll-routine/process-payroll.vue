@@ -12,9 +12,10 @@ export default {
     PageHeader,
   },
   async mounted() {
+    await this.getLocations()
     this.fetchPMY();
     await this.fetchPayrollRoutine();
-    await this.getLocations()
+
   },
   data() {
     return {
