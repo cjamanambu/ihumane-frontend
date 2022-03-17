@@ -52,11 +52,11 @@ export default {
       this.currentPage = 1;
     },
     resetForm() {
-      // this.gs_id = null;
-      // this.gs_year = null;
-      // this.gs_activity = null;
-      // this.gs_from = null;
-      // this.gs_to = null;
+      this.gs_id = null;
+      this.gs_year = null;
+      this.gs_activity = null;
+      this.gs_from = null;
+      this.gs_to = null;
       this.$v.$reset();
     },
     selectGoalSetting(goalSetting) {
@@ -100,7 +100,7 @@ export default {
         const data = {
           gs_from: this.gs_from,
           gs_to: this.gs_to,
-          // gs_year: this.currentGSY,
+          gs_year: this.currentGSY,
           gs_activity: this.gs_activity,
           gs_status: this.gs_status,
         };

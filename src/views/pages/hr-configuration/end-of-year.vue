@@ -16,10 +16,9 @@ export default {
   mounted() {
     this.refreshTable();
     this.getCurrentYear();
-
   },
   validations: {
-    eya_question:{ required },
+    eya_question: { required },
   },
   methods: {
     addField() {
@@ -34,28 +33,25 @@ export default {
       }
     },
     refreshTable() {
-      this.apiGet(this.ROUTES.endOfYear, "Get Questions Error").then(
-        (res) => {
-          const { data } = res;
-          this.eya_questions = data;
-          this.totalRows = this.eya_questions.length;
-        }
-      );
+      this.apiGet(this.ROUTES.endOfYear, "Get Questions Error").then((res) => {
+        const { data } = res;
+        data.forEach((question, index) => {
+          this.eya_questions[index] = { sn: ++index, ...question };
+        });
+        this.totalRows = this.eya_questions.length;
+      });
     },
 
     getCurrentYear() {
-      const url = `${this.ROUTES.goalSetting}/get-open-end-Year`
-      this.apiGet(url, "Get current year error").then(
-          (res) => {
-            if(res){
-              const { data } = res;
-              this.eya_year = data[0].eya_year
-              this.eyaYearStatus = true
-              this.eya_gs_id = data[0].gs_id
-            }
-
-          }
-      );
+      const url = `${this.ROUTES.goalSetting}/get-open-end-Year`;
+      this.apiGet(url, "Get current year error").then((res) => {
+        if (res) {
+          const { data } = res;
+          this.eya_year = data[0].eya_year;
+          this.eyaYearStatus = true;
+          this.eya_gs_id = data[0].gs_id;
+        }
+      });
     },
 
     onFiltered(filteredItems) {
@@ -64,34 +60,31 @@ export default {
       this.currentPage = 1;
     },
     resetForm() {
-      this.eya_question = null
+      this.eya_question = null;
       this.$v.$reset();
     },
     selectQuestion(question) {
       question = question[0];
-      this.eya_id = question.eya_id
-      this.eya_question = question.eya_question
+      this.eya_id = question.eya_id;
+      this.eya_question = question.eya_question;
       this.$refs["update-question"].show();
       this.$refs["question-table"].clearSelected();
     },
 
-
     submitNew() {
-
       const url = `${this.ROUTES.endOfYear}/add-question`;
       this.texts.forEach(async (field) => {
         const data = {
           eya_gs_id: parseInt(this.eya_gs_id),
           eya_question: field.eyaQuestion,
-                  };
-
-        this.questions.push(data)
-
+        };
+        this.questions.push(data);
       });
-       this.apiPost(url, this.questions, "Add Question Error").then();
-           this.apiResponseHandler("Process Complete", "Questions Added");
-      this.$refs["add-question"].hide();
-      this.refreshTable();
+      this.apiPost(url, this.questions, "Add Question Error").then(() => {
+        this.apiResponseHandler("Process Complete", "Questions Added");
+        this.$refs["add-question"].hide();
+        this.refreshTable();
+      });
     },
 
     async submitUpdate() {
@@ -102,15 +95,14 @@ export default {
       } else {
         const data = {
           eya_question: this.eya_question,
-
         };
-        const url = `${this.ROUTES.endOfYear}/update-question/${this.eya_id}`
+        const url = `${this.ROUTES.endOfYear}/update-question/${this.eya_id}`;
         this.apiPatch(url, data, "Update Question Error").then((res) => {
-         this.apiResponseHandler(`${res.data}`, "Update Question");
+          this.apiResponseHandler(`${res.data}`, "Update Question");
 
           this.$v.$reset();
           this.$refs["update-question"].hide();
-          this.eya_questions = null
+          this.eya_questions = null;
           this.refreshTable();
         });
       }
@@ -141,13 +133,12 @@ export default {
       pageOptions: [10, 25, 50, 100],
       filter: null,
       filterOn: [],
-      sortBy: "eya_id",
-      sortDesc: true,
+      sortBy: "sn",
+      sortDesc: false,
       fields: [
-        { key: "eya_id", label: "SN", sortable: true },
+        { key: "sn", label: "S/n", sortable: true },
         { key: "eya_question", label: "Question", sortable: true },
-        { key: "eya_year", label: "Year", sortable: true }
-
+        { key: "eya_year", label: "Year", sortable: true },
       ],
       eya_gs_id: null,
       eya_questions: [],
@@ -155,7 +146,7 @@ export default {
       eya_question: null,
       eya_year: null,
       eyaYearStatus: false,
-       submitted: false,
+      submitted: false,
     };
   },
 };
@@ -172,12 +163,8 @@ export default {
     </div>
 
     <div v-else class="d-flex justify-content-end mb-3">
-      <b-button class="btn btn-warning" >
-
-        No End of Year Activity Set
-      </b-button>
+      <b-button class="btn btn-warning"> No End of Year Activity Set </b-button>
     </div>
-
 
     <b-spinner type="grow" v-if="apiBusy" class="m-2" variant="success" />
     <div v-else class="row">
@@ -220,7 +207,7 @@ export default {
             <!-- Table -->
             <div class="table-responsive mb-0">
               <b-table
-                ref="goal-setting-table"
+                ref="question-table"
                 bordered
                 selectable
                 hover
@@ -238,8 +225,6 @@ export default {
                 select-mode="single"
                 @row-selected="selectQuestion"
               >
-
-
               </b-table>
             </div>
             <div class="row">
@@ -272,7 +257,6 @@ export default {
     >
       <form @submit.prevent="submitNew">
         <div class="row" v-for="(field, index) in texts" :key="index">
-
           <div class="col-lg-12">
             <div class="row">
               <div class="col-9">
@@ -281,26 +265,25 @@ export default {
                     Question <span class="text-danger">*</span>
                   </label>
                   <b-form-textarea
-                      id="eya_question"
-                      type="date"
-                      v-model="field.eyaQuestion"
-                      class="form-control"
-                      :class="{
-              'is-invalid': submitted && $v.gs_from.$error,
-            }"
+                    id="eya_question"
+                    type="date"
+                    v-model="field.eyaQuestion"
+                    class="form-control"
+                    :class="{
+                      'is-invalid': submitted && $v.gs_from.$error,
+                    }"
                   />
                 </div>
               </div>
-
 
               <div class="col-3">
                 <div class="form-group">
                   <div v-if="field.id > 0" class="form-group">
                     <label style="visibility: hidden">hidden</label>
                     <button
-                        type="button"
-                        class="btn btn-danger"
-                        @click="delField(index)"
+                      type="button"
+                      class="btn btn-danger"
+                      @click="delField(index)"
                     >
                       DEL
                     </button>
@@ -308,9 +291,9 @@ export default {
                   <div v-else class="form-group">
                     <label style="visibility: hidden">hidden</label>
                     <button
-                        type="button"
-                        class="btn btn-success"
-                        @click="addField"
+                      type="button"
+                      class="btn btn-success"
+                      @click="addField"
                     >
                       ADD
                     </button>
@@ -319,12 +302,7 @@ export default {
               </div>
             </div>
           </div>
-
         </div>
-
-
-
-
 
         <b-button
           v-if="!submitting"
@@ -357,34 +335,31 @@ export default {
             Question <span class="text-danger">*</span>
           </label>
           <b-form-textarea
-              id="eya_question"
-              type="date"
-              v-model="eya_question"
-              class="form-control"
-              :class="{
+            id="eya_question"
+            type="date"
+            v-model="eya_question"
+            class="form-control"
+            :class="{
               'is-invalid': submitted && $v.eya_question.$error,
             }"
           />
         </div>
 
-
-  <b-button
-      v-if="!submitting"
-      class="btn btn-success btn-block mt-4"
-      type="submit"
-  >
-   Update
-  </b-button>
-  <b-button
-      v-else
-      disabled
-      class="btn btn-success btn-block mt-4"
-      type="submit"
-  >
-    Updating...
-  </b-button>
-
-
+        <b-button
+          v-if="!submitting"
+          class="btn btn-success btn-block mt-4"
+          type="submit"
+        >
+          Update
+        </b-button>
+        <b-button
+          v-else
+          disabled
+          class="btn btn-success btn-block mt-4"
+          type="submit"
+        >
+          Updating...
+        </b-button>
       </form>
     </b-modal>
   </Layout>
