@@ -78,6 +78,7 @@ export default {
       ],
       currentEmployee: null,
       // statues: [{ value: 0, text: "Open" }, { value: 1, text: "Closed" }],
+      gsID: null,
     };
   },
   methods: {
@@ -110,6 +111,7 @@ export default {
         if (data) {
           this.assessments = [];
           data.forEach(async (datum) => {
+            this.gsID = datum.sa_gs_id;
             const dat = {
               id: datum.sa_id,
               goal: datum.sa_comment,
@@ -179,7 +181,7 @@ export default {
     },
     updateGoals() {
       const employeeID = this.$route.params.empid;
-      const url = `${this.ROUTES.selfAssessment}/add-self-assessment/${employeeID}/${this.openGoalActivityId}`;
+      const url = `${this.ROUTES.selfAssessment}/update-assessment/${employeeID}/${this.gsID}`;
       this.goals = [];
       let validForm = true;
       this.assessments.every(async (field) => {
@@ -195,7 +197,7 @@ export default {
         return true;
       });
       if (validForm) {
-        this.apiPost(url, this.goals, "Update Goals Error").then(() => {
+        this.apiPatch(url, this.goals, "Update Goals Error").then(() => {
           this.apiResponseHandler("Process Complete", "Goals Updated");
           this.getSelfAssessment();
         });
