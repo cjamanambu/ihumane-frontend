@@ -5,7 +5,7 @@ import appConfig from "@/app.config";
 import JsonExcel from "vue-json-excel";
 export default {
   page: {
-    title: "Deduction Report",
+    title: "Deduction Sheet",
     meta: [{ name: "description", content: appConfig.description }],
   },
   components: {
@@ -19,7 +19,6 @@ export default {
   methods: {
     fetchPaymentDefinitions() {
       this.paymentDefinitions = [];
-      this.deduction = this.$route.params.pdID;
       this.apiGet(
         this.ROUTES.paymentDefinition,
         "Get Payment Definitions Error"
@@ -28,6 +27,7 @@ export default {
         this.paymentDefinitions = data;
         await this.processFields(data);
         this.newFields.push(...this.deductionFields);
+        this.newFields.push("totalDeduction");
         this.newFields.forEach((newField) => {
           if (newField === "sn") {
             this.jsonFields["S/N"] = newField;
@@ -51,17 +51,13 @@ export default {
     refreshTable() {
       this.period = this.$route.params.period;
       this.period = this.period.split("-");
-      this.deduction = this.$route.params.pdID;
       let data = {
         pym_month: parseFloat(this.period[0]),
         pym_year: parseFloat(this.period[1]),
-        pd_id: parseFloat(this.deduction),
       };
-      const url = `${this.ROUTES.salary}/deduction-report-type`;
+      const url = `${this.ROUTES.salary}/deduction-report`;
       this.apiPost(url, data, "Generate Deduction Report").then((res) => {
         const { data } = res;
-        console.log({ data });
-        this.deductionSum = 0;
         data.forEach((deduction, index) => {
           let deductionObj = {
             sn: ++index,
@@ -70,14 +66,13 @@ export default {
             location: deduction.location,
           };
           deduction.deductions.forEach((deduction) => {
-            this.deductionSum += deduction.amount;
             deductionObj[deduction.paymentName] = parseFloat(
               deduction.amount.toFixed(2)
             ).toLocaleString();
           });
-          // deductionObj["totalDeduction"] = parseFloat(
-          //   deduction.totalDeduction.toFixed(2)
-          // ).toLocaleString();
+          deductionObj["totalDeduction"] = parseFloat(
+            deduction.totalDeduction.toFixed(2)
+          ).toLocaleString();
           this.deductions.push(deductionObj);
         });
         this.filtered = this.deductions;
@@ -110,8 +105,9 @@ export default {
     },
     async processFields(data) {
       await data.forEach((paymentDefinition, index) => {
-        if (paymentDefinition.pd_id === parseFloat(this.deduction)) {
-          this.deductionName = data[index].pd_payment_name;
+        if (paymentDefinition.pd_payment_type === 1) {
+          this.incomeFields.push(data[index].pd_payment_name);
+        } else if (paymentDefinition.pd_payment_type === 2) {
           this.deductionFields.push(data[index].pd_payment_name);
         }
       });
@@ -119,7 +115,7 @@ export default {
   },
   data() {
     return {
-      title: "Deduction Report",
+      title: "Deduction Sheet",
       items: [
         {
           text: "IHUMANE",
@@ -129,7 +125,7 @@ export default {
           href: "/",
         },
         {
-          text: "Deduction Report",
+          text: "Deduction Sheet",
           active: true,
         },
       ],
@@ -149,9 +145,6 @@ export default {
       incomeFields: [],
       deductionFields: [],
       jsonFields: {},
-      deduction: null,
-      deductionName: null,
-      deductionSum: 0,
     };
   },
 };
@@ -173,7 +166,7 @@ export default {
           <div class="card-body">
             <div class="p-3 bg-light mb-4 d-flex justify-content-between">
               <h5 class="font-size-14 mb-0" v-if="period">
-                Deduction Report For Payroll Period:
+                Deduction Sheet For Payroll Period:
                 {{ (parseInt(period[0]) - 1) | getMonth }}
                 {{ period[1] }}
               </h5>
@@ -182,7 +175,7 @@ export default {
                   style="cursor: pointer"
                   :data="filtered"
                   :fields="jsonFields"
-                  :name="`Deduction_Report(${period[0]}-${period[1]}).xls`"
+                  :name="`Deduction_Sheet(${period[0]}-${period[1]}).xls`"
                 >
                   Export to Excel
                 </JsonExcel>
@@ -282,22 +275,12 @@ export default {
                 <template #cell()="data">
                   <span class="float-right">{{ data.value }}</span>
                 </template>
+                <!--                <template #cell(netSalary)="row">-->
+                <!--                  <span class="float-right">-->
+                <!--                    {{ row.value }}-->
+                <!--                  </span>-->
+                <!--                </template>-->
               </b-table>
-            </div>
-            <div class="p-3 bg-light mb-4 d-flex justify-content-between">
-              <h5 class="font-size-14 mb-0" v-if="period">
-                Total {{ deductionName }}
-              </h5>
-              <h5 class="font-size-16 text-danger mb-0">
-                <JsonExcel
-                  style="cursor: pointer"
-                  :data="filtered"
-                  :fields="jsonFields"
-                  :name="`Deduction_Report(${period[0]}-${period[1]}).xls`"
-                >
-                  {{ parseFloat(deductionSum.toFixed(2)).toLocaleString() }}
-                </JsonExcel>
-              </h5>
             </div>
             <div class="row">
               <div class="col">

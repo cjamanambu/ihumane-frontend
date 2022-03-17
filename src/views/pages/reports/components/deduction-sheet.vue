@@ -28,7 +28,7 @@ export default {
     async generate() {
       let data, pym_month, pym_year;
       if (!this.useCurrent && !this.pmyDate) {
-        this.apiFormHandler("Deduction Report");
+        this.apiFormHandler("Deduction Sheet");
       } else {
         if (this.useCurrent) {
           await this.fetchPMY();
@@ -48,12 +48,11 @@ export default {
           };
         }
         const url = `${this.ROUTES.salary}/deduction-report`;
-        this.apiPost(url, data, "Generate Deduction Report").then((res) => {
+        this.apiPost(url, data, "Generate Deduction Sheet").then((res) => {
           const { data } = res;
-          console.log({ data });
           if (data.length) {
             this.$router.push({
-              name: "deduction-report",
+              name: "deduction-sheet",
               params: { period: `${pym_month}-${pym_year}` },
             });
           }
@@ -74,7 +73,7 @@ export default {
               Current Payroll Period: {{ (parseInt(pmyMonth) - 1) | getMonth }}
               {{ pmyYear }}
             </p>
-            <h4 class="mb-0">Deduction Report</h4>
+            <h4 class="mb-0">Deduction Sheet</h4>
           </div>
           <div class="text-secondary"></div>
         </div>
@@ -92,7 +91,7 @@ export default {
     </div>
     <b-modal
       v-model="selectPeriod"
-      title="Generate Deduction Report"
+      title="Generate Deduction Sheet"
       hide-footer
       centered
       title-class="font-18"
