@@ -16,11 +16,12 @@ export default {
     ...authComputed,
   },
   mounted() {
+    this.empId = this.getEmployee.emp_id;
     this.getOpenGoalSetting();
     this.prefillAssessment();
     this.getSelfAssessment();
-    this.finalAssessment();
-    this.getRatings();
+    // this.finalAssessment();
+    // this.getRatings();
   },
   data() {
     return {
@@ -66,6 +67,7 @@ export default {
       ratingsArray: [],
       employeeRating: null,
       checkOpenGoal: 0,
+      empId: null,
     };
   },
   methods: {
@@ -130,69 +132,47 @@ export default {
     },
 
     async getSelfAssessment() {
-      const urls = `${this.ROUTES.goalSetting}/get-open-goal-setting`;
-      const url = await this.apiGet(urls).then((res) => {
+      const url = `${this.ROUTES.selfAssessment}/get-self-assessments/${this.empId}`;
+      await this.apiGet(url).then((res) => {
         const { data } = res;
-        if (data.length > 0) {
-          return `${this.ROUTES.selfAssessment}/get-self-assessment/${
-            this.getEmployee.emp_id
-          }/${parseInt(data[0].gs_id)}`;
+        if (data) {
+          this.assessments = [];
+          data.forEach(async (datum) => {
+            const dat = {
+              id: datum.sa_id,
+              goal: datum.sa_comment,
+              response: datum.sa_response,
+              status: parseInt(datum.sa_status),
+              eya: datum.sa_eya_id,
+            };
+            this.assessments.push(dat);
+          });
         }
       });
-      if (url) {
-        await this.apiGet(url).then((res) => {
-          const { data } = res;
-          if (data) {
-            this.assessments = [];
-
-            data.forEach(async (datum) => {
-              this.selfAssessmentStatus = true;
-              this.prefillStatus = true;
-              const dat = {
-                id: datum.sa_id,
-                goal: datum.sa_comment,
-                status: datum.sa_status,
-              };
-
-              this.assessments.push(dat);
-            });
-          }
-        });
-      }
     },
 
     async prefillAssessment() {
-      const urls = `${this.ROUTES.goalSetting}/get-open-goal-setting`;
-      const url = await this.apiGet(urls).then((res) => {
-        const { data } = res;
-        if (data.length > 0) {
-          return `${this.ROUTES.selfAssessment}/prefill-self-assessment/${
-            this.getEmployee.emp_id
-          }/${parseInt(data[0].gs_id)}`;
-        }
+      const url = `${this.ROUTES.selfAssessment}/prefill-self-assessment/${this.getEmployee.emp_id}`;
+      await this.apiGet(url, "Get Prefilled Assessments Error").then(() => {
+        // console.log(res.data);
+        // const { data } = res;
+        // if (data) {
+        //   console.log({ data });
+        //   const questions = data.questions;
+        //   this.prefillAssessments = [];
+        //   questions.forEach(async (datum) => {
+        //     this.prefillStatus = false;
+        //     const dat = {
+        //       id: datum.sa_id,
+        //       goal: datum.sa_comment,
+        //       response: datum.sa_response,
+        //       status: datum.sa_status,
+        //       eya: datum.sa_eya_id,
+        //     };
+        //     this.prefillAssessments.push(dat);
+        //   });
+        // }
       });
-      if (url) {
-        await this.apiGet(url, "Get Prefilled Assessments Error").then(
-          (res) => {
-            const { data } = res;
-            if (data) {
-              const questions = data.questions;
-              this.prefillAssessments = [];
-              questions.forEach(async (datum) => {
-                this.prefillStatus = false;
-                const dat = {
-                  id: datum.sa_id,
-                  goal: datum.sa_comment,
-                  response: datum.sa_response,
-                  status: datum.sa_status,
-                };
-
-                this.prefillAssessments.push(dat);
-              });
-            }
-          }
-        );
-      }
     },
 
     async finalAssessment() {
@@ -216,9 +196,9 @@ export default {
       }
     },
 
-    getOpenGoalSetting() {
+    async getOpenGoalSetting() {
       const url = `${this.ROUTES.goalSetting}/get-open-goal-setting`;
-      this.apiGet(url).then((res) => {
+      await this.apiGet(url).then((res) => {
         const { data } = res;
         if (data.length > 0) {
           this.openGoalActivity = parseInt(data[0].gs_activity);
@@ -270,23 +250,18 @@ export default {
       const employeeID = this.getEmployee.emp_id;
       const url = `${this.ROUTES.selfAssessment}/respond-self-assessment/${employeeID}`;
       this.goals = [];
-      this.prefillAssessments.forEach(async (field) => {
+      this.assessments.forEach(async (field) => {
         const data = {
           sa_id: field.id,
           sa_response: field.response,
           sa_status: 1,
         };
-
         this.goals.push(data);
       });
       this.apiPatch(url, this.goals, "Update goals Error").then(() => {
         this.apiResponseHandler("Process Complete", "Goals Updated");
-        this.$router.push({
-          name: "self-assessment",
-        });
+        this.getSelfAssessment();
       });
-
-      this.prefillAssessment();
     },
 
     submitNew() {
@@ -333,11 +308,11 @@ export default {
               <h5 class="font-size-14 mb-0">End of Year Checking</h5>
             </div>
 
-            <div v-if="!prefillStatus">
+            <div>
               <div v-if="parseInt(finalAssessmentStatus) === 1">
                 <div
                   class="row"
-                  v-for="(field, index) in prefillAssessments"
+                  v-for="(field, index) in assessments"
                   :key="index"
                 >
                   <div class="col-lg-12">
@@ -413,19 +388,25 @@ export default {
                 <form @submit.prevent="respond">
                   <div
                     class="row"
-                    v-for="(field, index) in prefillAssessments"
+                    v-for="(field, index) in assessments"
                     :key="index"
                   >
                     <div class="col-lg-12">
                       <div class="row">
-                        <div class="col-4">
+                        <div class="col-lg-6">
                           <div class="form-group">
                             <label for="goal">
-                              Question <span class="text-danger">*</span>
+                              <span v-if="field.eya === 0">
+                                Goal {{ index + 1 }}
+                              </span>
+                              <span v-else> End of Year Question </span>
+                              <span class="text-danger">*</span>
                             </label>
                             <b-form-textarea
                               id="eya_question"
                               disabled
+                              no-resize
+                              rows="3"
                               v-model="field.goal"
                               class="form-control"
                               :class="{
@@ -435,13 +416,15 @@ export default {
                           </div>
                         </div>
 
-                        <div class="col-4">
+                        <div class="col-lg-6">
                           <div class="form-group">
                             <label for="goal">
                               Response <span class="text-danger">*</span>
                             </label>
                             <b-form-textarea
                               v-model="field.response"
+                              no-resize
+                              rows="3"
                               class="form-control"
                               :class="{
                                 'is-invalid': submitted && $v.goal.$error,
@@ -452,9 +435,8 @@ export default {
                       </div>
                     </div>
                   </div>
-
                   <div class="row">
-                    <div class="col-lg-8">
+                    <div class="col-lg-12">
                       <b-button
                         v-if="!submitting"
                         class="btn btn-success btn-block mt-4"
