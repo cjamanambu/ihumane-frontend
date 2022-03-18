@@ -24,6 +24,7 @@ export default {
     this.getSelfAssessment();
     this.getEndYearAssessment();
     this.getRatings();
+    this.fetchEmployee();
   },
   validations: {
     start: { required },
@@ -75,7 +76,9 @@ export default {
         { text: "CLOSE", value: 1 },
         { text: "OPEN", value: 0 },
       ],
+      currentEmployee: null,
       // statues: [{ value: 0, text: "Open" }, { value: 1, text: "Closed" }],
+      gsID: null,
     };
   },
   methods: {
@@ -102,27 +105,20 @@ export default {
       });
     },
     async getSelfAssessment() {
-      const urls = `${this.ROUTES.goalSetting}/get-open-goal-setting`;
-      await this.apiGet(urls).then(async (res) => {
+      const url = `${this.ROUTES.selfAssessment}/get-self-assessments/${this.empId}`;
+      await this.apiGet(url).then((res) => {
         const { data } = res;
-        if (data.length > 0) {
-          const url = `${this.ROUTES.selfAssessment}/get-self-assessment/${
-            this.empId
-          }/${parseInt(data[0].gs_id)}`;
-          await this.apiGet(url).then((res) => {
-            const { data } = res;
-            if (data) {
-              this.assessments = [];
-              data.forEach(async (datum) => {
-                const dat = {
-                  id: datum.sa_id,
-                  goal: datum.sa_comment,
-                  response: datum.sa_response,
-                  status: parseInt(datum.sa_status),
-                };
-                this.assessments.push(dat);
-              });
-            }
+        if (data) {
+          this.assessments = [];
+          data.forEach(async (datum) => {
+            this.gsID = datum.sa_gs_id;
+            const dat = {
+              id: datum.sa_id,
+              goal: datum.sa_comment,
+              response: datum.sa_response,
+              status: parseInt(datum.sa_status),
+            };
+            this.assessments.push(dat);
           });
         }
       });
@@ -183,6 +179,37 @@ export default {
       this.getRatings();
       this.getEndYearAssessment();
     },
+    updateGoals() {
+      const employeeID = this.$route.params.empid;
+      const url = `${this.ROUTES.selfAssessment}/update-assessment/${employeeID}/${this.gsID}`;
+      this.goals = [];
+      let validForm = true;
+      this.assessments.every(async (field) => {
+        if (field.goal === "" || !field.goal) {
+          this.apiFormHandler("Invalid Goal Fields");
+          validForm = false;
+          return false;
+        }
+        const data = {
+          sa_comment: field.goal,
+        };
+        this.goals.push(data);
+        return true;
+      });
+      if (validForm) {
+        this.apiPatch(url, this.goals, "Update Goals Error").then(() => {
+          this.apiResponseHandler("Process Complete", "Goals Updated");
+          this.getSelfAssessment();
+        });
+      }
+    },
+    fetchEmployee() {
+      const employeeID = this.$route.params.empid;
+      const url = `${this.ROUTES.employee}/get-employee/${employeeID}`;
+      this.apiGet(url, "Get Employee Error").then((res) => {
+        this.currentEmployee = res.data;
+      });
+    },
   },
 };
 </script>
@@ -204,337 +231,386 @@ export default {
       </b-button>
     </div>
     <scale-loader v-if="apiBusy" />
-    <div v-else class="row">
-      <div v-if="openGoalActivity === 1" class="col-lg-12">
-        <div class="card">
-          <div class="card-body">
-            <div class="p-3 bg-light mb-4">
-              <h5 class="font-size-14 mb-0">Beginning of the Year</h5>
-            </div>
-            <form v-if="assessments.length > 0" @submit.prevent="update">
-              <div
-                class="row"
-                v-for="(field, index) in assessments"
-                :key="index"
-              >
-                <div class="col-lg-12" v-if="field.status === 0">
-                  <div class="row">
-                    <div class="col-9">
-                      <div class="form-group">
-                        <label for="goal">
-                          Question <span class="text-danger">*</span>
-                        </label>
-                        <b-form-textarea
-                          id="eya_question"
-                          type="date"
-                          v-model="field.goal"
-                          class="form-control"
-                          :class="{
-                            'is-invalid': submitted && $v.goal.$error,
-                          }"
-                        />
+    <div v-else>
+      <div v-if="openGoalActivity === 1">
+        <div class="row">
+          <div class="col-lg-8">
+            <div class="card">
+              <div class="card-body">
+                <div class="p-3 bg-light mb-4">
+                  <h5 class="font-size-14 mb-0">Beginning of the Year</h5>
+                </div>
+                <form
+                  v-if="assessments.length > 0"
+                  @submit.prevent="updateGoals"
+                >
+                  <div
+                    class="row"
+                    v-for="(field, index) in assessments"
+                    :key="index"
+                  >
+                    <div class="col-lg-12">
+                      <div class="row">
+                        <div class="col-12">
+                          <div class="form-group">
+                            <label for="goal">
+                              Goal {{ index + 1 }}
+                              <span class="text-danger">*</span>
+                            </label>
+                            <b-form-textarea
+                              id="eya_question"
+                              no-resize
+                              rows="3"
+                              v-model="field.goal"
+                              class="form-control"
+                              :class="{
+                                'is-invalid': submitted && $v.goal.$error,
+                              }"
+                            />
+                          </div>
+                        </div>
                       </div>
                     </div>
-                    <div class="col-3">
+                  </div>
+                  <div class="row">
+                    <div class="col-lg-12">
                       <b-form-group>
-                        <label>Status</label><br />
-                        <!--                      <b-form-select-->
-                        <!--                          id="location"-->
-                        <!--                          v-model="field.status"-->
-                        <!--                          :options="statues"-->
-                        <!--                          :class="{-->
-                        <!--              'is-invalid': submitted && $v.location.$error,-->
-                        <!--            }"-->
-                        <!--                      />-->
-                        <b-form-radio-group
-                          id="user_type"
-                          v-model="field.status"
-                          :options="statuses"
-                          button-variant="outline-success"
-                          buttons
-                        />
+                        <b-button
+                          v-if="!submitting"
+                          class="btn btn-success btn-block mt-4"
+                          type="submit"
+                        >
+                          Update
+                        </b-button>
+                        <b-button
+                          v-else
+                          disabled
+                          class="btn btn-success btn-block mt-4"
+                          type="submit"
+                        >
+                          Updating...
+                        </b-button>
                       </b-form-group>
                     </div>
+                    <!--                    <div class="col-lg-4">-->
+                    <!--                      <b-form-group>-->
+                    <!--                        <b-button class="btn btn-warning btn-block mt-4">-->
+                    <!--                          Approve-->
+                    <!--                        </b-button>-->
+                    <!--                      </b-form-group>-->
+                    <!--                    </div>-->
                   </div>
-                </div>
-                <div class="col-lg-12" v-else>
-                  <div class="row">
-                    <div class="col-9">
-                      <div class="form-group">
-                        <label for="goal">
-                          Question <span class="text-danger">*</span>
-                        </label>
-                        <b-form-textarea
-                          id="eya_question"
-                          type="date"
-                          disabled
-                          v-model="field.goal"
-                          class="form-control"
-                          :class="{
-                            'is-invalid': submitted && $v.goal.$error,
-                          }"
-                        />
-                      </div>
+                </form>
+                <div class="row" v-else>
+                  <div class="col-12">
+                    <div class="alert alert-warning">
+                      Employee yet to submit assessment
                     </div>
                   </div>
                 </div>
               </div>
-              <div class="row">
-                <div class="col-12">
-                  <b-button
-                    v-if="!submitting"
-                    class="btn btn-success btn-block mt-4"
-                    type="submit"
-                  >
-                    Update
-                  </b-button>
-                  <b-button
-                    v-else
-                    disabled
-                    class="btn btn-success btn-block mt-4"
-                    type="submit"
-                  >
-                    Updating...
-                  </b-button>
+            </div>
+          </div>
+          <div class="col-lg-4">
+            <div class="card">
+              <div class="card-body">
+                <div class="p-3 bg-light mb-4">
+                  <h5 class="font-size-14 mb-0">Employee Details</h5>
                 </div>
-              </div>
-            </form>
-            <div class="row" v-else>
-              <div class="col-12">
-                <div class="alert alert-warning">
-                  Employee yet to submit assessment
+                <div class="d-flex justify-content-between text-capitalize">
+                  <p>Employee Name</p>
+                  <p>
+                    {{ currentEmployee.emp_first_name }}
+                    {{ currentEmployee.emp_last_name }}
+                  </p>
+                </div>
+                <div class="d-flex justify-content-between">
+                  <p>T7 Number</p>
+                  <p>{{ currentEmployee.emp_unique_id }}</p>
+                </div>
+                <div class="d-flex justify-content-between">
+                  <p>Phone Number</p>
+                  <p>{{ currentEmployee.emp_phone_no }}</p>
+                </div>
+                <div class="d-flex justify-content-between">
+                  <p>Office Email</p>
+                  <p>{{ currentEmployee.emp_office_email }}</p>
+                </div>
+                <div class="d-flex justify-content-between">
+                  <p>T3 Code</p>
+                  <p>{{ currentEmployee.JobRole.Department.d_t3_code }}</p>
+                </div>
+                <div class="d-flex justify-content-between">
+                  <p class="mb-0">T6 Code</p>
+                  <p class="mb-0">{{ currentEmployee.location.l_t6_code }}</p>
                 </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-      <div v-else-if="openGoalActivity === 2" class="col-lg-12">
-        <div class="card">
-          <div class="card-body">
-            <div class="p-3 bg-light mb-4">
-              <h5 class="font-size-14 mb-0">Mid Year Checking</h5>
+      <div v-else-if="openGoalActivity === 2">
+        <div class="row">
+          <div class="col-lg-8">
+            <div class="card">
+              <div class="card-body">
+                <div class="p-3 bg-light mb-4">
+                  <h5 class="font-size-14 mb-0">Mid Year Checking</h5>
+                </div>
+                <form
+                  v-if="assessments.length > 0"
+                  @submit.prevent="updateGoals"
+                >
+                  <div
+                    class="row"
+                    v-for="(field, index) in assessments"
+                    :key="index"
+                  >
+                    <div class="col-lg-12">
+                      <div class="row">
+                        <div class="col-12">
+                          <div class="form-group">
+                            <label for="goal">
+                              Goal {{ index + 1 }}
+                              <span class="text-danger">*</span>
+                            </label>
+                            <b-form-textarea
+                              id="eya_question"
+                              no-resize
+                              rows="3"
+                              v-model="field.goal"
+                              class="form-control"
+                              :class="{
+                                'is-invalid': submitted && $v.goal.$error,
+                              }"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-lg-12">
+                      <b-button
+                        v-if="!submitting"
+                        class="btn btn-success btn-block mt-4"
+                        type="submit"
+                      >
+                        Update
+                      </b-button>
+                      <b-button
+                        v-else
+                        disabled
+                        class="btn btn-success btn-block mt-4"
+                        type="submit"
+                      >
+                        Updating...
+                      </b-button>
+                    </div>
+                    <!--                    <div class="col-lg-4">-->
+                    <!--                      <b-form-group>-->
+                    <!--                        <b-button class="btn btn-warning btn-block mt-4">-->
+                    <!--                          Approve-->
+                    <!--                        </b-button>-->
+                    <!--                      </b-form-group>-->
+                    <!--                    </div>-->
+                  </div>
+                </form>
+                <div class="row" v-else>
+                  <div class="col-12">
+                    <div class="alert alert-warning">
+                      Employee yet to submit assessment
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
-            <form @submit.prevent="update">
-              <div
-                class="row"
-                v-for="(field, index) in assessments"
-                :key="index"
-              >
-                <div class="col-lg-12" v-if="field.status === 0">
-                  <div class="row">
-                    <div class="col-9">
-                      <div class="form-group">
-                        <label for="goal">
-                          Question <span class="text-danger">*</span>
-                        </label>
-                        <b-form-textarea
-                          id="eya_question"
-                          type="date"
-                          v-model="field.goal"
-                          class="form-control"
-                          :class="{
-                            'is-invalid': submitted && $v.goal.$error,
-                          }"
-                        />
-                      </div>
-                    </div>
-                    <div class="col-3">
-                      <b-form-group>
-                        <label>Status</label><br />
-                        <!--                      <b-form-select-->
-                        <!--                          id="location"-->
-                        <!--                          v-model="field.status"-->
-                        <!--                          :options="statues"-->
-                        <!--                          :class="{-->
-                        <!--              'is-invalid': submitted && $v.location.$error,-->
-                        <!--            }"-->
-                        <!--                      />-->
-                        <b-form-radio-group
-                          id="user_type"
-                          v-model="field.status"
-                          :options="statuses"
-                          button-variant="outline-success"
-                          buttons
-                        />
-                      </b-form-group>
-                    </div>
-                  </div>
+          </div>
+          <div class="col-lg-4">
+            <div class="card">
+              <div class="card-body">
+                <div class="p-3 bg-light mb-4">
+                  <h5 class="font-size-14 mb-0">Employee Details</h5>
                 </div>
-                <div class="col-lg-12" v-else>
-                  <div class="row">
-                    <div class="col-9">
-                      <div class="form-group">
-                        <label for="goal">
-                          Question <span class="text-danger">*</span>
-                        </label>
-                        <b-form-textarea
-                          id="eya_question"
-                          type="date"
-                          disabled
-                          v-model="field.goal"
-                          class="form-control"
-                          :class="{
-                            'is-invalid': submitted && $v.goal.$error,
-                          }"
-                        />
-                      </div>
-                    </div>
-                  </div>
+                <div class="d-flex justify-content-between text-capitalize">
+                  <p>Employee Name</p>
+                  <p>
+                    {{ currentEmployee.emp_first_name }}
+                    {{ currentEmployee.emp_last_name }}
+                  </p>
+                </div>
+                <div class="d-flex justify-content-between">
+                  <p>T7 Number</p>
+                  <p>{{ currentEmployee.emp_unique_id }}</p>
+                </div>
+                <div class="d-flex justify-content-between">
+                  <p>Phone Number</p>
+                  <p>{{ currentEmployee.emp_phone_no }}</p>
+                </div>
+                <div class="d-flex justify-content-between">
+                  <p>Office Email</p>
+                  <p>{{ currentEmployee.emp_office_email }}</p>
+                </div>
+                <div class="d-flex justify-content-between">
+                  <p>T3 Code</p>
+                  <p>{{ currentEmployee.JobRole.Department.d_t3_code }}</p>
+                </div>
+                <div class="d-flex justify-content-between">
+                  <p class="mb-0">T6 Code</p>
+                  <p class="mb-0">{{ currentEmployee.location.l_t6_code }}</p>
                 </div>
               </div>
-              <div class="row">
-                <div class="col-lg-9">
-                  <b-button
-                    v-if="!submitting"
-                    class="btn btn-success btn-block mt-4"
-                    type="submit"
-                  >
-                    Update
-                  </b-button>
-                  <b-button
-                    v-else
-                    disabled
-                    class="btn btn-success btn-block mt-4"
-                    type="submit"
-                  >
-                    Updating...
-                  </b-button>
-                </div>
-              </div>
-            </form>
+            </div>
           </div>
         </div>
       </div>
       <div v-else-if="openGoalActivity === 3" class="col-lg-12">
-        <div class="card">
-          <div class="card-body">
-            <div class="p-3 bg-light mb-4">
-              <h5 class="font-size-14 mb-0">End Of Year Assessment</h5>
+        <div class="row">
+          <div class="col-lg-8">
+            <div class="card">
+              <div class="card-body">
+                <div class="p-3 bg-light mb-4">
+                  <h5 class="font-size-14 mb-0">End Of Year Assessment</h5>
+                </div>
+                <b-table-simple responsive bordered>
+                  <b-thead head-variant="light">
+                    <b-tr>
+                      <b-th>Goals & End of Year Questions</b-th>
+                      <b-th>Responses</b-th>
+                    </b-tr>
+                  </b-thead>
+                  <b-tbody>
+                    <b-tr
+                      v-for="(field, index) in endYearAssessments"
+                      :key="index"
+                    >
+                      <b-td> {{ field.goal }} </b-td>
+                      <b-td> {{ field.response }} </b-td>
+                    </b-tr>
+                  </b-tbody>
+                </b-table-simple>
+              </div>
             </div>
-            <div
-              class="row"
-              v-for="(field, index) in endYearAssessments"
-              :key="index"
-            >
-              <div class="col-lg-12">
+            <div class="card mt-3">
+              <div v-if="parseInt(ratingStatus) === 0">
                 <div class="row">
-                  <div class="col-6">
-                    <div class="form-group">
-                      <div>
-                        <b-card title="Questions">
-                          <br />
-                          <b-card-text>
-                            {{ field.goal }}
-                          </b-card-text>
-                        </b-card>
+                  <div class="col-lg-12">
+                    <div class="card-body">
+                      <div class="p-3 bg-light mb-4">
+                        <h5 class="font-size-14 mb-0">Grading Rubric</h5>
                       </div>
+                      <b-card
+                        v-for="(field, index) in ratings"
+                        :key="index"
+                        :title="field.text"
+                      >
+                        <br />
+                        <b-card-text>
+                          {{ field.desc }}
+                        </b-card-text>
+                      </b-card>
+                      <form @submit.prevent="update">
+                        <b-form-group>
+                          <label>Overall Rating</label><br />
+                          <b-form-radio-group
+                            id="user_type"
+                            v-model="employeeRating"
+                            :options="ratingsArray"
+                            button-variant="outline-success"
+                            buttons
+                          />
+                        </b-form-group>
+                        <b-button
+                          v-if="!submitting"
+                          class="btn btn-block btn-success mt-4"
+                          type="submit"
+                        >
+                          Update
+                        </b-button>
+                        <b-button
+                          v-else
+                          disabled
+                          class="btn btn-block btn-success mt-4"
+                          type="submit"
+                        >
+                          Updating...
+                        </b-button>
+                      </form>
                     </div>
                   </div>
-                  <div class="col-6">
-                    <div class="form-group">
-                      <div>
-                        <b-card title="Response">
-                          <br />
-                          <b-card-text>
-                            {{ field.response }}
-                          </b-card-text>
-                        </b-card>
+                </div>
+              </div>
+              <div v-else>
+                <div class="row">
+                  <div class="col-lg-12">
+                    <div class="card-body">
+                      <div class="p-3 bg-light mb-4">
+                        <h5 class="font-size-14 mb-0">Grading Rubric</h5>
+                      </div>
+                      <b-card
+                        v-for="(field, index) in ratings"
+                        :key="index"
+                        :title="field.text"
+                      >
+                        <br />
+                        <b-card-text>
+                          {{ field.desc }}
+                        </b-card-text>
+                      </b-card>
+                      <div class="col-lg-12">
+                        <form @submit.prevent="update">
+                          <b-form-group>
+                            <label>Overall Rating </label><br />
+                            <b-form-radio-group
+                              id="user_type"
+                              v-model="employeeRating"
+                              :options="ratingsArray"
+                              readonly
+                              button-variant="outline-success"
+                              buttons
+                            />
+                          </b-form-group>
+                        </form>
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-            <div v-if="parseInt(ratingStatus) === 0">
-              <div class="row">
-                <div class="col-lg-12">
-                  <div class="card-body">
-                    <div class="p-3 bg-light mb-4">
-                      <h5 class="font-size-14 mb-0">Grading Rubric</h5>
-                    </div>
-                  </div>
-
-                  <b-card
-                    v-for="(field, index) in ratings"
-                    :key="index"
-                    :title="field.text"
-                  >
-                    <br />
-                    <b-card-text>
-                      {{ field.desc }}
-                    </b-card-text>
-                  </b-card>
+          </div>
+          <div class="col-lg-4">
+            <div class="card">
+              <div class="card-body">
+                <div class="p-3 bg-light mb-4">
+                  <h5 class="font-size-14 mb-0">Employee Details</h5>
                 </div>
-              </div>
-              <div class="row">
-                <form @submit.prevent="update">
-                  <div class="col-lg-12">
-                    <b-form-group>
-                      <label>Overall Rating</label><br />
-                      <b-form-radio-group
-                        id="user_type"
-                        v-model="employeeRating"
-                        :options="ratingsArray"
-                        button-variant="outline-success"
-                        buttons
-                      />
-                    </b-form-group>
-                    <b-button
-                      v-if="!submitting"
-                      class="btn btn-success mt-4"
-                      type="submit"
-                    >
-                      Update
-                    </b-button>
-                    <b-button
-                      v-else
-                      disabled
-                      class="btn btn-success mt-4"
-                      type="submit"
-                    >
-                      Updating...
-                    </b-button>
-                  </div>
-                </form>
-              </div>
-            </div>
-            <div v-else>
-              <div class="row">
-                <div class="col-lg-12">
-                  <div class="card-body">
-                    <div class="p-3 bg-light mb-4">
-                      <h5 class="font-size-14 mb-0">Grading Rubric</h5>
-                    </div>
-                  </div>
-                  <b-card
-                    v-for="(field, index) in ratings"
-                    :key="index"
-                    :title="field.text"
-                  >
-                    <br />
-                    <b-card-text>
-                      {{ field.desc }}
-                    </b-card-text>
-                  </b-card>
+                <div class="d-flex justify-content-between text-capitalize">
+                  <p>Employee Name</p>
+                  <p>
+                    {{ currentEmployee.emp_first_name }}
+                    {{ currentEmployee.emp_last_name }}
+                  </p>
                 </div>
-              </div>
-              <div class="row">
-                <form @submit.prevent="update">
-                  <div class="col-lg-12">
-                    <b-form-group>
-                      <label>Overall Rating </label><br />
-                      <b-form-radio-group
-                        id="user_type"
-                        v-model="employeeRating"
-                        :options="ratingsArray"
-                        readonly
-                        button-variant="outline-success"
-                        buttons
-                      />
-                    </b-form-group>
-                  </div>
-                </form>
+                <div class="d-flex justify-content-between">
+                  <p>T7 Number</p>
+                  <p>{{ currentEmployee.emp_unique_id }}</p>
+                </div>
+                <div class="d-flex justify-content-between">
+                  <p>Phone Number</p>
+                  <p>{{ currentEmployee.emp_phone_no }}</p>
+                </div>
+                <div class="d-flex justify-content-between">
+                  <p>Office Email</p>
+                  <p>{{ currentEmployee.emp_office_email }}</p>
+                </div>
+                <div class="d-flex justify-content-between">
+                  <p>T3 Code</p>
+                  <p>{{ currentEmployee.JobRole.Department.d_t3_code }}</p>
+                </div>
+                <div class="d-flex justify-content-between">
+                  <p class="mb-0">T6 Code</p>
+                  <p class="mb-0">{{ currentEmployee.location.l_t6_code }}</p>
+                </div>
               </div>
             </div>
           </div>

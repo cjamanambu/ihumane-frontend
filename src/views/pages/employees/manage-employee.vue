@@ -78,6 +78,7 @@ export default {
       const url = `${this.ROUTES.employee}/get-employee/${employeeID}`;
       this.apiGet(url, "Get Employee Error").then((res) => {
         const { data } = res;
+        //console.log({ data });
         if (data) {
           this.emp_first_name = data.emp_first_name;
           this.emp_last_name = data.emp_last_name;
@@ -197,8 +198,8 @@ export default {
     },
     async updateEmployee() {
       this.submitted = true;
-      //let employeeID = this.$route.params.employeeID;
-      //const url = `${this.ROUTES.employee}/update-employee-backoffice/${employeeID}`;
+      let employeeID = this.$route.params.employeeID;
+      const url = `${this.ROUTES.employee}/update-employee/${employeeID}`;
       const data = {
         emp_first_name: this.emp_first_name,
         emp_last_name: this.emp_last_name,
@@ -233,12 +234,11 @@ export default {
 
 
       };
-      console.log({data})
-      /*this.apiPatch(url, data, "Update Employee Error").then();
+      this.apiPatch(url, data, "Update Employee Error").then();
       this.apiResponseHandler("Process Complete", "Employee Update");
       this.fetchEmployee();
-      this.submitted = false;*/
-      //this.fetchEmployee();
+      this.submitted = false;
+      this.fetchEmployee();
     },
 
     async suspendEmployee() {
@@ -351,24 +351,38 @@ export default {
 <template>
   <Layout>
     <PageHeader :title="title" :items="items" />
-    <div class="d-flex justify-content-end mb-3">
-      <b-button
-        class="btn btn-success mr-3"
-        @click="$router.push({ name: 'manage-employees' })"
-      >
-        <i class="mdi mdi-plus mr-2"></i>
-        Manage Employees
-      </b-button>
-
-
-      <b-button
+    <div class="d-flex justify-content-between mb-3">
+      <div>
+        <b-button
           class="btn btn-danger"
           @click="$refs['deactivate-employee'].show()"
-      >
-        <i class="mdi mdi-minus mr-2"></i>
-       Deactivate Employee
-       </b-button>
+        >
+          <i class="mdi mdi-minus mr-2"></i>
+          Deactivate Employee
+        </b-button>
+      </div>
+      <div class="d-flex">
+        <b-button
+          class="btn btn-success mr-3"
+          @click="$router.push({ name: 'manage-employees' })"
+        >
+          <i class="mdi mdi-plus mr-2"></i>
+          Manage Employees
+        </b-button>
 
+        <b-button
+          class="btn btn-primary"
+          @click="
+            $router.push({
+              name: 'employee-documents',
+              params: { employeeID: $route.params.employeeID },
+            })
+          "
+        >
+          <i class="mdi mdi-plus mr-2"></i>
+          Upload Documents
+        </b-button>
+      </div>
       <b-button
         class="btn btn-primary"
         @click="
@@ -409,7 +423,6 @@ export default {
 
       </b-button>
     </div>
-
 
     <scale-loader v-if="apiBusy" />
     <div v-else class="row">
@@ -710,12 +723,12 @@ export default {
     </div>
 
     <b-modal
-        ref="deactivate-employee"
-        title="Deactivate Employee"
-        hide-footer
-        centered
-        title-class="font-18"
-        @hidden="resetForm"
+      ref="deactivate-employee"
+      title="Deactivate Employee"
+      hide-footer
+      centered
+      title-class="font-18"
+      @hidden="resetForm"
     >
       <form @submit.prevent="suspendEmployee">
         <div class="form-group">
@@ -723,26 +736,25 @@ export default {
             Suspension Reason <span class="text-danger">*</span>
           </label>
           <textarea
-              id="suspensionReason"
-              type="text"
-              v-model="emp_suspension_reason"
-              class="form-control"
-
+            id="suspensionReason"
+            type="text"
+            v-model="emp_suspension_reason"
+            class="form-control"
           />
         </div>
 
         <b-button
-            v-if="!submitting"
-            class="btn btn-success btn-block mt-4"
-            type="submit"
+          v-if="!submitting"
+          class="btn btn-success btn-block mt-4"
+          type="submit"
         >
           Submit
         </b-button>
         <b-button
-            v-else
-            disabled
-            class="btn btn-success btn-block mt-4"
-            type="submit"
+          v-else
+          disabled
+          class="btn btn-success btn-block mt-4"
+          type="submit"
         >
           Submitting...
         </b-button>

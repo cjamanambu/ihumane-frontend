@@ -90,6 +90,7 @@ export default {
         ta_ref_no = Math.random().toString(36).slice(2);
         url = `${this.ROUTES.timeAllocation}/add-time-allocation`;
       }
+      console.log(this.fields);
       this.fields.forEach(async (field) => {
         const data = {
           ta_emp_id: this.getEmployee.emp_id,

@@ -3,7 +3,7 @@ import Layout from "@/views/layouts/main";
 import PageHeader from "@/components/page-header";
 import appConfig from "@/app.config";
 import { required } from "vuelidate/lib/validators";
-import Multiselect from 'vue-multiselect';
+import Multiselect from "vue-multiselect";
 
 export default {
   page: {
@@ -34,9 +34,11 @@ export default {
   methods: {
     selectRow(salaryStructure) {
       salaryStructure = salaryStructure[0];
+      console.log({ salaryStructure });
       this.employee = salaryStructure.ss_empid;
       this.amount = salaryStructure.total_amount.toString();
       this.gross = salaryStructure.total_amount;
+      this.salaryGrade = salaryStructure.salary_grade.sg_id;
       const url = `${this.ROUTES.salaryStructure}/get-salary-structure/${this.employee}`;
       this.apiGet(url, "Get Salary Structure Error").then((res) => {
         const { data } = res;
@@ -45,8 +47,8 @@ export default {
       this.$refs["edit-salary-structure"].show();
       this.$refs["salary-structure-table"].clearSelected();
     },
-    employeeLabel ({ text }) {
-      return `${text}`
+    employeeLabel({ text }) {
+      return `${text}`;
     },
     refreshTable() {
       this.apiGet(
@@ -55,8 +57,13 @@ export default {
       ).then((res) => {
         const { data } = res;
         //console.log(data);
+        console.log({ data });
         data.forEach((salaryStructure, index) => {
-          this.salaryStructures[index] = { sn: ++index, grade: salaryStructure.salary_grade.sg_name,...salaryStructure };
+          this.salaryStructures[index] = {
+            sn: ++index,
+            grade: salaryStructure.salary_grade.sg_name,
+            ...salaryStructure,
+          };
         });
         this.totalRows = this.salaryStructures.length;
         this.fetchSalaryGrades();
@@ -191,9 +198,9 @@ export default {
           sortable: true,
         },
         {
-          key:"grade",
+          key: "grade",
           label: "Grade",
-          sortable: true
+          sortable: true,
         },
         { key: "grade", label: "Grade", sortable: true },
         { key: "total_amount", label: "Gross", sortable: true },
@@ -333,12 +340,12 @@ export default {
             Employee <span class="text-danger">*</span>
           </label>
           <multiselect
-                  v-model="employee"
-                  :options="employees"
-                  :custom-label="employeeLabel"
-                  :class="{
-                      'is-invalid': submitted && $v.employee.$error,
-                    }"
+            v-model="employee"
+            :options="employees"
+            :custom-label="employeeLabel"
+            :class="{
+              'is-invalid': submitted && $v.employee.$error,
+            }"
           ></multiselect>
         </div>
         <div class="form-group">

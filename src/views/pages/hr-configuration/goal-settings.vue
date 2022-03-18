@@ -19,20 +19,30 @@ export default {
   validations: {
     gs_from: { required },
     gs_to: { required },
-    gs_year: { required },
     gs_activity: { required },
   },
   methods: {
-    refreshTable() {
-      this.apiGet(this.ROUTES.goalSetting, "Get Goal Setting Error").then(
+    async refreshTable() {
+      await this.apiGet(this.ROUTES.goalSetting, "Get Goal Setting Error").then(
         (res) => {
           const { data } = res;
+          console.log({ data });
           if (data) {
             data.forEach((goalSetting, index) => {
               this.goalSettings[index] = { sn: ++index, ...goalSetting };
             });
           }
           this.totalRows = this.goalSettings.length;
+        }
+      );
+      this.refreshGSY();
+    },
+    refreshGSY() {
+      this.apiGet(this.ROUTES.goalSettingYear, "Get Goal Setting Year").then(
+        (res) => {
+          if (res.data) {
+            this.currentGSY = res.data.gsy_year;
+          }
         }
       );
     },
@@ -64,12 +74,12 @@ export default {
       this.submitted = true;
       this.$v.$touch();
       if (this.$v.$invalid) {
-        this.apiFormHandler("Invalid Leave Type");
+        this.apiFormHandler("Invalid Goal Setting");
       } else {
         const data = {
           gs_from: this.gs_from,
           gs_to: this.gs_to,
-          gs_year: this.gs_year,
+          // gs_year: this.currentGSY,
           gs_activity: String(this.gs_activity),
         };
         const url = `${this.ROUTES.goalSetting}/add-goal-setting`;
@@ -85,12 +95,12 @@ export default {
       this.submitted = true;
       this.$v.$touch();
       if (this.$v.$invalid) {
-        this.apiFormHandler("Invalid Leave Type");
+        this.apiFormHandler("Invalid Goal Setting");
       } else {
         const data = {
           gs_from: this.gs_from,
           gs_to: this.gs_to,
-          gs_year: this.gs_year,
+          gs_year: this.currentGSY,
           gs_activity: this.gs_activity,
           gs_status: this.gs_status,
         };
@@ -102,6 +112,26 @@ export default {
           this.$refs["update-goal-setting"].hide();
         });
       }
+    },
+    resetGSYForm() {
+      this.gsy = "";
+      this.$v.reset();
+    },
+    submitGSY() {
+      const data = {
+        gsy_year: this.gsy,
+      };
+      const url = `${this.ROUTES.goalSettingYear}/add-year`;
+      this.apiPost(url, data, "Add Goal Setting Year Error").then((res) => {
+        if (res.data) {
+          this.apiResponseHandler(
+            `Goal Setting Year has been set successfully`,
+            "New Goal Setting Year Set"
+          );
+          this.refreshGSY();
+          this.setGSY = false;
+        }
+      });
     },
   },
   data() {
@@ -150,15 +180,49 @@ export default {
         { value: 3, text: "End of Year" },
       ],
       submitted: false,
+      setGSY: false,
+      currentGSY: null,
+      gsy: "",
+      gsySet: false,
     };
   },
 };
 </script>
-
+<style>
+.update-mtr {
+  transition: 0.5s ease;
+}
+.update-mtr:hover {
+  cursor: pointer;
+  opacity: 0.8;
+}
+</style>
 <template>
   <Layout>
     <PageHeader :title="title" :items="items" />
-    <div class="d-flex justify-content-end mb-3">
+    <div class="d-flex justify-content-between align-items-start mb-3">
+      <div
+        class="d-flex justify-content-between align-items-start mb-3 flex-lg-row flex-column"
+      >
+        <b-card
+          header-class="bg-transparent border-success"
+          class="border border-success d-inline-block"
+        >
+          <template v-slot:header>
+            <h5 class="my-0 text-success">
+              <i class="mdi mdi-calendar-sync mr-3"></i>
+              Current Goal Setting Year
+            </h5>
+          </template>
+          <h5 class="card-title mt-0" v-if="currentGSY">
+            {{ currentGSY }}
+          </h5>
+          <p class="card-text update-mtr" @click="setGSY = true">
+            Update Goal Setting Year
+          </p>
+          <!--          <p v-else class="card-text update-mtr" @click="selectPMY">Set PMY</p>-->
+        </b-card>
+      </div>
       <b-button
         class="btn btn-success"
         @click="$refs['add-goal-setting'].show()"
@@ -293,9 +357,6 @@ export default {
             type="date"
             v-model="gs_from"
             class="form-control"
-            :class="{
-              'is-invalid': submitted && $v.gs_from.$error,
-            }"
           />
         </div>
         <div class="form-group">
@@ -312,16 +373,14 @@ export default {
         </div>
         <div class="form-group">
           <label for="lt-mode-add">
-            Year <span class="text-danger">*</span>
+            Goal Setting Year <span class="text-danger">*</span>
           </label>
           <input
             id="lt-mode-add"
             type="text"
-            v-model="gs_year"
+            v-model="currentGSY"
+            disabled
             class="form-control"
-            :class="{
-              'is-invalid': submitted && $v.gs_year.$error,
-            }"
           />
         </div>
         <div class="form-group">
@@ -393,16 +452,15 @@ export default {
           />
         </div>
         <div class="form-group">
-          <label for="yearU"> Year <span class="text-danger">*</span> </label>
+          <label for="yearU">
+            Goal Setting Year <span class="text-danger">*</span>
+          </label>
           <input
             id="yearU"
             type="text"
-            v-model="gs_year"
+            v-model="currentGSY"
             class="form-control"
             disabled
-            :class="{
-              'is-invalid': submitted && $v.gs_year.$error,
-            }"
           />
         </div>
         <div class="form-group">
@@ -437,6 +495,37 @@ export default {
             Closing...
           </b-button>
         </div>
+      </form>
+    </b-modal>
+    <b-modal
+      v-model="setGSY"
+      title="Set Goal Setting Year"
+      hide-footer
+      centered
+      title-class="font-18"
+      size="sm"
+      @hidden="resetGSYForm"
+    >
+      <form @submit.prevent="submitGSY">
+        <div class="form-group">
+          <label> Goal Setting Year <span class="text-danger">*</span> </label>
+          <input id="pmy" v-model="gsy" class="form-control" />
+        </div>
+        <b-button
+          v-if="!submitting"
+          class="btn btn-success btn-block mt-4"
+          type="submit"
+        >
+          Submit
+        </b-button>
+        <b-button
+          v-else
+          disabled
+          class="btn btn-success btn-block mt-4"
+          type="submit"
+        >
+          Submitting...
+        </b-button>
       </form>
     </b-modal>
   </Layout>

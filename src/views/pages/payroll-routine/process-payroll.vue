@@ -12,8 +12,10 @@ export default {
     PageHeader,
   },
   async mounted() {
+    await this.getLocations()
     this.fetchPMY();
     await this.fetchPayrollRoutine();
+
   },
   data() {
     return {
@@ -53,9 +55,25 @@ export default {
       ],
       pmyMonth: null,
       pmyYear: null,
+      payrollLocations: null,
+      payrollLocation: null
     };
   },
   methods: {
+    getLocations() {
+      this.apiGet(this.ROUTES.location, "Get Locations Error").then((res) => {
+        this.payrollLocations = [{ value: null, text: "Please select a location" }];
+        const { data } = res;
+        console.log(data)
+        data.forEach((location) => {
+          this.payrollLocations.push({
+            value: location.location_id,
+            text: `${location.location_name} - (${location.l_t6_code} ) `,
+          });
+        });
+      });
+    },
+
     checkRoutine() {
       let url = `${this.ROUTES.salary}/check-salary-routine`;
       this.apiGet(url, "Check Payroll Routine Error").then((res) => {
@@ -66,7 +84,11 @@ export default {
     },
     runRoutine() {
       let url = `${this.ROUTES.salary}/salary-routine`;
-      this.apiGet(url, "Run Payroll Routine Error").then((res) => {
+      const data = {
+        pmyl_location_id: this.payrollLocation,
+      };
+      //this.apiPost(url, data, "Payroll Routine").then();
+      this.apiPost(url, data, "Payroll Routine").then((res) => {
         if (res.data) {
           this.apiResponseHandler("Run Payroll Routine", res.data);
           this.fetchPayrollRoutine();
@@ -75,9 +97,13 @@ export default {
     },
     undoRoutine() {
       let url = `${this.ROUTES.salary}/undo-salary-routine`;
-      this.apiGet(url, "Undo Payroll Routine Error").then((res) => {
+      const data = {
+        pmyl_location_id: this.payrollLocation,
+      };
+      this.apiPost(url, data, "Undo Payroll Routine Error").then((res) => {
         if (res.data) {
           this.routineRun = false;
+          this.fetchPayrollRoutine();
           this.apiResponseHandler("Undo Payroll Routine", res.data);
         }
       });
@@ -109,6 +135,11 @@ export default {
         this.totalRows = this.pay.length;
       });
     },
+
+    resetForm() {
+      this.payrollLocation = null;
+    },
+
     fetchPMY() {
       this.apiGet(
         this.ROUTES.payrollMonthYear,
@@ -143,8 +174,24 @@ export default {
     <scale-loader v-if="apiBusy" />
     <div v-else>
       <div v-if="routineRun">
+
+        <div  class="alert alert-info">
+          The payroll routine for this payroll period
+          <b> ({{ (parseInt(pmyMonth) - 1) | getMonth }} {{ pmyYear }})</b> has
+          been run for some(all) locations.
+          <span
+              @click="$refs['run-routine'].show()"
+              style="
+            cursor: pointer;
+            text-decoration: underline;
+            margin-left: 0.1em;
+          "
+          >
+          Click here to run it.
+        </span>
+        </div>
         <div class="d-flex justify-content-end mb-3">
-          <b-button class="btn btn-warning" @click="undoRoutine">
+          <b-button class="btn btn-warning" @click="$refs['undo-routine'].show()">
             <i class="mdi mdi-plus mr-2"></i>
             Undo Routine
           </b-button>
@@ -259,12 +306,13 @@ export default {
           </div>
         </div>
       </div>
+
       <div v-else class="alert alert-info">
         The payroll routine for this payroll period
         <b> ({{ (parseInt(pmyMonth) - 1) | getMonth }} {{ pmyYear }})</b> hasn't
-        been run.
+        been run for any location.
         <span
-          @click="runRoutine"
+            @click="$refs['run-routine'].show()"
           style="
             cursor: pointer;
             text-decoration: underline;
@@ -275,5 +323,77 @@ export default {
         </span>
       </div>
     </div>
+
+    <b-modal
+        ref="run-routine"
+        title="Run Payroll Routine"
+        hide-footer
+        centered
+        title-class="font-18"
+        @hidden="resetForm"
+    >
+      <form @submit.prevent="runRoutine">
+        <div class="form-group">
+          <label> Location <span class="text-danger">*</span> </label>
+          <b-select
+              v-model="payrollLocation"
+              :options="payrollLocations"
+          ></b-select>
+
+        </div>
+
+        <b-button
+            v-if="!submitting"
+            class="btn btn-success btn-block mt-4"
+            type="submit"
+        >
+          Submit
+        </b-button>
+        <b-button
+            v-else
+            disabled
+            class="btn btn-success btn-block mt-4"
+            type="submit"
+        >
+          Submitting...
+        </b-button>
+      </form>
+    </b-modal>
+
+    <b-modal
+        ref="undo-routine"
+        title="Undo Payroll Routine"
+        hide-footer
+        centered
+        title-class="font-18"
+        @hidden="resetForm"
+    >
+      <form @submit.prevent="undoRoutine">
+        <div class="form-group">
+          <label> Location <span class="text-danger">*</span> </label>
+          <b-select
+              v-model="payrollLocation"
+              :options="payrollLocations"
+          ></b-select>
+
+        </div>
+
+        <b-button
+            v-if="!submitting"
+            class="btn btn-success btn-block mt-4"
+            type="submit"
+        >
+          Submit
+        </b-button>
+        <b-button
+            v-else
+            disabled
+            class="btn btn-success btn-block mt-4"
+            type="submit"
+        >
+          Submitting...
+        </b-button>
+      </form>
+    </b-modal>
   </Layout>
 </template>

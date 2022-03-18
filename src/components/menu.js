@@ -211,12 +211,12 @@ export const menuItems = [
       },
     ],
   },
-  {
-    id: 29,
-    label: "Employee Leaves",
-    icon: "ri-user-settings-line",
-    link: "/employee-leave",
-  },
+  // {
+  //   id: 29,
+  //   label: "Employee Leaves",
+  //   icon: "ri-user-settings-line",
+  //   link: "/employee-leave",
+  // },
   {
     id: 26,
     label: "Communication",
@@ -257,12 +257,12 @@ export const menuItems = [
     icon: "ri-calendar-event-line",
     link: "/manage-time-sheets",
   },
-  {
-    id: 29,
-    label: "Self Assessment",
-    icon: "ri-file-edit-line",
-    link: "/manage-self-assessment",
-  },
+  // {
+  //   id: 29,
+  //   label: "Self Assessment",
+  //   icon: "ri-file-edit-line",
+  //   link: "/manage-self-assessment",
+  // },
   {
     id: 26,
     label: "Payroll Routine",
