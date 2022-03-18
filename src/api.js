@@ -63,4 +63,6 @@ export const ROUTES = {
   education: `education`,
   workExperience: `work-experience`,
   announcement: `announcements`,
+  queries: `queries`,
+  queryReply: `query-reply`,
 };

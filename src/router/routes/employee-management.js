@@ -41,6 +41,22 @@ export default [
     },
     component: () => import("@/views/pages/communication/manage-announcement"),
   },
+  {
+    path: "/manage-queries",
+    name: "manage-queries",
+    meta: {
+      authRequired: true,
+    },
+    component: () => import("@/views/pages/communication/manage-queries"),
+  },
+  {
+    path: "/manage-queries-view/:queryId",
+    name: "manage-queries-view",
+    meta: {
+      authRequired: true,
+    },
+    component: () => import("@/views/pages/communication/manage-queries-view"),
+  },
 
   {
     path: "/supervisors",

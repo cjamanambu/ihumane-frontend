@@ -76,5 +76,29 @@ export default [
     },
     component: () => import("@/views/pages/service-forms/leave-application"),
   },
+  {
+    path: "/view-announcements",
+    name: "view-announcements",
+    meta: {
+      authRequired: true,
+    },
+    component: () => import("@/views/pages/self-service/announcement"),
+  },
+  {
+    path: "/view-queries",
+    name: "view-queries",
+    meta: {
+      authRequired: true,
+    },
+    component: () => import("@/views/pages/self-service/query"),
+  },
+  {
+    path: "/view-queries/:qId",
+    name: "read-query",
+    meta: {
+      authRequired: true,
+    },
+    component: () => import("@/views/pages/self-service/query-view"),
+  },
 
 ];

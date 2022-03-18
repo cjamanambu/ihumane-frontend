@@ -36,6 +36,23 @@ export const menuItems = [
       },
     ],
   },
+  {
+    id: 9,
+    label: "Communication",
+    icon: "ri-user-follow-line",
+    subItems: [
+      {
+        id: 10,
+        label: "Announcement",
+        link: "/view-announcements",
+      },
+      {
+        id: 10,
+        label: "Query",
+        link: "/view-queries",
+      },
+    ],
+  },
 
   {
     id: 7,

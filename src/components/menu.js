@@ -232,7 +232,7 @@ export const menuItems = [
     id: 209,
     label: "Query",
     icon: "ri-pages-line",
-    link: "/query",
+    link: "/manage-queries",
   },
   {
     id: 26,
