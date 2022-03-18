@@ -122,6 +122,11 @@ export const menuItems = [
             link: "/states",
           },
           {
+            id: 188,
+            label: "LGAs",
+            link: "/local-government-areas",
+          },
+          {
             id: 19,
             label: "Locations",
             link: "/locations",
@@ -212,6 +217,23 @@ export const menuItems = [
   //   icon: "ri-user-settings-line",
   //   link: "/employee-leave",
   // },
+  {
+    id: 26,
+    label: "Communication",
+    isTitle: true,
+  },
+  {
+    id: 299,
+    label: "Announcement",
+    icon: "ri-team-line",
+    link: "/manage-announcements",
+  },
+  {
+    id: 209,
+    label: "Query",
+    icon: "ri-pages-line",
+    link: "/manage-queries",
+  },
   {
     id: 26,
     label: "Self-Service",

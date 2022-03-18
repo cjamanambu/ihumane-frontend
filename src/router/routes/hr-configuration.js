@@ -62,6 +62,14 @@ export default [
       authRequired: true,
     },
     component: () => import("@/views/pages/hr-configuration/states"),
+  }
+  ,{
+    path: "/local-government-areas",
+    name: "Local Government Areas",
+    meta: {
+      authRequired: true,
+    },
+    component: () => import("@/views/pages/hr-configuration/lga"),
   },
   {
     path: "/locations",
