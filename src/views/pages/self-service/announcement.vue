@@ -3,9 +3,8 @@ import Layout from "@/views/layouts/main";
 import PageHeader from "@/components/page-header";
 import appConfig from "@/app.config";
 import {required} from "vuelidate/lib/validators";
-import { VueEditor } from "vue2-editor";
-import Multiselect from 'vue-multiselect';
 import { authComputed } from "@/state/helpers";
+//import html2pdf from 'html2pdf.js';
 
 export default {
   page: {
@@ -15,9 +14,8 @@ export default {
   components: {
     Layout,
     PageHeader,
-    VueEditor,
-    Multiselect,
-    ...authComputed
+    ...authComputed,
+    //VueHtml2pdf,
   },
   mounted() {
     this.refreshTable();
@@ -48,6 +46,12 @@ export default {
         });
         this.totalRows = this.employees.length;
       });
+    },
+    async print () {
+      // Pass the element id here html2pdf
+      //var element = document.getElementById('printArea');
+      //html2pdf(element);
+
     },
     fetchEmployees() {
       this.apiGet(this.ROUTES.employee, "Get Employees Error").then((res) => {
@@ -184,15 +188,6 @@ export default {
 <template>
   <Layout>
     <PageHeader :title="title" :items="items" />
-    <div class="d-flex justify-content-end mb-3">
-      <b-button
-        class="btn btn-success"
-        @click="$refs['post-announcement'].show()"
-      >
-        <i class="mdi mdi-plus mr-2"></i>
-        New Announcement
-      </b-button>
-    </div>
     <scale-loader v-if="apiBusy" />
     <div v-else class="row">
       <div class="col-12">
@@ -276,79 +271,6 @@ export default {
     </div>
 
     <b-modal
-      ref="post-announcement"
-      title="Post Announcement"
-      hide-footer
-      centered
-      title-class="font-18"
-      @hidden="resetForm"
-      class="modal-lg"
-    >
-      <form @submit.prevent="submitData">
-        <div class="form-group">
-          <label for="role">
-            Title <span class="text-danger">*</span>
-          </label>
-          <input
-            id="title"
-            type="text"
-            v-model="subject"
-            class="form-control"
-            placeholder="Title"
-            :class="{
-              'is-invalid': submitted && $v.subject.$error,
-            }"
-          />
-        </div>
-        <div class="form-group">
-          <label for="target">To</label>
-          <b-form-select v-model="selectedTarget" :options="target"></b-form-select>
-        </div>
-        <b-form-group v-if="selectedTarget == 2">
-          <label for="">Persons</label>
-          <multiselect
-            v-model="persons"
-            :options="employees"
-            :custom-label="authorizingAsLabel"
-            :multiple="true"
-            :class="{
-                      'is-invalid': submitted && $v.person.$error,
-                    }"
-          ></multiselect>
-        </b-form-group>
-        <div class="form-group">
-          <label for="">Attachment</label>
-          <b-form-file
-            v-model="attachment"
-            placeholder="Choose a file or drop it here..."
-            drop-placeholder="Drop file here..."
-          ></b-form-file>
-        </div>
-        <div class="form-group">
-          <label for="body">
-            Content <span class="text-danger">*</span>
-          </label>
-          <vue-editor v-model="body"></vue-editor>
-        </div>
-        <b-button
-          v-if="!submitting"
-          class="btn btn-success btn-block mt-4"
-          type="submit"
-        >
-          Submit
-        </b-button>
-        <b-button
-          v-else
-          disabled
-          class="btn btn-success btn-block mt-4"
-          type="submit"
-        >
-          Submitting...
-        </b-button>
-      </form>
-    </b-modal>
-
-    <b-modal
       ref="view-announcement"
       title=" Announcement Details"
       hide-footer
@@ -357,62 +279,26 @@ export default {
       @hidden="resetForm"
       class="modal-lg"
     >
-      <form @submit.prevent="submitData">
-        <div class="form-group">
-          <label for="role">
-            Title <span class="text-danger">*</span>
-          </label>
-          <input
-            id="title"
-            type="text"
-            v-model="subject"
-            class="form-control"
-            placeholder="Title"
-            readonly
-            :class="{
-              'is-invalid': submitted && $v.subject.$error,
-            }"
-          />
-        </div>
-        <div class="form-group">
-          <label for="target">Date</label>
-          <input
-            id="posted_on"
-            type="text"
-            v-model="posted_on"
-            class="form-control"
-            placeholder="Date Posted"
-            readonly
-            :class="{
-              'is-invalid': submitted && $v.posted_on.$error,
-            }"
-          />
-        </div>
-        <div class="form-group">
-          <label for="audience">To</label>
-          <input
-            id="audience"
-            type="text"
-            v-model="audience"
-            class="form-control"
-            placeholder="Date Posted"
-            readonly
-            :class="{
-              'is-invalid': submitted && $v.audience.$error,
-            }"
-          />
-        </div>
-        <div class="form-group">
-          <label for="body">
-            Content <span class="text-danger">*</span>
-          </label>
-          <div v-html="body" style="border: 1px solid #ccc; padding: 5px"></div>
+      <button class="btn btn-primary btn-sm float-right" type="button" @click="print"> <i class="mdi mdi-printer"></i> Print</button>
+      <form @submit.prevent="" id="printArea">
+        <img
+          style="width: 30%"
+          :src="require('@/assets/images/irc-logo.png')"
+          class="mr-4"
+        />
+        <h6 class=""><small for="" class="text-info text-uppercase">Title: </small>
+          <br><span v-html="subject"></span></h6>
+        <h6 class=""><small for="" class="text-info text-uppercase">Date: </small>
+          <br><span v-html="posted_on"></span></h6>
+        <h6 class=""><small for="" class="text-info text-uppercase">Audience: </small>
+          <br><span v-html="audience"></span></h6>
+        <h6 class=""><small for="" class="text-info text-uppercase">Content: </small>
+        </h6>
+        <div v-html="body"></div>
+        <h6 class=""><small for="" class="text-info text-uppercase">Attachment: </small>
+        </h6>
+        <a href="">Download attachment || No Attachment</a> <br>
 
-        </div>
-        <div class="form-group">
-          <label for="">Attachment</label> <br>
-          <a href="">Download attachment || No Attachment</a>
-        </div>
       </form>
     </b-modal>
 

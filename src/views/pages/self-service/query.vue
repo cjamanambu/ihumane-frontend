@@ -2,7 +2,6 @@
 import Layout from "@/views/layouts/main";
 import PageHeader from "@/components/page-header";
 import appConfig from "@/app.config";
-import {required} from "vuelidate/lib/validators";
 import { authComputed } from "@/state/helpers";
 export default {
   page: {
