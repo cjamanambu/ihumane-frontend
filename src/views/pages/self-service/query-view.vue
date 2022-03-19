@@ -197,7 +197,11 @@ export default {
       <div class="col-8">
         <div class="card">
           <div class="card-body">
-
+            <img
+              style="width: 30%"
+              :src="require('@/assets/images/irc-logo.png')"
+              class="mr-4"
+            />
             <h6 class="text-uppercase"><small for="" class="text-info">Subject: </small> <br>{{query.q_subject}}</h6>
             <h6 class="text-uppercase"><small class="text-info">Body:</small></h6>
             <div v-html="query.q_body">
@@ -209,7 +213,7 @@ export default {
             <h5 class="text-white text-uppercase"> Replies</h5>
           </div>
           <div class="card-body">
-            <div v-for="reply in replies">
+            <div v-for="reply in replies" :key="reply.qr_id">
               <h6 class=""><small for="" class="text-info text-uppercase">Name: </small> <br>{{reply.employee.emp_first_name}} {{reply.employee.emp_last_name}} ({{reply.employee.emp_unique_id}}) <small><i>{{new Date(reply.createdAt).toDateString()}}</i></small></h6>
               <div v-html="reply.qr_reply"></div>
             </div>
