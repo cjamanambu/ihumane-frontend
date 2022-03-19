@@ -33,6 +33,30 @@ export default [
     },
     component: () => import("@/views/pages/employees/manage-employee"),
   },
+  {
+    path: "/manage-announcements",
+    name: "manage-announcements",
+    meta: {
+      authRequired: true,
+    },
+    component: () => import("@/views/pages/communication/manage-announcement"),
+  },
+  {
+    path: "/manage-queries",
+    name: "manage-queries",
+    meta: {
+      authRequired: true,
+    },
+    component: () => import("@/views/pages/communication/manage-queries"),
+  },
+  {
+    path: "/manage-queries-view/:queryId",
+    name: "manage-queries-view",
+    meta: {
+      authRequired: true,
+    },
+    component: () => import("@/views/pages/communication/manage-queries-view"),
+  },
 
   {
     path: "/supervisors",
@@ -66,5 +90,21 @@ export default [
       authRequired: true,
     },
     component: () => import("@/views/pages/employees/manage-documents"),
+  },
+  {
+    path: "/employee-education/:employeeID",
+    name: "employee-education",
+    meta: {
+      authRequired: true,
+    },
+    component: () => import("@/views/pages/employees/employee-education"),
+  },
+  {
+    path: "/employee-work-experience/:employeeID",
+    name: "employee-work-experience",
+    meta: {
+      authRequired: true,
+    },
+    component: () => import("@/views/pages/employees/employee-work-experience"),
   },
 ];
