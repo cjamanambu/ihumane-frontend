@@ -12,10 +12,9 @@ export default {
     PageHeader,
   },
   async mounted() {
-    await this.getLocations()
+    await this.getLocations();
     this.fetchPMY();
     await this.fetchPayrollRoutine();
-
   },
   data() {
     return {
@@ -56,15 +55,17 @@ export default {
       pmyMonth: null,
       pmyYear: null,
       payrollLocations: null,
-      payrollLocation: null
+      payrollLocation: null,
     };
   },
   methods: {
     getLocations() {
       this.apiGet(this.ROUTES.location, "Get Locations Error").then((res) => {
-        this.payrollLocations = [{ value: null, text: "Please select a location" }];
+        this.payrollLocations = [
+          { value: null, text: "Please select a location" },
+        ];
         const { data } = res;
-        console.log(data)
+        console.log(data);
         data.forEach((location) => {
           this.payrollLocations.push({
             value: location.location_id,
@@ -174,24 +175,26 @@ export default {
     <scale-loader v-if="apiBusy" />
     <div v-else>
       <div v-if="routineRun">
-
-        <div  class="alert alert-info">
+        <div class="alert alert-info">
           The payroll routine for this payroll period
           <b> ({{ (parseInt(pmyMonth) - 1) | getMonth }} {{ pmyYear }})</b> has
           been run for some(all) locations.
           <span
-              @click="$refs['run-routine'].show()"
-              style="
-            cursor: pointer;
-            text-decoration: underline;
-            margin-left: 0.1em;
-          "
+            @click="$refs['run-routine'].show()"
+            style="
+              cursor: pointer;
+              text-decoration: underline;
+              margin-left: 0.1em;
+            "
           >
-          Click here to run it.
-        </span>
+            Click here to run it.
+          </span>
         </div>
         <div class="d-flex justify-content-end mb-3">
-          <b-button class="btn btn-warning" @click="$refs['undo-routine'].show()">
+          <b-button
+            class="btn btn-warning"
+            @click="$refs['undo-routine'].show()"
+          >
             <i class="mdi mdi-plus mr-2"></i>
             Undo Routine
           </b-button>
@@ -269,18 +272,18 @@ export default {
                     @row-selected="selectRow"
                   >
                     <template #cell(grossSalary)="row">
-                      <p class="mb-0">
-                        {{ row.value.toLocaleString() }}
+                      <p class="float-right mb-0">
+                        {{ parseFloat(row.value.toFixed(2)).toLocaleString() }}
                       </p>
                     </template>
                     <template #cell(netSalary)="row">
-                      <p class="mb-0">
-                        {{ row.value.toLocaleString() }}
+                      <p class="float-right mb-0">
+                        {{ parseFloat(row.value.toFixed(2)).toLocaleString() }}
                       </p>
                     </template>
                     <template #cell(totalDeduction)="row">
-                      <p class="mb-0">
-                        {{ row.value.toLocaleString() }}
+                      <p class="float-right mb-0">
+                        {{ parseFloat(row.value.toFixed(2)).toLocaleString() }}
                       </p>
                     </template>
                   </b-table>
@@ -312,7 +315,7 @@ export default {
         <b> ({{ (parseInt(pmyMonth) - 1) | getMonth }} {{ pmyYear }})</b> hasn't
         been run for any location.
         <span
-            @click="$refs['run-routine'].show()"
+          @click="$refs['run-routine'].show()"
           style="
             cursor: pointer;
             text-decoration: underline;
@@ -325,35 +328,34 @@ export default {
     </div>
 
     <b-modal
-        ref="run-routine"
-        title="Run Payroll Routine"
-        hide-footer
-        centered
-        title-class="font-18"
-        @hidden="resetForm"
+      ref="run-routine"
+      title="Run Payroll Routine"
+      hide-footer
+      centered
+      title-class="font-18"
+      @hidden="resetForm"
     >
       <form @submit.prevent="runRoutine">
         <div class="form-group">
           <label> Location <span class="text-danger">*</span> </label>
           <b-select
-              v-model="payrollLocation"
-              :options="payrollLocations"
+            v-model="payrollLocation"
+            :options="payrollLocations"
           ></b-select>
-
         </div>
 
         <b-button
-            v-if="!submitting"
-            class="btn btn-success btn-block mt-4"
-            type="submit"
+          v-if="!submitting"
+          class="btn btn-success btn-block mt-4"
+          type="submit"
         >
           Submit
         </b-button>
         <b-button
-            v-else
-            disabled
-            class="btn btn-success btn-block mt-4"
-            type="submit"
+          v-else
+          disabled
+          class="btn btn-success btn-block mt-4"
+          type="submit"
         >
           Submitting...
         </b-button>
@@ -361,35 +363,34 @@ export default {
     </b-modal>
 
     <b-modal
-        ref="undo-routine"
-        title="Undo Payroll Routine"
-        hide-footer
-        centered
-        title-class="font-18"
-        @hidden="resetForm"
+      ref="undo-routine"
+      title="Undo Payroll Routine"
+      hide-footer
+      centered
+      title-class="font-18"
+      @hidden="resetForm"
     >
       <form @submit.prevent="undoRoutine">
         <div class="form-group">
           <label> Location <span class="text-danger">*</span> </label>
           <b-select
-              v-model="payrollLocation"
-              :options="payrollLocations"
+            v-model="payrollLocation"
+            :options="payrollLocations"
           ></b-select>
-
         </div>
 
         <b-button
-            v-if="!submitting"
-            class="btn btn-success btn-block mt-4"
-            type="submit"
+          v-if="!submitting"
+          class="btn btn-success btn-block mt-4"
+          type="submit"
         >
           Submit
         </b-button>
         <b-button
-            v-else
-            disabled
-            class="btn btn-success btn-block mt-4"
-            type="submit"
+          v-else
+          disabled
+          class="btn btn-success btn-block mt-4"
+          type="submit"
         >
           Submitting...
         </b-button>

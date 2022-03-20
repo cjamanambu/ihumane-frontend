@@ -36,12 +36,9 @@ export default {
   <Layout>
     <PageHeader :title="title" :items="items" />
     <div class="d-flex justify-content-end mb-3">
-      <b-button
-        class="btn btn-success"
-        @click="$refs['add-payment-definition'].show()"
-      >
+      <b-button class="btn btn-success">
         <i class="mdi mdi-plus mr-2"></i>
-        Add Bank
+        perform action button
       </b-button>
     </div>
   </Layout>

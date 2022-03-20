@@ -6,6 +6,7 @@ import Emolument from "./components/emolument";
 import DeductionSheet from "./components/deduction-sheet";
 import DeductionReport from "./components/deduction-report";
 import Variation from "./components/variation";
+import BankOrder from "./components/bank-order";
 export default {
   page: {
     title: "Reports",
@@ -18,6 +19,7 @@ export default {
     DeductionSheet,
     DeductionReport,
     Variation,
+    BankOrder,
   },
   data() {
     return {
@@ -45,31 +47,21 @@ export default {
     <PageHeader :title="title" :items="items" />
     <scale-loader v-if="apiBusy" />
     <div v-else>
-      <div class="p-3 bg-light mb-4">
-        <h5 class="font-size-16 mb-0">Emoluments</h5>
-      </div>
       <div class="row">
         <div class="col-md-4">
           <Emolument />
         </div>
-      </div>
-      <div class="p-3 bg-light mb-4">
-        <h5 class="font-size-16 mb-0">Deductions</h5>
-      </div>
-      <div class="row">
         <div class="col-md-4">
           <DeductionReport />
         </div>
         <div class="col-md-4">
           <DeductionSheet />
         </div>
-      </div>
-      <div class="p-3 bg-light mb-4">
-        <h5 class="font-size-16 mb-0">Variations</h5>
-      </div>
-      <div class="row">
         <div class="col-md-4">
           <Variation />
+        </div>
+        <div class="col-md-4">
+          <BankOrder />
         </div>
       </div>
     </div>
