@@ -39,4 +39,12 @@ export default [
     },
     component: () => import("@/views/pages/reports/variation-report"),
   },
+  {
+    path: "/reports/bank-schedule/:period/:locationID",
+    name: "bank-schedule-report",
+    meta: {
+      authRequired: true,
+    },
+    component: () => import("@/views/pages/reports/bank-report"),
+  },
 ];
