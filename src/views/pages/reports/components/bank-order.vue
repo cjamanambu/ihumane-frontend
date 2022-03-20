@@ -2,7 +2,7 @@
 export default {
   mounted() {
     this.fetchPMY();
-    this.fetchDeductions();
+    this.fetchLocations();
   },
   data() {
     return {
@@ -11,8 +11,8 @@ export default {
       pmyYear: null,
       pmyDate: null,
       useCurrent: false,
-      deduction: null,
-      deductions: [{ value: null, text: "Select deduction type" }],
+      location: null,
+      locations: [{ value: null, text: "Select location" }],
     };
   },
   methods: {
@@ -28,26 +28,22 @@ export default {
         }
       });
     },
-    fetchDeductions() {
-      this.apiGet(this.ROUTES.paymentDefinition, "Get Payment Definition").then(
-        (res) => {
-          this.deductions = [{ value: null, text: "Select Deduction Type" }];
-          const { data } = res;
-          data.forEach((paymentDefinition) => {
-            if (paymentDefinition.pd_payment_type === 2) {
-              this.deductions.push({
-                value: paymentDefinition.pd_id,
-                text: paymentDefinition.pd_payment_name,
-              });
-            }
+    fetchLocations() {
+      this.apiGet(this.ROUTES.location, "Get Locations Error").then((res) => {
+        this.locations = [{ value: null, text: "Select location" }];
+        const { data } = res;
+        data.forEach((location) => {
+          this.locations.push({
+            value: location.location_id,
+            text: `${location.l_t6_code} (${location.location_name})`,
           });
-        }
-      );
+        });
+      });
     },
     async generate() {
       let data, pym_month, pym_year;
-      if ((!this.useCurrent && !this.pmyDate) || !this.deduction) {
-        this.apiFormHandler("Deduction Report");
+      if ((!this.useCurrent && !this.pmyDate) || !this.location) {
+        this.apiFormHandler("Bank Schedule Report");
       } else {
         if (this.useCurrent) {
           await this.fetchPMY();
@@ -56,7 +52,7 @@ export default {
           data = {
             pym_month,
             pym_year,
-            pd_id: this.deduction,
+            pym_location: this.location,
           };
         } else {
           let date = this.pmyDate.split("-");
@@ -65,20 +61,23 @@ export default {
           data = {
             pym_month,
             pym_year,
-            pd_id: this.deduction,
+            pym_location: this.location,
           };
         }
-        const url = `${this.ROUTES.salary}/deduction-report-type`;
-        this.apiPost(url, data, "Generate Deduction Report").then((res) => {
-          const { data } = res;
-          if (data.length) {
-            this.$router.push({
-              name: "deduction-report",
-              params: {
-                period: `${pym_month}-${pym_year}`,
-                pdID: this.deduction,
-              },
-            });
+        const url = `${this.ROUTES.salary}/pay-order`;
+        this.apiPost(url, data, "Generate Bank Schedule Report").then((res) => {
+          if (res) {
+            const { data } = res;
+            console.log({ data });
+            if (data.length) {
+              this.$router.push({
+                name: "bank-schedule-report",
+                params: {
+                  period: `${pym_month}-${pym_year}`,
+                  locationID: this.location,
+                },
+              });
+            }
           }
         });
       }
@@ -97,7 +96,7 @@ export default {
               Current Payroll Period: {{ (parseInt(pmyMonth) - 1) | getMonth }}
               {{ pmyYear }}
             </p>
-            <h4 class="mb-0">Deduction Report</h4>
+            <h4 class="mb-0">Bank Schedule Report</h4>
           </div>
           <div class="text-secondary"></div>
         </div>
@@ -115,7 +114,7 @@ export default {
     </div>
     <b-modal
       v-model="selectPeriod"
-      title="Generate Deduction Report"
+      title="Generate Bank Schedule Report"
       hide-footer
       centered
       title-class="font-18"
@@ -128,19 +127,11 @@ export default {
           <label for="pmy">
             Select Payroll Period <span class="text-danger">*</span>
           </label>
-          <input
-            id="pmy"
-            v-model="pmyDate"
-            type="month"
-            class="form-control"
-            :class="{
-              'is-invalid': submitted && $v.pmyDate.$error,
-            }"
-          />
+          <input id="pmy" v-model="pmyDate" type="month" class="form-control" />
         </div>
         <div class="form-group">
-          <label for="">Select Deduction</label>
-          <b-form-select v-model="deduction" :options="deductions" />
+          <label for="">Select Location</label>
+          <b-form-select v-model="location" :options="locations" />
         </div>
         <div class="form-group">
           <b-form-group>
