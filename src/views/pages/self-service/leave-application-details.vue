@@ -29,9 +29,14 @@
                 let requestID = this.$route.params.leaveAppID;
                 const url = `${this.ROUTES.leaveApplication}/${requestID}`;
                 this.apiGet(url, "Get Leave Application").then((res) => {
-                    console.log({ res });
-                    const { application, log } = res.data;
+                    //console.log({ res });
+                    const { application, log, previousApplications } = res.data;
                     this.application = application;
+                   // console.log(previousApplications);
+                  previousApplications.forEach((prev, index) => {
+                    this.previous_applications[index] = { sn: ++index, leaveType:prev.leave_type.leave_name, ...prev };
+                  });
+
                     this.log = log;
                     this.fetchEmployees();
                 });
@@ -58,6 +63,14 @@
                     });
                 });
             },
+          selectRow(row) {
+            row = row[0];
+            this.leaveAppID = row.leapp_id;
+            this.$router.push({
+              name: "leave-application-details",
+              params: { leaveAppID: this.leaveAppID },
+            });
+          },
             submit(type) {
                 this.submitted = true;
                 if (this.type === "approve") {
@@ -112,7 +125,33 @@
                         active: true,
                     },
                 ],
+              totalRows: 1,
+              currentPage: 1,
+              perPage: 10,
+              pageOptions: [10, 25, 50, 100],
+              filter: null,
+              filterOn: [],
+              sortBy: "sn",
+              sortDesc: false,
+              fields: [
+                { key: "sn", label: "S/n", sortable: true },
+                { key: "employee", label: "Employee", sortable: true },
+               {
+                  key: "leaveType",
+                  label: "Type",
+                  sortable: true,
+                },
+                { key: "leapp_start_date", label: "Starts", sortable: true },
+                { key: "leapp_end_date", label: "Ends", sortable: true },
+                { key: "leapp_total_days", label: "Length", sortable: true },
+                {
+                  key: "leapp_status",
+                  label: "Status",
+                  sortable: true,
+                },
+              ],
                 application: null,
+              leaveAppID: null,
                 log: [],
                 comment: null,
                 final: true,
@@ -128,6 +167,8 @@
                 status: null,
                 approving: false,
                 declining: false,
+                applications: [],
+              previous_applications: [],
             };
         },
     };
@@ -189,6 +230,7 @@
                         </div>
                     </div>
                 </div>
+
                 <div class="card">
                     <div class="card-body">
                         <div class="p-3 bg-light mb-4 d-flex justify-content-between">
@@ -196,19 +238,13 @@
                                 <h5 class="font-size-14 mb-0">Leave Details</h5>
                             </div>
                             <span class="d-inline mb-0">
-                <small
-                        v-if="application.leapp_status === 0"
-                        class="text-warning"
-                >
-                  Application Pending
-                </small>
-                <small
-                        v-else-if="application.leapp_status === 1"
-                        class="text-success"
-                >
-                  Application Approved
-                </small>
-                <small
+                            <small v-if="application.leapp_status === 0" class="text-warning">
+                              Application Pending
+                            </small>
+                          <small v-else-if="application.leapp_status === 1" class="text-success">
+                            Application Approved
+                          </small>
+                        <small
                         v-else-if="application.leapp_status === 2"
                         class="text-danger"
                 >
@@ -253,6 +289,125 @@
                             </div>
                         </div>
                     </div>
+                </div>
+
+                <div class="card">
+                  <div class="card-header">
+                    <h5>Previous Applications</h5>
+                  </div>
+                  <div class="card-body">
+                    <div class="row mt-4">
+                      <div class="col-sm-12 col-md-6">
+                        <div id="tickets-table_length" class="dataTables_length">
+                          <label class="d-inline-flex align-items-center">
+                            Show&nbsp;
+                            <b-form-select
+                              v-model="perPage"
+                              size="sm"
+                              :options="pageOptions"
+                            ></b-form-select
+                            >&nbsp;entries
+                          </label>
+                        </div>
+                      </div>
+                      <!-- Search -->
+                      <div class="col-sm-12 col-md-6">
+                        <div
+                          id="tickets-table_filter"
+                          class="dataTables_filter text-md-right"
+                        >
+                          <label class="d-inline-flex align-items-center">
+                            Search:
+                            <b-form-input
+                              v-model="filter"
+                              type="search"
+                              placeholder="Search..."
+                              class="form-control form-control-sm ml-2"
+                            ></b-form-input>
+                          </label>
+                        </div>
+                      </div>
+                      <!-- End search -->
+                    </div>
+                    <!-- Table -->
+                    <div class="table-responsive mb-0">
+                      <b-table
+                        ref="donor-table"
+                        bordered
+                        selectable
+                        hover
+                        :items="previous_applications"
+                        :fields="fields"
+                        responsive="sm"
+                        :per-page="perPage"
+                        :current-page="currentPage"
+                        :sort-by.sync="sortBy"
+                        :sort-desc.sync="sortDesc"
+                        :filter="filter"
+                        :filter-included-fields="filterOn"
+                        @filtered="onFiltered"
+                        show-empty
+                        select-mode="single"
+                        @row-selected="selectRow"
+                      >
+                        <template #cell(employee)="row">
+                          <p class="mb-0">
+                            {{ row.value.emp_first_name }} {{ row.value.emp_last_name }}
+                          </p>
+                          <small class="text-muted">
+                            {{ row.value.emp_unique_id }}
+                          </small>
+                        </template>
+
+                        <template #cell(leapp_start_date)="row">
+                          <span> {{ new Date(row.value).toDateString() }}</span>
+                        </template>
+                        <template #cell(leapp_end_date)="row">
+                          <span> {{ new Date(row.value).toDateString() }}</span>
+                        </template>
+                        <template #cell(leapp_total_days)="row">
+                          <span> {{ row.value }} days</span>
+                        </template>
+
+                        <template #cell(leapp_status)="row">
+                  <span
+                    v-if="row.value === 0"
+                    class="badge badge-pill badge-warning"
+                  >
+                    pending
+                  </span>
+                          <span
+                            v-else-if="row.value === 1"
+                            class="badge badge-pill badge-success"
+                          >
+                    approved
+                  </span>
+                          <span
+                            v-else-if="row.value === 2"
+                            class="badge badge-pill badge-danger"
+                          >
+                    declined
+                  </span>
+                        </template>
+                      </b-table>
+                    </div>
+                    <div class="row">
+                      <div class="col">
+                        <div
+                          class="dataTables_paginate paging_simple_numbers float-right"
+                        >
+                          <ul class="pagination pagination-rounded mb-0">
+                            <!-- pagination -->
+                            <b-pagination
+                              v-model="currentPage"
+                              :total-rows="totalRows"
+                              :per-page="perPage"
+                            ></b-pagination>
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
             </div>
             <div class="col-lg-4">

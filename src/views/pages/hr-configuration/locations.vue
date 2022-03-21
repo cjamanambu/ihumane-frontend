@@ -18,6 +18,7 @@ export default {
   mounted() {
     this.refreshTable();
     this.fetchStates();
+    this.getEmployees();
   },
   validations: {
     name: { required },
@@ -27,6 +28,26 @@ export default {
   methods: {
     locationLabel ({ text }) {
       return `${text}`
+    },
+    employeeLabel ({ text }) {
+      return `${text}`
+    },
+    getEmployees() {
+      const url = `${this.ROUTES.employee}`;
+      this.apiGet(url, "Couldn't get employees").then((res) => {
+        this.employee_list = [
+          { value: null, text: "Please select sector lead" },
+        ];
+        const { data } = res;
+        data.forEach((emp) => {
+          this.employee_list.push({
+            value: emp.emp_id,
+            text: `${emp.emp_first_name} ${emp.emp_last_name} ${
+              emp.emp_other_name !== null ? emp.emp_other_name : ""
+            } (${emp.emp_unique_id})`,
+          });
+        });
+      });
     },
     refreshTable() {
       this.apiGet(this.ROUTES.location, "Get Locations Error").then((res) => {
@@ -57,6 +78,7 @@ export default {
           location_name: this.name,
           location_state: this.state.value,
           location_t6_code: this.t6_code,
+          focal_points: this.focal_persons,
         };
         this.apiPost(this.ROUTES.location, data, "New Location Error").then(
           (res) => {
@@ -146,6 +168,8 @@ export default {
       state: null,
       states: [{ value: null, text: "Please select a state" }],
       locationID: null,
+      employee_list: [{ value: null, text: "Please select a sector lead" }],
+      focal_persons:[],
     };
   },
 };
@@ -269,6 +293,20 @@ export default {
               'is-invalid': submitted && $v.name.$error,
             }"
           />
+        </div>
+        <div class="form-group">
+          <label for="t3_code">
+            HR Focal Points <span class="text-danger">*</span>
+          </label>
+          <multiselect
+            v-model="focal_persons"
+            :options="employee_list"
+            :custom-label="employeeLabel"
+            :multiple="true"
+            :class="{
+                      'is-invalid': submitted && $v.employee_list.$error,
+                    }"
+          ></multiselect>
         </div>
         <div class="form-group">
           <label for="state"> State <span class="text-danger">*</span> </label>

@@ -59,14 +59,6 @@ export default [
     component: () => import("@/views/pages/self-service/leave-application"),
   },
   {
-    path: "/leave-application-details/:id",
-    name: "leave-application-details",
-    meta: {
-      authRequired: true,
-    },
-    component: () => import("@/views/pages/self-service/leave-application-details"),
-  },
-  {
     path: "/manage-travel-applications",
     name: "manage-travel-applications",
     meta: {

@@ -54,7 +54,7 @@
         },
         data() {
             return {
-                title: "Manage Leave Applications",
+                title: " Leave Applications",
                 items: [
                     {
                         text: "IHUMANE",
@@ -64,7 +64,7 @@
                         href: "/",
                     },
                     {
-                        text: "Manage Leave Applications",
+                        text: " Leave Applications",
                         active: true,
                     },
                 ],

@@ -76,8 +76,8 @@ export default [
     component: () => import("@/views/pages/employees/assign-supervisor"),
   },
   {
-    path: "/manage-leave-applications",
-    name: "manage-leave-application",
+    path: "/leave-applications",
+    name: "leave-application",
     meta: {
       authRequired: true,
     },
