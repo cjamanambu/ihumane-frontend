@@ -15,4 +15,12 @@ export default [
     },
     component: () => import("@/views/pages/self-service/payslip"),
   },
+  {
+    path: "/change-password",
+    name: "change-password",
+    meta: {
+      authRequired: true,
+    },
+    component: () => import("@/views/pages/self-service/change-password"),
+  },
 ];
