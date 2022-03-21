@@ -215,6 +215,15 @@ export default {
 <template>
   <Layout>
     <PageHeader :title="title" :items="items" />
+    <div class="d-flex justify-content-end mb-3">
+      <b-button
+        class="btn btn-success"
+        @click="$router.push({ name: 'change-password' })"
+      >
+        <i class="mdi mdi-plus mr-2"></i>
+        Change Password
+      </b-button>
+    </div>
     <scale-loader v-if="apiBusy" />
     <div v-else class="row">
       <div class="col-12">
