@@ -35,10 +35,11 @@ export default {
         })
         this.accruals = data.accruals;
         const data_holder = [];
-        this.accruals.forEach((leave)=>{
+        this.accruals.forEach((leave,index)=>{
           let keyV = `key_${leave.leave_type.leave_type_id}`;
           let val = leave.lea_rate;
           data_holder.push({
+            sn:++index,
             [keyV]:val,
             t7:leave.employee.emp_unique_id,
             t6:leave.employee.location.location_name,
