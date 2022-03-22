@@ -23,10 +23,32 @@ export default {
       const url = `${this.ROUTES.leaveAccrual}/employee-leave-accruals`;
       this.apiGet(url, "Get Leave Accrual Error").then((res) => {
         const { data } = res;
-        data.forEach((leave, index) => {
-          this.accruals[index] = { sn: ++index, leaveType:leave.leave_type.leave_name, ...leave };
+
+        data.leave_types.forEach((l_type)=>{
+          let field = {
+            key:`key_${l_type.leave_type_id}`,
+            label:l_type.leave_name,
+            sortable:true
+          };
+          this.fields.push(field);
+           this.newFields.push(field);
+        })
+        this.accruals = data.accruals;
+        const data_holder = [];
+        this.accruals.forEach((leave)=>{
+          let keyV = `key_${leave.leave_type.leave_type_id}`;
+          let val = leave.lea_rate;
+          data_holder.push({
+            [keyV]:val,
+            t7:leave.employee.emp_unique_id,
+            t6:leave.employee.location.location_name,
+            employee_details:`${leave.employee.emp_first_name} ${leave.employee.emp_last_name}`,
+            t3:leave.employee.JobRole.Department.department_name,
+            ...leave
+          });
         });
-        this.totalRows = data.length;
+        this.accruals = data_holder;
+
       });
     },
     onFiltered(filteredItems) {
@@ -59,6 +81,8 @@ export default {
           active: true,
         },
       ],
+      leave_types: [],
+      emp_leave_types: [],
       accruals: [],
       totalRows: 1,
       currentPage: 1,
@@ -68,13 +92,13 @@ export default {
       filterOn: [],
       sortBy: "sn",
       sortDesc: false,
+      newFields:[],
       fields: [
         { key: "sn", label: "S/n", sortable: true },
-        { key: "loc", label: "T7", sortable: true },
-        { key: "employee", label: "Name", sortable: true },
+        { key: "t7", label: "T7", sortable: true },
+        { key: "employee_details", label: "Name", sortable: true },
         { key: "t6", label: "T6", sortable: true },
         { key: "t3", label: "T3", sortable: true },
-        { key: "leaveType", label: "Leave Type", sortable: true },
       ],
       leaveAppID: null,
     };
@@ -144,56 +168,6 @@ export default {
                 select-mode="single"
                 @row-selected="selectRow"
               >
-                <template #cell(employee)="row">
-                  <p class="mb-0">
-                    {{ row.value.emp_first_name }} {{ row.value.emp_last_name }}
-                  </p>
-                  <small class="text-muted">
-                    {{ row.value.emp_unique_id }}
-                  </small>
-                </template>
-                <template #cell(LeaveType)="row">
-                  <p class="mb-0">
-                    {{ row.value.leave_name }}
-                  </p>
-                </template>
-                <template #cell(leapp_start_date)="row">
-                  <span> {{ new Date(row.value).toDateString() }}</span>
-                </template>
-                <template #cell(leapp_end_date)="row">
-                  <span> {{ new Date(row.value).toDateString() }}</span>
-                </template>
-                <template #cell(leapp_total_days)="row">
-                  <span> {{ row.value }} days</span>
-                </template>
-                <template #cell(Officer)="row">
-                  <p class="mb-0">
-                    {{ row.value.emp_first_name }} {{ row.value.emp_last_name }}
-                  </p>
-                  <small class="text-muted">
-                    {{ row.value.emp_unique_id }}
-                  </small>
-                </template>
-                <template #cell(leapp_status)="row">
-                  <span
-                    v-if="row.value === 0"
-                    class="badge badge-pill badge-warning"
-                  >
-                    pending
-                  </span>
-                  <span
-                    v-else-if="row.value === 1"
-                    class="badge badge-pill badge-success"
-                  >
-                    approved
-                  </span>
-                  <span
-                    v-else-if="row.value === 2"
-                    class="badge badge-pill badge-danger"
-                  >
-                    declined
-                  </span>
-                </template>
               </b-table>
             </div>
             <div class="row">
