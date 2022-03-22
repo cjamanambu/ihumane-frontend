@@ -211,6 +211,35 @@ export const menuItems = [
       },
     ],
   },
+  {
+    id: 26,
+    label: "Leave Management",
+    isTitle: true,
+  },
+  {
+    id: 27,
+    label: "Leave Management",
+    icon: "ri-walk-line",
+    subItems: [
+      {
+        id: 28,
+        label: "Leave Application",
+        link: "/leave-applications",
+      },
+
+      {
+        id: 30,
+        label: "Manage Leave",
+        link: "/manage-leave-applications",
+      },
+
+      {
+        id: 31,
+        label: "Employee Leave Accruals",
+        link: "/employee-leave-accruals",
+      },
+    ],
+  },
   // {
   //   id: 29,
   //   label: "Employee Leaves",
@@ -239,12 +268,7 @@ export const menuItems = [
     label: "Self-Service",
     isTitle: true,
   },
-  {
-    id: 29,
-    label: "Leave Application",
-    icon: "ri-walk-line",
-    link: "/manage-leave-applications",
-  },
+
   {
     id: 29,
     label: "Travel Application",
