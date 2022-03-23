@@ -100,6 +100,28 @@ export default {
       });
     },
 
+    launchFilePicker() {
+      this.$refs.file.click();
+    },
+    async onFileChange(fieldName, files) {
+      this.uploadFiles = [];
+      if (files.length > 0) {
+        for (let i = 0; i < files.length; i++) {
+          this.uploadFiles.push(files[i]);
+        }
+      } else {
+        this.$bvToast.toast("Please select at least one file to upload", {
+          title: "No Files Selected",
+          toaster: "b-toaster-top-right",
+          appendToast: true,
+          variant: "warning",
+        });
+      }
+    },
+    deleteFile(index) {
+      this.uploadFiles.splice(index, 1);
+    },
+
     getEmployees() {
       this.apiGet(this.ROUTES.employee, "Get Leave Types Error").then((res) => {
         this.employees = [{ value: null, text: "Please select an employee" }];
@@ -118,32 +140,75 @@ export default {
         name: "current-variation",
       });
     },
-    submitNew() {
-      this.submitted = true;
+    async submitNew() {
+      if (this.uploadFiles.length > 0) {
+        this.submitted = true;
 
-      this.paymentsFields.forEach(async (field) => {
-        const data = {
-          payment_definition: field.id,
-          amount: field.amount,
-        };
+        await this.paymentsFields.forEach((field) => {
+          const data = {
+            payment_definition: field.id,
+            amount: field.amount,
+          };
+          //console.log(data)
 
-        this.filledPayments.push(data);
-      });
+          this.filledPayments.push(data);
+        });
+        let formData = new FormData();
+        formData.append('employee', this.selectedEmployees.value)
+        formData.append('payments', this.filledPayments)
+        formData.append('month', this.month)
+        formData.append('year', this.year)
+        await this.uploadFiles.forEach((file) => {
+          formData.append("documents", file);
+        });
+        const url = `${this.ROUTES.variationalPayment}`;
+        this.apiPost(url, formData, "Add Variational Payment").then((res) => {
+          this.apiResponseHandler(`${res.data}`, "Add Variational Payment");
+          this.submitted = false;
+          this.selectedEmployees = null;
+          this.count = 0;
+          this.getVariationalPayments();
+        });
 
-      const data = {
-        employee: this.selectedEmployees.value,
-        payments: this.filledPayments,
-        month: this.month,
-        year: this.year,
-      };
-      const url = `${this.ROUTES.variationalPayment}`;
-      this.apiPost(url, data, "Add Variational Payment").then((res) => {
-        this.apiResponseHandler(`${res.data}`, "Add Variational Payment");
-        this.submitted = false;
-        this.selectedEmployees = null;
-        this.count = 0;
-        this.getVariationalPayments();
-      });
+        // const data = {
+        //   employee: this.selectedEmployees.value,
+        //   payments: this.filledPayments,
+        //   month: this.month,
+        //   year: this.year,
+        // };
+        // const url = `${this.ROUTES.variationalPayment}`;
+        // this.apiPost(url, data, "Add Variational Payment").then((res) => {
+        //   this.apiResponseHandler(`${res.data}`, "Add Variational Payment");
+        //   this.submitted = false;
+        //   this.selectedEmployees = null;
+        //   this.count = 0;
+        //   this.getVariationalPayments();
+        // });
+      }else{
+        this.$bvToast.toast("Please select at least one file to upload", {
+          title: "No Files Selected",
+          toaster: "b-toaster-top-right",
+          appendToast: true,
+          variant: "warning",
+        });
+
+      }
+
+
+      // const data = {
+      //   employee: this.selectedEmployees.value,
+      //   payments: this.filledPayments,
+      //   month: this.month,
+      //   year: this.year,
+      // };
+      // const url = `${this.ROUTES.variationalPayment}`;
+      // this.apiPost(url, data, "Add Variational Payment").then((res) => {
+      //   this.apiResponseHandler(`${res.data}`, "Add Variational Payment");
+      //   this.submitted = false;
+      //   this.selectedEmployees = null;
+      //   this.count = 0;
+      //   this.getVariationalPayments();
+      // });
     },
 
     addField() {
@@ -179,6 +244,7 @@ export default {
         },
       ],
       payments: [],
+      uploadFiles: [],
       payment: null,
       filledPayments: [],
       paymentsFields: [],
@@ -191,11 +257,27 @@ export default {
       submitted: false,
       pmySet: false,
       count: 0,
+      uploadFieldName: "file",
     };
   },
 };
 </script>
-
+<style>
+.file-uploads {
+  padding: 3em;
+  border: 1px dashed #1cbb8c;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  border-radius: 10px;
+}
+.file-detail {
+  border: 1px solid #ced4da;
+  padding: 0.5em 1em;
+  border-radius: 5px;
+}
+</style>
 <template>
   <Layout>
     <PageHeader :title="title" :items="items" />
@@ -232,7 +314,7 @@ export default {
 
                   <div
                     class="row"
-                    v-for="(field, index) in paymentsFields"
+                    v-for="(fields, index) in paymentsFields"
                     :key="index"
                   >
                     <!--                    <div class="col-lg-5">-->
@@ -253,7 +335,7 @@ export default {
                           type="text"
                           readonly
                           class="form-control"
-                          v-model="field.paymentDefinition"
+                          v-model="fields.paymentDefinition"
                         />
                       </div>
                     </div>
@@ -263,7 +345,7 @@ export default {
                         <input
                           type="text"
                           class="form-control"
-                          v-model="field.amount"
+                          v-model="fields.amount"
                         />
                       </div>
                     </div>
@@ -362,6 +444,54 @@ export default {
                   >
                     Updating...
                   </b-button>
+                </div>
+
+                <div class="col-lg-6">
+                  <div class="card">
+                    <div class="card-body">
+                      <div class="p-3 bg-light mb-4">
+                        <h5 class="font-size-14 mb-0">
+                          Supporting Documents
+
+                        </h5>
+                      </div>
+                      <input
+                          type="file"
+                          ref="file"
+                          multiple
+                          :name="uploadFieldName"
+                          @change="onFileChange($event.target.name, $event.target.files)"
+                          style="display: none"
+                      />
+                      <div class="file-uploads mb-3" @click="launchFilePicker()">
+                        <p class="mb-0 text-muted">Click here to upload files</p>
+                      </div>
+                      <div v-if="uploadFiles.length > 0">
+                        <div class="alert alert-info mb-3">
+                          You've chosen the following documents to upload. Confirm and
+                          upload your selection below.
+                        </div>
+                        <div
+                            class="file-detail d-flex justify-content-between align-items-center mt-3"
+                            v-for="(file, index) in uploadFiles"
+                            :key="index"
+                        >
+                          <small>
+                            <span>{{ file.name }}</span>
+                            <br />
+                            <span>{{ file.size | getFileSize }}</span>
+                          </small>
+                          <button
+                              class="btn btn-sm btn-danger"
+                              @click="deleteFile(index)"
+                          >
+                            DEL
+                          </button>
+                        </div>
+
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </form>
