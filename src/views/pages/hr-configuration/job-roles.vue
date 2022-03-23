@@ -3,7 +3,7 @@ import Layout from "@/views/layouts/main";
 import PageHeader from "@/components/page-header";
 import appConfig from "@/app.config";
 import { required } from "vuelidate/lib/validators";
-import Multiselect from 'vue-multiselect';
+//import Multiselect from 'vue-multiselect';
 
 export default {
   page: {
@@ -13,15 +13,14 @@ export default {
   components: {
     Layout,
     PageHeader,
-    Multiselect,
+    //Multiselect,
   },
   mounted() {
     this.refreshTable();
-    this.fetchDepartments();
+    //this.fetchDepartments();
   },
   validations: {
     role: { required },
-    department: { required },
     description: { required },
   },
   methods: {
@@ -81,7 +80,6 @@ export default {
       } else {
         const data = {
           job_role: this.role,
-          department_id: this.department.value,
           description: this.description,
         };
         this.apiPost(this.ROUTES.jobRole, data, "Add Job Role Error").then(
@@ -103,7 +101,6 @@ export default {
         const url = `${this.ROUTES.jobRole}/${this.jobRoleID}`;
         const data = {
           job_role: this.role,
-          department_id: this.department.value,
           description: this.description,
         };
         this.apiPatch(url, data, "Update Job Role Error").then((res) => {
@@ -146,11 +143,11 @@ export default {
         { key: "job_role_id", label: "ID", sortable: true },
         { key: "job_role", label: "Role", sortable: true },
         { key: "description", label: "Description", sortable: true },
-        { key: "Department", label: "Department", sortable: true },
+
       ],
       role: null,
-      department: null,
-      departments: [{ value: null, text: "Please select a department" }],
+      // department: null,
+      // departments: [{ value: null, text: "Please select a department" }],
       description: null,
       jobRoleID: null,
     };
@@ -281,25 +278,25 @@ export default {
             }"
           />
         </div>
-        <div class="form-group">
-          <label for="department">
-            Sector <span class="text-danger">*</span>
-          </label>
-          <multiselect
-                  v-model="department"
-                  :options="departments"
-                  :custom-label="departmentLabel"
-                  :class="{
-                      'is-invalid': submitted && $v.department.$error,
-                    }"
-          ></multiselect>
-          <small
-            class="form-text text-muted manage"
-            @click="$router.push('/departments')"
-          >
-            Manage Sectors
-          </small>
-        </div>
+<!--        <div class="form-group">-->
+<!--          <label for="department">-->
+<!--            Sector <span class="text-danger">*</span>-->
+<!--          </label>-->
+<!--          <multiselect-->
+<!--                  v-model="department"-->
+<!--                  :options="departments"-->
+<!--                  :custom-label="departmentLabel"-->
+<!--                  :class="{-->
+<!--                      'is-invalid': submitted && $v.department.$error,-->
+<!--                    }"-->
+<!--          ></multiselect>-->
+<!--          <small-->
+<!--            class="form-text text-muted manage"-->
+<!--            @click="$router.push('/departments')"-->
+<!--          >-->
+<!--            Manage Sectors-->
+<!--          </small>-->
+<!--        </div>-->
         <div class="form-group">
           <label for="description">
             Description <span class="text-danger">*</span>
@@ -353,26 +350,26 @@ export default {
             }"
           />
         </div>
-        <div class="form-group">
-          <label for="department">
-            Sector <span class="text-danger">*</span>
-          </label>
-          <multiselect
-                  v-model="department"
-                  :options="departments"
-                  :custom-label="departmentLabel"
-                  :class="{
-                      'is-invalid': submitted && $v.department.$error,
-                    }"
-          ></multiselect>
+<!--        <div class="form-group">-->
+<!--          <label for="department">-->
+<!--            Sector <span class="text-danger">*</span>-->
+<!--          </label>-->
+<!--          <multiselect-->
+<!--                  v-model="department"-->
+<!--                  :options="departments"-->
+<!--                  :custom-label="departmentLabel"-->
+<!--                  :class="{-->
+<!--                      'is-invalid': submitted && $v.department.$error,-->
+<!--                    }"-->
+<!--          ></multiselect>-->
 
-          <small
-            class="form-text text-muted manage"
-            @click="$router.push('/departments')"
-          >
-            Manage Sectors
-          </small>
-        </div>
+<!--          <small-->
+<!--            class="form-text text-muted manage"-->
+<!--            @click="$router.push('/departments')"-->
+<!--          >-->
+<!--            Manage Sectors-->
+<!--          </small>-->
+<!--        </div>-->
         <div class="form-group">
           <label for="description">
             Description <span class="text-danger">*</span>
