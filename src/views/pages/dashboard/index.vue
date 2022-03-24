@@ -311,11 +311,9 @@ export default {
                   <p v-if="this.getEmployee" class="d-flex">
                     <span class="mr-2">Sector (T3):</span>
                     <span>
-                      {{ this.getEmployee.JobRole.Department.d_t3_code }}
+                      {{ this.getEmployee.sector.d_t3_code }}
                       <small class="text-muted">
-                        ({{
-                          this.getEmployee.JobRole.Department.department_name
-                        }})
+                        ({{ this.getEmployee.sector.department_name }})
                       </small>
                     </span>
                   </p>
@@ -478,11 +476,9 @@ export default {
                 <p class="d-flex">
                   <span class="mr-2">Sector (T3):</span>
                   <span>
-                    {{ this.getEmployee.JobRole.Department.d_t3_code }}
+                    {{ this.getEmployee.sector.d_t3_code }}
                     <small class="text-muted">
-                      ({{
-                        this.getEmployee.JobRole.Department.department_name
-                      }})
+                      ({{ this.getEmployee.sector.department_name }})
                     </small>
                   </span>
                 </p>
