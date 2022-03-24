@@ -22,6 +22,7 @@ export default {
   },
   mounted() {
     this.getLeaveAccruals();
+    this.fetchApplications();
   },
   validations: {
     leaveType: { required },
@@ -51,7 +52,12 @@ export default {
       leaveTypes: [],
       leapp_start_date: null,
       leapp_end_date: null,
+      leapp_alt_email: null,
+      leapp_alt_phone: null,
       submitted: false,
+      omittedDays: [],
+      omittedStartDate: null,
+      omittedEndDate: null,
     };
   },
   methods: {
@@ -79,10 +85,57 @@ export default {
         });
       });
     },
+    fetchApplications() {
+      const url = `${this.ROUTES.leaveApplication}/get-employee-leave/${this.getEmployee.emp_id}`;
+      this.apiGet(url, "Get Employee Leaves Error").then((res) => {
+        const { data } = res.data;
+        this.omittedDays = [];
+        data.forEach((application) => {
+          if (
+            application.leapp_status === 0 ||
+            application.leapp_status === 1 ||
+            application.leapp_status === 3
+          )
+            this.omittedDays.push(
+              ...this.getDates(
+                application.leapp_start_date,
+                application.leapp_end_date
+              )
+            );
+        });
+      });
+    },
+    getDates(startDate, endDate) {
+      const dates = [];
+      let currentDate = new Date(startDate);
+      const addDays = function (days) {
+        const date = new Date(this.valueOf());
+        date.setDate(date.getDate() + days);
+        return date;
+      };
+      while (currentDate <= new Date(endDate)) {
+        dates.push(currentDate);
+        currentDate = addDays.call(currentDate, 1);
+      }
+      return dates;
+    },
     notBeforeToday(date) {
       const today = new Date();
-      today.setHours(0, 0, 0, 0);
       return date < today;
+    },
+    confirmStartDate() {
+      this.omittedStartDate = this.omittedDays.find((date) => {
+        return (
+          date.toDateString() === new Date(this.leapp_start_date).toDateString()
+        );
+      });
+    },
+    confirmEndDate() {
+      this.omittedEndDate = this.omittedDays.find((date) => {
+        return (
+          date.toDateString() === new Date(this.leapp_end_date).toDateString()
+        );
+      });
     },
     notBeforeStartDate(date) {
       let startDate = new Date();
@@ -124,9 +177,13 @@ export default {
           leapp_leave_type: this.leaveType,
           leapp_start_date: this.leapp_start_date,
           leapp_end_date: this.leapp_end_date,
-          leapp_alt_email: this.leapp_alt_email,
-          leapp_alt_phone: this.leapp_alt_phone,
         };
+        this.leapp_alt_email
+          ? (data["leapp_alt_email"] = this.leapp_alt_email)
+          : false;
+        this.leapp_alt_phone
+          ? (data["leapp_alt_phone"] = this.leapp_alt_phone)
+          : false;
         const url = `${this.ROUTES.leaveApplication}/add-leave-application`;
         this.apiPost(url, data, "Add Leave Application").then((res) => {
           this.apiResponseHandler(`${res.data}`, "New leave application Added");
@@ -218,12 +275,17 @@ export default {
                 <date-picker
                   v-model="leapp_start_date"
                   valueType="format"
+                  @input="confirmStartDate"
                   placeholder="Select start date"
                   :disabled-date="notBeforeToday"
                   :class="{
                     'is-invalid': submitted && $v.leapp_start_date.$error,
                   }"
                 />
+                <small v-if="omittedStartDate" class="text-danger">
+                  {{ new Date(leapp_start_date).toDateString() }} is already
+                  part of a current leave application.
+                </small>
               </div>
               <div class="form-group">
                 <label for="start-date">
@@ -232,12 +294,17 @@ export default {
                 <date-picker
                   v-model="leapp_end_date"
                   valueType="format"
+                  @input="confirmEndDate"
                   placeholder="Select end date"
                   :disabled-date="notBeforeStartDate"
                   :class="{
                     'is-invalid': submitted && $v.leapp_end_date.$error,
                   }"
                 />
+                <small v-if="omittedEndDate" class="text-danger">
+                  {{ new Date(leapp_end_date).toDateString() }} is already part
+                  of a current leave application.
+                </small>
               </div>
               <div class="form-group">
                 <label for="alt-email"> Emergency Email Address </label>
@@ -261,6 +328,7 @@ export default {
                 v-if="!submitting"
                 class="btn btn-success btn-block mt-4"
                 type="submit"
+                :disabled="omittedStartDate || omittedEndDate"
               >
                 Submit
               </b-button>
