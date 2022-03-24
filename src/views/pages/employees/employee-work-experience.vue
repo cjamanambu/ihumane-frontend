@@ -87,7 +87,7 @@ export default {
           end_date:this.end_date,
         };
         const url = `${this.ROUTES.workExperience}/${this.workID}`;
-        this.apiPatch(url, data, "Update Education Error").then((res) => {
+        this.apiPatch(url, data, "Update Experience Error").then((res) => {
           this.apiResponseHandler(`${res.data}`, "Update Successful");
           this.refreshTable();
           this.$v.$reset();
@@ -109,7 +109,7 @@ export default {
   },
   data() {
     return {
-      title: " Education Background ",
+      title: " Work Experience ",
       items: [
         {
           text: "IHUMANE",
@@ -119,7 +119,7 @@ export default {
           href: "/",
         },
         {
-          text: " Education Background ",
+          text: " Work Experience ",
           active: true,
         },
       ],

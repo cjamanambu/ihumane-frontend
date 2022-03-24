@@ -9702,7 +9702,7 @@
   "resolved" "https://registry.npmjs.org/vue/-/vue-2.6.14.tgz"
   "version" "2.6.14"
 
-"vue2-datepicker@^3.8.0":
+"vue2-datepicker@^3.10.4":
   "integrity" "sha512-WIdYa1fSF9rQCXOGG+qvTiE7q7+K1FIpUUZ/r6Q/tUP+NO7IePEoDAY+Lpy73ofj/4zmrT2FjD5O5QChVKFOSQ=="
   "resolved" "https://registry.npmjs.org/vue2-datepicker/-/vue2-datepicker-3.10.4.tgz"
   "version" "3.10.4"

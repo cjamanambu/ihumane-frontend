@@ -100,6 +100,7 @@ export default {
           location_name: this.name,
           location_state: this.state.value,
           location_t6_code: this.t6_code,
+          focal_points: this.focal_persons,
         };
         const url = `${this.ROUTES.location}/${this.locationID}`;
         this.apiPatch(url, data, "Update Location Error").then((res) => {
@@ -379,6 +380,20 @@ export default {
               'is-invalid': submitted && $v.name.$error,
             }"
           />
+        </div>
+        <div class="form-group">
+          <label for="t3_code">
+            HR Focal Points <span class="text-danger">*</span>
+          </label>
+          <multiselect
+            v-model="focal_persons"
+            :options="employee_list"
+            :custom-label="employeeLabel"
+            :multiple="true"
+            :class="{
+                      'is-invalid': submitted && $v.employee_list.$error,
+                    }"
+          ></multiselect>
         </div>
         <div class="form-group">
           <label for="state"> State <span class="text-danger">*</span> </label>
