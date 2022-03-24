@@ -51,6 +51,7 @@ export default {
       leaveTypes: [],
       leapp_start_date: null,
       leapp_end_date: null,
+      submitted: false,
     };
   },
   methods: {
@@ -191,7 +192,7 @@ export default {
         </div>
       </div>
     </div>
-    <form @submit.prevent>
+    <form @submit.prevent="submitNew">
       <div class="row">
         <div class="col-lg-7">
           <div class="card">
