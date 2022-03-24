@@ -71,7 +71,7 @@
               params: { leaveAppID: this.leaveAppID },
             });
           },
-            submit(type) {
+          submit(type) {
                 this.submitted = true;
                 if (this.type === "approve") {
                     this.approving = true;
@@ -108,6 +108,19 @@
                         });
                 }
             },
+           updateLeaveStatus() {
+            this.submitted = true;
+            let leaveId = this.$route.params.leaveAppID;
+            const url = `${this.ROUTES.leaveApplication}/update-leaveapp-status/${leaveId}`;
+            const data = {
+              leave: leaveId,
+              status: this.selected,
+            };
+            this.apiPatch(url, data, "Update Leave Error").then();
+            this.apiResponseHandler("Process Complete", "Leave Update");
+            this.submitted = false;
+            this.fetchRequest();
+          },
         },
         data() {
             return {
@@ -169,6 +182,16 @@
                 declining: false,
                 applications: [],
               previous_applications: [],
+              selected: null,
+              options: [
+                { value: null, text: 'Please select status' },
+                { value: 0, text: 'Pending' },
+                { value: 1, text: 'Approve' },
+                { value: 2, text: 'Decline' },
+                { value: 3, text: 'Active' },
+                { value: 4, text: 'Finished' },
+                ],
+
             };
         },
     };
@@ -290,7 +313,72 @@
                         </div>
                     </div>
                 </div>
-
+              <div class="card">
+                <div class="card-body">
+                  <div class="p-3 bg-light mb-4 d-flex justify-content-between">
+                    <div class="d-inline mb-0">
+                      <h5 class="font-size-14 mb-0">Authorization Log</h5>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-12">
+                      <b-table-simple striped responsive bordered outlined>
+                        <b-thead head-variant="light">
+                          <b-tr>
+                            <b-th>OFFICER</b-th>
+                            <b-th>STATUS</b-th>
+                            <b-th>COMMENT</b-th>
+                            <b-th>DATE</b-th>
+                          </b-tr>
+                        </b-thead>
+                        <b-tbody>
+                          <b-tr v-for="(logEntry, index) in log" :key="index">
+                            <b-td style="width: 25%">
+                        <span>
+                          {{ logEntry.officers.emp_first_name }}
+                          {{ logEntry.officers.emp_last_name }}
+                        </span>
+                            </b-td>
+                            <b-td style="width: 15%">
+                        <span
+                          v-if="logEntry.auth_status === 0"
+                          class="text-warning"
+                        >
+                          Pending
+                        </span>
+                              <span
+                                v-else-if="logEntry.auth_status === 1"
+                                class="text-success"
+                              >
+                          Approved
+                        </span>
+                              <span
+                                v-else-if="logEntry.auth_status === 2"
+                                class="text-success"
+                              >
+                          Declined
+                        </span>
+                            </b-td>
+                            <b-td style="width: 40%">
+                        <span>
+                          {{ logEntry.auth_comment }}
+                        </span>
+                            </b-td>
+                            <b-td style="width: 20%">
+                        <span>
+                          {{ new Date(logEntry.updatedAt).toDateString() }}
+                          {{
+                            new Date(logEntry.updatedAt).toLocaleTimeString()
+                          }}
+                        </span>
+                            </b-td>
+                          </b-tr>
+                        </b-tbody>
+                      </b-table-simple>
+                    </div>
+                  </div>
+                </div>
+              </div>
                 <div class="card">
                   <div class="card-header">
                     <h5>Previous Applications</h5>
@@ -411,73 +499,45 @@
                 </div>
             </div>
             <div class="col-lg-4">
-                <div class="card">
-                    <div class="card-body">
-                        <div class="p-3 bg-light mb-4 d-flex justify-content-between">
-                            <div class="d-inline mb-0">
-                                <h5 class="font-size-14 mb-0">Authorization Log</h5>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-12">
-                                <b-table-simple striped responsive bordered outlined>
-                                    <b-thead head-variant="light">
-                                        <b-tr>
-                                            <b-th>OFFICER</b-th>
-                                            <b-th>STATUS</b-th>
-                                            <b-th>COMMENT</b-th>
-                                            <b-th>DATE</b-th>
-                                        </b-tr>
-                                    </b-thead>
-                                    <b-tbody>
-                                        <b-tr v-for="(logEntry, index) in log" :key="index">
-                                            <b-td style="width: 25%">
-                        <span>
-                          {{ logEntry.officers.emp_first_name }}
-                          {{ logEntry.officers.emp_last_name }}
-                        </span>
-                                            </b-td>
-                                            <b-td style="width: 15%">
-                        <span
-                                v-if="logEntry.auth_status === 0"
-                                class="text-warning"
-                        >
-                          Pending
-                        </span>
-                                                <span
-                                                        v-else-if="logEntry.auth_status === 1"
-                                                        class="text-success"
-                                                >
-                          Approved
-                        </span>
-                                                <span
-                                                        v-else-if="logEntry.auth_status === 2"
-                                                        class="text-success"
-                                                >
-                          Declined
-                        </span>
-                                            </b-td>
-                                            <b-td style="width: 40%">
-                        <span>
-                          {{ logEntry.auth_comment }}
-                        </span>
-                                            </b-td>
-                                            <b-td style="width: 20%">
-                        <span>
-                          {{ new Date(logEntry.updatedAt).toDateString() }}
-                          {{
-                            new Date(logEntry.updatedAt).toLocaleTimeString()
-                          }}
-                        </span>
-                                            </b-td>
-                                        </b-tr>
-                                    </b-tbody>
-                                </b-table-simple>
-                            </div>
-                        </div>
+              <div class="card">
+                <div class="card-body">
+                  <div class="p-3 bg-light mb-4 d-flex justify-content-between">
+                    <div class="d-inline mb-0">
+                      <h5 class="font-size-14 mb-0">Process Leave</h5>
                     </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-12">
+                      <form @submit.prevent="updateLeaveStatus">
+                        <div class="form-group">
+                          <label for="">
+                            Status <span class="text-danger">*</span>
+                          </label>
+                          <b-form-select v-model="selected" :options="options"></b-form-select>
+                        </div>
+
+                        <b-button
+                          v-if="!submitting"
+                          class="btn btn-success btn-block mt-4"
+                          type="submit"
+                        >
+                          Submit
+                        </b-button>
+                        <b-button
+                          v-else
+                          disabled
+                          class="btn btn-success btn-block mt-4"
+                          type="submit"
+                        >
+                          Submitting...
+                        </b-button>
+                      </form>
+                    </div>
+                  </div>
                 </div>
+              </div>
             </div>
+
         </div>
     </Layout>
 </template>
