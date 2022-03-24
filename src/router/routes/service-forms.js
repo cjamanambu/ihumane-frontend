@@ -74,15 +74,28 @@ export default [
     meta: {
       authRequired: true,
     },
-    component: () => import("@/views/pages/service-forms/leave-application"),
-  }
-  ,{
+    component: () =>
+      import("@/views/pages/service-forms/leave-application/index"),
+  },
+  {
+    path: "/new-leave-application",
+    name: "new-leave-application",
+    meta: {
+      authRequired: true,
+    },
+    component: () =>
+      import(
+        "@/views/pages/service-forms/leave-application/new-leave-application"
+      ),
+  },
+  {
     path: "/leave-application/:leaveAppID",
     name: "leave-application-details",
     meta: {
       authRequired: true,
     },
-    component: () => import("@/views/pages/self-service/leave-application-details"),
+    component: () =>
+      import("@/views/pages/self-service/leave-application-details"),
   },
   {
     path: "/manage-leave-applications",
@@ -98,7 +111,8 @@ export default [
     meta: {
       authRequired: true,
     },
-    component: () => import("@/views/pages/self-service/employee-leave-accruals"),
+    component: () =>
+      import("@/views/pages/self-service/employee-leave-accruals"),
   },
   {
     path: "/view-announcements",
@@ -124,5 +138,4 @@ export default [
     },
     component: () => import("@/views/pages/self-service/query-view"),
   },
-
 ];

@@ -216,9 +216,12 @@ export default {
   <Layout>
     <PageHeader :title="title" :items="items" />
     <div class="d-flex justify-content-end mb-3">
-      <b-button class="btn btn-success" @click="$refs['add-leave'].show()">
+      <b-button
+        class="btn btn-success"
+        @click="$router.push({ name: 'new-leave-application' })"
+      >
         <i class="mdi mdi-plus mr-2"></i>
-        Initiate Leave
+        New Leave Application
       </b-button>
     </div>
     <scale-loader v-if="apiBusy" />
