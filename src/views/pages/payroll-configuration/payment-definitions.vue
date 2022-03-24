@@ -40,6 +40,7 @@ export default {
       this.tax = pd.pd_tax;
       this.taxable = pd.pd_payment_taxable;
       this.welfare = pd.pd_welfare || 0;
+      this.pd_employee = pd.pd_employee;
       this.$refs["edit-payment-definition"].show();
       this.$refs["pd-table"].clearSelected();
     },
@@ -86,6 +87,7 @@ export default {
           pd_percentage: this.pdPercentage,
           pd_total_gross: this.sum,
           pd_total_gross_ii: this.sumII,
+          pd_employee: this.pd_employee,
         };
         this.type === 1
           ? (data.pd_payment_taxable = this.taxable)
@@ -129,6 +131,7 @@ export default {
           pd_percentage: this.pdPercentage,
           pd_total_gross: this.sum,
           pd_total_gross_ii: this.sumII,
+          pd_employee: this.pd_employee
         };
         this.type === 1
           ? (data.pd_payment_taxable = this.taxable)
@@ -294,8 +297,15 @@ export default {
         { text: "YES", value: 1 },
         { text: "NO", value: 0 },
       ],
+
+      pd_employee: 1,
+      pd_employees:[
+        {text: "Employee", value: 1},
+        {text: "Employer", value: 2}
+      ],
       sumIIDisabled: false,
       pdPercentage: 0,
+
     };
   },
 };
@@ -523,6 +533,28 @@ export default {
             </div>
           </div>
         </div>
+        <div class="ff-wrapper mt-5">
+          <h5 class="ff-header" style="bottom: 90%">Payment Category</h5>
+          <div class="ff-content">
+            <div class="row">
+              <div class="col-lg-12">
+                <b-form-group>
+                  <label for="user_type">Category</label><br />
+                  <b-form-radio-group
+                      id="user_type"
+                      v-model="pd_employee"
+                      :options="pd_employees"
+                      button-variant="outline-success"
+                      buttons
+                  />
+                </b-form-group>
+              </div>
+
+
+            </div>
+          </div>
+        </div>
+
         <div class="ff-wrapper mt-5">
           <h5 class="ff-header" style="bottom: 90%">Payment Type</h5>
           <div class="ff-content">
@@ -763,6 +795,28 @@ export default {
                   />
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="ff-wrapper mt-5">
+          <h5 class="ff-header" style="bottom: 90%">Payment Category</h5>
+          <div class="ff-content">
+            <div class="row">
+              <div class="col-lg-12">
+                <b-form-group>
+                  <label for="user_type">Category</label><br />
+                  <b-form-radio-group
+                      id="user_type"
+                      v-model="pd_employee"
+                      :options="pd_employees"
+                      button-variant="outline-success"
+                      buttons
+                  />
+                </b-form-group>
+              </div>
+
+
             </div>
           </div>
         </div>
