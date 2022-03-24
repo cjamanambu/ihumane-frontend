@@ -18,6 +18,7 @@ export default {
     refreshTable() {
       this.apiGet(this.ROUTES.employee, "Get Employees Error").then((res) => {
         const { data } = res;
+        console.log({ data });
         data.forEach((employee, index) => {
           this.employees[index] = { sn: ++index, ...employee };
         });
@@ -74,7 +75,7 @@ export default {
         { key: "email", label: "Email", sortable: true },
         { key: "emp_phone_no", label: "Phone", sortable: true },
         {
-          key: "JobRole.Department",
+          key: "sector",
           label: "T3 Code (Sector)",
           sortable: true,
         },
@@ -165,7 +166,8 @@ export default {
                   <span>
                     {{ row.item.emp_first_name }}
                     {{ row.item.emp_last_name }}
-                  </span> <br>
+                  </span>
+                  <br />
                   <small>{{ row.item.emp_unique_id }}</small>
                 </template>
                 <template #cell(email)="row">
@@ -174,7 +176,7 @@ export default {
                   </p>
                   <small>{{ row.item.emp_personal_email }}</small>
                 </template>
-                <template #cell(JobRole.Department)="row">
+                <template #cell(sector)="row">
                   <p class="mb-0">
                     {{ row.value.d_t3_code }}
                   </p>
