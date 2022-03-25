@@ -67,4 +67,5 @@ export const ROUTES = {
   queries: `queries`,
   queryReply: `query-reply`,
   hrFocalPoint: `hr-focal-point`,
+  leaveDoc: `leavedoc`,
 };
