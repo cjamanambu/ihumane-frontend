@@ -66,4 +66,5 @@ export const ROUTES = {
   announcement: `announcements`,
   queries: `queries`,
   queryReply: `query-reply`,
+  hrFocalPoint: `hr-focal-point`,
 };

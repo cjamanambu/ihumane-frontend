@@ -23,6 +23,7 @@ export default {
   mounted() {
     this.getLeaveAccruals();
     this.fetchApplications();
+    this.getHRFocalPoints();
   },
   validations: {
     leaveType: { required },
@@ -58,13 +59,14 @@ export default {
       omittedDays: [],
       omittedStartDate: null,
       omittedEndDate: null,
+      focalPoints: [],
+      location: null,
     };
   },
   methods: {
     getLeaveAccruals() {
       let url = `${this.ROUTES.leaveAccrual}/get-leave-acrruals/${this.getEmployee.emp_id}`;
       this.apiGet(url, "Get Leave Accruals Error").then((res) => {
-        console.log({ res });
         const { data } = res;
         this.leaveTypes = [
           { value: null, text: "Please select a leave type", disabled: true },
@@ -103,6 +105,15 @@ export default {
               )
             );
         });
+      });
+    },
+    getHRFocalPoints() {
+      const locationID = this.getEmployee.location.location_id;
+      this.location = this.getEmployee.location.location_name;
+      const url = `${this.ROUTES.hrFocalPoint}/${locationID}`;
+      this.apiGet(url, "Get Focal Point Error").then((res) => {
+        const { data } = res;
+        this.focalPoints = data;
       });
     },
     getDates(startDate, endDate) {
@@ -344,6 +355,41 @@ export default {
           </div>
         </div>
         <div class="col-lg-5">
+          <div class="card mb-4">
+            <div class="card-body">
+              <div class="p-3 bg-light mb-4">
+                <h5 class="font-size-14 mb-0">
+                  HR Focal Points for {{ location }}
+                </h5>
+              </div>
+              <div v-if="focalPoints.length > 0">
+                <div
+                  class="media mb-2"
+                  v-for="(focalPoint, index) in focalPoints"
+                  :key="index"
+                >
+                  <img
+                    :src="focalPoint.focal_person.emp_passport"
+                    width="8%"
+                    class="mr-3"
+                    alt="profile pic"
+                  />
+                  <div class="media-body">
+                    <h6 class="text-capitalize mt-0 mb-n1">
+                      {{ focalPoint.focal_person.emp_first_name }}
+                      {{ focalPoint.focal_person.emp_last_name }}
+                    </h6>
+                    <small class="text-capitalize">
+                      {{ focalPoint.focal_person.emp_unique_id }}
+                    </small>
+                  </div>
+                </div>
+              </div>
+              <div v-else class="alert alert-info">
+                There are currently no HR Focal Points for your location.
+              </div>
+            </div>
+          </div>
           <div class="card">
             <div class="card-body">
               <div class="p-3 bg-light mb-4">
