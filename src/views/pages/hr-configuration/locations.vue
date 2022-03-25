@@ -3,7 +3,7 @@ import Layout from "@/views/layouts/main";
 import PageHeader from "@/components/page-header";
 import appConfig from "@/app.config";
 import { required } from "vuelidate/lib/validators";
-import Multiselect from 'vue-multiselect';
+import Multiselect from "vue-multiselect";
 
 export default {
   page: {
@@ -26,11 +26,11 @@ export default {
     t6_code: { required },
   },
   methods: {
-    locationLabel ({ text }) {
-      return `${text}`
+    locationLabel({ text }) {
+      return `${text}`;
     },
-    employeeLabel ({ text }) {
-      return `${text}`
+    employeeLabel({ text }) {
+      return `${text}`;
     },
     getEmployees() {
       const url = `${this.ROUTES.employee}`;
@@ -119,9 +119,10 @@ export default {
     },
     selectLocation(location) {
       location = location[0];
+      console.log({ location });
       this.locationID = location.location_id;
       this.name = location.location_name;
-      this.state = location.l_state_id;
+      this.state = { value: location.State.s_id, text: location.State.s_name };
       this.t6_code = location.l_t6_code;
       this.$refs["update-location"].show();
       this.$refs["location-table"].clearSelected();
@@ -130,6 +131,9 @@ export default {
       // Trigger pagination to update the number of buttons/pages due to filtering
       this.totalRows = filteredItems.length;
       this.currentPage = 1;
+    },
+    test() {
+      console.log(this.state);
     },
   },
   data() {
@@ -170,7 +174,7 @@ export default {
       states: [{ value: null, text: "Please select a state" }],
       locationID: null,
       employee_list: [{ value: null, text: "Please select a sector lead" }],
-      focal_persons:[],
+      focal_persons: [],
     };
   },
 };
@@ -305,21 +309,21 @@ export default {
             :custom-label="employeeLabel"
             :multiple="true"
             :class="{
-                      'is-invalid': submitted && $v.employee_list.$error,
-                    }"
-          ></multiselect>
+              'is-invalid': submitted && $v.employee_list.$error,
+            }"
+          />
         </div>
         <div class="form-group">
           <label for="state"> State <span class="text-danger">*</span> </label>
           <multiselect
-                  v-model="state"
-                  :options="states"
-                  :custom-label="locationLabel"
-                  :class="{
-                      'is-invalid': submitted && $v.state.$error,
-                    }"
-          ></multiselect>
-
+            v-model="state"
+            :options="states"
+            @select="test"
+            :custom-label="locationLabel"
+            :class="{
+              'is-invalid': submitted && $v.state.$error,
+            }"
+          />
           <small
             class="form-text text-muted manage"
             @click="$router.push('/states')"
@@ -391,19 +395,19 @@ export default {
             :custom-label="employeeLabel"
             :multiple="true"
             :class="{
-                      'is-invalid': submitted && $v.employee_list.$error,
-                    }"
+              'is-invalid': submitted && $v.employee_list.$error,
+            }"
           ></multiselect>
         </div>
         <div class="form-group">
           <label for="state"> State <span class="text-danger">*</span> </label>
           <multiselect
-                  v-model="state"
-                  :options="states"
-                  :custom-label="locationLabel"
-                  :class="{
-                      'is-invalid': submitted && $v.state.$error,
-                    }"
+            v-model="state"
+            :options="states"
+            :custom-label="locationLabel"
+            :class="{
+              'is-invalid': submitted && $v.state.$error,
+            }"
           ></multiselect>
           <small
             class="form-text text-muted manage"

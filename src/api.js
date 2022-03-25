@@ -1,8 +1,9 @@
 import axios from "axios";
 
 export const API = axios.create({
-  //baseURL: `https://irc-api.ihumane.net/`,
-  baseURL: `http://localhost:9829/`,
+  baseURL: `https://irc-api.ihumane.net/`,
+  //baseURL: `http://localhost:9829/`,
+  // baseURL: `https://api.ircng.org`,
 });
 
 export function SET_TOKEN(token) {
@@ -65,4 +66,5 @@ export const ROUTES = {
   announcement: `announcements`,
   queries: `queries`,
   queryReply: `query-reply`,
+  hrFocalPoint: `hr-focal-point`,
 };
