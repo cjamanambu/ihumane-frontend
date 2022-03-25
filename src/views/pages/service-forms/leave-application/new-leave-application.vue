@@ -61,6 +61,9 @@ export default {
       omittedEndDate: null,
       focalPoints: [],
       location: null,
+      existingLeaveType: null,
+      applications: [],
+      applying: false,
     };
   },
   methods: {
@@ -92,6 +95,7 @@ export default {
       this.apiGet(url, "Get Employee Leaves Error").then((res) => {
         const { data } = res.data;
         this.omittedDays = [];
+        this.applications = data;
         data.forEach((application) => {
           if (
             application.leapp_status === 0 ||
@@ -148,6 +152,16 @@ export default {
         );
       });
     },
+    confirmApplicationType() {
+      this.existingLeaveType = this.applications.find((application) => {
+        return (
+          application.leapp_leave_type === this.leaveType &&
+          (application.leapp_status === 0 ||
+            application.leapp_status === 1 ||
+            application.leapp_status === 3)
+        );
+      });
+    },
     notBeforeStartDate(date) {
       let startDate = new Date();
       if (this.leapp_start_date) {
@@ -177,8 +191,9 @@ export default {
     deleteFile(index) {
       this.uploadFiles.splice(index, 1);
     },
-    submitNew() {
+    async submitNew() {
       this.submitted = true;
+      this.applying = true;
       this.$v.$touch();
       if (this.$v.$invalid) {
         this.apiFormHandler("Invalid Leave Application");
@@ -195,10 +210,34 @@ export default {
         this.leapp_alt_phone
           ? (data["leapp_alt_phone"] = this.leapp_alt_phone)
           : false;
-        const url = `${this.ROUTES.leaveApplication}/add-leave-application`;
-        this.apiPost(url, data, "Add Leave Application").then((res) => {
-          this.apiResponseHandler(`${res.data}`, "New leave application Added");
-        });
+        let url = `${this.ROUTES.leaveApplication}/add-leave-application`;
+        await this.apiPost(url, data, "Add Leave Application").then(
+          async (res) => {
+            const { data } = res;
+            if (data) {
+              const leaveApplicationID = data.leapp_id;
+              if (this.uploadFiles.length > 0) {
+                url = `${this.ROUTES.leaveDoc}/leave-doc/${leaveApplicationID}`;
+                let formData = new FormData();
+                await this.uploadFiles.forEach((file) => {
+                  formData.append("documents", file);
+                });
+                await this.apiPost(
+                  url,
+                  formData,
+                  "Upload Leave Supporting Documents Error"
+                );
+              }
+              this.$router.push("/leave-application").then(() => {
+                this.apiResponseHandler(
+                  "Action Successful",
+                  "Leave Application Submitted"
+                );
+              });
+            }
+          }
+        );
+        this.applying = false;
       }
     },
   },
@@ -274,10 +313,15 @@ export default {
                   id="leave-types"
                   v-model="leaveType"
                   :options="leaveTypes"
+                  @change="confirmApplicationType"
                   :class="{
                     'is-invalid': submitted && $v.leaveType.$error,
                   }"
                 />
+                <small v-if="existingLeaveType" class="text-danger">
+                  You have an existing
+                  {{ existingLeaveType.LeaveType.leave_name }} application
+                </small>
               </div>
               <div class="form-group">
                 <label for="start-date">
@@ -336,10 +380,12 @@ export default {
                 />
               </div>
               <b-button
-                v-if="!submitting"
+                v-if="!applying"
                 class="btn btn-success btn-block mt-4"
                 type="submit"
-                :disabled="omittedStartDate || omittedEndDate"
+                :disabled="
+                  omittedStartDate || omittedEndDate || existingLeaveType
+                "
               >
                 Submit
               </b-button>
