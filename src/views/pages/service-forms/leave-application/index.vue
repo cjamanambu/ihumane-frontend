@@ -124,6 +124,10 @@ export default {
     },
     selectLeave(leave) {
       leave = leave[0];
+      this.$router.push({
+        name: "view-leave-application",
+        params: { leaveApplicationID: leave.leapp_id },
+      });
       this.leapp_id = leave.leapp_id;
       this.leapp_emp_name = `${leave.employee.emp_first_name} ${leave.employee.emp_last_name}`;
       this.leapp_leave_name = leave.LeaveType.leave_name;
