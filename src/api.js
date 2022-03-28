@@ -1,7 +1,8 @@
 import axios from "axios";
 
 export const API = axios.create({
-baseURL: `https://irc-api.ihumane.net/`,
+baseURL: `https://api.ircng.org/`,
+
 
  //baseURL: `http://localhost:9000/`,
 });

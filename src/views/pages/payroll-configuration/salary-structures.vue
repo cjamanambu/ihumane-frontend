@@ -17,10 +17,26 @@ export default {
   },
   watch: {
     amount: function (newValue) {
-      const result = newValue
-        .replace(/\D/g, "")
-        .replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+      let count;
+      let result;
+      newValue.match(/\./g) === null ? count = 0 : count = newValue.match(/\./g);
+      console.log(count)
+      if(count.length > 1){
+        result = ''
+      }else{
+        const components = newValue.toString().split(".");
+        if (components.length === 1)
+          components[0] = newValue;
+        components[0] = components[0].replace(/\D/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+        if (components.length === 2)
+          components[1] = components[1].replace(/\D/g, "");
+        result =  components.join(".");
+
+
+      }
       this.$nextTick(() => (this.amount = result));
+
     },
   },
   mounted() {
@@ -32,11 +48,34 @@ export default {
     amount: { required },
   },
   methods: {
+
+  testDecimals(currentVal) {
+    let count;
+    currentVal.match(/\./g) === null ? count = 0 : count = currentVal.match(/\./g);
+  return count;
+},
+
+replaceCommas(yourNumber) {
+  const components = yourNumber.toString().split(".");
+  if (components.length === 1)
+    components[0] = yourNumber;
+  components[0] = components[0].replace(/\D/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+  if (components.length === 2)
+    components[1] = components[1].replace(/\D/g, "");
+  return components.join(".");
+},
+
     selectRow(salaryStructure) {
       salaryStructure = salaryStructure[0];
-      console.log({ salaryStructure });
+      //console.log({ salaryStructure });
+      let tAmount = parseFloat(salaryStructure.total_amount).toFixed(2)
+      let amountArray = tAmount.split('.')
+      let afterDecimal = amountArray[1]
+      let beforeDecimal = this.replaceCommas(amountArray[0])
+     tAmount =  `${beforeDecimal}.${afterDecimal}`
       this.employee = salaryStructure.ss_empid;
-      this.amount = salaryStructure.total_amount.toString();
+      this.amount = tAmount;
       this.gross = salaryStructure.total_amount;
       this.salaryGrade = salaryStructure.salary_grade.sg_id;
       const url = `${this.ROUTES.salaryStructure}/get-salary-structure/${this.employee}`;
