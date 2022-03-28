@@ -70,7 +70,6 @@ export default {
       return `${text}`;
     },
     lGALabel({ text }) {
-
       return `${text}`;
     },
     async fetchEmployee() {
@@ -103,9 +102,13 @@ export default {
           this.emp_emergency_contact = data.emp_emergency_contact;
           this.job_role_id = data.emp_job_role_id;
           this.gender = data.emp_sex;
-          this.birth_date = new Date(data.emp_dob).toISOString().slice(0,10);
-          this.emp_contract_end_date = new Date(data.emp_contract_end_date).toISOString().slice(0,10);
-          this.emp_hire_date = new Date(data.emp_hire_date).toISOString().slice(0,10);
+          this.birth_date = new Date(data.emp_dob).toISOString().slice(0, 10);
+          this.emp_contract_end_date = new Date(data.emp_contract_end_date)
+            .toISOString()
+            .slice(0, 10);
+          this.emp_hire_date = new Date(data.emp_hire_date)
+            .toISOString()
+            .slice(0, 10);
         }
       });
     },
@@ -178,7 +181,7 @@ export default {
       await this.apiGet(url).then((res) => {
         const { data } = res;
         //console.log(data);
-       this.lgas = [{ value: null, text: "Please select LGA" }];
+        this.lgas = [{ value: null, text: "Please select LGA" }];
         data.forEach(async (datum) => {
           const dat = {
             value: datum.lg_id,
@@ -192,7 +195,6 @@ export default {
             this.lga.push(val);
           }
           this.lgas.push(dat);
-
         });
       });
     },
@@ -211,8 +213,8 @@ export default {
         emp_bank_id: this.emp_bank_id[0].value,
         //emp_state_id: this.emp_state_id.value,
         //emp_job_role_id:this.job_role[0].value,
-        emp_lga_id:this.lga[0].value,
-        emp_religion:this.religion,
+        emp_lga_id: this.lga[0].value,
+        emp_religion: this.religion,
 
         emp_marital_status: this.emp_marital_status,
         emp_spouse_name: this.emp_spouse_name,
@@ -227,12 +229,9 @@ export default {
         emp_emergency_contact: this.emp_emergency_contact,
         emp_contract_end_date: this.emp_contract_end_date,
         emp_hire_date: this.emp_hire_date,
-        emp_dob:this.birth_date,
+        emp_dob: this.birth_date,
 
-
-        emp_sex : this.gender,
-
-
+        emp_sex: this.gender,
       };
       this.apiPatch(url, data, "Update Employee Error").then();
       this.apiResponseHandler("Process Complete", "Employee Update");
@@ -261,7 +260,6 @@ export default {
 
     test() {
       console.log(this.bank);
-
     },
   },
   data() {
@@ -294,7 +292,7 @@ export default {
       emp_state_id: [],
       job_role: [],
       job_roles: [],
-      job_role_id:null,
+      job_role_id: null,
 
       emp_lga_id: null,
       emp_marital_status: null,
@@ -320,29 +318,29 @@ export default {
         { value: 2, text: "Not Married" },
       ],
       gender_options: [
-        { value: null, text: 'Please select gender' },
-        { value: '1', text: 'Male' },
-        { value: '2', text: 'Female' }
+        { value: null, text: "Please select gender" },
+        { value: "1", text: "Male" },
+        { value: "2", text: "Female" },
       ],
-      gender:null,
+      gender: null,
       religion_options: [
-        { value: null, text: 'Please select religion' },
-        { value: '1', text: 'Christianity' },
-        { value: '2', text: 'Islam' },
-        { value: '3', text: 'Hinduism' },
-        { value: '3', text: 'Buddhism' },
+        { value: null, text: "Please select religion" },
+        { value: "1", text: "Christianity" },
+        { value: "2", text: "Islam" },
+        { value: "3", text: "Hinduism" },
+        { value: "3", text: "Buddhism" },
       ],
-      religion:null,
+      religion: null,
       bank: null,
       banks: [],
       state: null,
       states: [],
-      lgas:[],
+      lgas: [],
       jrs: [],
-      lga:[],
-      stateId:null,
-      birth_date:null,
-      selectedStateId:null,
+      lga: [],
+      stateId: null,
+      birth_date: null,
+      selectedStateId: null,
     };
   },
 };
@@ -369,9 +367,8 @@ export default {
           <i class="mdi mdi-plus mr-2"></i>
           Manage Employees
         </b-button>
-
         <b-button
-          class="btn btn-primary"
+          class="btn btn-primary mr-3"
           @click="
             $router.push({
               name: 'employee-documents',
@@ -382,48 +379,32 @@ export default {
           <i class="mdi mdi-plus mr-2"></i>
           Upload Documents
         </b-button>
+        <b-button
+          class="btn btn-info mr-3"
+          @click="
+            $router.push({
+              name: 'employee-work-experience',
+              params: { employeeID: $route.params.employeeID },
+            })
+          "
+        >
+          <i class="mdi mdi-briefcase mr-2"></i>
+          Work Experience
+        </b-button>
+        <b-button
+          class="btn btn-warning mr-3"
+          @click="
+            $router.push({
+              name: 'employee-education',
+              params: { employeeID: $route.params.employeeID },
+            })
+          "
+        >
+          <i class="mdi mdi-book mr-2"></i>
+          Education
+        </b-button>
       </div>
-      <b-button
-        class="btn btn-primary"
-        @click="
-          $router.push({
-            name: 'employee-documents',
-            params: { employeeID: $route.params.employeeID },
-          })
-        "
-      >
-        <i class="mdi mdi-plus mr-2"></i>
-        Manage Documents
-
-      </b-button>
-      <b-button
-        class="btn btn-info"
-        @click="
-          $router.push({
-            name: 'employee-work-experience',
-            params: { employeeID: $route.params.employeeID },
-          })
-        "
-      >
-        <i class="mdi mdi-briefcase mr-2"></i>
-        Work Experience
-
-      </b-button>
-      <b-button
-        class="btn btn-warning"
-        @click="
-          $router.push({
-            name: 'employee-education',
-            params: { employeeID: $route.params.employeeID },
-          })
-        "
-      >
-        <i class="mdi mdi-book mr-2"></i>
-        Education
-
-      </b-button>
     </div>
-
     <scale-loader v-if="apiBusy" />
     <div v-else class="row">
       <div class="col-12">

@@ -18,7 +18,7 @@ export default {
     refreshTable() {
       this.apiGet(this.ROUTES.employee, "Get Employees Error").then((res) => {
         const { data } = res;
-        console.log(data)
+        console.log({ data });
         data.forEach((employee, index) => {
           this.employees[index] = { sn: ++index, ...employee };
         });
@@ -166,7 +166,8 @@ export default {
                   <span>
                     {{ row.item.emp_first_name }}
                     {{ row.item.emp_last_name }}
-                  </span> <br>
+                  </span>
+                  <br />
                   <small>{{ row.item.emp_unique_id }}</small>
                 </template>
                 <template #cell(email)="row">
