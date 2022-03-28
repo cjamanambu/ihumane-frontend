@@ -34,7 +34,6 @@ export default {
   methods: {
     selectRow(salaryStructure) {
       salaryStructure = salaryStructure[0];
-      console.log({ salaryStructure });
       this.employee = salaryStructure.ss_empid;
       this.amount = salaryStructure.total_amount.toString();
       this.gross = salaryStructure.total_amount;
@@ -56,8 +55,6 @@ export default {
         "Get Salary Structures Error"
       ).then((res) => {
         const { data } = res;
-        //console.log(data);
-        console.log({ data });
         data.forEach((salaryStructure, index) => {
           this.salaryStructures[index] = {
             sn: ++index,
@@ -435,7 +432,6 @@ export default {
                 </b-card-text>
               </b-card>
             </div>
-
             <div class="col-sm-3">
               <b-card
                 title="Gross Salary"
@@ -449,7 +445,6 @@ export default {
             </div>
           </div>
         </div>
-
         <div class="form-group">
           <label for="code">
             Salary Grade <span class="text-danger">*</span>
