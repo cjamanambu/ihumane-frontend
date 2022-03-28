@@ -34,7 +34,6 @@ export default {
   methods: {
     selectRow(salaryStructure) {
       salaryStructure = salaryStructure[0];
-      console.log({ salaryStructure });
       this.employee = salaryStructure.ss_empid;
       this.amount = salaryStructure.total_amount.toString();
       this.gross = salaryStructure.total_amount;
