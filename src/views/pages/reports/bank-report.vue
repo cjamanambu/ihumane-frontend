@@ -29,7 +29,6 @@ export default {
       const url = `${this.ROUTES.salary}/pay-order`;
       this.apiPost(url, data, "Generate Bank Schedule Report").then((res) => {
         const { data } = res;
-        console.log({ data });
         data.forEach((payOrder, index) => {
           this.locationName = payOrder.location;
           let payOrderObj = {
@@ -296,6 +295,11 @@ export default {
                   <span class="float-right">{{ data.value }}</span>
                 </template>
               </b-table>
+            </div>
+            <div v-else>
+              <p class="text-center my-5">
+                Populating report table, please wait...
+              </p>
             </div>
             <div class="row">
               <div class="col">
