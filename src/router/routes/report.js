@@ -8,7 +8,7 @@ export default [
     component: () => import("@/views/pages/reports/index.vue"),
   },
   {
-    path: "/reports/emolument/:period",
+    path: "/reports/emolument/:period/:locationID",
     name: "emolument-report",
     meta: {
       authRequired: true,

@@ -283,6 +283,11 @@ export default {
                 </template>
               </b-table>
             </div>
+            <div v-else>
+              <p class="text-center my-5">
+                Populating report table, please wait...
+              </p>
+            </div>
             <div class="p-3 bg-light mb-4 d-flex justify-content-between">
               <h5 class="font-size-14 mb-0" v-if="period">
                 Total {{ deductionName }}
