@@ -296,6 +296,11 @@ export default {
                 </template>
               </b-table>
             </div>
+            <div v-else>
+              <p class="text-center my-5">
+                Populating report table, please wait...
+              </p>
+            </div>
             <div class="row">
               <div class="col">
                 <div
