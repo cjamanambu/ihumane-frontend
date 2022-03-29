@@ -69,10 +69,10 @@ export default {
       <div class="card-body">
         <div class="media">
           <div class="media-body overflow-hidden">
-            <p class="text-truncate font-size-14 mb-2">
-              Current Payroll Period: {{ (parseInt(pmyMonth) - 1) | getMonth }}
-              {{ pmyYear }}
-            </p>
+            <!--            <p class="text-truncate font-size-14 mb-2">-->
+            <!--              Current Payroll Period: {{ (parseInt(pmyMonth) - 1) | getMonth }}-->
+            <!--              {{ pmyYear }}-->
+            <!--            </p>-->
             <h4 class="mb-0">Deduction Sheet</h4>
           </div>
           <div class="text-secondary"></div>
