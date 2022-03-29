@@ -7,6 +7,7 @@ import DeductionSheet from "./components/deduction-sheet";
 import DeductionReport from "./components/deduction-report";
 import Variation from "./components/variation";
 import BankOrder from "./components/bank-order";
+import EmployeeReport from "./components/employee-report";
 export default {
   page: {
     title: "Reports",
@@ -20,6 +21,8 @@ export default {
     DeductionReport,
     Variation,
     BankOrder,
+    EmployeeReport
+
   },
   data() {
     return {
@@ -62,6 +65,9 @@ export default {
         </div>
         <div class="col-md-4">
           <BankOrder />
+        </div>
+        <div class="col-md-4">
+          <EmployeeReport />
         </div>
       </div>
     </div>
