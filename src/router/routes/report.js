@@ -47,4 +47,12 @@ export default [
     },
     component: () => import("@/views/pages/reports/bank-report"),
   },
+  {
+    path: "/reports/employee-report/:type",
+    name: "employee-report",
+    meta: {
+      authRequired: true,
+    },
+    component: () => import("@/views/pages/reports/employee-report"),
+  },
 ];
