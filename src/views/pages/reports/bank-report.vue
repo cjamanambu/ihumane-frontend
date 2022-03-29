@@ -29,7 +29,6 @@ export default {
       const url = `${this.ROUTES.salary}/pay-order`;
       this.apiPost(url, data, "Generate Bank Schedule Report").then((res) => {
         const { data } = res;
-        console.log({ data });
         data.forEach((payOrder, index) => {
           this.locationName = payOrder.location;
           let payOrderObj = {

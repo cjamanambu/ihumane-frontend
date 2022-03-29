@@ -54,9 +54,11 @@ export default {
     refreshTable() {
       this.period = this.$route.params.period;
       this.period = this.period.split("-");
+      this.location = this.$route.params.locationID;
       let data = {
         pym_month: parseFloat(this.period[0]),
         pym_year: parseFloat(this.period[1]),
+        pmyl_location_id: this.location,
       };
       const url = `${this.ROUTES.salary}/pull-emolument`;
       this.apiPost(url, data, "Generate Emolument Report").then((res) => {
@@ -160,6 +162,7 @@ export default {
       incomeFields: [],
       deductionFields: [],
       jsonFields: {},
+      location: null,
     };
   },
 };

@@ -2,6 +2,7 @@
 export default {
   mounted() {
     this.fetchPMY();
+    this.fetchLocations();
   },
   data() {
     return {
@@ -10,6 +11,11 @@ export default {
       pmyYear: null,
       pmyDate: null,
       useCurrent: false,
+      location: null,
+      locations: [
+        { value: null, text: "Select location" },
+        { value: 0, text: "All Locations" },
+      ],
     };
   },
   methods: {
@@ -25,6 +31,21 @@ export default {
         }
       });
     },
+    fetchLocations() {
+      this.apiGet(this.ROUTES.location, "Get Locations Error").then((res) => {
+        this.locations = [
+          { value: null, text: "Select location" },
+          { value: 0, text: "All Locations" },
+        ];
+        const { data } = res;
+        data.forEach((location) => {
+          this.locations.push({
+            value: location.location_id,
+            text: `${location.l_t6_code} (${location.location_name})`,
+          });
+        });
+      });
+    },
     async generate() {
       let data, pym_month, pym_year;
       if (!this.useCurrent && !this.pmyDate) {
@@ -37,6 +58,7 @@ export default {
           data = {
             pym_month,
             pym_year,
+            pmyl_location_id: this.location,
           };
         } else {
           let date = this.pmyDate.split("-");
@@ -45,16 +67,19 @@ export default {
           data = {
             pym_month,
             pym_year,
+            pmyl_location_id: this.location,
           };
         }
         const url = `${this.ROUTES.salary}/pull-emolument`;
         this.apiPost(url, data, "Generate Emolument Report").then((res) => {
           const { data } = res;
           if (data.length) {
-            //route to new page and make request again
             this.$router.push({
               name: "emolument-report",
-              params: { period: `${pym_month}-${pym_year}` },
+              params: {
+                period: `${pym_month}-${pym_year}`,
+                locationID: this.location,
+              },
             });
           }
         });
@@ -105,15 +130,11 @@ export default {
           <label for="pmy">
             Select Payroll Period <span class="text-danger">*</span>
           </label>
-          <input
-            id="pmy"
-            v-model="pmyDate"
-            type="month"
-            class="form-control"
-            :class="{
-              'is-invalid': submitted && $v.pmyDate.$error,
-            }"
-          />
+          <input id="pmy" v-model="pmyDate" type="month" class="form-control" />
+        </div>
+        <div class="form-group">
+          <label for="">Select Location</label>
+          <b-form-select v-model="location" :options="locations" />
         </div>
         <div class="form-group">
           <b-form-group>
