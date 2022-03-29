@@ -23,7 +23,7 @@ export default {
       const url = `${this.ROUTES.leaveAccrual}/employee-leave-accruals`;
       this.apiGet(url, "Get Leave Accrual Error").then((res) => {
         const { data } = res;
-
+        console.log(data)
         data.leave_types.forEach((l_type)=>{
           let field = {
             key:`key_${l_type.leave_type_id}`,
@@ -34,6 +34,7 @@ export default {
            this.newFields.push(field);
         })
         this.accruals = data.accruals;
+
         const data_holder = [];
         this.accruals.forEach((leave,index)=>{
           let keyV = `key_${leave.leave_type.leave_type_id}`;
@@ -44,7 +45,7 @@ export default {
             t7:leave.employee.emp_unique_id,
             t6:leave.employee.location.location_name,
             employee_details:`${leave.employee.emp_first_name} ${leave.employee.emp_last_name}`,
-            t3:leave.employee.JobRole.Department.department_name,
+            t3:leave.employee.sector.department_name,
             ...leave
           });
         });
