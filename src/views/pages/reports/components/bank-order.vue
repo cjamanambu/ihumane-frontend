@@ -68,7 +68,6 @@ export default {
         this.apiPost(url, data, "Generate Bank Schedule Report").then((res) => {
           if (res) {
             const { data } = res;
-            console.log({ data });
             if (data.length) {
               this.$router.push({
                 name: "bank-schedule-report",

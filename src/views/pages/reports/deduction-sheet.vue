@@ -198,7 +198,7 @@ export default {
               <div class="col-sm-12 col-md-3 text-md-right">
                 <b-form-group
                   label="Filter On"
-                  label-cols-sm="8"
+                  label-cols-sm="7"
                   label-align-sm="right"
                   label-size="sm"
                   class="mb-0"
@@ -281,6 +281,11 @@ export default {
                 <!--                  </span>-->
                 <!--                </template>-->
               </b-table>
+            </div>
+            <div v-else>
+              <p class="text-center my-5">
+                Populating report table, please wait...
+              </p>
             </div>
             <div class="row">
               <div class="col">
