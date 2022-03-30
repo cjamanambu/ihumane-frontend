@@ -39,15 +39,11 @@ export default {
             accountNumber: payOrder.accountNumber,
             bankName: payOrder.bankName,
             bankSortCode: payOrder.bankSortCode,
-            grossSalary: parseFloat(
-              payOrder.grossSalary.toFixed(2)
-            ).toLocaleString(),
-            totalDeduction: parseFloat(
+            grossSalary: this.apiValueHandler(payOrder.grossSalary.toFixed(2)),
+            totalDeduction: this.apiValueHandler(
               payOrder.totalDeduction.toFixed(2)
-            ).toLocaleString(),
-            netSalary: parseFloat(
-              payOrder.netSalary.toFixed(2)
-            ).toLocaleString(),
+            ),
+            netSalary: this.apiValueHandler(payOrder.netSalary.toFixed(2)),
           };
           this.payOrders.push(payOrderObj);
         });

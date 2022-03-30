@@ -20,10 +20,7 @@ export default {
     fetchPaymentDefinitions() {
       this.paymentDefinitions = [];
       const url = `${this.ROUTES.paymentDefinition}/employee-payment-definition`;
-      this.apiGet(
-        url,
-        "Get Payment Definitions Error"
-      ).then(async (res) => {
+      this.apiGet(url, "Get Payment Definitions Error").then(async (res) => {
         const { data } = res;
         this.paymentDefinitions = data;
         await this.processFields(data);
@@ -72,24 +69,24 @@ export default {
             location: emolument.location,
           };
           emolument.incomes.forEach((income) => {
-            emolumentObj[income.paymentName] = parseFloat(
+            emolumentObj[income.paymentName] = this.apiValueHandler(
               income.amount.toFixed(2)
-            ).toLocaleString();
+            );
           });
           emolument.deductions.forEach((deduction) => {
-            emolumentObj[deduction.paymentName] = parseFloat(
+            emolumentObj[deduction.paymentName] = this.apiValueHandler(
               deduction.amount.toFixed(2)
-            ).toLocaleString();
+            );
           });
-          emolumentObj["grossSalary"] = parseFloat(
+          emolumentObj["grossSalary"] = this.apiValueHandler(
             emolument.grossSalary.toFixed(2)
-          ).toLocaleString();
-          emolumentObj["totalDeduction"] = parseFloat(
+          );
+          emolumentObj["totalDeduction"] = this.apiValueHandler(
             emolument.totalDeduction.toFixed(2)
-          ).toLocaleString();
-          emolumentObj["netSalary"] = parseFloat(
+          );
+          emolumentObj["netSalary"] = this.apiValueHandler(
             emolument.netSalary.toFixed(2)
-          ).toLocaleString();
+          );
           this.newEmoluments.push(emolumentObj);
         });
         this.filtered = this.newEmoluments;
