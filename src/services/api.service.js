@@ -81,5 +81,10 @@ export default {
         variant: "warning",
       });
     },
+    apiValueHandler(input) {
+      let output = input.toString().split(".");
+      output[0] = output[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+      return output.join(".");
+    },
   },
 };

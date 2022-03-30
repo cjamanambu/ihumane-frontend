@@ -70,13 +70,10 @@ export default {
           };
           deduction.deductions.forEach((deduction) => {
             this.deductionSum += deduction.amount;
-            deductionObj[deduction.paymentName] = parseFloat(
+            deductionObj[deduction.paymentName] = this.apiValueHandler(
               deduction.amount.toFixed(2)
-            ).toLocaleString();
+            );
           });
-          // deductionObj["totalDeduction"] = parseFloat(
-          //   deduction.totalDeduction.toFixed(2)
-          // ).toLocaleString();
           this.deductions.push(deductionObj);
         });
         this.filtered = this.deductions;
@@ -293,7 +290,7 @@ export default {
                 Total {{ deductionName }}
               </h5>
               <h5 class="font-size-16 mb-0">
-                {{ parseFloat(deductionSum.toFixed(2)).toLocaleString() }}
+                {{ apiValueHandler(deductionSum.toFixed(2)) }}
               </h5>
             </div>
             <div class="row">
