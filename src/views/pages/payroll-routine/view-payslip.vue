@@ -217,17 +217,17 @@ export default {
 
               <div class="row">
                 <div class="col-lg-6">
-                  <div class="d-flex justify-content-between">
-                    <h6>PENSION (EMPLOYER CONTRIBUTION)</h6>
-                    <p class="text-capitalize">
-                      =N= {{ payslipData.pension.toLocaleString() }}
-                    </p>
-                  </div>
-                  <div class="d-flex justify-content-between">
-                    <h6>NSITF</h6>
-                    <p class="text-capitalize">
-                      =N= {{ payslipData.nsitf.toLocaleString() }}
-                    </p>
+                  <div v-if="payslipData">
+                    <div
+                        class="d-flex justify-content-between"
+                        v-for="(income, index) in payslipData.employersIncomes"
+                        :key="index"
+                    >
+                      <p class="mb-1">{{ income.paymentName }}</p>
+                      <p class="mb-1">
+                        =N= {{ income.amount.toLocaleString() }}
+                      </p>
+                    </div>
                   </div>
                 </div>
                 <div class="col-lg-6"></div>
@@ -391,7 +391,27 @@ export default {
 
                 <div class="row">
                   <div class="col-lg-6">
+
+                    <div v-if="payslipData">
+                      <div
+                          class="d-flex justify-content-between"
+                          v-for="(income, index) in payslipData.employersIncomes"
+                          :key="index"
+                      >
+                        <p class="mb-1">{{ income.paymentName }}</p>
+                        <p class="mb-1">
+                          =N= {{ income.amount.toLocaleString() }}
+                        </p>
+                      </div>
+                    </div>
+
+
                     <div class="d-flex justify-content-between">
+
+
+
+
+
                       <h6>PENSION (EMPLOYER CONTRIBUTION)</h6>
                       <p class="text-capitalize">
                         =N= {{ payslipData.pension.toLocaleString() }}
