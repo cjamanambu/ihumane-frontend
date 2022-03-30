@@ -180,7 +180,7 @@ export default {
       const url = `${this.ROUTES.localGovernment}/${stateId}`;
       await this.apiGet(url).then((res) => {
         const { data } = res;
-        //console.log(data);
+        console.log(data);
         this.lgas = [{ value: null, text: "Please select LGA" }];
         data.forEach(async (datum) => {
           const dat = {
@@ -419,30 +419,30 @@ export default {
                   <div class="form-group">
                     <label for=""> First Name </label>
                     <input
-                      readonly
                       type="text"
                       class="form-control"
                       v-model="emp_first_name"
+                      placeholder="First Name"
                     />
                   </div>
 
                   <div class="form-group">
                     <label for=""> Other Name </label>
                     <input
-                      readonly
                       type="text"
                       class="form-control"
                       v-model="emp_other_name"
+                      placeholder="Other Name"
                     />
                   </div>
 
                   <div class="form-group">
                     <label for=""> Last Name </label>
                     <input
-                      readonly
                       type="text"
                       class="form-control"
                       v-model="emp_last_name"
+                      placeholder="Last Name"
                     />
                   </div>
                   <div class="form-group">
@@ -460,6 +460,7 @@ export default {
                       required
                       class="form-control"
                       v-model="emp_phone_no"
+                      placeholder="Phone Number"
                     />
                   </div>
                   <div class="form-group">
