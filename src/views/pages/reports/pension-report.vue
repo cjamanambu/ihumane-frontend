@@ -38,7 +38,7 @@ export default {
           //   if(typeof pensionArray[0])
           let pensionObj = {
             sn: ++index,
-            employeeUniqueId: pension.employeeUniqueId,
+            employee_unique_id: pension.employeeUniqueId,
             employeeName: pension.employeeName,
             sector: pension.sector,
             pension_employee_contribution: this.apiValueHandler(pension.pensionArray[0].Amount.toFixed(2))  ?? '0.00',
@@ -48,8 +48,28 @@ export default {
           this.pensions.push(pensionObj);
         });
         this.filtered = this.pensions;
-        this.totalRows = this.ppensions.length;
+        this.totalRows = this.pensions.length;
 
+
+      });
+
+      this.newFields.forEach((field) => {
+        let key = field;
+        if (key === "sn") {
+          this.jsonFields["S/N"] = key;
+        } else if (key === "employee_unique_id") {
+          this.jsonFields["T7 NUMBER"] = key;
+        } else if (key === "employeeName") {
+          this.jsonFields["NAME"] = key;
+        }  else if (key === "sector") {
+          this.jsonFields["SECTOR"] = key;
+        } else if (key === "pension_employee_contribution") {
+          this.jsonFields["EMPLOYEE CONTRIBUTION"] = key;
+        } else if (key === "pension_employer_contribution") {
+          this.jsonFields["EMPLOYER CONTRIBUTION"] = key;
+        } else if (key === "voluntary_pension") {
+          this.jsonFields["VOLUNTARY PENSION"] = key;
+        }
       });
     },
     onFiltered(filteredItems) {
@@ -107,7 +127,7 @@ export default {
       sortDesc: false,
       newFields: [
         "sn",
-        "t7_number",
+        "employee_unique_id",
         "employeeName",
         "sector",
         "pension_employee_contribution",
@@ -148,7 +168,7 @@ export default {
               <span class="font-size-12 text-success">
                 <JsonExcel
                   style="cursor: pointer"
-                  :data="filtered"
+                  :data="pensions"
                   :fields="jsonFields"
                   :name="`Pension_Report_${locationName}(${period[0]}-${period[1]}).xls`"
                 >
@@ -232,9 +252,9 @@ export default {
                     {{ row.value }}
                   </span>
                 </template>
-                <template #cell(t7_number)="row">
+                <template #cell(employee_unique_id)="row">
                   <span>
-                    {{ row.item.employeeUniqueId }}
+                    {{ row.value }}
                   </span>
                 </template>
                 <template #cell(employeeName)="row">
