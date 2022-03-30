@@ -68,7 +68,6 @@ export default {
         this.apiPost(url, data, "Generate Bank Schedule Report").then((res) => {
           if (res) {
             const { data } = res;
-            console.log({ data });
             if (data.length) {
               this.$router.push({
                 name: "bank-schedule-report",
@@ -92,10 +91,10 @@ export default {
       <div class="card-body">
         <div class="media">
           <div class="media-body overflow-hidden">
-            <p class="text-truncate font-size-14 mb-2">
-              Current Payroll Period: {{ (parseInt(pmyMonth) - 1) | getMonth }}
-              {{ pmyYear }}
-            </p>
+            <!--            <p class="text-truncate font-size-14 mb-2">-->
+            <!--              Current Payroll Period: {{ (parseInt(pmyMonth) - 1) | getMonth }}-->
+            <!--              {{ pmyYear }}-->
+            <!--            </p>-->
             <h4 class="mb-0">Bank Schedule Report</h4>
           </div>
           <div class="text-secondary"></div>

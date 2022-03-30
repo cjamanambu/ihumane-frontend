@@ -3,7 +3,7 @@ import Layout from "@/views/layouts/main";
 import PageHeader from "@/components/page-header";
 import appConfig from "@/app.config";
 import { required } from "vuelidate/lib/validators";
-import Multiselect from 'vue-multiselect';
+import Multiselect from "vue-multiselect";
 
 export default {
   page: {
@@ -17,8 +17,6 @@ export default {
   },
   mounted() {
     this.refreshTable();
-    this.fetchStates();
-    this.getEmployees();
   },
   validations: {
     name: { required },
@@ -26,18 +24,16 @@ export default {
     t6_code: { required },
   },
   methods: {
-    locationLabel ({ text }) {
-      return `${text}`
+    locationLabel({ text }) {
+      return `${text}`;
     },
-    employeeLabel ({ text }) {
-      return `${text}`
+    employeeLabel({ text }) {
+      return `${text}`;
     },
     getEmployees() {
       const url = `${this.ROUTES.employee}`;
       this.apiGet(url, "Couldn't get employees").then((res) => {
-        this.employee_list = [
-          { value: null, text: "Please select sector lead" },
-        ];
+        this.employee_list = [];
         const { data } = res;
         data.forEach((emp) => {
           this.employee_list.push({
@@ -52,13 +48,42 @@ export default {
     refreshTable() {
       this.apiGet(this.ROUTES.location, "Get Locations Error").then((res) => {
         const { data } = res;
-        this.locations = data;
+        data.forEach((location, index) => {
+          const url = `${this.ROUTES.hrFocalPoint}/${location.location_id}`;
+          this.apiGet(url, "Get Focal Points Error").then((res) => {
+            const { data } = res;
+            let focalPoints = null;
+            if (data.length) {
+              focalPoints = [];
+              data.forEach((focalPoint) => {
+                focalPoints.push({
+                  value: focalPoint.focal_person.emp_id,
+                  text: `${focalPoint.focal_person.emp_first_name} ${
+                    focalPoint.focal_person.emp_last_name
+                  } ${
+                    focalPoint.focal_person.emp_other_name !== null
+                      ? focalPoint.focal_person.emp_other_name
+                      : ""
+                  } (${focalPoint.focal_person.emp_unique_id})`,
+                });
+              });
+            }
+            this.locations[index] = {
+              sn: ++index,
+              ...location,
+              focalPoints,
+            };
+          });
+        });
+        console.log(this.locations);
         this.totalRows = this.locations.length;
+        this.fetchStates();
+        this.getEmployees();
       });
     },
     fetchStates() {
       this.apiGet(this.ROUTES.state, "Get States Error").then((res) => {
-        this.states = [{ value: null, text: "Please select a state" }];
+        this.states = [];
         const { data } = res;
         data.forEach((state) => {
           this.states.push({
@@ -83,6 +108,7 @@ export default {
         this.apiPost(this.ROUTES.location, data, "New Location Error").then(
           (res) => {
             this.apiResponseHandler(`${res.data}`, "New Location Added");
+            this.locations = [];
             this.refreshTable();
             this.$v.$reset();
             this.$refs["add-location"].hide();
@@ -105,6 +131,7 @@ export default {
         const url = `${this.ROUTES.location}/${this.locationID}`;
         this.apiPatch(url, data, "Update Location Error").then((res) => {
           this.apiResponseHandler(`${res.data}`, "Update Successful");
+          this.locations = [];
           this.refreshTable();
           this.$v.$reset();
           this.$refs["update-location"].hide();
@@ -121,7 +148,8 @@ export default {
       location = location[0];
       this.locationID = location.location_id;
       this.name = location.location_name;
-      this.state = location.l_state_id;
+      this.state = { value: location.State.s_id, text: location.State.s_name };
+      this.focal_persons = location.focalPoints;
       this.t6_code = location.l_t6_code;
       this.$refs["update-location"].show();
       this.$refs["location-table"].clearSelected();
@@ -130,6 +158,9 @@ export default {
       // Trigger pagination to update the number of buttons/pages due to filtering
       this.totalRows = filteredItems.length;
       this.currentPage = 1;
+    },
+    test() {
+      console.log(this.state);
     },
   },
   data() {
@@ -156,13 +187,14 @@ export default {
       pageOptions: [10, 25, 50, 100],
       filter: null,
       filterOn: [],
-      sortBy: "location_id",
+      sortBy: "sn",
       sortDesc: false,
       fields: [
-        { key: "location_id", label: "ID", sortable: true },
+        { key: "sn", label: "S/n", sortable: true },
         { key: "location_name", label: "Location", sortable: true },
         { key: "State.s_name", label: "State", sortable: true },
         { key: "l_t6_code", label: "T6 Code", sortable: true },
+        { key: "focalPoints", label: "HR Focal Points", sortable: true },
       ],
       name: null,
       t6_code: null,
@@ -170,7 +202,7 @@ export default {
       states: [{ value: null, text: "Please select a state" }],
       locationID: null,
       employee_list: [{ value: null, text: "Please select a sector lead" }],
-      focal_persons:[],
+      focal_persons: [],
     };
   },
 };
@@ -232,6 +264,7 @@ export default {
             <!-- Table -->
             <div class="table-responsive mb-0">
               <b-table
+                v-if="locations.length"
                 ref="location-table"
                 bordered
                 selectable
@@ -250,6 +283,23 @@ export default {
                 select-mode="single"
                 @row-selected="selectLocation"
               >
+                <template #cell(focalPoints)="row">
+                  <span v-if="row.value.length">
+                    <span
+                      class="text-capitalize"
+                      v-for="(focalPoint, index) in row.value"
+                      :key="index"
+                    >
+                      <span v-if="index < row.value.length - 1">
+                        {{ focalPoint.text }},
+                      </span>
+                      <span v-else>
+                        {{ focalPoint.text }}
+                      </span>
+                    </span>
+                  </span>
+                  <span v-else> --- </span>
+                </template>
               </b-table>
             </div>
             <div class="row">
@@ -304,22 +354,22 @@ export default {
             :options="employee_list"
             :custom-label="employeeLabel"
             :multiple="true"
-            :class="{
-                      'is-invalid': submitted && $v.employee_list.$error,
-                    }"
-          ></multiselect>
+            :close-on-select="false"
+            track-by="value"
+            placeholder="Select HR Focal Points"
+          />
         </div>
         <div class="form-group">
           <label for="state"> State <span class="text-danger">*</span> </label>
           <multiselect
-                  v-model="state"
-                  :options="states"
-                  :custom-label="locationLabel"
-                  :class="{
-                      'is-invalid': submitted && $v.state.$error,
-                    }"
-          ></multiselect>
-
+            v-model="state"
+            :options="states"
+            :custom-label="locationLabel"
+            placeholder="Select State"
+            :class="{
+              'is-invalid': submitted && $v.state.$error,
+            }"
+          />
           <small
             class="form-text text-muted manage"
             @click="$router.push('/states')"
@@ -390,20 +440,21 @@ export default {
             :options="employee_list"
             :custom-label="employeeLabel"
             :multiple="true"
-            :class="{
-                      'is-invalid': submitted && $v.employee_list.$error,
-                    }"
+            track-by="value"
+            :close-on-select="false"
+            placeholder="Select HR Focal Points"
           ></multiselect>
         </div>
         <div class="form-group">
           <label for="state"> State <span class="text-danger">*</span> </label>
           <multiselect
-                  v-model="state"
-                  :options="states"
-                  :custom-label="locationLabel"
-                  :class="{
-                      'is-invalid': submitted && $v.state.$error,
-                    }"
+            v-model="state"
+            :options="states"
+            :custom-label="locationLabel"
+            placeholder="Select State"
+            :class="{
+              'is-invalid': submitted && $v.state.$error,
+            }"
           ></multiselect>
           <small
             class="form-text text-muted manage"

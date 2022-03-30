@@ -22,6 +22,8 @@ export default {
   },
   mounted() {
     this.getLeaveAccruals();
+    this.fetchApplications();
+    this.getHRFocalPoints();
   },
   validations: {
     leaveType: { required },
@@ -51,14 +53,23 @@ export default {
       leaveTypes: [],
       leapp_start_date: null,
       leapp_end_date: null,
+      leapp_alt_email: null,
+      leapp_alt_phone: null,
       submitted: false,
+      omittedDays: [],
+      omittedStartDate: null,
+      omittedEndDate: null,
+      focalPoints: [],
+      location: null,
+      existingLeaveType: null,
+      applications: [],
+      applying: false,
     };
   },
   methods: {
     getLeaveAccruals() {
       let url = `${this.ROUTES.leaveAccrual}/get-leave-acrruals/${this.getEmployee.emp_id}`;
       this.apiGet(url, "Get Leave Accruals Error").then((res) => {
-        console.log({ res });
         const { data } = res;
         this.leaveTypes = [
           { value: null, text: "Please select a leave type", disabled: true },
@@ -79,10 +90,77 @@ export default {
         });
       });
     },
+    fetchApplications() {
+      const url = `${this.ROUTES.leaveApplication}/get-employee-leave/${this.getEmployee.emp_id}`;
+      this.apiGet(url, "Get Employee Leaves Error").then((res) => {
+        const { data } = res.data;
+        this.omittedDays = [];
+        this.applications = data;
+        data.forEach((application) => {
+          if (
+            application.leapp_status === 0 ||
+            application.leapp_status === 1 ||
+            application.leapp_status === 3
+          )
+            this.omittedDays.push(
+              ...this.getDates(
+                application.leapp_start_date,
+                application.leapp_end_date
+              )
+            );
+        });
+      });
+    },
+    getHRFocalPoints() {
+      const locationID = this.getEmployee.location.location_id;
+      this.location = this.getEmployee.location.location_name;
+      const url = `${this.ROUTES.hrFocalPoint}/${locationID}`;
+      this.apiGet(url, "Get Focal Point Error").then((res) => {
+        const { data } = res;
+        this.focalPoints = data;
+      });
+    },
+    getDates(startDate, endDate) {
+      const dates = [];
+      let currentDate = new Date(startDate);
+      const addDays = function (days) {
+        const date = new Date(this.valueOf());
+        date.setDate(date.getDate() + days);
+        return date;
+      };
+      while (currentDate <= new Date(endDate)) {
+        dates.push(currentDate);
+        currentDate = addDays.call(currentDate, 1);
+      }
+      return dates;
+    },
     notBeforeToday(date) {
       const today = new Date();
-      today.setHours(0, 0, 0, 0);
       return date < today;
+    },
+    confirmStartDate() {
+      this.omittedStartDate = this.omittedDays.find((date) => {
+        return (
+          date.toDateString() === new Date(this.leapp_start_date).toDateString()
+        );
+      });
+    },
+    confirmEndDate() {
+      this.omittedEndDate = this.omittedDays.find((date) => {
+        return (
+          date.toDateString() === new Date(this.leapp_end_date).toDateString()
+        );
+      });
+    },
+    confirmApplicationType() {
+      this.existingLeaveType = this.applications.find((application) => {
+        return (
+          application.leapp_leave_type === this.leaveType &&
+          (application.leapp_status === 0 ||
+            application.leapp_status === 1 ||
+            application.leapp_status === 3)
+        );
+      });
     },
     notBeforeStartDate(date) {
       let startDate = new Date();
@@ -113,8 +191,9 @@ export default {
     deleteFile(index) {
       this.uploadFiles.splice(index, 1);
     },
-    submitNew() {
+    async submitNew() {
       this.submitted = true;
+      this.applying = true;
       this.$v.$touch();
       if (this.$v.$invalid) {
         this.apiFormHandler("Invalid Leave Application");
@@ -124,13 +203,41 @@ export default {
           leapp_leave_type: this.leaveType,
           leapp_start_date: this.leapp_start_date,
           leapp_end_date: this.leapp_end_date,
-          leapp_alt_email: this.leapp_alt_email,
-          leapp_alt_phone: this.leapp_alt_phone,
         };
-        const url = `${this.ROUTES.leaveApplication}/add-leave-application`;
-        this.apiPost(url, data, "Add Leave Application").then((res) => {
-          this.apiResponseHandler(`${res.data}`, "New leave application Added");
-        });
+        this.leapp_alt_email
+          ? (data["leapp_alt_email"] = this.leapp_alt_email)
+          : false;
+        this.leapp_alt_phone
+          ? (data["leapp_alt_phone"] = this.leapp_alt_phone)
+          : false;
+        let url = `${this.ROUTES.leaveApplication}/add-leave-application`;
+        await this.apiPost(url, data, "Add Leave Application").then(
+          async (res) => {
+            const { data } = res;
+            if (data) {
+              const leaveApplicationID = data.leapp_id;
+              if (this.uploadFiles.length > 0) {
+                url = `${this.ROUTES.leaveDoc}/leave-doc/${leaveApplicationID}`;
+                let formData = new FormData();
+                await this.uploadFiles.forEach((file) => {
+                  formData.append("documents", file);
+                });
+                await this.apiPost(
+                  url,
+                  formData,
+                  "Upload Leave Supporting Documents Error"
+                );
+              }
+              this.$router.push("/leave-application").then(() => {
+                this.apiResponseHandler(
+                  "Action Successful",
+                  "Leave Application Submitted"
+                );
+              });
+            }
+          }
+        );
+        this.applying = false;
       }
     },
   },
@@ -206,10 +313,15 @@ export default {
                   id="leave-types"
                   v-model="leaveType"
                   :options="leaveTypes"
+                  @change="confirmApplicationType"
                   :class="{
                     'is-invalid': submitted && $v.leaveType.$error,
                   }"
                 />
+                <small v-if="existingLeaveType" class="text-danger">
+                  You have an existing
+                  {{ existingLeaveType.LeaveType.leave_name }} application
+                </small>
               </div>
               <div class="form-group">
                 <label for="start-date">
@@ -218,12 +330,17 @@ export default {
                 <date-picker
                   v-model="leapp_start_date"
                   valueType="format"
+                  @input="confirmStartDate"
                   placeholder="Select start date"
                   :disabled-date="notBeforeToday"
                   :class="{
                     'is-invalid': submitted && $v.leapp_start_date.$error,
                   }"
                 />
+                <small v-if="omittedStartDate" class="text-danger">
+                  {{ new Date(leapp_start_date).toDateString() }} is already
+                  part of a current leave application.
+                </small>
               </div>
               <div class="form-group">
                 <label for="start-date">
@@ -232,12 +349,17 @@ export default {
                 <date-picker
                   v-model="leapp_end_date"
                   valueType="format"
+                  @input="confirmEndDate"
                   placeholder="Select end date"
                   :disabled-date="notBeforeStartDate"
                   :class="{
                     'is-invalid': submitted && $v.leapp_end_date.$error,
                   }"
                 />
+                <small v-if="omittedEndDate" class="text-danger">
+                  {{ new Date(leapp_end_date).toDateString() }} is already part
+                  of a current leave application.
+                </small>
               </div>
               <div class="form-group">
                 <label for="alt-email"> Emergency Email Address </label>
@@ -258,9 +380,12 @@ export default {
                 />
               </div>
               <b-button
-                v-if="!submitting"
+                v-if="!applying"
                 class="btn btn-success btn-block mt-4"
                 type="submit"
+                :disabled="
+                  omittedStartDate || omittedEndDate || existingLeaveType
+                "
               >
                 Submit
               </b-button>
@@ -276,6 +401,41 @@ export default {
           </div>
         </div>
         <div class="col-lg-5">
+          <div class="card mb-4">
+            <div class="card-body">
+              <div class="p-3 bg-light mb-4">
+                <h5 class="font-size-14 mb-0">
+                  HR Focal Points for {{ location }}
+                </h5>
+              </div>
+              <div v-if="focalPoints.length > 0">
+                <div
+                  class="media mb-2"
+                  v-for="(focalPoint, index) in focalPoints"
+                  :key="index"
+                >
+                  <img
+                    :src="focalPoint.focal_person.emp_passport"
+                    width="8%"
+                    class="mr-3"
+                    alt="profile pic"
+                  />
+                  <div class="media-body">
+                    <h6 class="text-capitalize mt-0 mb-n1">
+                      {{ focalPoint.focal_person.emp_first_name }}
+                      {{ focalPoint.focal_person.emp_last_name }}
+                    </h6>
+                    <small class="text-capitalize">
+                      {{ focalPoint.focal_person.emp_unique_id }}
+                    </small>
+                  </div>
+                </div>
+              </div>
+              <div v-else class="alert alert-info">
+                There are currently no HR Focal Points for your location.
+              </div>
+            </div>
+          </div>
           <div class="card">
             <div class="card-body">
               <div class="p-3 bg-light mb-4">

@@ -175,14 +175,14 @@ export default {
         });
       });
     },
-    async getLocalGovernmentAreasByStateId() {
+     getLocalGovernmentAreasByStateId() {
       let stateId = this.emp_state_id.value;
       const url = `${this.ROUTES.localGovernment}/${stateId}`;
-      await this.apiGet(url).then((res) => {
+       this.apiGet(url).then((res) => {
         const { data } = res;
-        console.log(data);
+        //console.log(data);
         this.lgas = [{ value: null, text: "Please select LGA" }];
-        data.forEach(async (datum) => {
+        data.forEach( (datum) => {
           const dat = {
             value: datum.lg_id,
             text: datum.lg_name,
@@ -306,9 +306,10 @@ export default {
       emp_genotype: null,
       emp_emergency_name: null,
       emp_emergency_contact: null,
-
+      emp_bvn:null,
       emp_suspension_reason: null,
-
+      emp_office_email: null,
+      emp_personal_email: null,
       emp_hire_date: null,
       emp_contract_end_date: null,
 
@@ -349,356 +350,205 @@ export default {
 <template>
   <Layout>
     <PageHeader :title="title" :items="items" />
-    <div class="d-flex justify-content-between mb-3">
-      <div>
-        <b-button
-          class="btn btn-danger"
-          @click="$refs['deactivate-employee'].show()"
-        >
-          <i class="mdi mdi-minus mr-2"></i>
-          Deactivate Employee
-        </b-button>
-      </div>
-      <div class="d-flex">
-        <b-button
-          class="btn btn-success mr-3"
-          @click="$router.push({ name: 'manage-employees' })"
-        >
-          <i class="mdi mdi-plus mr-2"></i>
-          Manage Employees
-        </b-button>
-        <b-button
-          class="btn btn-primary mr-3"
-          @click="
-            $router.push({
-              name: 'employee-documents',
-              params: { employeeID: $route.params.employeeID },
-            })
-          "
-        >
-          <i class="mdi mdi-plus mr-2"></i>
-          Upload Documents
-        </b-button>
-        <b-button
-          class="btn btn-info mr-3"
-          @click="
-            $router.push({
-              name: 'employee-work-experience',
-              params: { employeeID: $route.params.employeeID },
-            })
-          "
-        >
-          <i class="mdi mdi-briefcase mr-2"></i>
-          Work Experience
-        </b-button>
-        <b-button
-          class="btn btn-warning mr-3"
-          @click="
-            $router.push({
-              name: 'employee-education',
-              params: { employeeID: $route.params.employeeID },
-            })
-          "
-        >
-          <i class="mdi mdi-book mr-2"></i>
-          Education
-        </b-button>
-      </div>
-    </div>
     <scale-loader v-if="apiBusy" />
     <div v-else class="row">
-      <div class="col-12">
-        <div class="card">
-          <div class="card-body">
-            <form @submit.prevent>
+      <div class="col-lg-12">
+          <div class="card">
+            <div class="card-body">
               <div class="row">
-                <div class="col-lg-6">
-                  <div class="p-3 bg-light mb-4">
-                    <h5 class="font-size-14 mb-0">Personal Information</h5>
-                  </div>
-                  <div class="form-group">
-                    <label for=""> First Name </label>
-                    <input
-                      type="text"
-                      class="form-control"
-                      v-model="emp_first_name"
-                      placeholder="First Name"
-                    />
-                  </div>
-
-                  <div class="form-group">
-                    <label for=""> Other Name </label>
-                    <input
-                      type="text"
-                      class="form-control"
-                      v-model="emp_other_name"
-                      placeholder="Other Name"
-                    />
-                  </div>
-
-                  <div class="form-group">
-                    <label for=""> Last Name </label>
-                    <input
-                      type="text"
-                      class="form-control"
-                      v-model="emp_last_name"
-                      placeholder="Last Name"
-                    />
-                  </div>
-                  <div class="form-group">
-                    <label for=""> Date of Birth </label>
-                    <input
-                      type="date"
-                      class="form-control"
-                      v-model="birth_date"
-                    />
-                  </div>
-                  <div class="form-group">
-                    <label for=""> Phone Number </label>
-                    <input
-                      type="text"
-                      required
-                      class="form-control"
-                      v-model="emp_phone_no"
-                      placeholder="Phone Number"
-                    />
-                  </div>
-                  <div class="form-group">
-                    <label for=""> Location </label>
-                    <input
-                      readonly
-                      type="text"
-                      class="form-control"
-                      v-model="emp_location"
-                    />
-                  </div>
-
-                  <div class="form-group">
-                    <label for=""> Qualification </label>
-                    <input
-                      type="text"
-                      class="form-control"
-                      v-model="emp_qualification"
-                    />
-                  </div>
-                  <div class="form-group">
-                    <label>Gender</label>
-                    <b-select
-                      v-model="gender"
-                      :options="gender_options"
-                      :class="{
-                        'is-invalid': submitted && $v.gender.$error,
-                      }"
-                    ></b-select>
-                  </div>
-                  <div class="form-group">
-                    <label>Religion</label>
-                    <b-select
-                      v-model="religion"
-                      :options="religion_options"
-                      :class="{
-                        'is-invalid': submitted && $v.religion.$error,
-                      }"
-                    ></b-select>
-                  </div>
-                  <div class="form-group">
-                    <label>Job Role</label>
-                    <multiselect
-                      v-model="job_role"
-                      :options="job_roles"
-                      :custom-label="locationLabel"
-                      :class="{
-                        'is-invalid': submitted && $v.job_role.$error,
-                      }"
-                    ></multiselect>
-                  </div>
-                  <div class="form-group">
-                    <label>State Of Origin</label>
-                    <multiselect
-                      v-model="emp_state_id"
-                      :options="states"
-                      :custom-label="stateOfOriginLabel"
-                      @input="getLocalGovernmentAreasByStateId"
-                      :class="{
-                        'is-invalid': submitted && $v.emp_state_id.$error,
-                      }"
-                    ></multiselect>
-                  </div>
-                  <div class="form-group">
-                    <label>LGA</label>
-                    <multiselect
-                      v-model="lga"
-                      :options="lgas"
-                      :custom-label="lGALabel"
-                      :class="{
-                        'is-invalid': submitted && $v.emp_state_id.$error,
-                      }"
-                    ></multiselect>
-                  </div>
-                  <div class="p-3 bg-light mb-4">
-                    <h5 class="font-size-14 mb-0">
-                      Bank Information -- For Salary Disbursement
-                    </h5>
-                  </div>
-                  <div class="form-group">
-                    <label>Bank</label>
-                    <multiselect
-                      v-model="emp_bank_id"
-                      :options="banks"
-                      :custom-label="bankLabel"
-                      @select="toggleSelected"
-                      :class="{
-                        'is-invalid': submitted && $v.emp_bank_id.$error,
-                      }"
-                    >
-                    </multiselect>
-                  </div>
-
-                  <div class="form-group">
-                    <label for=""> Account Number </label>
-                    <input
-                      type="text"
-                      class="form-control"
-                      v-model="emp_account_no"
-                    />
-                  </div>
-                  <div class="p-3 bg-light mb-4">
-                    <h5 class="font-size-14 mb-0">Marital Information</h5>
-                  </div>
-                  <div class="form-group">
-                    <label>Marital Status</label>
-                    <b-form-select
-                      v-model="emp_marital_status"
-                      :options="maritalStatus"
-                    />
-                  </div>
-
-                  <div class="form-group">
-                    <label for=""> Spouse Name </label>
-                    <input
-                      type="text"
-                      class="form-control"
-                      v-model="emp_spouse_name"
-                    />
-                  </div>
-
-                  <div class="form-group">
-                    <label for=""> Spouse Contact (Phone No) </label>
-                    <input
-                      type="text"
-                      class="form-control"
-                      v-model="emp_spouse_phone_no"
-                    />
+                <div class="col-md-4">  <!--@click="$router.push({ name: 'manage-employees' })"-->
+                  <div class="d-flex" style="cursor: pointer;" @click="$router.push({name: 'employee-documents',
+              params: { employeeID: $route.params.employeeID },})">
+                    <div class="avatar-sm me-3 mr-1">
+                        <span class="avatar-title bg-light rounded-circle text-primary font-size-24">
+                            <i class="ri-upload-cloud-2-fill"></i>
+                        </span>
+                    </div>
+                    <div class="flex-1 align-self-center overflow-hidden">
+                      <h5>Upload Documents</h5>
+                      <p>Upload employee documents</p>
+                    </div>
                   </div>
                 </div>
-                <div class="col-lg-6">
-                  <div class="p-3 bg-light mb-4">
-                    <h5 class="font-size-14 mb-0">Health Information</h5>
+                <div class="col-md-4">
+                  <div class="d-flex mt-4 mt-md-0" style="cursor: pointer;" @click="
+                      $router.push({
+                        name: 'employee-work-experience',
+                        params: { employeeID: $route.params.employeeID },
+                      })
+                    ">
+                    <div class="avatar-sm me-3">
+                        <span class="avatar-title bg-light rounded-circle text-primary font-size-24">
+                            <i class="ri-heart-add-fill"></i>
+                        </span>
+                    </div>
+                    <div class="flex-1 align-self-center overflow-hidden" >
+                      <h5>Work Experience</h5>
+                      <p class="text-muted mb-0">Mange employee work experience log.</p>
+                    </div>
                   </div>
-                  <div class="form-group">
-                    <label for=""> Blood Group </label>
-                    <input
-                      type="text"
-                      class="form-control"
-                      v-model="emp_blood_group"
-                    />
-                  </div>
-
-                  <div class="form-group">
-                    <label for=""> Genotype </label>
-                    <input
-                      type="text"
-                      class="form-control"
-                      v-model="emp_genotype"
-                    />
-                  </div>
-
-                  <div class="p-3 bg-light mb-4">
-                    <h5 class="font-size-14 mb-0">Next of Kin Details</h5>
-                  </div>
-                  <div class="form-group">
-                    <label for=""> Next of Kin Name </label>
-                    <input
-                      type="text"
-                      class="form-control"
-                      v-model="emp_next_of_kin_name"
-                    />
-                  </div>
-
-                  <div class="form-group">
-                    <label for=""> Next of Kin Address </label>
-                    <input
-                      type="text"
-                      class="form-control"
-                      v-model="emp_next_of_kin_address"
-                    />
-                  </div>
-
-                  <div class="form-group">
-                    <label for=""> Next of Kin Phone No </label>
-                    <input
-                      type="text"
-                      class="form-control"
-                      v-model="emp_next_of_kin_phone_no"
-                    />
-                  </div>
-
-                  <div class="p-3 bg-light mb-4">
-                    <h5 class="font-size-14 mb-0">Emergency Contact Details</h5>
-                  </div>
-                  <div class="form-group">
-                    <label for=""> Name </label>
-                    <input
-                      type="text"
-                      class="form-control"
-                      v-model="emp_emergency_name"
-                    />
-                  </div>
-
-                  <div class="form-group">
-                    <label for=""> Contact </label>
-                    <input
-                      type="text"
-                      class="form-control"
-                      v-model="emp_emergency_contact"
-                    />
-                  </div>
-
-                  <div class="p-3 bg-light mb-4">
-                    <h5 class="font-size-14 mb-0">Contract Details</h5>
-                  </div>
-                  <div class="form-group">
-                    <label for=""> Hire Date </label>
-                    <input
-                      type="date"
-                      class="form-control"
-                      v-model="emp_hire_date"
-                    />
-                  </div>
-
-                  <div class="form-group">
-                    <label for=""> Contract End Date </label>
-                    <input
-                      type="date"
-                      class="form-control"
-                      v-model="emp_contract_end_date"
-                    />
+                </div>
+                <div class="col-md-4">
+                  <div class="d-flex mt-4 mt-md-0" style="cursor:pointer;"  @click="
+                      $router.push({
+                        name: 'employee-education',
+                        params: { employeeID: $route.params.employeeID },
+                      })
+                    ">
+                    <div class="avatar-sm me-3">
+                        <span class="avatar-title bg-light rounded-circle text-primary font-size-24">
+                            <i class="ri-book-2-fill"></i>
+                        </span>
+                    </div>
+                    <div class="flex-1 align-self-center overflow-hidden">
+                      <h5>Education</h5>
+                      <p class="text-muted mb-0">Employee education background log</p>
+                    </div>
                   </div>
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+      <div class="col-12">
+        <div class="card">
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-3 col-3">
+                <div class="tab-content" id="v-pills-tabContent">
+                  <div class="tab-pane fade show active" id="product-1" role="tabpanel">
+                    <div class="product-img">
+                      <img src="https://i.pravatar.cc/300" alt="img-1" class="img-fluid mx-auto d-block" data-zoom="assets/images/product/img-1.png">
+                    </div>
+                  </div>
+                </div>
+                <div class="row text-center mt-2">
+                  <div class="col-sm-6">
+                    <div class="d-grid">
+                      <button type="button" @click="$refs['deactivate-employee'].show()" class="btn btn-danger waves-effect waves-light mt-2">
+                        <i class="mdi mdi-cancel me-2"></i> Deactivate
+                      </button>
+                    </div>
+                  </div>
+                  <div class="col-sm-6">
+                    <div class="d-grid">
+                      <button type="button" @click="$refs['update-employee-profile'].show()"  class="btn btn-light waves-effect  mt-2 waves-light">
+                        <i class="mdi mdi-pencil me-2"></i> Edit Profile
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-xl-8 ml-2">
+                <div class="mt-4 mt-xl-3">
+                  <a href="#" class="text-primary">{{ emp_location }}</a>
+                  <h5 class="mt-1 mb-3">{{ emp_first_name }} {{emp_last_name}} {{emp_other_name}}</h5>
+                  <div class="row">
+                    <div class="col-md-6">
+                      <h5 class="mt-2"> <span class="text-success font-size-12 ms-2"> <span class="text-muted">Hire Date: </span>{{ emp_hire_date }}</span>
+                      </h5>
+                    </div>
+                    <div class="col-md-6">
+                      <h5 class="mt-2"> <span class="text-success font-size-12 ms-2"> <span class="text-muted">Birth Date: </span>{{ birth_date }}</span></h5>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-6">
+                      <h5 class="mt-2"> <span class="text-success font-size-12 ms-2"> <span class="text-muted">Office Email: </span>{{ emp_office_email }}</span>
+                      </h5>
+                    </div>
+                    <div class="col-md-6">
+                      <h5 class="mt-2"> <span class="text-success font-size-12 ms-2"> <span class="text-muted">Personal Email: </span>{{ emp_personal_email }}</span></h5>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-6">
+                      <h5 class="mt-2"> <span class="text-success font-size-12 ms-2"> <span class="text-muted">Mobile No.: </span>{{ emp_phone_no }}</span>
+                      </h5>
+                    </div>
+                    <div class="col-md-6">
+                      <h5 class="mt-2"> <span class="text-success font-size-12 ms-2"> <span class="text-muted">Qualification: </span>{{ emp_qualification }}</span></h5>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-6">
+                      <h5 class="mt-2"> <span class="text-success font-size-12 ms-2"> <span class="text-muted">State: </span>{{ emp_state_id_val }}</span>
+                      </h5>
+                    </div>
+                    <div class="col-md-6">
+                      <h5 class="mt-2"> <span class="text-success font-size-12 ms-2"> <span class="text-muted">LGA: </span>{{ emp_lga_id }}</span></h5>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-6">
+                      <h5 class="mt-2"> <span class="text-success font-size-12 ms-2"> <span class="text-muted">Marital Status: </span>officeemail</span>
+                      </h5>
+                    </div>
+                    <div class="col-md-6">
+                      <h5 class="mt-2"> <span class="text-success font-size-12 ms-2"> <span class="text-muted">Ailment: </span>{{ emp_ailments }}</span></h5>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-6">
+                      <h5 class="mt-2"> <span class="text-success font-size-12 ms-2"> <span class="text-muted">Gender: </span>{{ gender }}</span>
+                      </h5>
+                    </div>
+                    <div class="col-md-6">
+                      <h5 class="mt-2"> <span class="text-success font-size-12 ms-2"> <span class="text-muted">Religion: </span>{{ religion }}</span></h5>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-6">
+                      <h5 class="mt-2"> <span class="text-success font-size-12 ms-2"> <span class="text-muted">Department: </span>{{ department }}</span>
+                      </h5>
+                    </div>
+                    <div class="col-md-6">
+                      <h5 class="mt-2"> <span class="text-success font-size-12 ms-2"> <span class="text-muted">Grade Level: </span>{{ grade }}</span></h5>
+                    </div>
+                  </div>
+                  <hr class="my-4">
 
-              <b-button
-                v-if="!submitted"
-                type="submit"
-                class="btn btn-success btn-block mt-4"
-                @click="updateEmployee"
-              >
-                Update Employee
-              </b-button>
-              <b-button v-else disabled class="btn btn-success btn-block mt-4">
-                Updating...
-              </b-button>
-            </form>
+                  <div class="row">
+                    <div class="col-md-6">
+                      <div>
+                        <h5 class="font-size-14 text-uppercase mt-3"> Health Information</h5>
+                          <h5 class="mt-2"> <span class="text-success font-size-12 ms-2"> <span class="text-muted">Blood Group: </span>{{ emp_blood_group }}</span></h5>
+                          <h5 class="mt-2"> <span class="text-success font-size-12 ms-2"> <span class="text-muted">Geno-type: </span>{{ emp_genotype }}</span></h5>
+
+                         <h5 class="font-size-14 text-uppercase mt-3"> Emergency Contact Details</h5>
+                          <h5 class="mt-2"> <span class="text-success font-size-12 ms-2"> <span class="text-muted">Name: </span>{{ emp_emergency_name }}</span></h5>
+                          <h5 class="mt-2"> <span class="text-success font-size-12 ms-2"> <span class="text-muted">Contact: </span>{{ emp_emergency_contact }}</span></h5>
+
+                        <h5 class="font-size-14 text-uppercase mt-3"> Contract Details</h5>
+                          <h5 class="mt-2"> <span class="text-success font-size-12 ms-2"> <span class="text-muted">Hire Date: </span>{{ emp_hire_date }}</span></h5>
+                          <h5 class="mt-2"> <span class="text-success font-size-12 ms-2"> <span class="text-muted">End Date: </span>{{ emp_contract_end_date }}</span></h5>
+
+                        <h5 class="font-size-14 text-uppercase mt-3">Marital Information:</h5>
+                        <h5 class="mt-2"> <span class="text-success font-size-12 ms-2"> <span class="text-muted">Marital Status: </span>{{ maritalStatus }}</span></h5>
+                        <h5 class="mt-2"> <span class="text-success font-size-12 ms-2"> <span class="text-muted">Spouse Name: </span>{{ emp_spouse_name }}</span></h5>
+                        <h5 class="mt-2"> <span class="text-success font-size-12 ms-2"> <span class="text-muted">Contact No.: </span>{{ emp_spouse_phone_no }}</span></h5>
+
+                      </div>
+                    </div>
+
+                    <div class="col-md-6">
+                      <h5 class="font-size-14 text-uppercase mt-3">Next of Kin:</h5>
+                      <h5 class="mt-2"> <span class="text-success font-size-12 ms-2"> <span class="text-muted">Name: </span>{{ emp_next_of_kin_name }}</span></h5>
+                      <h5 class="mt-2"> <span class="text-success font-size-12 ms-2"> <span class="text-muted">Address: </span>{{ emp_next_of_kin_address }}</span></h5>
+                      <h5 class="mt-2"> <span class="text-success font-size-12 ms-2"> <span class="text-muted">Phone No.: </span>{{ emp_next_of_kin_phone_no }}</span></h5>
+
+                      <h5 class="font-size-14 text-uppercase mt-3">Bank Information:</h5>
+                      <h5 class="mt-2"> <span class="text-success font-size-12 ms-2"> <span class="text-muted">Account Name: </span></span></h5>
+                      <h5 class="mt-2"> <span class="text-success font-size-12 ms-2"> <span class="text-muted">Account No.: </span>personal</span></h5>
+                      <h5 class="mt-2"> <span class="text-success font-size-12 ms-2"> <span class="text-muted">BVN.: </span>personal</span></h5>
+                      <h5 class="mt-2"> <span class="text-success font-size-12 ms-2"> <span class="text-muted">Bank.: </span>personal</span></h5>
+
+                    </div>
+
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -741,6 +591,318 @@ export default {
           Submitting...
         </b-button>
       </form>
+    </b-modal>
+
+    <b-modal
+      ref="update-employee-profile"
+      title="Edit Profile"
+      hide-footer
+      centered
+      title-class="font-18"
+      size="xl"
+      @hidden="resetForm"
+    >
+      <div class="modal-dialog modal-xl">
+        <form @submit.prevent>
+          <div class="row">
+            <div class="col-lg-6">
+              <div class="p-3 bg-light mb-4">
+                <h5 class="font-size-14 mb-0">Personal Information</h5>
+              </div>
+              <div class="form-group">
+                <label for=""> First Name </label>
+                <input
+                  type="text"
+                  class="form-control"
+                  v-model="emp_first_name"
+                  placeholder="First Name"
+                />
+              </div>
+
+              <div class="form-group">
+                <label for=""> Other Name </label>
+                <input
+                  type="text"
+                  class="form-control"
+                  v-model="emp_other_name"
+                  placeholder="Other Name"
+                />
+              </div>
+
+              <div class="form-group">
+                <label for=""> Last Name </label>
+                <input
+                  type="text"
+                  class="form-control"
+                  v-model="emp_last_name"
+                  placeholder="Last Name"
+                />
+              </div>
+              <div class="form-group">
+                <label for=""> Date of Birth </label>
+                <input
+                  type="date"
+                  class="form-control"
+                  v-model="birth_date"
+                />
+              </div>
+              <div class="form-group">
+                <label for=""> Phone Number </label>
+                <input
+                  type="text"
+                  required
+                  class="form-control"
+                  v-model="emp_phone_no"
+                  placeholder="Phone Number"
+                />
+              </div>
+              <div class="form-group">
+                <label for=""> Location </label>
+                <input
+                  readonly
+                  type="text"
+                  class="form-control"
+                  v-model="emp_location"
+                />
+              </div>
+
+              <div class="form-group">
+                <label for=""> Qualification </label>
+                <input
+                  type="text"
+                  class="form-control"
+                  v-model="emp_qualification"
+                />
+              </div>
+              <div class="form-group">
+                <label>Gender</label>
+                <b-select
+                  v-model="gender"
+                  :options="gender_options"
+                  :class="{
+                        'is-invalid': submitted && $v.gender.$error,
+                      }"
+                ></b-select>
+              </div>
+              <div class="form-group">
+                <label>Religion</label>
+                <b-select
+                  v-model="religion"
+                  :options="religion_options"
+                  :class="{
+                        'is-invalid': submitted && $v.religion.$error,
+                      }"
+                ></b-select>
+              </div>
+              <div class="form-group">
+                <label>Job Role</label>
+                <multiselect
+                  v-model="job_role"
+                  :options="job_roles"
+                  :custom-label="locationLabel"
+                  :class="{
+                        'is-invalid': submitted && $v.job_role.$error,
+                      }"
+                ></multiselect>
+              </div>
+              <div class="form-group">
+                <label>State Of Origin</label>
+                <multiselect
+                  v-model="emp_state_id"
+                  :options="states"
+                  :custom-label="stateOfOriginLabel"
+                  @input="getLocalGovernmentAreasByStateId"
+                  :class="{
+                        'is-invalid': submitted && $v.emp_state_id.$error,
+                      }"
+                ></multiselect>
+              </div>
+              <div class="form-group">
+                <label>LGA</label>
+                <multiselect
+                  v-model="lga"
+                  :options="lgas"
+                  :custom-label="lGALabel"
+                  :class="{
+                        'is-invalid': submitted && $v.emp_state_id.$error,
+                      }"
+                ></multiselect>
+              </div>
+              <div class="p-3 bg-light mb-4">
+                <h5 class="font-size-14 mb-0">Marital Information</h5>
+              </div>
+              <div class="form-group">
+                <label>Marital Status</label>
+                <b-form-select
+                  v-model="emp_marital_status"
+                  :options="maritalStatus"
+                />
+              </div>
+
+              <div class="form-group">
+                <label for=""> Spouse Name </label>
+                <input
+                  type="text"
+                  class="form-control"
+                  v-model="emp_spouse_name"
+                />
+              </div>
+
+              <div class="form-group">
+                <label for=""> Spouse Contact (Phone No) </label>
+                <input
+                  type="text"
+                  class="form-control"
+                  v-model="emp_spouse_phone_no"
+                />
+              </div>
+            </div>
+            <div class="col-lg-6">
+              <div class="p-3 bg-light mb-4">
+                <h5 class="font-size-14 mb-0">Health Information</h5>
+              </div>
+              <div class="form-group">
+                <label for=""> Blood Group </label>
+                <input
+                  type="text"
+                  class="form-control"
+                  v-model="emp_blood_group"
+                />
+              </div>
+
+              <div class="form-group">
+                <label for=""> Genotype </label>
+                <input
+                  type="text"
+                  class="form-control"
+                  v-model="emp_genotype"
+                />
+              </div>
+
+              <div class="p-3 bg-light mb-4">
+                <h5 class="font-size-14 mb-0">Next of Kin Details</h5>
+              </div>
+              <div class="form-group">
+                <label for=""> Next of Kin Name </label>
+                <input
+                  type="text"
+                  class="form-control"
+                  v-model="emp_next_of_kin_name"
+                />
+              </div>
+
+              <div class="form-group">
+                <label for=""> Next of Kin Address </label>
+                <input
+                  type="text"
+                  class="form-control"
+                  v-model="emp_next_of_kin_address"
+                />
+              </div>
+
+              <div class="form-group">
+                <label for=""> Next of Kin Phone No </label>
+                <input
+                  type="text"
+                  class="form-control"
+                  v-model="emp_next_of_kin_phone_no"
+                />
+              </div>
+
+              <div class="p-3 bg-light mb-4">
+                <h5 class="font-size-14 mb-0">Emergency Contact Details</h5>
+              </div>
+              <div class="form-group">
+                <label for=""> Name </label>
+                <input
+                  type="text"
+                  class="form-control"
+                  v-model="emp_emergency_name"
+                />
+              </div>
+
+              <div class="form-group">
+                <label for=""> Contact </label>
+                <input
+                  type="text"
+                  class="form-control"
+                  v-model="emp_emergency_contact"
+                />
+              </div>
+
+              <div class="p-3 bg-light mb-4">
+                <h5 class="font-size-14 mb-0">Contract Details</h5>
+              </div>
+              <div class="form-group">
+                <label for=""> Hire Date </label>
+                <input
+                  type="date"
+                  class="form-control"
+                  v-model="emp_hire_date"
+                />
+              </div>
+
+              <div class="form-group">
+                <label for=""> Contract End Date </label>
+                <input
+                  type="date"
+                  class="form-control"
+                  v-model="emp_contract_end_date"
+                />
+              </div>
+              <div class="p-3 bg-light mb-4">
+                <h5 class="font-size-14 mb-0">
+                  Bank Information -- For Salary Disbursement
+                </h5>
+              </div>
+              <div class="form-group">
+                <label>Bank</label>
+                <multiselect
+                  v-model="emp_bank_id"
+                  :options="banks"
+                  :custom-label="bankLabel"
+                  @select="toggleSelected"
+                  :class="{
+                        'is-invalid': submitted && $v.emp_bank_id.$error,
+                      }"
+                >
+                </multiselect>
+              </div>
+
+              <div class="form-group">
+                <label for=""> Account Number </label>
+                <input
+                  type="text"
+                  class="form-control"
+                  v-model="emp_account_no"
+                  placeholder="Account Number"
+                />
+              </div>
+              <div class="form-group">
+                <label for=""> BVN </label>
+                <input
+                  type="text"
+                  class="form-control"
+                  v-model="emp_bvn"
+                  placeholder="BVN"
+                />
+              </div>
+            </div>
+          </div>
+
+          <b-button
+            v-if="!submitted"
+            type="submit"
+            class="btn btn-success btn-block mt-4"
+            @click="updateEmployee"
+          >
+            Update Employee
+          </b-button>
+          <b-button v-else disabled class="btn btn-success btn-block mt-4">
+            Updating...
+          </b-button>
+        </form>
+      </div>
     </b-modal>
   </Layout>
 </template>

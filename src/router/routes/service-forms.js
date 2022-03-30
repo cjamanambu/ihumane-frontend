@@ -89,6 +89,15 @@ export default [
       ),
   },
   {
+    path: "/view-leave-application/:leaveApplicationID",
+    name: "view-leave-application",
+    meta: {
+      authRequired: true,
+    },
+    component: () =>
+      import("@/views/pages/service-forms/leave-application/leave-application"),
+  },
+  {
     path: "/leave-application/:leaveAppID",
     name: "leave-application-details",
     meta: {

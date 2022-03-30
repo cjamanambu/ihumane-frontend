@@ -33,7 +33,6 @@ export default {
       let requestID = this.$route.params.leaveAppID;
       const url = `${this.ROUTES.leaveApplication}/${requestID}`;
       this.apiGet(url, "Get Leave Application").then((res) => {
-        console.log({ res });
         const { application, log } = res.data;
         this.application = application;
         this.getLocation(application.employee.emp_location_id);

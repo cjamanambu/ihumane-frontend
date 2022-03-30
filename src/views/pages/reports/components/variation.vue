@@ -69,10 +69,10 @@ export default {
       <div class="card-body">
         <div class="media">
           <div class="media-body overflow-hidden">
-            <p class="text-truncate font-size-14 mb-2">
-              Current Payroll Period: {{ (parseInt(pmyMonth) - 1) | getMonth }}
-              {{ pmyYear }}
-            </p>
+            <!--            <p class="text-truncate font-size-14 mb-2">-->
+            <!--              Current Payroll Period: {{ (parseInt(pmyMonth) - 1) | getMonth }}-->
+            <!--              {{ pmyYear }}-->
+            <!--            </p>-->
             <h4 class="mb-0">Variation Report</h4>
           </div>
           <div class="text-secondary"></div>
@@ -104,15 +104,7 @@ export default {
           <label for="pmy">
             Select Payroll Period <span class="text-danger">*</span>
           </label>
-          <input
-            id="pmy"
-            v-model="pmyDate"
-            type="month"
-            class="form-control"
-            :class="{
-              'is-invalid': submitted && $v.pmyDate.$error,
-            }"
-          />
+          <input id="pmy" v-model="pmyDate" type="month" class="form-control" />
         </div>
         <div class="form-group">
           <b-form-group>

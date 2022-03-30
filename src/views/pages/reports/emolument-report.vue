@@ -19,8 +19,9 @@ export default {
   methods: {
     fetchPaymentDefinitions() {
       this.paymentDefinitions = [];
+      const url = `${this.ROUTES.paymentDefinition}/employee-payment-definition`;
       this.apiGet(
-        this.ROUTES.paymentDefinition,
+        url,
         "Get Payment Definitions Error"
       ).then(async (res) => {
         const { data } = res;
@@ -54,9 +55,11 @@ export default {
     refreshTable() {
       this.period = this.$route.params.period;
       this.period = this.period.split("-");
+      this.location = this.$route.params.locationID;
       let data = {
         pym_month: parseFloat(this.period[0]),
         pym_year: parseFloat(this.period[1]),
+        pmyl_location_id: this.location,
       };
       const url = `${this.ROUTES.salary}/pull-emolument`;
       this.apiPost(url, data, "Generate Emolument Report").then((res) => {
@@ -160,6 +163,7 @@ export default {
       incomeFields: [],
       deductionFields: [],
       jsonFields: {},
+      location: null,
     };
   },
 };
@@ -213,7 +217,7 @@ export default {
               <div class="col-sm-12 col-md-3 text-md-right">
                 <b-form-group
                   label="Filter On"
-                  label-cols-sm="8"
+                  label-cols-sm="7"
                   label-align-sm="right"
                   label-size="sm"
                   class="mb-0"
@@ -296,6 +300,11 @@ export default {
                   </span>
                 </template>
               </b-table>
+            </div>
+            <div v-else>
+              <p class="text-center my-5">
+                Populating report table, please wait...
+              </p>
             </div>
             <div class="row">
               <div class="col">
