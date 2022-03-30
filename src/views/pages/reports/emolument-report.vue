@@ -19,8 +19,9 @@ export default {
   methods: {
     fetchPaymentDefinitions() {
       this.paymentDefinitions = [];
+      const url = `${this.ROUTES.paymentDefinition}/employee-payment-definition`;
       this.apiGet(
-        this.ROUTES.paymentDefinition,
+        url,
         "Get Payment Definitions Error"
       ).then(async (res) => {
         const { data } = res;
