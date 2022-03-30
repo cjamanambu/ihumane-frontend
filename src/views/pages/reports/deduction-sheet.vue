@@ -66,13 +66,13 @@ export default {
             location: deduction.location,
           };
           deduction.deductions.forEach((deduction) => {
-            deductionObj[deduction.paymentName] = parseFloat(
+            deductionObj[deduction.paymentName] = this.apiValueHandler(
               deduction.amount.toFixed(2)
-            ).toLocaleString();
+            );
           });
-          deductionObj["totalDeduction"] = parseFloat(
+          deductionObj["totalDeduction"] = this.apiValueHandler(
             deduction.totalDeduction.toFixed(2)
-          ).toLocaleString();
+          );
           this.deductions.push(deductionObj);
         });
         this.filtered = this.deductions;

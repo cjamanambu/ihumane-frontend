@@ -66,14 +66,14 @@ export default {
             location: variation.location,
           };
           variation.incomes.forEach((income) => {
-            variationObj[income.paymentName] = parseFloat(
+            variationObj[income.paymentName] = this.apiValueHandler(
               income.amount.toFixed(2)
-            ).toLocaleString();
+            );
           });
           variation.deductions.forEach((deduction) => {
-            variationObj[deduction.paymentName] = parseFloat(
+            variationObj[deduction.paymentName] = this.apiValueHandler(
               deduction.amount.toFixed(2)
-            ).toLocaleString();
+            );
           });
           this.variations.push(variationObj);
         });
