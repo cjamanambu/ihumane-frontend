@@ -41,9 +41,13 @@ export default {
             employee_unique_id: pension.employeeUniqueId,
             employeeName: pension.employeeName,
             sector: pension.sector,
+            location: pension.location,
             pension_employee_contribution: this.apiValueHandler(pension.pensionArray[0].Amount.toFixed(2))  ?? '0.00',
             pension_employer_contribution:this.apiValueHandler(pension.pensionArray[1].Amount.toFixed(2)) ?? '0.00',
             voluntary_pension: this.apiValueHandler(pension.pensionArray[2].Amount.toFixed(2)) ?? '0.00',
+            total: this.apiValueHandler(pension.totalPension.toFixed(2)) ?? '0.00',
+            pfa: pension.pfa,
+            pension_number: pension.pin,
           };
           this.pensions.push(pensionObj);
         });
@@ -63,12 +67,20 @@ export default {
           this.jsonFields["NAME"] = key;
         }  else if (key === "sector") {
           this.jsonFields["SECTOR"] = key;
+        }else if (key === "location") {
+          this.jsonFields["LOCATION"] = key;
         } else if (key === "pension_employee_contribution") {
           this.jsonFields["EMPLOYEE CONTRIBUTION"] = key;
         } else if (key === "pension_employer_contribution") {
           this.jsonFields["EMPLOYER CONTRIBUTION"] = key;
         } else if (key === "voluntary_pension") {
           this.jsonFields["VOLUNTARY PENSION"] = key;
+        }else if (key === "total") {
+          this.jsonFields["TOTAL"] = key;
+        }else if (key === "pfa") {
+          this.jsonFields["PFA"] = key;
+        }else if (key === "pension_number") {
+          this.jsonFields["PENSION NUMBER"] = key;
         }
       });
     },
@@ -130,9 +142,13 @@ export default {
         "employee_unique_id",
         "employeeName",
         "sector",
+         "location",
         "pension_employee_contribution",
         "pension_employer_contribution",
         "voluntary_pension",
+         "total",
+        "pfa",
+        "pension_number"
       ],
       incomeFields: [],
       deductionFields: [],
@@ -267,6 +283,13 @@ export default {
                     {{ row.value }}
                   </span>
                 </template>
+
+                <template #cell(location)="row">
+                  <span class="text-nowrap">
+                    {{ row.value }}
+                  </span>
+                </template>
+
                 <template #cell(pension_employee_contribution)="row">
                   <span class="text-nowrap">
                     {{ row.value }}
@@ -282,6 +305,23 @@ export default {
                     {{ row.value }}
                   </span>
                 </template>
+
+                <template #cell(total)="row">
+                  <span class="text-nowrap">
+                    {{ row.value }}
+                  </span>
+                </template>
+                <template #cell(pfa)="row">
+                  <span class="text-nowrap">
+                    {{ row.value }}
+                  </span>
+                </template>
+                <template #cell(pension_number)="row">
+                  <span class="text-nowrap">
+                    {{ row.value }}
+                  </span>
+                </template>
+
 
               </b-table>
             </div>

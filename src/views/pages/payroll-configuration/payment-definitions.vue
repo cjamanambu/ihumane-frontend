@@ -37,6 +37,7 @@ export default {
       this.pdPrGross = pd.pd_pr_gross;
       this.sum = pd.pd_total_gross;
       this.sumII = pd.pd_total_gross_ii;
+      this.tie_number = pd.pd_tie_number;
       this.tax = pd.pd_tax;
       this.taxable = pd.pd_payment_taxable;
       this.welfare = pd.pd_welfare || 0;
@@ -81,7 +82,7 @@ export default {
           pd_payment_type: this.type,
           pd_payment_variant: this.variant,
           pd_desc: "null",
-          pd_tie_number: "null",
+          pd_tie_number: this.tie_number,
           pd_pr_gross: this.pdPrGross,
           pd_value: this.pdValue,
           pd_percentage: this.pdPercentage,
@@ -125,7 +126,7 @@ export default {
           pd_payment_type: this.type,
           pd_payment_variant: this.variant,
           pd_desc: "null",
-          pd_tie_number: "null",
+          pd_tie_number: this.tie_number,
           pd_pr_gross: this.pdPrGross,
           pd_value: this.pdValue,
           pd_percentage: this.pdPercentage,
@@ -300,11 +301,21 @@ export default {
 
       pd_employee: 1,
       pd_employees:[
-        {text: "Employee", value: 1},
-        {text: "Employer", value: 2}
+        {text: "EMPLOYEE", value: 1},
+        {text: "EMPLOYER", value: 2}
+      ],
+
+      tie_number: 0,
+      tie_numbers:[
+        {text: "NONE", value: 0},
+        {text: "TAX", value: 1},
+        {text: "PENSION", value: 2},
+        {text: "NHF", value: 3},
+
       ],
       sumIIDisabled: false,
       pdPercentage: 0,
+
 
     };
   },
@@ -631,6 +642,19 @@ export default {
                   />
                 </b-form-group>
               </div>
+
+              <div class="col-lg-6" v-if="type === 2">
+                <b-form-group>
+                  <label>Tie Number?</label><br />
+                  <b-form-radio-group
+                    id="user_type"
+                    v-model="tie_number"
+                    :options="tie_numbers"
+                    button-variant="outline-success"
+                    buttons
+                  />
+                </b-form-group>
+              </div>
             </div>
           </div>
         </div>
@@ -893,6 +917,18 @@ export default {
                     :options="welfares"
                     button-variant="outline-success"
                     buttons
+                  />
+                </b-form-group>
+              </div>
+              <div class="col-lg-6" v-if="type === 2">
+                <b-form-group>
+                  <label>Tie Number?</label><br />
+                  <b-form-radio-group
+                      id="user_type"
+                      v-model="tie_number"
+                      :options="tie_numbers"
+                      button-variant="outline-success"
+                      buttons
                   />
                 </b-form-group>
               </div>
