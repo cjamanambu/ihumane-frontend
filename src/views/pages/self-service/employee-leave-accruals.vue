@@ -23,7 +23,7 @@ export default {
       const url = `${this.ROUTES.leaveAccrual}/employee-leave-accruals`;
       this.apiGet(url, "Get Leave Accrual Error").then((res) => {
         const { data } = res;
-        console.log(data)
+        //console.log(data)
         data.leave_types.forEach((l_type)=>{
           let field = {
             key:`key_${l_type.leave_type_id}`,
@@ -38,7 +38,7 @@ export default {
         const data_holder = [];
         this.accruals.forEach((leave,index)=>{
           let keyV = `key_${leave.leave_type.leave_type_id}`;
-          let val = leave.lea_rate;
+          let val = leave.total;
           data_holder.push({
             sn:++index,
             [keyV]:val,
