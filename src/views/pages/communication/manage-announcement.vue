@@ -89,12 +89,13 @@ export default {
           body:this.body,
           persons:this.persons
         };
-        this.apiPost(this.ROUTES.announcement, data, "Post announcement Error").then((res) => {
+        console.log(this.getEmployee);
+        /*this.apiPost(this.ROUTES.announcement, data, "Post announcement Error").then((res) => {
           this.apiResponseHandler(`${res.data}`, "Publish Announcement");
           this.refreshTable();
           this.$v.$reset();
           this.$refs["post-announcement"].hide();
-        });
+        });*/
      // }
     },
     onFiltered(filteredItems) {
@@ -293,9 +294,6 @@ export default {
             v-model="subject"
             class="form-control"
             placeholder="Title"
-            :class="{
-              'is-invalid': submitted && $v.subject.$error,
-            }"
           />
         </div>
         <div class="form-group">
@@ -309,9 +307,6 @@ export default {
             :options="employees"
             :custom-label="authorizingAsLabel"
             :multiple="true"
-            :class="{
-                      'is-invalid': submitted && $v.person.$error,
-                    }"
           ></multiselect>
         </b-form-group>
         <div class="form-group">
