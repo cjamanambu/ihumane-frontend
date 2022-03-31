@@ -93,6 +93,7 @@ export default {
         if (res.data) {
           this.apiResponseHandler("Run Payroll Routine", res.data);
           this.fetchPayrollRoutine();
+          this.$refs["run-routine"].hide();
         }
       });
     },
@@ -106,6 +107,7 @@ export default {
           this.routineRun = false;
           this.fetchPayrollRoutine();
           this.apiResponseHandler("Undo Payroll Routine", res.data);
+          this.$refs["undo-routine"].hide();
         }
       });
     },
