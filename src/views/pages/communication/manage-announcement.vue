@@ -102,7 +102,7 @@ export default {
           this.$v.$reset();
           this.$refs["post-announcement"].hide();
         });*/
-      // }
+     // }
     },
     onFiltered(filteredItems) {
       // Trigger pagination to update the number of buttons/pages due to filtering
@@ -407,5 +407,6 @@ export default {
         </div>
       </form>
     </b-modal>
+
   </Layout>
 </template>
