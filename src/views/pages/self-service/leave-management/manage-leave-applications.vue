@@ -194,23 +194,20 @@ export default {
                   </small>
                 </template>
                 <template #cell(leapp_status)="row">
-                  <span
-                    v-if="row.value === 0"
-                    class="badge badge-pill badge-warning"
-                  >
-                    pending
+                  <span v-if="row.value === 0" class="text-warning">
+                    PENDING
                   </span>
-                  <span
-                    v-else-if="row.value === 1"
-                    class="badge badge-pill badge-success"
-                  >
-                    approved
+                  <span v-else-if="row.value === 1" class="text-success">
+                    APPROVED
                   </span>
-                  <span
-                    v-else-if="row.value === 2"
-                    class="badge badge-pill badge-danger"
-                  >
-                    declined
+                  <span v-else-if="row.value === 2" class="text-danger">
+                    DECLINED
+                  </span>
+                  <span v-else-if="row.value === 3" class="text-primary">
+                    ACTIVE
+                  </span>
+                  <span v-else-if="row.value === 4" class="text-info">
+                    FINISHED
                   </span>
                 </template>
               </b-table>

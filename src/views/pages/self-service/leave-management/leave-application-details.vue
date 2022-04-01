@@ -314,7 +314,7 @@ export default {
                   Leave Active
                 </small>
                 <small
-                  v-else-if="application.leapp_status === 3"
+                  v-else-if="application.leapp_status === 4"
                   class="text-danger"
                 >
                   Leave Finished

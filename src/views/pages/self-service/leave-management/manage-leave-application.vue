@@ -4,6 +4,8 @@ import PageHeader from "@/components/page-header";
 import appConfig from "@/app.config.json";
 import { authComputed } from "@/state/helpers";
 import { required } from "vuelidate/lib/validators";
+import DatePicker from "vue2-datepicker";
+import "vue2-datepicker/index.css";
 
 export default {
   page: {
@@ -16,6 +18,7 @@ export default {
   components: {
     Layout,
     PageHeader,
+    DatePicker,
   },
   mounted() {
     this.fetchLeaveDocuments();
@@ -41,16 +44,16 @@ export default {
       let requestID = this.$route.params.leaveAppID;
       const url = `${this.ROUTES.leaveApplication}/${requestID}`;
       this.apiGet(url, "Get Leave Application").then((res) => {
-        console.log({ res });
         const { application, log, previousApplications } = res.data;
         this.application = application;
-        // console.log(previousApplications);
         previousApplications.forEach((prev, index) => {
-          this.previous_applications[index] = {
-            sn: ++index,
-            leaveType: prev.leave_type.leave_name,
-            ...prev,
-          };
+          if (prev.leapp_id !== parseFloat(this.$route.params.leaveAppID)) {
+            this.previous_applications[index] = {
+              sn: ++index,
+              leaveType: prev.leave_type.leave_name,
+              ...prev,
+            };
+          }
         });
         this.log = log;
         this.fetchEmployees();
@@ -135,6 +138,39 @@ export default {
       this.apiResponseHandler("Process Complete", "Leave Update");
       this.submitted = false;
       this.fetchRequest();
+    },
+    notBeforeToday(date) {
+      const today = new Date();
+      return date < today;
+    },
+    notBeforeStartDate(date) {
+      let startDate = new Date();
+      if (this.leapp_start_date) {
+        startDate = new Date(this.leapp_start_date);
+      }
+      startDate.setHours(0, 0, 0, 0);
+      return date < startDate;
+    },
+    updatePeriod() {
+      this.submitted = true;
+      this.updating = true;
+      let leaveApplicationID = parseFloat(this.$route.params.leaveAppID);
+      let url = `${this.ROUTES.leaveApplication}/update-leaveapp-period/${leaveApplicationID}`;
+      const data = {
+        start_date: this.leapp_start_date,
+        end_date: this.leapp_end_date,
+      };
+      this.apiPatch(url, data, "Update Leave Period Error")
+        .then(() => {
+          this.apiResponseHandler("Process Complete", "Leave Update");
+          this.submitted = false;
+          this.leapp_start_date = false;
+          this.leapp_end_date = false;
+          this.fetchRequest();
+        })
+        .finally(() => {
+          this.updating = false;
+        });
     },
   },
   data() {
@@ -229,6 +265,9 @@ export default {
       filterOnAlt: [],
       sortByAlt: "sn",
       sortDescAlt: false,
+      leapp_start_date: null,
+      leapp_end_date: null,
+      updating: false,
     };
   },
 };
@@ -250,7 +289,7 @@ export default {
     <div class="row" v-else>
       <div class="col-lg-8">
         <div class="card">
-          <div class="card-body">
+          <div class="card-body" v-if="application">
             <div class="p-3 bg-light mb-4 d-flex justify-content-between">
               <div class="d-inline mb-0">
                 <h5 class="font-size-14 mb-0">Employee Details</h5>
@@ -275,24 +314,10 @@ export default {
               <span>T7 Number</span>
               <span> {{ application.employee.emp_unique_id }} </span>
             </div>
-            <div class="d-flex justify-content-between mb-3">
-              <span>T3 Code</span>
-              <span> - </span>
-            </div>
-            <div class="d-flex justify-content-between mb-3">
-              <span>T6 Code</span>
-              <span> - </span>
-            </div>
-            <div class="d-flex justify-content-between mb-3">
-              <span>Status</span>
-              <span v-if="status === 1" class="text-success">Approved</span>
-              <span v-else-if="status === 2" class="text-danger">Declined</span>
-            </div>
           </div>
         </div>
-
         <div class="card">
-          <div class="card-body">
+          <div class="card-body" v-if="application">
             <div class="p-3 bg-light mb-4 d-flex justify-content-between">
               <div class="d-inline mb-0">
                 <h5 class="font-size-14 mb-0">Leave Details</h5>
@@ -316,15 +341,45 @@ export default {
                 >
                   Application Declined
                 </small>
+                <small
+                  v-else-if="application.leapp_status === 3"
+                  class="text-success"
+                >
+                  Leave Active
+                </small>
+                <small
+                  v-else-if="application.leapp_status === 4"
+                  class="text-danger"
+                >
+                  Leave Finished
+                </small>
               </span>
             </div>
             <div class="row">
-              <div class="col-12">
+              <div class="col-lg-4">
                 <div class="form-group">
                   <label for=""> Leave Type </label>
                   <p class="text-muted">
                     {{ application.LeaveType.leave_name }}
                   </p>
+                </div>
+              </div>
+              <div class="col-lg-4">
+                <div class="form-group">
+                  <label for=""> Emergency Email Address </label>
+                  <p class="text-muted" v-if="application.leapp_alt_email">
+                    {{ application.leapp_alt_email }}
+                  </p>
+                  <p v-else>---</p>
+                </div>
+              </div>
+              <div class="col-lg-4">
+                <div class="form-group">
+                  <label for=""> Emergency Phone Number </label>
+                  <p class="text-muted" v-if="application.leapp_alt_phone">
+                    {{ application.leapp_alt_phone }}
+                  </p>
+                  <p v-else>---</p>
                 </div>
               </div>
             </div>
@@ -397,7 +452,7 @@ export default {
                         </span>
                         <span
                           v-else-if="logEntry.auth_status === 2"
-                          class="text-success"
+                          class="text-danger"
                         >
                           Declined
                         </span>
@@ -423,10 +478,12 @@ export default {
           </div>
         </div>
         <div class="card">
-          <div class="card-header">
-            <h5>Previous Applications</h5>
-          </div>
           <div class="card-body">
+            <div class="p-3 bg-light mb-4 d-flex justify-content-between">
+              <div class="d-inline mb-0">
+                <h5 class="font-size-14 mb-0">Previous Applications</h5>
+              </div>
+            </div>
             <div class="row mt-4">
               <div class="col-sm-12 col-md-6">
                 <div id="tickets-table_length" class="dataTables_length">
@@ -540,13 +597,101 @@ export default {
             </div>
           </div>
         </div>
+        <div class="card mt-4">
+          <div class="card-body">
+            <div class="p-3 bg-light mb-4 d-flex justify-content-between">
+              <div class="d-inline mb-0">
+                <h5 class="font-size-14 mb-0">Supporting Documents</h5>
+              </div>
+            </div>
+            <div class="row mt-4">
+              <div class="col-sm-12 col-md-6">
+                <div id="tickets-table_length" class="dataTables_length">
+                  <label class="d-inline-flex align-items-center">
+                    Show&nbsp;
+                    <b-form-select
+                      v-model="perPageAlt"
+                      size="sm"
+                      :options="pageOptionsAlt"
+                    ></b-form-select
+                    >&nbsp;entries
+                  </label>
+                </div>
+              </div>
+              <!-- Search -->
+              <div class="col-sm-12 col-md-6">
+                <div
+                  id="tickets-table_filter"
+                  class="dataTables_filter text-md-right"
+                >
+                  <label class="d-inline-flex align-items-center">
+                    Search:
+                    <b-form-input
+                      v-model="filterAlt"
+                      type="search"
+                      placeholder="Search..."
+                      class="form-control form-control-sm ml-2"
+                    ></b-form-input>
+                  </label>
+                </div>
+              </div>
+              <!-- End search -->
+            </div>
+            <div class="table-responsive mb-0">
+              <b-table
+                ref="employee-doc-table"
+                bordered
+                selectable
+                hover
+                :items="supportingDocs"
+                :fields="docFields"
+                responsive="sm"
+                :per-page="perPageAlt"
+                :current-page="currentPageAlt"
+                :sort-by.sync="sortByAlt"
+                :sort-desc.sync="sortDescAlt"
+                :filter="filterAlt"
+                :filter-included-fields="filterOnAlt"
+                @filtered="onFiltered"
+                show-empty
+                select-mode="single"
+                @row-selected="selectRow"
+              >
+                <template #cell(createdAt)="row">
+                  <span>
+                    {{ new Date(row.value).toDateString() }}
+                  </span>
+                  <span>
+                    {{ new Date(row.value).toLocaleTimeString("en") }}
+                  </span>
+                </template>
+              </b-table>
+            </div>
+            <div class="row">
+              <div class="col">
+                <div
+                  class="dataTables_paginate paging_simple_numbers float-right"
+                >
+                  <ul class="pagination pagination-rounded mb-0">
+                    <!-- pagination -->
+                    <b-pagination
+                      v-model="currentPageAlt"
+                      :total-rows="totalRowsAlt"
+                      :per-page="perPageAlt"
+                    ></b-pagination>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
       <div class="col-lg-4">
         <div class="card">
           <div class="card-body">
             <div class="p-3 bg-light mb-4 d-flex justify-content-between">
               <div class="d-inline mb-0">
-                <h5 class="font-size-14 mb-0">Process Leave</h5>
+                <h5 class="font-size-14 mb-0">Update Status</h5>
               </div>
             </div>
             <div class="row">
@@ -580,6 +725,60 @@ export default {
                 </form>
               </div>
             </div>
+          </div>
+        </div>
+        <div
+          class="card mt-4"
+          v-if="
+            application &&
+            (application.leapp_status === 1 || application.leapp_status === 3)
+          "
+        >
+          <div class="card-body">
+            <div class="p-3 bg-light mb-4 d-flex justify-content-between">
+              <div class="d-inline mb-0">
+                <h5 class="font-size-14 mb-0">Update Period</h5>
+              </div>
+            </div>
+            <form @submit.prevent="updatePeriod">
+              <div class="form-group">
+                <label for="start-date">
+                  Start Date <span class="text-danger">*</span>
+                </label>
+                <date-picker
+                  v-model="leapp_start_date"
+                  valueType="format"
+                  placeholder="Select start date"
+                  :disabled-date="notBeforeToday"
+                />
+              </div>
+              <div class="form-group">
+                <label for="start-date">
+                  End Date <span class="text-danger">*</span>
+                </label>
+                <date-picker
+                  v-model="leapp_end_date"
+                  valueType="format"
+                  placeholder="Select end date"
+                  :disabled-date="notBeforeStartDate"
+                />
+              </div>
+              <b-button
+                v-if="!updating"
+                class="btn btn-success btn-block mt-4"
+                type="submit"
+              >
+                Submit
+              </b-button>
+              <b-button
+                v-else
+                disabled
+                class="btn btn-success btn-block mt-4"
+                type="submit"
+              >
+                Submitting...
+              </b-button>
+            </form>
           </div>
         </div>
       </div>

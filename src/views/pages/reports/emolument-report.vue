@@ -50,13 +50,12 @@ export default {
       });
     },
     refreshTable() {
-      this.period = this.$route.params.period;
-      this.period = this.period.split("-");
+      this.period = this.$route.params.period.split("-");
       this.location = this.$route.params.locationID;
       let data = {
         pym_month: parseFloat(this.period[0]),
         pym_year: parseFloat(this.period[1]),
-        pmyl_location_id: this.location,
+        pmyl_location_id: parseFloat(this.location),
       };
       const url = `${this.ROUTES.salary}/pull-emolument`;
       this.apiPost(url, data, "Generate Emolument Report").then((res) => {
@@ -145,7 +144,7 @@ export default {
           active: true,
         },
       ],
-      period: null,
+      period: [],
       emoluments: [],
       filtered: [],
       newEmoluments: [],
@@ -190,7 +189,7 @@ export default {
         <div class="card">
           <div class="card-body">
             <div class="p-3 bg-light mb-4 d-flex justify-content-between">
-              <h5 class="font-size-14 mb-0" v-if="period">
+              <h5 class="font-size-14 mb-0" v-if="period.length">
                 Emolument Report For Payroll Period:
                 {{ (parseInt(period[0]) - 1) | getMonth }}
                 {{ period[1] }}
@@ -292,7 +291,17 @@ export default {
                     {{ row.value }}
                   </span>
                 </template>
+                <template #cell(sector)="row">
+                  <span class="text-nowrap">
+                    {{ row.value }}
+                  </span>
+                </template>
                 <template #cell(location)="row">
+                  <span class="text-nowrap">
+                    {{ row.value }}
+                  </span>
+                </template>
+                <template #cell(jobRole)="row">
                   <span class="text-nowrap">
                     {{ row.value }}
                   </span>
