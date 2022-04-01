@@ -82,13 +82,13 @@ export default {
         this.apiFormHandler("Invalid Entry");
       } else {*/
 
-        const data = {
-          author:this.getEmployee.emp_id,
-          title:this.subject,
-          target:parseInt(this.selectedTarget),
-          body:this.body,
-          persons:this.persons
-        };
+        // const data = {
+        //   author:this.getEmployee.emp_id,
+        //   title:this.subject,
+        //   target:parseInt(this.selectedTarget),
+        //   body:this.body,
+        //   persons:this.persons
+        // };
         console.log(this.getEmployee);
         /*this.apiPost(this.ROUTES.announcement, data, "Post announcement Error").then((res) => {
           this.apiResponseHandler(`${res.data}`, "Publish Announcement");
