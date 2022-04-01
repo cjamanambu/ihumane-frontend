@@ -67,6 +67,8 @@ export default {
             employeeUniqueId: emolument.employeeUniqueId,
             employeeName: emolument.employeeName,
             location: emolument.location,
+            sector: emolument.sector,
+            jobRole: emolument.jobRole,
           };
           emolument.incomes.forEach((income) => {
             emolumentObj[income.paymentName] = this.apiValueHandler(
@@ -156,7 +158,14 @@ export default {
       filterOn: [],
       sortBy: "sn",
       sortDesc: false,
-      newFields: ["sn", "t7_number", "employeeName", "location"],
+      newFields: [
+        "sn",
+        "t7_number",
+        "employeeName",
+        "sector",
+        "location",
+        "jobRole",
+      ],
       incomeFields: [],
       deductionFields: [],
       jsonFields: {},

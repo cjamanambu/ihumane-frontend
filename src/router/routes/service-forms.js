@@ -98,32 +98,6 @@ export default [
       import("@/views/pages/service-forms/leave-application/leave-application"),
   },
   {
-    path: "/leave-application/:leaveAppID",
-    name: "leave-application-details",
-    meta: {
-      authRequired: true,
-    },
-    component: () =>
-      import("@/views/pages/self-service/leave-application-details"),
-  },
-  {
-    path: "/manage-leave-applications",
-    name: "manage-leave-applications",
-    meta: {
-      authRequired: true,
-    },
-    component: () => import("@/views/pages/self-service/manage-leave"),
-  },
-  {
-    path: "/employee-leave-accruals",
-    name: "employee-leave-accruals",
-    meta: {
-      authRequired: true,
-    },
-    component: () =>
-      import("@/views/pages/self-service/employee-leave-accruals"),
-  },
-  {
     path: "/view-announcements",
     name: "view-announcements",
     meta: {

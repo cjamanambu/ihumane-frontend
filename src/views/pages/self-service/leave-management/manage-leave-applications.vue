@@ -47,7 +47,7 @@ export default {
       row = row[0];
       this.leaveAppID = row.leapp_id;
       this.$router.push({
-        name: "leave-application-details",
+        name: "manage-leave-application",
         params: { leaveAppID: this.leaveAppID },
       });
     },
