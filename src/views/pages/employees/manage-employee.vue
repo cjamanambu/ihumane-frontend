@@ -19,7 +19,9 @@ export default {
     await this.fetchEmployee();
     await this.getStates();
     await this.getBanks();
-    await this.getJobRoles();
+     this.getJobRoles();
+    await this.getLocations();
+    await this.getPensionProviders();
     await this.getLocalGovernmentAreasByStateId();
   },
 
@@ -67,6 +69,9 @@ export default {
       return `${text}`;
     },
     locationLabel({ text }) {
+      return `${text}`;
+    },
+    pensionLabel({ text }) {
       return `${text}`;
     },
     stateOfOriginLabel({ text }) {
@@ -128,6 +133,8 @@ export default {
           this.emp_office_email = data.emp_office_email;
           this.bank_text = data.bank.bank_name;
           this.state_text = data.state.s_name;
+          this.pension_provider_text = data.pension.provider_name;
+          this.emp_nhf = data.emp_nhf;
           this.job_role_text = data.jobrole.job_role;
           this.lga_text = data.lga.lg_name;
           this.birth_date = new Date(data.emp_dob).toISOString().slice(0, 10);
@@ -140,9 +147,11 @@ export default {
         }
       });
     },
-    async getJobRoles() {
+     getJobRoles() {
       this.apiGet(this.ROUTES.jobRole, "Get Job Roles Error").then((res) => {
         const { data } = res;
+        //console.log('Job roles');
+        //console.log(data);
         data.forEach(async (datum) => {
           const dat = {
             value: datum.job_role_id,
@@ -156,6 +165,28 @@ export default {
             this.job_role.push(val);
           }
           this.job_roles.push(dat);
+        });
+
+        //this.jrs = data;
+      });
+    },
+    async getPensionProviders() {
+      this.apiGet(this.ROUTES.pensionProvider, "Get Pension providers Error").then((res) => {
+        const { data } = res;
+        //console.log(data);
+        data.forEach(async (datum) => {
+          const dat = {
+            value: datum.pension_provider_id,
+            text: datum.provider_name,
+          };
+          if (datum.pension_provider_id === this.pension_provider_id) {
+            const val = {
+              value: datum.pension_provider_id,
+              text: datum.provider_name,
+            };
+            this.pensionProviders.push(val);
+          }
+          this.pensionProviders.push(dat);
         });
 
         //this.jrs = data;
@@ -179,6 +210,27 @@ export default {
             this.emp_bank_id.push(val);
           }
           this.banks.push(dat);
+        });
+      });
+    },
+    async getLocations() {
+      const url = `${this.ROUTES.location}`;
+      await this.apiGet(url).then((res) => {
+        const { data } = res;
+        this.locations = [{ value: null, text: "Please select location" }];
+        data.forEach(async (datum) => {
+          const dat = {
+            value: datum.location_id,
+            text: datum.location_name,
+          };
+          if (datum.location_id === this.emp_location) {
+            const val = {
+              value: datum.location_id,
+              text: datum.location_name,
+            };
+            this.locations.push(val);
+          }
+          this.locations.push(dat);
         });
       });
     },
@@ -240,9 +292,11 @@ export default {
 
         emp_bank_id: this.emp_bank_id.value,
         emp_state_id: this.emp_state_id.value,
-        //emp_job_role_id:this.job_role.value,
+        emp_pension_id:this.selectedPensionProvider.value,
         emp_lga_id: this.lga.value,
         emp_religion: this.religion,
+        emp_nhf: this.emp_nhf,
+        emp_location_id:this.emp_location.value,
 
         emp_marital_status: this.emp_marital_status,
         emp_spouse_name: this.emp_spouse_name,
@@ -291,9 +345,6 @@ export default {
       this.emp_suspension_reason = null;
     },
 
-    test() {
-      console.log(this.bank);
-    },
   },
   data() {
     return {
@@ -349,6 +400,7 @@ export default {
       emp_hire_date: null,
       emp_contract_end_date: null,
       emp_grade_level: null,
+      locations: [],
 
       maritalStatus: [
         { value: null, text: "select marital Status" },
@@ -382,12 +434,16 @@ export default {
       banks: [],
       state: null,
       states: [],
+      pensionProviders: [],
       lgas: [],
       jrs: [],
       lga: [],
       stateId: null,
       birth_date: null,
       selectedStateId: null,
+      selectedPensionProvider: null,
+      emp_nhf: null,
+      pension_provider_text: null,
     };
   },
 };
@@ -402,7 +458,7 @@ export default {
           <div class="card">
             <div class="card-body">
               <div class="row">
-                <div class="col-md-4">  <!--@click="$router.push({ name: 'manage-employees' })"-->
+                <div class="col-md-4">
                   <div class="d-flex" style="cursor: pointer;" @click="$router.push({name: 'employee-documents',
               params: { employeeID: $route.params.employeeID },})">
                     <div class="avatar-sm me-3 mr-1">
@@ -549,7 +605,7 @@ export default {
                       </h5>
                     </div>
                     <div class="col-md-6">
-                      <h5 class="mt-2"> <span class="text-success font-size-12 ms-2"> <span class="text-muted">Grade Level: </span>{{ grade }}</span></h5>
+
                     </div>
                   </div>
                   <hr class="my-4">
@@ -592,9 +648,11 @@ export default {
                       <h5 class="mt-2"> <span class="text-success font-size-12 ms-2"> <span class="text-muted">Bank.: </span>{{ bank_text }}</span></h5>
 
                       <h5 class="font-size-14 text-uppercase mt-3">Pension Information:</h5>
+                      <h5 class="mt-2"> <span class="text-success font-size-12 ms-2"> <span class="text-muted">Pension Provider: </span>{{ pension_provider_text }}</span></h5>
                       <h5 class="mt-2"> <span class="text-success font-size-12 ms-2"> <span class="text-muted">Pensionable?: </span>{{emp_pension === 1 ? 'Yes' : 'No'}}</span></h5>
                       <h5 class="mt-2"> <span class="text-success font-size-12 ms-2"> <span class="text-muted">Pension No.: </span>{{ emp_pension_no }}</span></h5>
                       <h5 class="mt-2"> <span class="text-success font-size-12 ms-2"> <span class="text-muted">PAYE No.: </span>{{ emp_paye }}</span></h5>
+                      <h5 class="mt-2"> <span class="text-success font-size-12 ms-2"> <span class="text-muted">NHF: </span>{{ emp_nhf }}</span></h5>
 
                     </div>
 
@@ -655,7 +713,7 @@ export default {
       size="xl"
       @hidden="resetForm"
     >
-      <form @submit.prevent>
+      <form @submit.prevent="updateEmployee">
         <div class="row">
           <div class="col-lg-6">
             <div class="p-3 bg-light mb-4">
@@ -709,13 +767,12 @@ export default {
               />
             </div>
             <div class="form-group">
-              <label for=""> Location </label>
-              <input
-                type="text"
-                class="form-control"
+              <label>Location</label>
+              <multiselect
                 v-model="emp_location"
-                placeholder="Location"
-              />
+                :options="locations"
+                :custom-label="stateOfOriginLabel"
+              ></multiselect>
             </div>
 
             <div class="form-group">
@@ -732,9 +789,6 @@ export default {
               <b-select
                 v-model="gender"
                 :options="gender_options"
-                :class="{
-                        'is-invalid': submitted && $v.gender.$error,
-                      }"
               ></b-select>
             </div>
             <div class="form-group">
@@ -742,9 +796,6 @@ export default {
               <b-select
                 v-model="religion"
                 :options="religion_options"
-                :class="{
-                        'is-invalid': submitted && $v.religion.$error,
-                      }"
               ></b-select>
             </div>
             <div class="form-group">
@@ -753,9 +804,6 @@ export default {
                 v-model="job_role"
                 :options="job_roles"
                 :custom-label="locationLabel"
-                :class="{
-                        'is-invalid': submitted && $v.job_role.$error,
-                      }"
               ></multiselect>
             </div>
             <div class="form-group">
@@ -765,9 +813,6 @@ export default {
                 :options="states"
                 :custom-label="stateOfOriginLabel"
                 @input="getLocalGovernmentAreasByStateId"
-                :class="{
-                        'is-invalid': submitted && $v.emp_state_id.$error,
-                      }"
               ></multiselect>
             </div>
             <div class="form-group">
@@ -810,6 +855,14 @@ export default {
               <h5 class="font-size-14 mb-0">Pension Information</h5>
             </div>
             <div class="form-group">
+              <label>Pension Provider</label>
+              <multiselect
+                v-model="selectedPensionProvider"
+                :options="pensionProviders"
+                :custom-label="pensionLabel"
+              ></multiselect>
+            </div>
+            <div class="form-group">
               <label>Pensionable?</label>
               <b-form-select
                 v-model="emp_pension"
@@ -834,6 +887,15 @@ export default {
                 class="form-control"
                 v-model="emp_paye"
                 placeholder="PAYE"
+              />
+            </div>
+            <div class="form-group">
+              <label for=""> NHF</label>
+              <input
+                type="text"
+                class="form-control"
+                v-model="emp_nhf"
+                placeholder="NHF"
               />
             </div>
           </div>
@@ -946,14 +1008,6 @@ export default {
                 v-model="emp_contract_end_date"
               />
             </div>
-            <div class="form-group">
-              <label for=""> Grade Level </label>
-              <input
-                type="date"
-                class="form-control"
-                v-model="emp_grade_level"
-              />
-            </div>
             <div class="p-3 bg-light mb-4">
               <h5 class="font-size-14 mb-0">
                 Bank Information -- For Salary Disbursement
@@ -966,9 +1020,6 @@ export default {
                 :options="banks"
                 :custom-label="bankLabel"
                 @select="toggleSelected"
-                :class="{
-                        'is-invalid': submitted && $v.emp_bank_id.$error,
-                      }"
               >
               </multiselect>
             </div>
