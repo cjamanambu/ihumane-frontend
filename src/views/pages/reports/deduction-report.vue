@@ -69,6 +69,7 @@ export default {
             employeeName: deduction.employeeName,
             location: deduction.location,
           };
+          deductionObj['ref_no'] = deduction.paymentNumber
           deduction.deductions.forEach((deduction) => {
             this.deductionSum += deduction.amount;
             deductionObj[deduction.paymentName] = this.apiValueHandler(
@@ -76,7 +77,7 @@ export default {
             );
           });
 
-          deductionObj['payment_number'] = deduction.paymentNumber
+
           this.deductions.push(deductionObj);
         });
         this.filtered = this.deductions;
@@ -108,6 +109,7 @@ export default {
       return ret;
     },
     async processFields(data) {
+      this.deductionFields.push(`ref_no`)
       await data.forEach((paymentDefinition, index) => {
         if (paymentDefinition.pd_id === parseFloat(this.deduction)) {
           this.deductionName = data[index].pd_payment_name;
@@ -115,7 +117,7 @@ export default {
 
         }
       });
-      this.deductionFields.push(`payment_number`)
+
     },
   },
   data() {
