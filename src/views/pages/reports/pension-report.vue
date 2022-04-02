@@ -42,10 +42,13 @@ export default {
             employeeName: pension.employeeName,
             sector: pension.sector,
             location: pension.location,
+            employee_gross: this.apiValueHandler(pension.adjustedGrossII.toFixed(2))  ?? '0.00',
             pension_employee_contribution: this.apiValueHandler(pension.pensionArray[0].Amount.toFixed(2))  ?? '0.00',
             pension_employer_contribution:this.apiValueHandler(pension.pensionArray[1].Amount.toFixed(2)) ?? '0.00',
             voluntary_pension: this.apiValueHandler(pension.pensionArray[2].Amount.toFixed(2)) ?? '0.00',
             total: this.apiValueHandler(pension.totalPension.toFixed(2)) ?? '0.00',
+            month: pension.month,
+            year: pension.year,
             pfa: pension.pfa,
             pension_number: pension.pin,
           };
@@ -69,6 +72,8 @@ export default {
           this.jsonFields["SECTOR"] = key;
         }else if (key === "location") {
           this.jsonFields["LOCATION"] = key;
+        } else if (key === "employee_gross") {
+          this.jsonFields["EMPLOYEE GROSS"] = key;
         } else if (key === "pension_employee_contribution") {
           this.jsonFields["EMPLOYEE CONTRIBUTION"] = key;
         } else if (key === "pension_employer_contribution") {
@@ -77,6 +82,10 @@ export default {
           this.jsonFields["VOLUNTARY PENSION"] = key;
         }else if (key === "total") {
           this.jsonFields["TOTAL"] = key;
+        }else if (key === "month") {
+          this.jsonFields["MONTH"] = key;
+        }else if (key === "year") {
+          this.jsonFields["YEAR"] = key;
         }else if (key === "pfa") {
           this.jsonFields["PFA"] = key;
         }else if (key === "pension_number") {
@@ -143,6 +152,9 @@ export default {
         "employeeName",
         "sector",
          "location",
+        "month",
+        "year",
+          "employee_gross",
         "pension_employee_contribution",
         "pension_employer_contribution",
         "voluntary_pension",
@@ -285,6 +297,25 @@ export default {
                 </template>
 
                 <template #cell(location)="row">
+                  <span class="text-nowrap">
+                    {{ row.value }}
+                  </span>
+                </template>
+
+                <template #cell(month)="row">
+                  <span class="text-nowrap">
+                     {{ (parseInt(row.value) - 1) | getMonth }}
+
+                  </span>
+                </template>
+                <template #cell(year)="row">
+                  <span class="text-nowrap">
+                    {{ row.value }}
+                  </span>
+                </template>
+
+
+                <template #cell(employee_gross)="row">
                   <span class="text-nowrap">
                     {{ row.value }}
                   </span>
