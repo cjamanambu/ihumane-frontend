@@ -25,8 +25,8 @@ export default {
     first_name: { required },
     last_name: { required },
 
-    personal_email: { required },
-    official_email: { required },
+   // personal_email: { required },
+    //official_email: { required },
     telephone: { required },
     account_number: { required },
   },
