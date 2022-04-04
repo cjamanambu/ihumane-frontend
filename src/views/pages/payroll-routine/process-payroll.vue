@@ -65,7 +65,6 @@ export default {
           { value: null, text: "Please select a location" },
         ];
         const { data } = res;
-        console.log(data);
         data.forEach((location) => {
           this.payrollLocations.push({
             value: location.location_id,
@@ -128,8 +127,9 @@ export default {
       });
     },
     async fetchPayrollRoutine() {
-      let url = `${this.ROUTES.salary}/pull-salary-routine`;
+      let url = `${this.ROUTES.salary}/pull-salary-routine-locations`;
       await this.apiGet(url, "Fetch Payroll Routine Error").then((res) => {
+        console.log({ res });
         this.routineRun = true;
         const { data } = res;
         data.forEach((pay, index) => {
@@ -149,7 +149,6 @@ export default {
         "Get Payroll Month & Year Error"
       ).then((res) => {
         if (res.data) {
-          console.log(res.data);
           const { pym_year, pym_month } = res.data;
           this.pmyMonth = pym_month;
           this.pmyYear = pym_year;
