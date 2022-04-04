@@ -179,9 +179,9 @@ export default {
   <Layout>
     <PageHeader :title="title" :items="items" />
     <div class="d-flex justify-content-end mb-3">
-      <b-button class="btn btn-success" @click="$router.push('/reports')">
-        <i class="mdi mdi-plus mr-2"></i>
-        Reports
+      <b-button class="btn btn-success" @click="$router.push('/process-payroll')">
+        <i class="mdi mdi-skip-backward mr-2"></i>
+        Back
       </b-button>
     </div>
     <scale-loader v-if="apiBusy" />
