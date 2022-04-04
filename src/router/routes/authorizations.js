@@ -56,7 +56,8 @@ export default [
     meta: {
       authRequired: true,
     },
-    component: () => import("@/views/pages/self-service/leave-application"),
+    component: () =>
+      import("@/views/pages/self-service/leave-management/leave-application"),
   },
   {
     path: "/manage-travel-applications",
@@ -72,7 +73,8 @@ export default [
     meta: {
       authRequired: true,
     },
-    component: () => import("@/views/pages/self-service/travel-application-details"),
+    component: () =>
+      import("@/views/pages/self-service/travel-application-details"),
   },
   {
     path: "/manage-time-sheet-details/:month/:year",
@@ -82,5 +84,4 @@ export default [
     },
     component: () => import("@/views/pages/self-service/time-sheet-details"),
   },
-
 ];

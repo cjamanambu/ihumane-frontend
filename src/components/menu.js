@@ -184,7 +184,7 @@ export const menuItems = [
   {
     id: 27,
     label: "Employee",
-    icon: "ri-user-settings-line",
+    icon: " ri-account-circle-line",
     subItems: [
       {
         id: 28,
@@ -211,9 +211,37 @@ export const menuItems = [
       },
     ],
   },
+  // {
+  //   id: 26,
+  //   label: "Leave Management",
+  //   isTitle: true,
+  // },
+  // {
+  //   id: 29,
+  //   label: "Employee Leaves",
+  //   icon: "ri-user-settings-line",
+  //   link: "/employee-leave",
+  // },
   {
     id: 26,
-    label: "Leave Management",
+    label: "Communication",
+    isTitle: true,
+  },
+  {
+    id: 299,
+    label: "Announcement",
+    icon: "ri-error-warning-line",
+    link: "/manage-announcements",
+  },
+  {
+    id: 209,
+    label: "Query",
+    icon: "ri-file-list-2-line",
+    link: "/manage-queries",
+  },
+  {
+    id: 26,
+    label: "Self-Service",
     isTitle: true,
   },
   {
@@ -223,7 +251,7 @@ export const menuItems = [
     subItems: [
       {
         id: 28,
-        label: "Leave Application",
+        label: "All Leave Applications",
         link: "/leave-applications",
       },
 
@@ -240,35 +268,6 @@ export const menuItems = [
       },
     ],
   },
-  // {
-  //   id: 29,
-  //   label: "Employee Leaves",
-  //   icon: "ri-user-settings-line",
-  //   link: "/employee-leave",
-  // },
-  {
-    id: 26,
-    label: "Communication",
-    isTitle: true,
-  },
-  {
-    id: 299,
-    label: "Announcement",
-    icon: "ri-team-line",
-    link: "/manage-announcements",
-  },
-  {
-    id: 209,
-    label: "Query",
-    icon: "ri-pages-line",
-    link: "/manage-queries",
-  },
-  {
-    id: 26,
-    label: "Self-Service",
-    isTitle: true,
-  },
-
   {
     id: 29,
     label: "Travel Application",

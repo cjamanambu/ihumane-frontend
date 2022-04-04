@@ -24,9 +24,9 @@ import "@/assets/scss/app.scss";
 
 Vue.config.productionTip = false;
 Vue.config.silent = true;
-Vue.config.errorHandler = function (err, vm, info) {
-  console.warn({ err, vm, info });
-};
+// Vue.config.errorHandler = function (err, vm, info) {
+//   console.warn({ err, vm, info });
+// };
 Vue.use(VueYoutube);
 Vue.use(BootstrapVue);
 Vue.use(vco);
