@@ -17,12 +17,12 @@ export default {
   },
   async mounted() {
     await this.fetchEmployee();
-    await this.getStates();
-    await this.getBanks();
+     this.getStates();
+     this.getBanks();
      this.getJobRoles();
-    await this.getLocations();
-    await this.getPensionProviders();
-    await this.getLocalGovernmentAreasByStateId();
+     this.getLocations();
+     this.getPensionProviders();
+     this.getLocalGovernmentAreasByStateId();
   },
 
   /*: null,
@@ -87,15 +87,17 @@ export default {
         const { data } = res;
         //console.log({ data });
         if (data) {
+          //console.log('State ID: '+ data.emp_state_id);
           this.emp_first_name = data.emp_first_name;
           this.emp_last_name = data.emp_last_name;
           this.emp_other_name = data.emp_other_name;
           this.emp_qualification = data.emp_qualification;
           this.emp_location = data.location.location_name;
+          this.location_id = data.location.location_id;
           this.emp_account_no = data.emp_account_no;
           this.emp_phone_no = data.emp_phone_no;
           this.emp_bank_id_val = data.emp_bank_id;
-          this.emp_state_id_val = data.emp_state_id;
+          this.emp_state_id = data.emp_state_id;
           this.emp_lga_id = data.emp_lga_id;
           this.emp_marital_status = data.emp_marital_status;
           this.emp_spouse_name = data.emp_spouse_name;
@@ -114,7 +116,9 @@ export default {
           this.religion = data.emp_religion;
           this.emp_pension = data.emp_pension;
           this.emp_pension_no = data.emp_pension_no;
+          this.pension_provider_id = data.emp_pension_id;
           this.emp_paye = data.emp_paye;
+          this.emp_passport = data.emp_passport;
           switch(parseInt(data.emp_religion) ){
             case 1:
             this.religion_text = "Christianity";
@@ -170,7 +174,7 @@ export default {
         //this.jrs = data;
       });
     },
-    async getPensionProviders() {
+     getPensionProviders() {
       this.apiGet(this.ROUTES.pensionProvider, "Get Pension providers Error").then((res) => {
         const { data } = res;
         //console.log(data);
@@ -184,7 +188,7 @@ export default {
               value: datum.pension_provider_id,
               text: datum.provider_name,
             };
-            this.pensionProviders.push(val);
+            this.pensionProvider.push(val);
           }
           this.pensionProviders.push(dat);
         });
@@ -192,9 +196,9 @@ export default {
         //this.jrs = data;
       });
     },
-    async getBanks() {
+     getBanks() {
       const url = `${this.ROUTES.bank}`;
-      await this.apiGet(url).then((res) => {
+       this.apiGet(url).then((res) => {
         const { data } = res;
         this.banks = [{ value: null, text: "Please select from the list" }];
         data.forEach(async (datum) => {
@@ -213,9 +217,9 @@ export default {
         });
       });
     },
-    async getLocations() {
+     getLocations() {
       const url = `${this.ROUTES.location}`;
-      await this.apiGet(url).then((res) => {
+       this.apiGet(url).then((res) => {
         const { data } = res;
         this.locations = [{ value: null, text: "Please select location" }];
         data.forEach(async (datum) => {
@@ -223,20 +227,20 @@ export default {
             value: datum.location_id,
             text: datum.location_name,
           };
-          if (datum.location_id === this.emp_location) {
+          if (datum.location_id === this.location_id) {
             const val = {
               value: datum.location_id,
               text: datum.location_name,
             };
-            this.locations.push(val);
+            this.location.push(val);
           }
           this.locations.push(dat);
         });
       });
     },
-    async getStates() {
+     getStates() {
       const url = `${this.ROUTES.state}`;
-      await this.apiGet(url).then((res) => {
+       this.apiGet(url).then((res) => {
         const { data } = res;
         this.states = [{ value: null, text: "Please select a State" }];
         data.forEach(async (datum) => {
@@ -244,12 +248,12 @@ export default {
             value: datum.s_id,
             text: datum.s_name,
           };
-          if (datum.s_id === this.emp_state_id_val) {
+          if (datum.s_id === this.emp_state_id) {
             const val = {
               value: datum.s_id,
               text: datum.s_name,
             };
-            this.emp_state_id.push(val);
+            this.state.push(val);
           }
           this.states.push(dat);
         });
@@ -291,12 +295,12 @@ export default {
         emp_account_no: this.emp_account_no,
 
         emp_bank_id: this.emp_bank_id.value,
-        emp_state_id: this.emp_state_id.value,
-        emp_pension_id:this.selectedPensionProvider.value,
+        emp_state_id: this.state.value,
+        emp_pension_id:this.pensionProvider.value,
         emp_lga_id: this.lga.value,
         emp_religion: this.religion,
         emp_nhf: this.emp_nhf,
-        emp_location_id:this.emp_location.value,
+        emp_location_id:this.location.value,
 
         emp_marital_status: this.emp_marital_status,
         emp_spouse_name: this.emp_spouse_name,
@@ -317,7 +321,7 @@ export default {
 
         emp_pension: this.emp_pension,
         emp_pension_no: this.emp_pension_no,
-        emp_paye: this.emp_paye,
+        emp_paye_no: this.emp_paye,
       };
       //console.log(data);
       this.apiPatch(url, data, "Update Employee Error").then();
@@ -373,9 +377,14 @@ export default {
       emp_bank_id: [],
       emp_bank_id_val: null,
       emp_state_id_val: null,
-      emp_state_id: [],
+
+      state: [],
+      states: [],
+      state_id: null,
+
       job_role: [],
       job_roles: [],
+
       job_role_id: null,
       bank_text:null,
       lga_text:null,
@@ -400,7 +409,10 @@ export default {
       emp_hire_date: null,
       emp_contract_end_date: null,
       emp_grade_level: null,
+      emp_passport: null,
       locations: [],
+      location: [],
+      location_id: null,
 
       maritalStatus: [
         { value: null, text: "select marital Status" },
@@ -432,9 +444,10 @@ export default {
       emp_paye: null,
       bank: null,
       banks: [],
-      state: null,
-      states: [],
+
       pensionProviders: [],
+      pensionProvider: [],
+      pension_provider_id: null,
       lgas: [],
       jrs: [],
       lga: [],
@@ -520,7 +533,7 @@ export default {
                 <div class="tab-content" id="v-pills-tabContent">
                   <div class="tab-pane fade show active" id="product-1" role="tabpanel">
                     <div class="product-img">
-                      <img src="https://i.pravatar.cc/300" alt="img-1" class="img-fluid mx-auto d-block" data-zoom="assets/images/product/img-1.png">
+                      <img :src="emp_passport " height="64" width="64" alt="img-1" class="img-fluid mx-auto d-block" data-zoom="assets/images/product/img-1.png">
                     </div>
                   </div>
                 </div>
@@ -642,7 +655,6 @@ export default {
                       <h5 class="mt-2"> <span class="text-success font-size-12 ms-2"> <span class="text-muted">Phone No.: </span>{{ emp_next_of_kin_phone_no }}</span></h5>
 
                       <h5 class="font-size-14 text-uppercase mt-3">Bank Information:</h5>
-                      <h5 class="mt-2"> <span class="text-success font-size-12 ms-2"> <span class="text-muted">Account Name: </span></span></h5>
                       <h5 class="mt-2"> <span class="text-success font-size-12 ms-2"> <span class="text-muted">Account No.: </span>{{ emp_account_no }}</span></h5>
                       <h5 class="mt-2"> <span class="text-success font-size-12 ms-2"> <span class="text-muted">BVN.: </span>{{ emp_bvn }}</span></h5>
                       <h5 class="mt-2"> <span class="text-success font-size-12 ms-2"> <span class="text-muted">Bank.: </span>{{ bank_text }}</span></h5>
@@ -769,7 +781,7 @@ export default {
             <div class="form-group">
               <label>Location</label>
               <multiselect
-                v-model="emp_location"
+                v-model="location"
                 :options="locations"
                 :custom-label="stateOfOriginLabel"
               ></multiselect>
@@ -809,7 +821,7 @@ export default {
             <div class="form-group">
               <label>State Of Origin</label>
               <multiselect
-                v-model="emp_state_id"
+                v-model="state"
                 :options="states"
                 :custom-label="stateOfOriginLabel"
                 @input="getLocalGovernmentAreasByStateId"
@@ -857,7 +869,7 @@ export default {
             <div class="form-group">
               <label>Pension Provider</label>
               <multiselect
-                v-model="selectedPensionProvider"
+                v-model="pensionProvider"
                 :options="pensionProviders"
                 :custom-label="pensionLabel"
               ></multiselect>

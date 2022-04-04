@@ -89,13 +89,13 @@ export default {
           body:this.body,
           persons:this.persons
         };
-        console.log(this.getEmployee);
-        /*this.apiPost(this.ROUTES.announcement, data, "Post announcement Error").then((res) => {
+        //console.log(this.getEmployee);
+        this.apiPost(this.ROUTES.announcement, data, "Post announcement Error").then((res) => {
           this.apiResponseHandler(`${res.data}`, "Publish Announcement");
           this.refreshTable();
           this.$v.$reset();
           this.$refs["post-announcement"].hide();
-        });*/
+        });
      // }
     },
     onFiltered(filteredItems) {
