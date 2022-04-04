@@ -55,4 +55,12 @@ export default [
     },
     component: () => import("@/views/pages/reports/employee-report"),
   },
+  {
+    path: "/reports/pension-report/:period/:locationID",
+    name: "pension-report",
+    meta: {
+      authRequired: true,
+    },
+    component: () => import("@/views/pages/reports/pension-report"),
+  },
 ];

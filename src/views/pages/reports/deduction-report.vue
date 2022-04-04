@@ -60,6 +60,7 @@ export default {
       const url = `${this.ROUTES.salary}/deduction-report-type`;
       this.apiPost(url, data, "Generate Deduction Report").then((res) => {
         const { data } = res;
+        console.log(data)
         this.deductionSum = 0;
         data.forEach((deduction, index) => {
           let deductionObj = {
@@ -68,12 +69,15 @@ export default {
             employeeName: deduction.employeeName,
             location: deduction.location,
           };
+          deductionObj['ref_no'] = deduction.paymentNumber
           deduction.deductions.forEach((deduction) => {
             this.deductionSum += deduction.amount;
             deductionObj[deduction.paymentName] = this.apiValueHandler(
               deduction.amount.toFixed(2)
             );
           });
+
+
           this.deductions.push(deductionObj);
         });
         this.filtered = this.deductions;
@@ -105,12 +109,15 @@ export default {
       return ret;
     },
     async processFields(data) {
+      this.deductionFields.push(`ref_no`)
       await data.forEach((paymentDefinition, index) => {
         if (paymentDefinition.pd_id === parseFloat(this.deduction)) {
           this.deductionName = data[index].pd_payment_name;
           this.deductionFields.push(data[index].pd_payment_name);
+
         }
       });
+
     },
   },
   data() {

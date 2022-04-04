@@ -103,21 +103,21 @@ export default {
     launchFilePicker() {
       this.$refs.file.click();
     },
-    async onFileChange(fieldName, files) {
-      this.uploadFiles = [];
-      if (files.length > 0) {
-        for (let i = 0; i < files.length; i++) {
-          this.uploadFiles.push(files[i]);
-        }
-      } else {
-        this.$bvToast.toast("Please select at least one file to upload", {
-          title: "No Files Selected",
-          toaster: "b-toaster-top-right",
-          appendToast: true,
-          variant: "warning",
-        });
-      }
-    },
+    // async onFileChange(fieldName, files) {
+    //   this.uploadFiles = [];
+    //   if (files.length > 0) {
+    //     for (let i = 0; i < files.length; i++) {
+    //       this.uploadFiles.push(files[i]);
+    //     }
+    //   } else {
+    //     this.$bvToast.toast("Please select at least one file to upload", {
+    //       title: "No Files Selected",
+    //       toaster: "b-toaster-top-right",
+    //       appendToast: true,
+    //       variant: "warning",
+    //     });
+    //   }
+    // },
     deleteFile(index) {
       this.uploadFiles.splice(index, 1);
     },
@@ -141,7 +141,9 @@ export default {
       });
     },
     async submitNew() {
-      if (this.uploadFiles.length > 0) {
+      // if (1) {
+        // if (this.uploadFiles.length > 0) {
+        // }
         this.submitted = true;
 
         await this.paymentsFields.forEach((field) => {
@@ -153,46 +155,48 @@ export default {
 
           this.filledPayments.push(data);
         });
-        let formData = new FormData();
-        formData.append('employee', this.selectedEmployees.value)
-        formData.append('payments', this.filledPayments)
-        formData.append('month', this.month)
-        formData.append('year', this.year)
-        await this.uploadFiles.forEach((file) => {
-          formData.append("documents", file);
-        });
-        const url = `${this.ROUTES.variationalPayment}`;
-        this.apiPost(url, formData, "Add Variational Payment").then((res) => {
-          this.apiResponseHandler(`${res.data}`, "Add Variational Payment");
-          this.submitted = false;
-          this.selectedEmployees = null;
-          this.count = 0;
-          this.getVariationalPayments();
-        });
-
-        // const data = {
-        //   employee: this.selectedEmployees.value,
-        //   payments: this.filledPayments,
-        //   month: this.month,
-        //   year: this.year,
-        // };
+        // let formData = new FormData();
+        // formData.append('employee', this.selectedEmployees.value)
+        // formData.append('payments', this.filledPayments)
+        // formData.append('month', this.month)
+        // formData.append('year', this.year)
+        //
+        //
+        // await this.uploadFiles.forEach((file) => {
+        //   formData.append("documents", file);
+        // });
         // const url = `${this.ROUTES.variationalPayment}`;
-        // this.apiPost(url, data, "Add Variational Payment").then((res) => {
+        // this.apiPost(url, formData, "Add Variational Payment").then((res) => {
         //   this.apiResponseHandler(`${res.data}`, "Add Variational Payment");
         //   this.submitted = false;
         //   this.selectedEmployees = null;
         //   this.count = 0;
         //   this.getVariationalPayments();
         // });
-      }else{
-        this.$bvToast.toast("Please select at least one file to upload", {
-          title: "No Files Selected",
-          toaster: "b-toaster-top-right",
-          appendToast: true,
-          variant: "warning",
-        });
 
-      }
+        const data = {
+          employee: this.selectedEmployees.value,
+          payments: this.filledPayments,
+          month: this.month,
+          year: this.year,
+        };
+        const url = `${this.ROUTES.variationalPayment}`;
+        this.apiPost(url, data, "Add Variational Payment").then((res) => {
+          this.apiResponseHandler(`${res.data}`, "Add Variational Payment");
+          this.submitted = false;
+          this.selectedEmployees = null;
+          this.count = 0;
+          this.getVariationalPayments();
+        });
+      // }else{
+      //   this.$bvToast.toast("Please select at least one file to upload", {
+      //     title: "No Files Selected",
+      //     toaster: "b-toaster-top-right",
+      //     appendToast: true,
+      //     variant: "warning",
+      //   });
+      //
+      // }
 
 
       // const data = {
