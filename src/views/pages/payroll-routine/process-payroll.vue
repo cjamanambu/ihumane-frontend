@@ -44,13 +44,13 @@ export default {
       sortDesc: false,
       fields: [
         { key: "sn", label: "S/n", sortable: true },
-        { key: "employeeName", label: "Employee", sortable: true },
-        { key: "employeeUniqueId", label: "T7 Number", sortable: true },
-        { key: "location", label: "Location (T6)", sortable: true },
-        { key: "sector", label: "Sector (T3)", sortable: true },
-        { key: "grossSalary", label: "Gross Salary", sortable: true },
-        { key: "totalDeduction", label: "Total Deduction", sortable: true },
-        { key: "netSalary", label: "Net Salary", sortable: true },
+        { key: "locationName", label: "Location", sortable: true },
+        { key: "locationTotalGross", label: "Total Gross", sortable: true },
+        { key: "locationTotalDeduction", label: "Total Deduction", sortable: true },
+        { key: "locationTotalNet", label: "Total Net", sortable: true },
+        { key: "locationEmployeesCount", label: "Total Employees", sortable: true },
+        { key: "month", label: "month", sortable: true },
+        { key: "year", label: "year", sortable: true },
       ],
       pmyMonth: null,
       pmyYear: null,
@@ -162,8 +162,8 @@ export default {
     },
     selectRow(row) {
       row = row[0];
-      let empID = row.employeeId;
-      this.$router.push({ name: "view-payslip", params: { empID } });
+      let locationId = row.locationId;
+      this.$router.push({ name: "emolument-location", params: { locationId } });
       this.$refs["payroll-summary-table"].clearSelected();
     },
   },
@@ -252,7 +252,7 @@ export default {
                   <!-- End search -->
                 </div>
                 <!-- Table -->
-                <div class="table-responsive mb-0">
+                <div class="table-responsive mb-0" v-if="pay.length">
                   <b-table
                     ref="payroll-summary-table"
                     bordered
@@ -272,19 +272,25 @@ export default {
                     select-mode="single"
                     @row-selected="selectRow"
                   >
-                    <template #cell(grossSalary)="row">
+                    <template #cell(locationTotalGross)="row">
                       <p class="float-right mb-0">
                         {{ parseFloat(row.value.toFixed(2)).toLocaleString() }}
                       </p>
                     </template>
-                    <template #cell(netSalary)="row">
+                    <template #cell(locationTotalDeduction)="row">
                       <p class="float-right mb-0">
                         {{ parseFloat(row.value.toFixed(2)).toLocaleString() }}
                       </p>
                     </template>
-                    <template #cell(totalDeduction)="row">
+                    <template #cell(locationTotalNet)="row">
                       <p class="float-right mb-0">
                         {{ parseFloat(row.value.toFixed(2)).toLocaleString() }}
+                      </p>
+                    </template>
+
+                    <template #cell(month)="row">
+                      <p class="float-right mb-0">
+                        {{ (parseInt(row.value) - 1) | getMonth }}
                       </p>
                     </template>
                   </b-table>
