@@ -15,4 +15,13 @@ export default [
     },
     component: () => import("@/views/pages/payroll-routine/view-payslip"),
   },
+
+  {
+    path: "/emolument-location/:locationId",
+    name: "emolument-location",
+    meta: {
+      authRequired: true,
+    },
+    component: () => import("@/views/pages/payroll-routine/emolument-location"),
+  },
 ];
