@@ -874,13 +874,6 @@ export default {
                 :custom-label="pensionLabel"
               ></multiselect>
             </div>
-            <div class="form-group">
-              <label>Pensionable?</label>
-              <b-form-select
-                v-model="emp_pension"
-                :options="pension_options"
-              />
-            </div>
 
             <div class="form-group">
               <label for=""> Pension No. </label>
