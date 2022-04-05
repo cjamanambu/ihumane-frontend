@@ -289,7 +289,7 @@ export default {
                     </template>
 
                     <template #cell(month)="row">
-                      <p class="float-right mb-0">
+                      <p class="mb-0">
                         {{ (parseInt(row.value) - 1) | getMonth }}
                       </p>
                     </template>

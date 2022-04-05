@@ -64,6 +64,7 @@ export default {
         data.forEach((emolument, index) => {
           let emolumentObj = {
             sn: ++index,
+            employeeId: emolument.employeeId,
             employeeUniqueId: emolument.employeeUniqueId,
             employeeName: emolument.employeeName,
             location: emolument.location,
@@ -127,6 +128,13 @@ export default {
           this.deductionFields.push(data[index].pd_payment_name);
         }
       });
+    },
+
+    selectRow(row) {
+      row = row[0];
+      let employeeId = row.employeeId;
+      this.$router.push({ name: "view-payslip", params: { employeeId } });
+      this.$refs["emolument-table"].clearSelected();
     },
   },
   data() {
@@ -220,24 +228,7 @@ export default {
                   </label>
                 </div>
               </div>
-              <div class="col-sm-12 col-md-3 text-md-right">
-                <b-form-group
-                    label="Filter On"
-                    label-cols-sm="7"
-                    label-align-sm="right"
-                    label-size="sm"
-                    class="mb-0"
-                    v-slot="{ ariaDescribedby }"
-                >
-                  <b-form-checkbox-group
-                      v-model="filterOn"
-                      :aria-describedby="ariaDescribedby"
-                      class="mt-1"
-                  >
-                    <b-form-checkbox value="location">Location</b-form-checkbox>
-                  </b-form-checkbox-group>
-                </b-form-group>
-              </div>
+
               <!-- Search -->
               <div class="col-sm-12 col-md-3">
                 <div
@@ -275,6 +266,8 @@ export default {
                   :filter="filter"
                   :filter-included-fields="filterOn"
                   @filtered="onFiltered"
+                  select-mode="single"
+                  @row-selected="selectRow"
                   show-empty
               >
                 <template #cell(sn)="row">
