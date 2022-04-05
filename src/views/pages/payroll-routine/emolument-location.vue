@@ -70,6 +70,8 @@ export default {
             location: emolument.location,
             sector: emolument.sector,
             jobRole: emolument.jobRole,
+            employeeStartDate: emolument.employeeStartDate,
+            empEndDate: emolument.empEndDate
           };
           emolument.incomes.forEach((income) => {
             emolumentObj[income.paymentName] = this.apiValueHandler(
@@ -174,6 +176,8 @@ export default {
         "sector",
         "location",
         "jobRole",
+         "employeeStartDate",
+         "empEndDate"
       ],
       incomeFields: [],
       deductionFields: [],
@@ -305,7 +309,11 @@ export default {
                 <template #cell()="data">
                   <span class="text-nowrap float-right">{{ data.value }}</span>
                 </template>
-                <template #cell(netSalary)="row">
+                <template #cell(grossSalary)="row">
+                  <span class="float-right">
+                    {{ row.value }}
+                  </span>
+                </template><template #cell(netSalary)="row">
                   <span class="float-right">
                     {{ row.value }}
                   </span>
