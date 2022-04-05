@@ -22,7 +22,7 @@ export default {
      this.getJobRoles();
      this.getLocations();
      this.getPensionProviders();
-     this.getLocalGovernmentAreasByStateId();
+     this.getLocalGovernmentAreas();
   },
 
   /*: null,
@@ -255,6 +255,28 @@ export default {
             this.state.push(val);
           }
           this.states.push(dat);
+        });
+      });
+    },
+    getLocalGovernmentAreas() {
+      const url = `${this.ROUTES.localGovernment}`;
+      this.apiGet(url).then((res) => {
+        const { data } = res;
+        //console.log(data);
+        this.lgas = [{ value: null, text: "Please select LGA" }];
+        data.forEach( (datum) => {
+          const dat = {
+            value: datum.lg_id,
+            text: datum.lg_name,
+          };
+          if (parseInt(datum.lg_id ) === parseInt(this.emp_lga_id)) {
+            const val = {
+              value: datum.lg_id,
+              text: datum.lg_name,
+            };
+            this.lga.push(val);
+          }
+          this.lgas.push(dat);
         });
       });
     },
