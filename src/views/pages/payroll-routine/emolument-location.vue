@@ -132,8 +132,9 @@ export default {
 
     selectRow(row) {
       row = row[0];
-      let employeeId = row.employeeId;
-      this.$router.push({ name: "view-payslip", params: { employeeId } });
+      console.log(row)
+      let empID = row.employeeId;
+      this.$router.push({ name: "view-payslip", params: { empID } });
       this.$refs["emolument-table"].clearSelected();
     },
   },
@@ -251,6 +252,7 @@ export default {
             <!-- Table -->
             <div class="table-responsive mb-0" v-if="newEmoluments.length">
               <b-table
+                  selectable
                   ref="emolument-table"
                   bordered
                   hover
