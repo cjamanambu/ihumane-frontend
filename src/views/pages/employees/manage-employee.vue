@@ -154,24 +154,23 @@ export default {
      getJobRoles() {
       this.apiGet(this.ROUTES.jobRole, "Get Job Roles Error").then((res) => {
         const { data } = res;
-        //console.log('Job roles');
-        //console.log(data);
+        //console.log({data});
         data.forEach(async (datum) => {
           const dat = {
             value: datum.job_role_id,
             text: datum.job_role,
           };
-          if (datum.job_role_id === this.job_role_id) {
+          if (parseInt(datum.job_role_id) === parseInt(this.job_role_id)) {
             const val = {
               value: datum.job_role_id,
               text: datum.job_role,
             };
             this.job_role.push(val);
+
           }
           this.job_roles.push(dat);
         });
 
-        //this.jrs = data;
       });
     },
      getPensionProviders() {
@@ -183,7 +182,7 @@ export default {
             value: datum.pension_provider_id,
             text: datum.provider_name,
           };
-          if (datum.pension_provider_id === this.pension_provider_id) {
+          if (parseInt(datum.pension_provider_id) === parseInt(this.pension_provider_id)) {
             const val = {
               value: datum.pension_provider_id,
               text: datum.provider_name,
@@ -206,7 +205,7 @@ export default {
             value: datum.bank_id,
             text: datum.bank_name,
           };
-          if (datum.bank_id === this.emp_bank_id_val) {
+          if (parseInt(datum.bank_id) === parseInt(this.emp_bank_id_val)) {
             const val = {
               value: datum.bank_id,
               text: datum.bank_name,
@@ -227,7 +226,7 @@ export default {
             value: datum.location_id,
             text: datum.location_name,
           };
-          if (datum.location_id === this.location_id) {
+          if (parseInt(datum.location_id) === parseInt(this.location_id)) {
             const val = {
               value: datum.location_id,
               text: datum.location_name,
@@ -248,7 +247,7 @@ export default {
             value: datum.s_id,
             text: datum.s_name,
           };
-          if (datum.s_id === this.emp_state_id) {
+          if (parseInt(datum.s_id) === parseInt(this.emp_state_id)) {
             const val = {
               value: datum.s_id,
               text: datum.s_name,
@@ -271,7 +270,7 @@ export default {
             value: datum.lg_id,
             text: datum.lg_name,
           };
-          if (datum.lg_id === this.emp_lga_id) {
+          if (parseInt(datum.lg_id ) === parseInt(this.emp_lga_id)) {
             const val = {
               value: datum.lg_id,
               text: datum.lg_name,
