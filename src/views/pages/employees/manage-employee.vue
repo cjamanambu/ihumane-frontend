@@ -661,7 +661,6 @@ export default {
 
                       <h5 class="font-size-14 text-uppercase mt-3">Pension Information:</h5>
                       <h5 class="mt-2"> <span class="text-success font-size-12 ms-2"> <span class="text-muted">Pension Provider: </span>{{ pension_provider_text }}</span></h5>
-                      <h5 class="mt-2"> <span class="text-success font-size-12 ms-2"> <span class="text-muted">Pensionable?: </span>{{emp_pension === 1 ? 'Yes' : 'No'}}</span></h5>
                       <h5 class="mt-2"> <span class="text-success font-size-12 ms-2"> <span class="text-muted">Pension No.: </span>{{ emp_pension_no }}</span></h5>
                       <h5 class="mt-2"> <span class="text-success font-size-12 ms-2"> <span class="text-muted">PAYE No.: </span>{{ emp_paye }}</span></h5>
                       <h5 class="mt-2"> <span class="text-success font-size-12 ms-2"> <span class="text-muted">NHF: </span>{{ emp_nhf }}</span></h5>
