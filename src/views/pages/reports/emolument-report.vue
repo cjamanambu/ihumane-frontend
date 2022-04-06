@@ -68,6 +68,7 @@ export default {
             location: emolument.location,
             sector: emolument.sector,
             jobRole: emolument.jobRole,
+            salaryGrade: emolument.salaryGrade,
             contractStartDate: emolument.employeeStartDate,
             contractEndDate: emolument.empEndDate
           };
@@ -166,6 +167,7 @@ export default {
         "sector",
         "location",
         "jobRole",
+        "salaryGrade",
         "contractStartDate",
         "contractEndDate"
       ],
