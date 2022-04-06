@@ -70,8 +70,10 @@ export default {
             location: emolument.location,
             sector: emolument.sector,
             jobRole: emolument.jobRole,
-            employeeStartDate: emolument.employeeStartDate,
-            empEndDate: emolument.empEndDate
+            salaryGrade: emolument.salaryGrade,
+            contractStartDate: emolument.employeeStartDate,
+            contractEndDate: emolument.empEndDate
+
           };
           emolument.incomes.forEach((income) => {
             emolumentObj[income.paymentName] = this.apiValueHandler(
@@ -176,8 +178,9 @@ export default {
         "sector",
         "location",
         "jobRole",
-         "employeeStartDate",
-         "empEndDate"
+         "salaryGrade",
+        "contractStartDate",
+        "contractEndDate"
       ],
       incomeFields: [],
       deductionFields: [],
