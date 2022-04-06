@@ -323,6 +323,7 @@ export default {
         emp_religion: this.religion,
         emp_nhf: this.emp_nhf,
         emp_location_id:this.location.value,
+        emp_job_role_id:this.job_role.value,
 
         emp_marital_status: this.emp_marital_status,
         emp_spouse_name: this.emp_spouse_name,
