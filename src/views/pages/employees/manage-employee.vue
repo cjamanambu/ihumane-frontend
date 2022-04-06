@@ -148,6 +148,7 @@ export default {
           this.emp_hire_date = new Date(data.emp_hire_date)
             .toISOString()
             .slice(0, 10);
+          this.emp_nin = data.emp_nin;
         }
       });
     },
@@ -344,6 +345,7 @@ export default {
         emp_pension: this.emp_pension,
         emp_pension_no: this.emp_pension_no,
         emp_paye_no: this.emp_paye,
+        emp_nin: this.emp_nin,
       };
       //console.log(data);
       this.apiPatch(url, data, "Update Employee Error").then();
@@ -479,6 +481,7 @@ export default {
       selectedPensionProvider: null,
       emp_nhf: null,
       pension_provider_text: null,
+      emp_nin: null,
     };
   },
 };
@@ -640,7 +643,12 @@ export default {
                       </h5>
                     </div>
                     <div class="col-md-6">
-
+                      <h5 class="mt-2">
+                        <span class="text-success font-size-12 ms-2">
+                          <span class="text-muted">NIN: </span
+                          >{{ emp_nin }}</span
+                        >
+                      </h5>
                     </div>
                   </div>
                   <hr class="my-4">
@@ -855,6 +863,15 @@ export default {
                 :options="lgas"
                 :custom-label="lGALabel"
               ></multiselect>
+            </div>
+            <div class="form-group">
+              <label for=""> NIN </label>
+              <input
+                type="text"
+                class="form-control"
+                v-model="emp_nin"
+                placeholder="NIN"
+              />
             </div>
             <div class="p-3 bg-light mb-4">
               <h5 class="font-size-14 mb-0">Marital Information</h5>
