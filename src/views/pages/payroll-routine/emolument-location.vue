@@ -70,6 +70,8 @@ export default {
             location: emolument.location,
             sector: emolument.sector,
             jobRole: emolument.jobRole,
+            employeeStartDate: emolument.employeeStartDate,
+            empEndDate: emolument.empEndDate
           };
           emolument.incomes.forEach((income) => {
             emolumentObj[income.paymentName] = this.apiValueHandler(
@@ -132,8 +134,9 @@ export default {
 
     selectRow(row) {
       row = row[0];
-      let employeeId = row.employeeId;
-      this.$router.push({ name: "view-payslip", params: { employeeId } });
+      console.log(row)
+      let empID = row.employeeId;
+      this.$router.push({ name: "view-payslip", params: { empID } });
       this.$refs["emolument-table"].clearSelected();
     },
   },
@@ -173,6 +176,8 @@ export default {
         "sector",
         "location",
         "jobRole",
+         "employeeStartDate",
+         "empEndDate"
       ],
       incomeFields: [],
       deductionFields: [],
@@ -251,6 +256,7 @@ export default {
             <!-- Table -->
             <div class="table-responsive mb-0" v-if="newEmoluments.length">
               <b-table
+                  selectable
                   ref="emolument-table"
                   bordered
                   hover
@@ -303,7 +309,11 @@ export default {
                 <template #cell()="data">
                   <span class="text-nowrap float-right">{{ data.value }}</span>
                 </template>
-                <template #cell(netSalary)="row">
+                <template #cell(grossSalary)="row">
+                  <span class="float-right">
+                    {{ row.value }}
+                  </span>
+                </template><template #cell(netSalary)="row">
                   <span class="float-right">
                     {{ row.value }}
                   </span>
