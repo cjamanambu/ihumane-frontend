@@ -25,8 +25,8 @@ export default {
         this.paymentDefinitions = data;
         await this.processFields(data);
         this.newFields.push(...this.incomeFields);
-        this.newFields.push("grossSalary");
         this.newFields.push(...this.deductionFields);
+        this.newFields.push("grossSalary");
         this.newFields.push("totalDeduction");
         this.newFields.push("netSalary");
         this.newFields.forEach((newField) => {
