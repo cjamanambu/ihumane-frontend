@@ -23,6 +23,7 @@ export default {
      this.getLocations();
      this.getPensionProviders();
      this.getLocalGovernmentAreas();
+     this.getSectors()
   },
 
   /*: null,
@@ -119,6 +120,8 @@ export default {
           this.pension_provider_id = data.emp_pension_id;
           this.emp_paye = data.emp_paye;
           this.emp_passport = data.emp_passport;
+          this.emp_sector = data.sector.department_id;
+          this.emp_sector_text = data.sector.department_name;
           switch(parseInt(data.emp_religion) ){
             case 1:
             this.religion_text = "Christianity";
@@ -150,6 +153,27 @@ export default {
             .slice(0, 10);
           this.emp_nin = data.emp_nin;
         }
+      });
+    },
+    getSectors() {
+      this.apiGet(this.ROUTES.department, "Get Job Roles Error").then((res) => {
+        const { data } = res;
+        //console.log({data});
+        data.departments.forEach(async (datum) => {
+          const dat = {
+            value: datum.department_id,
+            text: datum.department_name,
+          };
+          if (parseInt(datum.department_id) === parseInt(this.emp_sector)) {
+            const val = {
+              value: datum.department_id,
+              text: datum.department_name,
+            };
+            this.sector.push(val);
+          }
+          this.sectors.push(dat);
+        });
+
       });
     },
      getJobRoles() {
@@ -345,7 +369,6 @@ export default {
         emp_pension: this.emp_pension,
         emp_pension_no: this.emp_pension_no,
         emp_paye_no: this.emp_paye,
-        emp_nin: this.emp_nin,
       };
       //console.log(data);
       this.apiPatch(url, data, "Update Employee Error").then();
@@ -468,6 +491,10 @@ export default {
       emp_paye: null,
       bank: null,
       banks: [],
+      emp_sector:null,
+      emp_sector_text:null,
+      sectors:[],
+      sector:[],
 
       pensionProviders: [],
       pensionProvider: [],
@@ -648,6 +675,8 @@ export default {
                           <span class="text-muted">NIN: </span
                           >{{ emp_nin }}</span
                         >
+                      </h5>
+                      <h5 class="mt-2"> <span class="text-success font-size-12 ms-2"> <span class="text-muted">Sector: </span>{{ emp_sector_text }}</span>
                       </h5>
                     </div>
                   </div>
@@ -844,6 +873,14 @@ export default {
               <multiselect
                 v-model="job_role"
                 :options="job_roles"
+                :custom-label="locationLabel"
+              ></multiselect>
+            </div>
+            <div class="form-group">
+              <label>Sector</label>
+              <multiselect
+                v-model="sector"
+                :options="sectors"
                 :custom-label="locationLabel"
               ></multiselect>
             </div>
