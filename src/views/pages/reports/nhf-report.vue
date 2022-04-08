@@ -34,7 +34,6 @@ export default {
           // let pensionEmployeeContribution;
           // let pensionEmployeeContribution;
           // let voluntaryPension;
-          //
           //   if(typeof pensionArray[0])
           let nhfObj = {
             sn: ++index,
