@@ -158,16 +158,16 @@ export default {
     getSectors() {
       this.apiGet(this.ROUTES.department, "Get Job Roles Error").then((res) => {
         const { data } = res;
-        //console.log({data});
+        console.log({data});
         data.departments.forEach(async (datum) => {
           const dat = {
             value: datum.department_id,
-            text: datum.department_name,
+            text: `${datum.d_t3_code} - ${datum.department_name}`,
           };
           if (parseInt(datum.department_id) === parseInt(this.emp_sector)) {
             const val = {
               value: datum.department_id,
-              text: datum.department_name,
+              text: `${datum.d_t3_code} - ${datum.department_name}`,
             };
             this.sector.push(val);
           }
