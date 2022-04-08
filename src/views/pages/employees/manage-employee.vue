@@ -606,8 +606,8 @@ export default {
                     <div class="flex-1 align-self-center overflow-hidden ml-2 mb-0" >
                       <h5 class="mb-0">Retrieve</h5>
                       <form v-on:submit.prevent="retrieveEmployee" class="form-inline">
-                        <div class="form-group mb-2" style="width: 150px!important;">
-                          <label>Employee</label>
+                        <div class="form-group mb-2">
+                          <label>Search Employee</label>
                           <multiselect
                             v-model="selectedEmployee"
                             :options="employees"
