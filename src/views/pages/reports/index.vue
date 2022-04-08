@@ -9,6 +9,7 @@ import Variation from "./components/variation";
 import BankOrder from "./components/bank-order";
 import EmployeeReport from "./components/employee-report";
 import PensionReport from "./components/pension-report";
+import NhfReport from "./components/nhf-report";
 export default {
   page: {
     title: "Reports",
@@ -23,7 +24,9 @@ export default {
     Variation,
     BankOrder,
     EmployeeReport,
-    PensionReport
+    PensionReport,
+    NhfReport
+
   },
   mounted() {
     this.fetchPMY();
@@ -95,6 +98,9 @@ export default {
         </div>
         <div class="col-md-4">
           <PensionReport />
+        </div>
+        <div class="col-md-4">
+          <NhfReport />
         </div>
       </div>
       <div class="p-3 bg-light mb-4 d-flex justify-content-between">

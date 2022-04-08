@@ -63,4 +63,13 @@ export default [
     },
     component: () => import("@/views/pages/reports/pension-report"),
   },
+
+  {
+    path: "/reports/nhf-report/:period/:locationID",
+    name: "nhf-report",
+    meta: {
+      authRequired: true,
+    },
+    component: () => import("@/views/pages/reports/nhf-report"),
+  },
 ];
