@@ -5,7 +5,7 @@ import appConfig from "@/app.config";
 import JsonExcel from "vue-json-excel";
 export default {
   page: {
-    title: "Pension Report",
+    title: "NHF Report",
     meta: [{ name: "description", content: appConfig.description }],
   },
   components: {
