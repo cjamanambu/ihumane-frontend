@@ -42,7 +42,7 @@ export default {
             employeeName: nhf.employeeName,
             sector: nhf.sector,
             location: nhf.location,
-            employee_gross: this.apiValueHandler(nhf.adjustedGrossII.toFixed(2))  ?? '0.00',
+            employee_gross: this.apiValueHandler(nhf.adjustedGross.toFixed(2))  ?? '0.00',
             nhf_contribution: this.apiValueHandler(nhf.nhfArray[0].Amount.toFixed(2))  ?? '0.00',
             month: nhf.month,
             year: nhf.year,
