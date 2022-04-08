@@ -104,8 +104,8 @@ export default {
       this.apiPost(url, data, "Undo Payroll Routine Error").then((res) => {
         if (res.data) {
           this.routineRun = false;
-          this.fetchPayrollRoutine();
           this.apiResponseHandler("Undo Payroll Routine", res.data);
+          this.fetchPayrollRoutine();
           this.$refs["undo-routine"].hide();
         }
       });
