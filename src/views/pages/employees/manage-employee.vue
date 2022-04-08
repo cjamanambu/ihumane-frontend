@@ -270,7 +270,7 @@ export default {
         data.forEach((employee) => {
           const emp = {
             value: employee.emp_id,
-            text: `${employee.sector?.d_t3_code} ${employee.emp_first_name} ${employee.emp_last_name}`,
+            text: `${employee.emp_unique_id} ${employee.emp_first_name} ${employee.emp_last_name}`,
           };
           this.employees.push(emp);
         });
@@ -603,7 +603,7 @@ export default {
                 <div class="col-md-3">
                   <div class="d-flex mt-4 mt-md-0">
 
-                    <div class="flex-1 align-self-center overflow-hidden ml-2 mb-0">
+                    <div class="flex-1 align-self-center overflow-hidden ml-2 mb-0" >
                       <h5 class="mb-0">Retrieve</h5>
                       <form v-on:submit.prevent="retrieveEmployee" class="form-inline">
                         <div class="form-group mb-2" style="width: 150px!important;">
@@ -612,7 +612,6 @@ export default {
                             v-model="selectedEmployee"
                             :options="employees"
                             :custom-label="stateOfOriginLabel"
-
                           ></multiselect>
                         </div>
                         <button type="submit" class="btn btn-primary mt-2 ml-2"> <i class="mdi mdi-timer-sand-empty"></i> Retrieve</button>
