@@ -174,7 +174,7 @@ export default {
           <div class="card-body">
             <div class="p-3 bg-light mb-4 d-flex justify-content-between">
               <h5 class="font-size-14 mb-0" v-if="period">
-                Pension Report for
+                NHF Report for
                 {{ locationName }} in Payroll Period:
                 {{ (parseInt(period[0]) - 1) | getMonth }}
                 {{ period[1] }}
