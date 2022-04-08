@@ -24,6 +24,7 @@ export default {
      this.getPensionProviders();
      this.getLocalGovernmentAreas();
      this.getSectors()
+     this.getEmployees()
   },
 
   /*: null,
@@ -93,8 +94,8 @@ export default {
           this.emp_last_name = data.emp_last_name;
           this.emp_other_name = data.emp_other_name;
           this.emp_qualification = data.emp_qualification;
-          this.emp_location = data.location.location_name;
-          this.location_id = data.location.location_id;
+          this.emp_location = data.location?.location_name;
+          this.location_id = data.location?.location_id;
           this.emp_account_no = data.emp_account_no;
           this.emp_phone_no = data.emp_phone_no;
           this.emp_bank_id_val = data.emp_bank_id;
@@ -120,8 +121,8 @@ export default {
           this.pension_provider_id = data.emp_pension_id;
           this.emp_paye = data.emp_paye;
           this.emp_passport = data.emp_passport;
-          this.emp_sector = data.sector.department_id;
-          this.emp_sector_text = data.sector.department_name;
+          this.emp_sector = data.sector?.department_id;
+          this.emp_sector_text = data.sector?.department_name;
           switch(parseInt(data.emp_religion) ){
             case 1:
             this.religion_text = "Christianity";
@@ -138,12 +139,12 @@ export default {
           }
           this.emp_personal_email = data.emp_personal_email;
           this.emp_office_email = data.emp_office_email;
-          this.bank_text = data.bank.bank_name;
-          this.state_text = data.state.s_name;
-          this.pension_provider_text = data.pension.provider_name;
+          this.bank_text = data.bank?.bank_name;
+          this.state_text = data.state?.s_name;
+          this.pension_provider_text = data.pension?.provider_name;
           this.emp_nhf = data.emp_nhf;
-          this.job_role_text = data.jobrole.job_role;
-          this.lga_text = data.lga.lg_name;
+          this.job_role_text = data.jobrole?.job_role;
+          this.lga_text = data.lga?.lg_name;
           this.birth_date = new Date(data.emp_dob).toISOString().slice(0, 10);
           this.emp_contract_end_date = new Date(data.emp_contract_end_date)
             .toISOString()
@@ -158,7 +159,7 @@ export default {
     getSectors() {
       this.apiGet(this.ROUTES.department, "Get Job Roles Error").then((res) => {
         const { data } = res;
-        console.log({data});
+        //console.log({data});
         data.departments.forEach(async (datum) => {
           const dat = {
             value: datum.department_id,
@@ -261,6 +262,30 @@ export default {
           this.locations.push(dat);
         });
       });
+    },
+    getEmployees() {
+      this.apiGet(this.ROUTES.employee, "Get Employees Error").then((res) => {
+        const { data } = res;
+        //console.log( data );
+        data.forEach((employee) => {
+          const emp = {
+            value: employee.emp_id,
+            text: `${employee.sector?.d_t3_code} ${employee.emp_first_name} ${employee.emp_last_name}`,
+          };
+          this.employees.push(emp);
+        });
+
+      });
+    },
+    retrieveEmployee(){
+      const employeedId = this.selectedEmployee.value;
+
+      //if(employeedId !== null || employeedId !== ''){
+        this.$route.params.employeeID = employeedId;
+        this.fetchEmployee();
+      /*}else{
+        alert("Select an employee");
+      }*/
     },
      getStates() {
       const url = `${this.ROUTES.state}`;
@@ -495,6 +520,8 @@ export default {
       emp_sector_text:null,
       sectors:[],
       sector:[],
+      employees:[],
+      selectedEmployee:[],
 
       pensionProviders: [],
       pensionProvider: [],
@@ -523,7 +550,7 @@ export default {
           <div class="card">
             <div class="card-body">
               <div class="row">
-                <div class="col-md-4">
+                <div class="col-md-3">
                   <div class="d-flex" style="cursor: pointer;" @click="$router.push({name: 'employee-documents',
               params: { employeeID: $route.params.employeeID },})">
                     <div class="avatar-sm me-3 mr-1">
@@ -537,7 +564,7 @@ export default {
                     </div>
                   </div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-3">
                   <div class="d-flex mt-4 mt-md-0" style="cursor: pointer;" @click="
                       $router.push({
                         name: 'employee-work-experience',
@@ -555,7 +582,7 @@ export default {
                     </div>
                   </div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-3">
                   <div class="d-flex mt-4 mt-md-0" style="cursor:pointer;"  @click="
                       $router.push({
                         name: 'employee-education',
@@ -570,6 +597,26 @@ export default {
                     <div class="flex-1 align-self-center overflow-hidden ml-2 mb-0">
                       <h5 class="mb-0">Education</h5>
                       <p class="text-muted mb-0">Employee education background log</p>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <div class="d-flex mt-4 mt-md-0">
+
+                    <div class="flex-1 align-self-center overflow-hidden ml-2 mb-0">
+                      <h5 class="mb-0">Retrieve</h5>
+                      <form v-on:submit.prevent="retrieveEmployee" class="form-inline">
+                        <div class="form-group mb-2" style="width: 150px!important;">
+                          <label>Employee</label>
+                          <multiselect
+                            v-model="selectedEmployee"
+                            :options="employees"
+                            :custom-label="stateOfOriginLabel"
+
+                          ></multiselect>
+                        </div>
+                        <button type="submit" class="btn btn-primary mt-2 ml-2"> <i class="mdi mdi-timer-sand-empty"></i> Retrieve</button>
+                      </form>
                     </div>
                   </div>
                 </div>
