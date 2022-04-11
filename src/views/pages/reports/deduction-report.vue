@@ -33,6 +33,10 @@ export default {
             this.jsonFields["S/N"] = newField;
           } else if (newField === "t7_number") {
             this.jsonFields["T7 NUMBER"] = "employeeUniqueId";
+          }else if (newField === "t6_code") {
+            this.jsonFields["T6 CODE"] = "location";
+          }else if (newField === "t3_code") {
+            this.jsonFields["T3 CODE"] = "sector";
           } else if (newField === "employeeName") {
             this.jsonFields["EMPLOYEE NAME"] = newField;
           } else if (newField === "netSalary") {
@@ -67,7 +71,10 @@ export default {
             sn: ++index,
             employeeUniqueId: deduction.employeeUniqueId,
             employeeName: deduction.employeeName,
-            location: deduction.location,
+            location: deduction.locationCode,
+            sector: deduction.sectorCode,
+            month: deduction.month,
+            year: deduction.year
           };
           deductionObj['ref_no'] = deduction.paymentNumber
           deduction.deductions.forEach((deduction) => {
@@ -148,7 +155,7 @@ export default {
       filterOn: [],
       sortBy: "sn",
       sortDesc: false,
-      newFields: ["sn", "t7_number", "employeeName", "location"],
+      newFields: ["sn", "t7_number", "t6_code",  "t3_code", "employeeName", "month", "year"],
       incomeFields: [],
       deductionFields: [],
       jsonFields: {},
@@ -268,8 +275,20 @@ export default {
                   </span>
                 </template>
                 <template #cell(t7_number)="row">
-                  <span>
+                  <span class="text-nowrap">
                     {{ row.item.employeeUniqueId }}
+                  </span>
+                </template>
+
+                <template #cell(t6_code)="row">
+                  <span class="text-nowrap">
+                    {{ row.item.location }}
+                  </span>
+                </template>
+
+                <template #cell(t3_code)="row">
+                  <span class="text-nowrap">
+                    {{ row.item.sector }}
                   </span>
                 </template>
                 <template #cell(employeeName)="row">
@@ -277,7 +296,14 @@ export default {
                     {{ row.value }}
                   </span>
                 </template>
-                <template #cell(location)="row">
+
+                <template #cell(month)="row">
+                  <span class="text-nowrap">
+                     {{ (parseInt(row.value) - 1) | getMonth }}
+
+                  </span>
+                </template>
+                <template #cell(year)="row">
                   <span class="text-nowrap">
                     {{ row.value }}
                   </span>
