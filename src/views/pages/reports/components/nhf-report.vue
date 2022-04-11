@@ -113,7 +113,7 @@ export default {
     </div>
     <b-modal
       v-model="selectPeriod"
-      title="Generate Pension Report"
+      title="Generate NHF Report"
       hide-footer
       centered
       title-class="font-18"

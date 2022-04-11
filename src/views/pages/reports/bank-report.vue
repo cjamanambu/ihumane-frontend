@@ -35,14 +35,13 @@ export default {
             sn: ++index,
             employeeUniqueId: payOrder.employeeUniqueId,
             employeeName: payOrder.employeeName,
-            sector: payOrder.sector,
+            location: payOrder.locationCode,
+            sector: payOrder.sectorCode,
             accountNumber: payOrder.accountNumber,
             bankName: payOrder.bankName,
             bankSortCode: payOrder.bankSortCode,
-            grossSalary: this.apiValueHandler(payOrder.grossSalary.toFixed(2)),
-            totalDeduction: this.apiValueHandler(
-              payOrder.totalDeduction.toFixed(2)
-            ),
+            month: payOrder.month,
+            year: payOrder.year,
             netSalary: this.apiValueHandler(payOrder.netSalary.toFixed(2)),
           };
           this.payOrders.push(payOrderObj);
@@ -54,7 +53,11 @@ export default {
             this.jsonFields["S/N"] = newField;
           } else if (newField === "t7_number") {
             this.jsonFields["T7 NUMBER"] = "employeeUniqueId";
-          } else if (newField === "employeeName") {
+          } else if (newField === "t6_code") {
+            this.jsonFields["LOCATION"] = "location";
+          }else if (newField === "t3_code") {
+            this.jsonFields["SECTOR"] = "sector";
+          }else if (newField === "employeeName") {
             this.jsonFields["EMPLOYEE NAME"] = newField;
           } else if (newField === "accountNumber") {
             this.jsonFields["ACCOUNT NUMBER"] = newField;
@@ -64,11 +67,11 @@ export default {
             this.jsonFields["BANK SORT CODE"] = newField;
           } else if (newField === "netSalary") {
             this.jsonFields["NET SALARY"] = newField;
-          } else if (newField === "grossSalary") {
-            this.jsonFields["GROSS SALARY"] = newField;
-          } else if (newField === "totalDeduction") {
-            this.jsonFields["TOTAL DEDUCTION"] = newField;
-          } else {
+          } else if (newField === "month") {
+            this.jsonFields["MONTH"] = newField;
+          } else if (newField === "year") {
+            this.jsonFields["YEAR"] = newField;
+          }  else {
             this.jsonFields[newField.toUpperCase()] = newField;
           }
         });
@@ -130,14 +133,15 @@ export default {
       newFields: [
         "sn",
         "t7_number",
+        "t6_code",
+        "t3_code",
         "employeeName",
-        "sector",
         "accountNumber",
         "bankName",
         "bankSortCode",
-        "grossSalary",
-        "totalDeduction",
         "netSalary",
+         "month",
+         "year"
       ],
       incomeFields: [],
       deductionFields: [],
@@ -267,9 +271,15 @@ export default {
                     {{ row.value }}
                   </span>
                 </template>
-                <template #cell(sector)="row">
+                <template #cell(t6_code)="row">
                   <span class="text-nowrap">
-                    {{ row.value }}
+                     {{ row.item.location }}
+                  </span>
+                </template>
+
+                <template #cell(t3_code)="row">
+                  <span class="text-nowrap">
+                     {{ row.item.sector }}
                   </span>
                 </template>
                 <template #cell(accountNumber)="row">
@@ -287,6 +297,19 @@ export default {
                     {{ row.value }}
                   </span>
                 </template>
+
+                <template #cell(month)="row">
+                  <span class="text-nowrap">
+                     {{ (parseInt(row.value) - 1) | getMonth }}
+
+                  </span>
+                </template>
+                <template #cell(year)="row">
+                  <span class="text-nowrap">
+                    {{ row.value }}
+                  </span>
+                </template>
+
                 <template #cell()="data">
                   <span class="float-right">{{ data.value }}</span>
                 </template>
