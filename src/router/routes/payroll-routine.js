@@ -33,4 +33,13 @@ export default [
     },
     component: () => import("@/views/pages/payroll-routine/emolument-location"),
   },
+
+  {
+    path: "/approve-emolument-location/:locationId",
+    name: "approve-emolument-location",
+    meta: {
+      authRequired: true,
+    },
+    component: () => import("@/views/pages/payroll-routine/approve-emolument-location"),
+  },
 ];

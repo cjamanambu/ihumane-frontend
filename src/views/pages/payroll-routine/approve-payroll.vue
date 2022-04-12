@@ -150,14 +150,6 @@ export default {
     },
 
 
-    approveRoutine() {
-      let url = `${this.ROUTES.salary}/approve-salary-routine`;
-      this.apiGet(url, "Approve Payroll Routine Error").then((res) => {
-        if (res.data) {
-          this.apiResponseHandler("Approve Payroll Routine", res.data);
-        }
-      });
-    },
     async fetchPayrollRoutine() {
       let url = `${this.ROUTES.salary}/pull-confirmed-salary-routine-locations`;
       await this.apiGet(url, "Fetch Payroll Routine Error").then((res) => {
@@ -195,7 +187,7 @@ export default {
     selectRow(row) {
       row = row[0];
       let locationId = row.locationId;
-      this.$router.push({ name: "emolument-location", params: { locationId } });
+      this.$router.push({ name: "approve-emolument-location", params: { locationId } });
       this.$refs["payrollSummaryTable"].clearSelected();
     },
   },
