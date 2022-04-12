@@ -328,11 +328,11 @@ export const menuItems = [
         label: "Process Payroll Routine",
         link: "/process-payroll",
       },
-      // {
-      //   id: 30,
-      //   label: "Approve Payroll Routine",
-      //   link: "/approve-payroll",
-      // },
+      {
+        id: 30,
+        label: "Approve Payroll Routine",
+        link: "/approve-payroll",
+      },
     ],
   },
   {
