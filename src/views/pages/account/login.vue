@@ -23,11 +23,13 @@ export default {
     // and password they provided.
     tryToLogIn() {
       this.submitted = true;
+      this.submitting = true;
       // stop here if form is invalid
       this.$v.$touch();
 
       if (this.$v.$invalid) {
         this.apiFormHandler("Invalid Login");
+        this.submitting = false;
       } else {
         const { username, password } = this;
         this.login(username, password).then((userType) => {
@@ -42,6 +44,7 @@ export default {
               this.adminLogin(username);
               break;
           }
+          this.submitting = false;
         });
       }
     },
@@ -221,7 +224,7 @@ export default {
 
                           <div class="mt-4 text-center">
                             <button
-                              v-if="this.loading"
+                              v-if="this.submitting"
                               class="btn btn-success w-md waves-effect waves-light"
                               type="submit"
                               disabled

@@ -10,6 +10,7 @@ export const authComputed = {
     "loading",
     "getUser",
     "getEmployee",
+    "getNotifications",
     "locked",
     "panel",
   ]),
