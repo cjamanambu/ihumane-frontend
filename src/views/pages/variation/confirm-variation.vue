@@ -78,6 +78,7 @@ export default {
 
 
     selectPayment(items) {
+      this.selectedPayments = [ ]
       this.selectedPayments = items
     },
     onFiltered(filteredItems) {
