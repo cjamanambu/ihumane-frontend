@@ -7,6 +7,7 @@ export const state = {
   loggedIn: false,
   userData: {},
   employee: {},
+  notifications: [],
   locked: false,
   panel: "admin",
 };
@@ -38,6 +39,9 @@ export const mutations = {
   SET_PANEL(state, panel) {
     state.panel = panel;
   },
+  SET_NOTIFICATION(state, notification) {
+    state.notifications = notification;
+  },
 };
 
 export const getters = {
@@ -53,6 +57,9 @@ export const getters = {
   },
   getEmployee(state) {
     return state.employee;
+  },
+  getNotifications(state){
+    return state.notifications;
   },
   locked(state) {
     return state.locked;
@@ -92,10 +99,12 @@ export const actions = {
       };
       API.post(url, data)
         .then((res) => {
-          const { userData, token, employee } = res.data;
+          const { userData, token, employee, notifications } = res.data;
+          console.log({notifications})
           commit("SET_TOKEN", token);
           commit("SET_USER_DATA", userData);
           commit("SET_EMPLOYEE", employee);
+          commit("SET_NOTIFICATION", notifications);
           commit("TOGGLE_LOGGED_IN");
           resolve(res);
         })
