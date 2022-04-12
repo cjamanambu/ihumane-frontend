@@ -128,16 +128,17 @@ export default {
 
     confirmSelected(){
       this.submitted = true;
-
+      this.locationIds = [ ]
       this.selectedLocations.forEach((location) => {
         this.locationIds.push(location.locationId);
       });
+      //console.log(this.locationIds)
 
       const data = {
-
         pmyl_location_id: this.locationIds,
 
       };
+      //console.log(data)
       const url = `${this.ROUTES.salary}/confirm-salary-routine`;
       this.apiPost(url, data, "Salary Confirmation").then(
           (res) => {
@@ -296,7 +297,7 @@ export default {
                     @filtered="onFiltered"
                     show-empty
                     select-mode="multi"
-                    @row-selected="selectedLocations"
+                    @row-selected="selectLocations"
                   >
 
                     <template #cell(#)="{ rowSelected }">
