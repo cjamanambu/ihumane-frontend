@@ -18,7 +18,7 @@ export default {
   },
   data() {
     return {
-      title: "Process Payroll Routine",
+      title: "Approve Payroll Routine",
       items: [
         {
           text: "IHUMANE",
@@ -28,7 +28,7 @@ export default {
           href: "/",
         },
         {
-          text: "Process Payroll Routine",
+          text: "Approve Payroll Routine",
           active: true,
         },
       ],
@@ -45,7 +45,6 @@ export default {
       sortBy: "sn",
       sortDesc: false,
       fields: [
-        '#',
         { key: "sn", label: "S/n", sortable: true },
         { key: "locationName", label: "Location", sortable: true },
         { key: "locationTotalGross", label: "Total Gross", sortable: true },
@@ -54,7 +53,6 @@ export default {
         { key: "locationEmployeesCount", label: "Total Employees", sortable: true },
         { key: "month", label: "month", sortable: true },
         { key: "year", label: "year", sortable: true },
-         "Action"
       ],
       pmyMonth: null,
       pmyYear: null,
@@ -195,8 +193,8 @@ export default {
       this.currentPage = 1;
     },
     selectRow(row) {
-      // row = row[0];
-      let locationId = row;
+      row = row[0];
+      let locationId = row.locationId;
       this.$router.push({ name: "emolument-location", params: { locationId } });
       this.$refs["payrollSummaryTable"].clearSelected();
     },
@@ -210,31 +208,7 @@ export default {
     <scale-loader v-if="apiBusy" />
     <div v-else>
       <div v-if="routineRun">
-        <div class="alert alert-info">
-          The payroll routine for this payroll period
-          <b> ({{ (parseInt(pmyMonth) - 1) | getMonth }} {{ pmyYear }})</b> has
-          been run for some(all) locations.
-          <span
-            @click="$refs['run-routine'].show()"
-            style="
-              cursor: pointer;
-              text-decoration: underline;
-              margin-left: 0.1em;
-            "
-          >
-            Click here to run it.
-          </span>
-        </div>
-        <div class="d-flex justify-content-end mb-3">
-          <b-button
-            class="btn btn-warning"
-            @click="$refs['undo-routine'].show()"
-          >
-            <i class="mdi mdi-plus mr-2"></i>
-            Undo Routine
-          </b-button>
 
-        </div>
         <div class="row">
           <div class="col-12">
             <div class="card">
@@ -296,20 +270,11 @@ export default {
                     :filter-included-fields="filterOn"
                     @filtered="onFiltered"
                     show-empty
-                    select-mode="multi"
-                    @row-selected="selectLocations"
+                    select-mode="single"
+                    @row-selected="selectRow"
                   >
 
-                    <template #cell(#)="{ rowSelected }">
-                      <template v-if="rowSelected">
-                        <span aria-hidden="true">&check;</span>
-                        <span class="sr-only">Selected</span>
-                      </template>
-                      <template v-else>
-                        <span aria-hidden="true">&nbsp;</span>
-                        <span class="sr-only">Not selected</span>
-                      </template>
-                    </template>
+
                     <template #cell(locationTotalGross)="row">
                       <p class="float-right mb-0">
                         {{ parseFloat(row.value.toFixed(2)).toLocaleString() }}
@@ -332,18 +297,9 @@ export default {
                       </p>
                     </template>
 
-                    <template #cell(action)="row">
-                      <b-button style="margin: 10px" variant="primary" size="sm" @click="selectRow(row.item.locationId)">View</b-button>
-                    </template>
+
                   </b-table>
 
-                  <p>
-                    <b-button style="margin: 10px" variant="primary" size="sm" @click="selectAllRows">Select all</b-button>
-
-                    <b-button style="margin: 10px" variant="warning" size="sm" @click="clearSelected">Clear Selection</b-button>
-
-                    <b-button style="margin: 10px" variant="success" size="sm" @click="confirmSelected">Confirm Selected</b-button>
-                  </p>
 
                 </div>
                 <div v-else>
@@ -375,16 +331,7 @@ export default {
         The payroll routine for this payroll period
         <b> ({{ (parseInt(pmyMonth) - 1) | getMonth }} {{ pmyYear }})</b> hasn't
         been run for any location.
-        <span
-          @click="$refs['run-routine'].show()"
-          style="
-            cursor: pointer;
-            text-decoration: underline;
-            margin-left: 0.1em;
-          "
-        >
-          Click here to run it.
-        </span>
+
       </div>
     </div>
 
