@@ -216,7 +216,7 @@ export default {
     <PageHeader :title="title" :items="items" />
     <div class="d-flex justify-content-end mb-3">
       <b-button class="btn btn-success" @click="approveRoutine">
-        <i class="mdi mdi-skip-backward mr-2"></i>
+        <i class="mdi mdi-check mr-2"></i>
         Approve Routine
       </b-button>
     </div>
