@@ -20,6 +20,14 @@ export default {
     ...authComputed,
   },
   components: { simplebar },
+  mounted() {
+    this.value = this.languages.find((x) => x.language === i18n.locale);
+    this.text = this.value.title;
+    this.flag = this.value.flag;
+
+    this.notifications = this.getNotifications;
+    this.getEmployeeNotifications();
+  },
   data() {
     return {
       notifications:[],
@@ -54,6 +62,17 @@ export default {
     };
   },
   methods: {
+    getEmployeeNotifications(){
+      let employeeID = this.getEmployee.emp_id
+      const url = `${this.ROUTES.notifications}/${employeeID}`;
+      this.apiGet(url, "Get Notifications Error").then((res) => {
+        const { data } = res;
+        //console.log({ data });
+        data.forEach((notification) => {
+          this.notifications.push(notification);
+        });
+      });
+    },
 
     initFullScreen() {
       document.body.classList.toggle("fullscreen-enable");
@@ -107,13 +126,7 @@ export default {
         );
     },
   },
-  mounted() {
-    this.value = this.languages.find((x) => x.language === i18n.locale);
-    this.text = this.value.title;
-    this.flag = this.value.flag;
 
-    this.notifications = this.getNotifications;
-  },
   watch: {
     type: {
       immediate: true,
