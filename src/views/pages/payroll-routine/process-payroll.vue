@@ -34,6 +34,8 @@ export default {
       ],
       routineRun: false,
       pay: [],
+      selectedLocations: [],
+      locationIds:[],
       totalRows: 1,
       currentPage: 1,
       perPage: 10,
@@ -43,6 +45,7 @@ export default {
       sortBy: "sn",
       sortDesc: false,
       fields: [
+        '#',
         { key: "sn", label: "S/n", sortable: true },
         { key: "locationName", label: "Location", sortable: true },
         { key: "locationTotalGross", label: "Total Gross", sortable: true },
@@ -51,6 +54,7 @@ export default {
         { key: "locationEmployeesCount", label: "Total Employees", sortable: true },
         { key: "month", label: "month", sortable: true },
         { key: "year", label: "year", sortable: true },
+         "Action"
       ],
       pmyMonth: null,
       pmyYear: null,
@@ -59,6 +63,17 @@ export default {
     };
   },
   methods: {
+
+    selectLocations(items) {
+      this.selectedLocations = items
+    },
+    selectAllRows() {
+      this.$refs.payrollSummaryTable.selectAllRows()
+    },
+
+    clearSelected() {
+      this.$refs.payrollSummaryTable.clearSelected()
+    },
     getLocations() {
       this.apiGet(this.ROUTES.location, "Get Locations Error").then((res) => {
         this.payrollLocations = [
@@ -110,14 +125,32 @@ export default {
         }
       });
     },
-    confirmRoutine() {
-      let url = `${this.ROUTES.salary}/confirm-salary-routine`;
-      this.apiGet(url, "Confirm Payroll Routine Error").then((res) => {
-        if (res.data) {
-          this.apiResponseHandler("Confirm Payroll Routine", res.data);
-        }
+
+    confirmSelected(){
+      this.submitted = true;
+
+      this.selectedLocations.forEach((location) => {
+        this.locationIds.push(location.locationId);
       });
+
+      const data = {
+
+        pmyl_location_id: this.locationIds,
+
+      };
+      const url = `${this.ROUTES.salary}/confirm-salary-routine`;
+      this.apiPost(url, data, "Salary Confirmation").then(
+          (res) => {
+            this.apiResponseHandler(`${res.data}`, "Salary Confirmed");
+            this.selectedLocations= [ ]
+            this.locationIds = [ ]
+            this.fetchPayrollRoutine()
+
+          }
+      );
     },
+
+
     approveRoutine() {
       let url = `${this.ROUTES.salary}/approve-salary-routine`;
       this.apiGet(url, "Approve Payroll Routine Error").then((res) => {
@@ -161,10 +194,10 @@ export default {
       this.currentPage = 1;
     },
     selectRow(row) {
-      row = row[0];
-      let locationId = row.locationId;
+      // row = row[0];
+      let locationId = row;
       this.$router.push({ name: "emolument-location", params: { locationId } });
-      this.$refs["payroll-summary-table"].clearSelected();
+      this.$refs["payrollSummaryTable"].clearSelected();
     },
   },
 };
@@ -199,14 +232,7 @@ export default {
             <i class="mdi mdi-plus mr-2"></i>
             Undo Routine
           </b-button>
-          <b-button class="btn btn-success mx-3" @click="confirmRoutine">
-            <i class="mdi mdi-plus mr-2"></i>
-            Confirm Routine
-          </b-button>
-          <b-button class="btn btn-success" @click="approveRoutine">
-            <i class="mdi mdi-plus mr-2"></i>
-            Approve Routine
-          </b-button>
+
         </div>
         <div class="row">
           <div class="col-12">
@@ -254,7 +280,7 @@ export default {
                 <!-- Table -->
                 <div class="table-responsive mb-0" v-if="pay.length">
                   <b-table
-                    ref="payroll-summary-table"
+                    ref="payrollSummaryTable"
                     bordered
                     selectable
                     hover
@@ -269,9 +295,20 @@ export default {
                     :filter-included-fields="filterOn"
                     @filtered="onFiltered"
                     show-empty
-                    select-mode="single"
-                    @row-selected="selectRow"
+                    select-mode="multi"
+                    @row-selected="selectedLocations"
                   >
+
+                    <template #cell(#)="{ rowSelected }">
+                      <template v-if="rowSelected">
+                        <span aria-hidden="true">&check;</span>
+                        <span class="sr-only">Selected</span>
+                      </template>
+                      <template v-else>
+                        <span aria-hidden="true">&nbsp;</span>
+                        <span class="sr-only">Not selected</span>
+                      </template>
+                    </template>
                     <template #cell(locationTotalGross)="row">
                       <p class="float-right mb-0">
                         {{ parseFloat(row.value.toFixed(2)).toLocaleString() }}
@@ -293,7 +330,23 @@ export default {
                         {{ (parseInt(row.value) - 1) | getMonth }}
                       </p>
                     </template>
+
+                    <template #cell(action)="row">
+                      <b-button style="margin: 10px" variant="primary" size="sm" @click="selectRow(row.item.locationId)">View</b-button>
+                    </template>
                   </b-table>
+
+                  <p>
+                    <b-button style="margin: 10px" variant="primary" size="sm" @click="selectAllRows">Select all</b-button>
+
+                    <b-button style="margin: 10px" variant="warning" size="sm" @click="clearSelected">Clear Selection</b-button>
+
+                    <b-button style="margin: 10px" variant="success" size="sm" @click="confirmSelected">Confirm Selected</b-button>
+                  </p>
+
+                </div>
+                <div v-else>
+                  <scale-loader />
                 </div>
                 <div class="row">
                   <div class="col">
