@@ -100,7 +100,7 @@ export const actions = {
       API.post(url, data)
         .then((res) => {
           const { userData, token, employee, notifications } = res.data;
-          console.log({notifications})
+          //console.log({notifications})
           commit("SET_TOKEN", token);
           commit("SET_USER_DATA", userData);
           commit("SET_EMPLOYEE", employee);
