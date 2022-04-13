@@ -73,6 +73,7 @@ export default {
     },
     getEmployeeNotifications(){
       let employeeID = this.getEmployee.emp_id
+
       const url = `${this.ROUTES.notifications}/${employeeID}`;
       this.apiGet(url, "Get Notifications Error").then((res) => {
         const { data } = res;
@@ -103,9 +104,18 @@ export default {
         );
     },
   },
+
+ /* getUserType(){
+    if(user == 2 || user == 3){
+      this.getEmployeeNotifications();
+    }
+  }*/
   mounted() {
-    this.notifications = this.getNotifications;
-    this.getEmployeeNotifications();
+    if( parseInt(this.getUser.user_type) === 2 || parseInt(this.getUser.user_type) === 3){
+      this.notifications = this.getNotifications;
+      this.getEmployeeNotifications();
+
+    }
   },
 };
 </script>
