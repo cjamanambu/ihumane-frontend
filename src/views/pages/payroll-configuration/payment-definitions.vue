@@ -23,7 +23,6 @@ export default {
   },
   methods: {
     selectPD(pd) {
-      pd = pd[0];
       this.pdID = pd.pd_id;
       this.code = pd.pd_payment_code;
       this.name = pd.pd_payment_name;
@@ -156,6 +155,30 @@ export default {
         );
       }
     },
+
+    async submitDelete() {
+      this.submitted = true;
+      const data = {
+          pd_id: this.pdID,
+        };
+        const url = `${this.ROUTES.paymentDefinition}/delete-payment-definition`;
+        await this.apiPost(url, data, "Delete Payment Definition Error").then(
+          (res) => {
+            this.apiResponseHandler(`${res.data}`, "Delete Successful");
+            this.$v.$reset();
+            this.$refs["delete-payment-definition"].hide();
+            this.refreshTable();
+          }
+        );
+
+    },
+
+    deletePD(pd){
+      this.pdID = pd.pd_id;
+      this.code = pd.pd_payment_code;
+      this.name = pd.pd_payment_name;
+      this.$refs["delete-payment-definition"].show();
+    },
     onFiltered(filteredItems) {
       this.totalRows = filteredItems.length;
       this.currentPage = 1;
@@ -231,6 +254,8 @@ export default {
           sortable: true,
           thClass: "text-nowrap",
         },
+          "action"
+
       ],
       submitted: false,
       code: null,
@@ -409,8 +434,7 @@ export default {
                 :filter-included-fields="filterOn"
                 @filtered="onFiltered"
                 show-empty
-                select-mode="single"
-                @row-selected="selectPD"
+
               >
                 <template #cell(pd_payment_name)="row">
                   <p class="text-nowrap">{{ row.value }}</p>
@@ -472,6 +496,19 @@ export default {
                 <template #cell(pd_total_gross_ii)="row">
                   <p v-if="row.value === 1">YES</p>
                   <p v-else>NO</p>
+                </template>
+
+                <template #cell(action)="row">
+
+
+                      <div class="btn-group">
+                       <b-button style="margin: 10px" variant="primary" size="sm" @click="selectPD(row.item)"> <i class="dripicons-document-edit"></i></b-button>
+                        <b-button style="margin: 10px" variant="danger" size="sm" @click="deletePD(row.item)"> <i class="dripicons-trash"></i></b-button>
+
+                      </div>
+
+
+
                 </template>
               </b-table>
             </div>
@@ -1033,6 +1070,7 @@ export default {
             </div>
           </div>
         </div>
+
         <b-button
           v-if="!submitting"
           class="btn btn-success btn-block mt-5"
@@ -1047,6 +1085,78 @@ export default {
           type="submit"
         >
           Submitting...
+        </b-button>
+      </form>
+    </b-modal>
+
+    <b-modal
+      ref="delete-payment-definition"
+      title="Delete Payment Definition"
+      hide-footer
+      centered
+      title-class="font-18"
+      size="lg"
+      @hidden="resetForm"
+    >
+      <form @submit.prevent="submitDelete">
+        <div class="ff-wrapper mt-3">
+          <h5 class="ff-header" style="bottom: 86%">Are you Sure You want to Delete {{ name }} ? </h5>
+          <div class="ff-content">
+            <div class="row">
+              <div class="col-lg-6">
+                <div class="form-group">
+                  <label for="username">
+                    Payment Code <span class="text-danger">*</span>
+                  </label>
+                  <input
+                    id="username"
+                    type="text"
+                    v-model="code"
+                    disabled
+                    class="form-control"
+                    :class="{
+                      'is-invalid': submitted && $v.code.$error,
+                    }"
+                  />
+                </div>
+              </div>
+              <div class="col-lg-6">
+                <div class="form-group">
+                  <label for="fullname">
+                    Payment Name <span class="text-danger">*</span>
+                  </label>
+                  <input
+                    id="fullname"
+                    type="text"
+                    disabled
+                    v-model="name"
+                    class="form-control"
+                    :class="{
+                      'is-invalid': submitted && $v.name.$error,
+                    }"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+
+        <b-button
+          v-if="!submitting"
+          class="btn btn-danger btn-block mt-5"
+          type="submit"
+        >
+          Delete
+        </b-button>
+        <b-button
+          v-else
+          disabled
+          class="btn btn-danger btn-block mt-5"
+          type="submit"
+        >
+          Deleting...
         </b-button>
       </form>
     </b-modal>
