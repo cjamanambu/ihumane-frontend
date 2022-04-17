@@ -42,6 +42,8 @@ export default {
         (res) => {
           if (res.data) {
             this.currentGSY = res.data.gsy_year;
+            this.currentFrom = res.data.gsy_from;
+            this.currentTo = res.data.gsy_to;
           }
         }
       );
@@ -120,6 +122,8 @@ export default {
     submitGSY() {
       const data = {
         gsy_year: this.gsy,
+        gsy_from: this.period_from,
+        gsy_to: this.period_to,
       };
       const url = `${this.ROUTES.goalSettingYear}/add-year`;
       this.apiPost(url, data, "Add Goal Setting Year Error").then((res) => {
@@ -172,6 +176,10 @@ export default {
       gs_to: null,
       gs_year: null,
       gs_activity: null,
+      period_from: null,
+      period_to: null,
+      currentFrom: null,
+      currentTo: null,
       gs_status: 0,
       gs_activities: [
         { value: null, text: "Please select an Activity" },
@@ -360,7 +368,7 @@ export default {
           />
         </div>
         <div class="form-group">
-          <label for="gs_to"> To <span class="text-danger">*</span> </label>
+          <label for="gs_to"> To  <span class="text-danger">*</span> </label>
           <input
             id="gs_to"
             type="date"
@@ -430,7 +438,7 @@ export default {
           <input
             id="gs_fromU"
             type="date"
-            v-model="gs_from"
+            v-model="currentFrom"
             class="form-control"
             disabled
             :class="{
@@ -443,7 +451,7 @@ export default {
           <input
             id="gs_toU"
             type="date"
-            v-model="gs_to"
+            v-model="currentTo"
             class="form-control"
             disabled
             :class="{
@@ -508,8 +516,16 @@ export default {
     >
       <form @submit.prevent="submitGSY">
         <div class="form-group">
+          <label> Period From <span class="text-danger">*</span> </label>
+          <input id="from" v-model="period_from" class="form-control" placeholder="From" type="date"  />
+        </div>
+        <div class="form-group">
+          <label> Period To <span class="text-danger">*</span> </label>
+          <input id="to" v-model="period_to" class="form-control" placeholder="To" type="date"  />
+        </div>
+        <div class="form-group">
           <label> Goal Setting Year <span class="text-danger">*</span> </label>
-          <input id="pmy" v-model="gsy" class="form-control" />
+          <input id="pmy" v-model="gsy" class="form-control" placeholder="Year"/>
         </div>
         <b-button
           v-if="!submitting"
