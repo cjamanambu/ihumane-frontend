@@ -19,6 +19,7 @@ export default {
   },
   mounted() {
     this.getOpenGoalSetting();
+    this.getSelfAssessmentMaster();
   },
   validations: {
     start: { required },
@@ -44,9 +45,54 @@ export default {
       ],
       openGoalActivity: null,
       openGoalActivityYear: null,
+
+      assessments: [],
+      totalRows: 1,
+      currentPage: 1,
+      perPage: 10,
+      pageOptions: [10, 25, 50, 100],
+      filter: null,
+      filterOn: [],
+      sortBy: "sn",
+      sortDesc: false,
+      posted_on:null,
+      audience:null,
+      fields: [
+        { key: "sn", label: "S/n", sortable: true },
+        {
+          key: "target",
+          label: "Goal",
+          sortable: true,
+        },
+        { key: "officer", label: "Supervisor", sortable: true },
+        { key: "status", label: "Status", sortable: true },
+        {
+          key: "date_published",
+          label: "Date",
+          sortable: true,
+        },
+      ],
     };
   },
   methods: {
+
+    getSelfAssessmentMaster(){
+      const empId = this.getEmployee.emp_id;
+      const url = `${this.ROUTES.selfAssessment}/get-self-assessment-master/${empId}`;
+      this.apiGet(url).then((res) => {
+        const { data } = res;
+        data.forEach((ass, index)=>{
+          let localData = {
+            sn:++index,
+            target:`${new Date(ass.goal.gs_from).toDateString()} - ${ new Date(ass.goal.gs_to).toDateString()}`,
+            status:ass.sam_status,
+            date_published:new Date(ass.createdAt).toDateString(),
+            officer:`${ass.supervisor.emp_first_name} ${ass.supervisor.emp_last_name} - ${ass.supervisor.emp_unique_id}`,
+            ...ass}
+          this.assessments.push(localData);
+        })
+      });
+    },
     getOpenGoalSetting() {
       const url = `${this.ROUTES.goalSetting}/get-open-goal-setting`;
       this.apiGet(url).then((res) => {
@@ -55,6 +101,19 @@ export default {
           this.openGoalActivity = parseInt(data[0].gs_activity);
           this.openGoalActivityYear = data[0].gs_year;
         }
+      });
+    },
+    onFiltered(filteredItems) {
+      // Trigger pagination to update the number of buttons/pages due to filtering
+      this.totalRows = filteredItems.length;
+      this.currentPage = 1;
+    },
+    selectRow(row) {
+      row = row[0];
+      this.travelAppID = row.travelapp_id;
+      this.$router.push({
+        name: "travel-application-details",
+        params: { travelAppID: this.travelAppID },
       });
     },
   },
@@ -180,21 +239,82 @@ export default {
       </div>
     </div>
     <div class="row">
-      <div class="col-md-12">
-        <div  class="col-12">
-          <div class="card">
-            <div class="card-header">
-              <h6 class="text-uppercase">Previously Submitted Self-assessments</h6>
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header">
+            <h6 class="text-uppercase">Previously Submitted Self-assessments</h6>
+          </div>
+          <div class="card-body">
+            <div class="row mt-4">
+              <div class="col-sm-12 col-md-6">
+                <div id="tickets-table_length" class="dataTables_length">
+                  <label class="d-inline-flex align-items-center">
+                    Show&nbsp;
+                    <b-form-select
+                      v-model="perPage"
+                      size="sm"
+                      :options="pageOptions"
+                    ></b-form-select
+                    >&nbsp;entries
+                  </label>
+                </div>
+              </div>
+              <!-- Search -->
+              <div class="col-sm-12 col-md-6">
+                <div
+                  id="tickets-table_filter"
+                  class="dataTables_filter text-md-right"
+                >
+                  <label class="d-inline-flex align-items-center">
+                    Search:
+                    <b-form-input
+                      v-model="filter"
+                      type="search"
+                      placeholder="Search..."
+                      class="form-control form-control-sm ml-2"
+                    ></b-form-input>
+                  </label>
+                </div>
+              </div>
+              <!-- End search -->
             </div>
-            <div class="card-body">
-              <div class="table-responsive">
-                <table class="table table-bordered">
-                  <tr>
-                    <thead>#</thead>
-                    <thead>Supervisor</thead>
-                    <thead>Status</thead>
-                  </tr>
-                </table>
+            <!-- Table -->
+            <div class="table-responsive mb-0">
+              <b-table
+                ref="donor-table"
+                bordered
+                selectable
+                hover
+                :items="assessments"
+                :fields="fields"
+                responsive="sm"
+                :per-page="perPage"
+                :current-page="currentPage"
+                :sort-by.sync="sortBy"
+                :sort-desc.sync="sortDesc"
+                :filter="filter"
+                :filter-included-fields="filterOn"
+                @filtered="onFiltered"
+                show-empty
+                select-mode="single"
+                @row-selected="selectRow"
+              >
+              </b-table>
+            </div>
+            <div class="row">
+              <div class="col">
+                <div
+                  class="dataTables_paginate paging_simple_numbers float-right"
+                >
+                  <ul class="pagination pagination-rounded mb-0">
+                    <!-- pagination -->
+                    <b-pagination
+                      v-model="currentPage"
+                      :total-rows="totalRows"
+                      :per-page="perPage"
+                    ></b-pagination>
+                  </ul>
+                </div>
               </div>
             </div>
           </div>
