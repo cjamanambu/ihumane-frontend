@@ -106,6 +106,7 @@ export default {
     },
     getOpenGoalSetting() {
       const url = `${this.ROUTES.goalSetting}/get-open-goal-setting`;
+
       this.apiGet(url).then((res) => {
         const { data } = res;
         if (data.length > 0) {
@@ -120,6 +121,7 @@ export default {
     },
     submitNewBeginning() {
       const employeeID = this.getEmployee.emp_id;
+      //console.log("EmpID: "+employeeID);
       const url = `${this.ROUTES.selfAssessment}/add-self-assessment/${employeeID}/${this.openGoalActivityId}`;
       this.goals = [];
       let validForm = true;
@@ -357,6 +359,7 @@ export default {
           The beginning of year review period is currently closed.
         </div>
       </div>
+
     </div>
   </Layout>
 </template>
