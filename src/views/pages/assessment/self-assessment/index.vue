@@ -179,5 +179,27 @@ export default {
         </div>
       </div>
     </div>
+    <div class="row">
+      <div class="col-md-12">
+        <div  class="col-12">
+          <div class="card">
+            <div class="card-header">
+              <h6 class="text-uppercase">Previously Submitted Self-assessments</h6>
+            </div>
+            <div class="card-body">
+              <div class="table-responsive">
+                <table class="table table-bordered">
+                  <tr>
+                    <thead>#</thead>
+                    <thead>Supervisor</thead>
+                    <thead>Status</thead>
+                  </tr>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </Layout>
 </template>
