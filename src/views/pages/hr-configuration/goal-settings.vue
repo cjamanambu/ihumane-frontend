@@ -17,8 +17,10 @@ export default {
     this.refreshTable();
   },
   validations: {
-    gs_from: { required },
-    gs_to: { required },
+    //gs_from: { required },
+    currentFrom: { required },
+    //gs_to: { required },
+    currentTo: { required },
     gs_activity: { required },
   },
   methods: {
@@ -66,8 +68,8 @@ export default {
       this.gs_id = goalSetting.gs_id;
       this.gs_year = goalSetting.gs_year;
       this.gs_activity = goalSetting.gs_activity;
-      this.gs_from = goalSetting.gs_from;
-      this.gs_to = goalSetting.gs_to;
+      this.gs_from = this.currentFrom;//goalSetting.gs_from;
+      this.gs_to = this.currentTo;//goalSetting.gs_to;
       this.gs_status = parseInt(goalSetting.gs_status);
       this.$refs["update-goal-setting"].show();
       this.$refs["goal-setting-table"].clearSelected();
@@ -79,8 +81,8 @@ export default {
         this.apiFormHandler("Invalid Goal Setting");
       } else {
         const data = {
-          gs_from: this.gs_from,
-          gs_to: this.gs_to,
+          gs_from: this.currentFrom,//this.gs_from,
+          gs_to: this.currentTo,//this.gs_to,
           // gs_year: this.currentGSY,
           gs_activity: String(this.gs_activity),
         };
@@ -363,7 +365,7 @@ export default {
           <input
             id="gs_from"
             type="date"
-            v-model="gs_from"
+            v-model="currentFrom"
             class="form-control"
           />
         </div>
@@ -372,7 +374,7 @@ export default {
           <input
             id="gs_to"
             type="date"
-            v-model="gs_to"
+            v-model="currentTo"
             class="form-control"
             :class="{
               'is-invalid': submitted && $v.gs_to.$error,
