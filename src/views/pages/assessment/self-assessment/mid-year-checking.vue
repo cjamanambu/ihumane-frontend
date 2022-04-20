@@ -18,6 +18,7 @@ export default {
   mounted() {
     this.getOpenGoalSetting();
     this.getSelfAssessment();
+
   },
   data() {
     return {
@@ -36,9 +37,9 @@ export default {
         },
       ],
       texts: [
-        { id: 0, goal: null },
-        { id: 1, goal: null },
-        { id: 2, goal: null },
+        { id: 0, goal: null, challenge:null, accomplishment:null, support:null },
+        { id: 1, goal: null, challenge:null, accomplishment:null, support:null },
+        { id: 2, goal: null, challenge:null, accomplishment:null, support:null },
       ],
       endYearQuestions: [],
       openGoalActivity: null,
@@ -68,7 +69,7 @@ export default {
   },
   methods: {
     addField() {
-      this.texts.push({ id: this.count++, goal: null });
+      this.texts.push({ id: this.count++, goal: null, challenge: null, accomplishment: null, support: null });
       this.count++;
     },
     delField(index) {
@@ -89,6 +90,9 @@ export default {
             const dat = {
               id: datum.sa_id,
               goal: datum.sa_comment,
+              challenge: datum.sa_challenges,
+              accomplishment: datum.sa_accomplishment,
+              support: datum.sa_support_needed,
               status: datum.sa_status,
             };
             this.texts.push(dat);
@@ -123,6 +127,7 @@ export default {
         }
         const data = {
           sa_comment: field.goal,
+
         };
         this.goals.push(data);
         return true;
@@ -147,6 +152,9 @@ export default {
         }
         const data = {
           sa_comment: field.goal,
+          sa_challenge:field.challenge,
+          sa_accomplishment:field.accomplishment,
+          sa_support:field.support,
         };
         this.goals.push(data);
         return true;
@@ -238,6 +246,54 @@ export default {
                       class="form-control"
                       :class="{
                         'is-invalid': submitted && $v.goal.$error,
+                      }"
+                    />
+                  </div>
+                  <div class="form-group " style="margin-left: 30px;">
+                    <label for="goal">
+                      Challenge <label for="" class="badge badge-danger">{{ index + 1 }}</label> <span class="text-danger">*</span>
+                    </label>
+                    <b-form-textarea
+                      id="eya_question"
+                      no-resize
+                      rows="3"
+                      v-model="field.challenge"
+                      placeholder="Challenge"
+                      class="form-control"
+                      :class="{
+                        'is-invalid': submitted && $v.challenge.$error,
+                      }"
+                    />
+                  </div>
+                  <div class="form-group " style="margin-left: 30px;">
+                    <label for="goal">
+                      Accomplishment <label for="" class="badge badge-danger">{{ index + 1 }}</label> <span class="text-danger">*</span>
+                    </label>
+                    <b-form-textarea
+                      id="eya_question"
+                      no-resize
+                      rows="3"
+                      v-model="field.accomplishment"
+                      placeholder="Accomplishment"
+                      class="form-control"
+                      :class="{
+                        'is-invalid': submitted && $v.accomplishment.$error,
+                      }"
+                    />
+                  </div>
+                  <div class="form-group " style="margin-left: 30px;">
+                    <label for="goal">
+                      Support Needed <label for="" class="badge badge-danger">{{ index + 1 }}</label> <span class="text-danger">*</span>
+                    </label>
+                    <b-form-textarea
+                      id="eya_question"
+                      no-resize
+                      rows="3"
+                      v-model="field.support"
+                      class="form-control"
+                      placeholder="Support needed"
+                      :class="{
+                        'is-invalid': submitted && $v.support.$error,
                       }"
                     />
                   </div>
