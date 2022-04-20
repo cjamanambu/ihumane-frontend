@@ -47,7 +47,6 @@ export default {
       openGoalActivityYear: null,
 
       assessments: [],
-      supervisor_assessments: [],
       totalRows: 1,
       currentPage: 1,
       perPage: 10,
@@ -75,23 +74,7 @@ export default {
           sortable: true,
         },
       ],
-      sup_fields: [
-        { key: "sn", label: "S/n", sortable: true },
-        {
-          key: "target",
-          label: "Goal",
-          sortable: true,
-        },
-        { key: "year", label: "Year", sortable: true },
-        { key: "type_of_activity", label: "Activity Type", sortable: true },
-        { key: "officer", label: "Employee", sortable: true },
-        { key: "status", label: "Status", sortable: true },
-        {
-          key: "date_published",
-          label: "Date",
-          sortable: true,
-        },
-      ],
+
     };
   },
   methods: {
@@ -126,31 +109,7 @@ export default {
           this.assessments.push(localData);
         })
 
-        //supervisor
-        data.sup.forEach((ass, index)=>{
-          let activity = null;
-          switch(parseInt(ass.goal.gs_activity)){
-            case 1:
-              activity = "Beginning of Year";
-              break;
-            case 2:
-              activity = "Mid-Year";
-              break;
-            case 3:
-              activity = "End of Year";
-              break;
-          }
-          let supData = {
-            sn:++index,
-            target:`${new Date(ass.goal.gs_from).toDateString()} - ${ new Date(ass.goal.gs_to).toDateString()}`,
-            status: parseInt(ass.sam_status) === 1 ? 'Approved' : 'Pending',
-            type_of_activity:activity,
-            year:ass.goal.gs_year,
-            date_published:new Date(ass.createdAt).toDateString(),
-            officer:`${ass.employee.emp_first_name} ${ass.employee.emp_last_name} - ${ass.employee.emp_unique_id}`,
-            ...ass}
-          this.supervisor_assessments.push(supData);
-        })
+
       });
     },
     getOpenGoalSetting() {
@@ -384,88 +343,6 @@ export default {
       </div>
     </div>
 
-    <div class="row">
-      <div class="col-12">
-        <div class="card">
-          <div class="card-header">
-            <h6 class="text-uppercase">Supervisor</h6>
-          </div>
-          <div class="card-body">
-            <div class="row mt-4">
-              <div class="col-sm-12 col-md-6">
-                <div id="tickets-table_length-supervisor" class="dataTables_length">
-                  <label class="d-inline-flex align-items-center">
-                    Show&nbsp;
-                    <b-form-select
-                      v-model="perPage"
-                      size="sm"
-                      :options="pageOptions"
-                    ></b-form-select
-                    >&nbsp;entries
-                  </label>
-                </div>
-              </div>
-              <!-- Search -->
-              <div class="col-sm-12 col-md-6">
-                <div
-                  id="tickets-table_filter-supervisor"
-                  class="dataTables_filter text-md-right"
-                >
-                  <label class="d-inline-flex align-items-center">
-                    Search:
-                    <b-form-input
-                      v-model="filter"
-                      type="search"
-                      placeholder="Search..."
-                      class="form-control form-control-sm ml-2"
-                    ></b-form-input>
-                  </label>
-                </div>
-              </div>
-              <!-- End search -->
-            </div>
-            <!-- Table -->
-            <div class="table-responsive mb-0">
-              <b-table
-                ref="donor-table"
-                bordered
-                selectable
-                hover
-                :items="supervisor_assessments"
-                :fields="sup_fields"
-                responsive="sm"
-                :per-page="perPage"
-                :current-page="currentPage"
-                :sort-by.sync="sortBy"
-                :sort-desc.sync="sortDesc"
-                :filter="filter"
-                :filter-included-fields="filterOn"
-                @filtered="onFiltered"
-                show-empty
-                select-mode="single"
-                @row-selected="selectRow"
-              >
-              </b-table>
-            </div>
-            <div class="row">
-              <div class="col">
-                <div
-                  class="dataTables_paginate paging_simple_numbers float-right"
-                >
-                  <ul class="pagination pagination-rounded mb-0">
-                    <!-- pagination -->
-                    <b-pagination
-                      v-model="currentPage"
-                      :total-rows="totalRows"
-                      :per-page="perPage"
-                    ></b-pagination>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+
   </Layout>
 </template>

@@ -159,6 +159,7 @@ export default {
       const url = `${this.ROUTES.goalSetting}/get-open-goal-setting`;
       this.apiGet(url).then((res) => {
         const { data } = res;
+        console.log(data);
         if (data.length > 0) {
           this.openGoalActivity = parseInt(data[0].gs_activity);
           this.openGoalActivityId = parseInt(data[0].gs_id);
@@ -203,10 +204,28 @@ export default {
         });
       }
     },
+    processAssessment(){
+
+      const employeeID = this.$route.params.empid;
+      const gsId = this.gsID;
+      const url = `${this.ROUTES.selfAssessment}/process-assessment`;
+      const data = {
+        goalId: gsId,
+        employee:employeeID,
+        //supervisor:this.getEmployee.emp_id
+      };
+      this.apiPost(url, data, "Could not process request").then(() => {
+        this.apiResponseHandler("Process Complete", "Employee self-assessment completed.");
+
+      });
+
+
+    },
     fetchEmployee() {
       const employeeID = this.$route.params.empid;
       const url = `${this.ROUTES.employee}/get-employee/${employeeID}`;
       this.apiGet(url, "Get Employee Error").then((res) => {
+        //console.log(res.data);
         this.currentEmployee = res.data;
       });
     },
@@ -338,12 +357,21 @@ export default {
                 </div>
                 <div class="d-flex justify-content-between">
                   <p>T3 Code</p>
-                  <p>{{ currentEmployee.JobRole.Department.d_t3_code }}</p>
+                  <p>{{ currentEmployee.sector.d_t3_code }}</p>
                 </div>
                 <div class="d-flex justify-content-between">
                   <p class="mb-0">T6 Code</p>
                   <p class="mb-0">{{ currentEmployee.location.l_t6_code }}</p>
                 </div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-body">
+                <form @submit.prevent="processAssessment">
+                  <div class="btn-group d-flex ">
+                    <button class="btn btn-success btn-sm"> <i class="mdi mdi-check mr-2"></i> Approve</button>
+                  </div>
+                </form>
               </div>
             </div>
           </div>
