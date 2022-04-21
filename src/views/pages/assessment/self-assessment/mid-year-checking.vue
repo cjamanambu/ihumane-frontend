@@ -47,6 +47,7 @@ export default {
       openGoalActivityFrom: null,
       openGoalActivityTo: null,
       openGoalActivityId: null,
+      optional: null,
       goals: [],
       start: "",
       end: "",
@@ -82,11 +83,13 @@ export default {
       await this.apiGet(url).then((res) => {
         const { data } = res;
         if (data) {
+          console.log(data);
           this.texts = [];
-          data.forEach(async (datum) => {
+          this.gsID = data.openGoal[0].gs_id;
+          data.questions.forEach(async (datum) => {
             this.selfAssessmentStatus = true;
             this.prefillStatus = true;
-            this.gsID = datum.sa_gs_id;
+
             const dat = {
               id: datum.sa_id,
               goal: datum.sa_comment,
@@ -143,7 +146,7 @@ export default {
     },
     submitMidYearChecking() {
       const employeeID = this.getEmployee.emp_id;
-      const url = `${this.ROUTES.selfAssessment}/update-assessment/${employeeID}/${this.gsID}`;
+      const url = `${this.ROUTES.selfAssessment}/add-self-assessment-mid-year/${employeeID}/${this.gsID}`;
       this.goals = [];
       let validForm = true;
       this.texts.every(async (field) => {
@@ -154,17 +157,18 @@ export default {
         }
         const data = {
           sa_comment: field.goal,
-          sa_challenge:field.challenge,
+          sa_challenges:field.challenge,
           sa_accomplishment:field.accomplishment,
-          sa_support:field.support,
-          sa_next_step:field.next_step,
+          sa_support_needed:field.support,
+          sa_next_steps:field.next_step,
           sa_update:field.update,
+          optional:this.optional,
         };
         this.goals.push(data);
         return true;
       });
       if (validForm) {
-        this.apiPatch(url, this.goals, "Add goals Error").then(() => {
+        this.apiPost(url, this.goals, "Add goals Error").then(() => {
           this.apiResponseHandler("Process Complete", "Goals Added");
           this.getSelfAssessment();
         });
@@ -258,31 +262,31 @@ export default {
                       Update <label for="" class="badge badge-danger">{{ index + 1 }}</label> <span class="text-danger">*</span>
                     </label>
                     <div class="form-check">
-                      <input class="form-check-input" v-model="field.update" checked value="1" type="radio" >
+                      <input class="form-check-input" v-model="field.update" checked value="Complete" type="radio" >
                       <label class="form-check-label" >
                         Complete
                       </label>
                     </div>
                     <div class="form-check">
-                      <input class="form-check-input" id="on-track" v-model="field.update" value="2" type="radio" >
+                      <input class="form-check-input" id="on-track" v-model="field.update" value="On track" type="radio" >
                       <label class="form-check-label" >
                         On track
                       </label>
                     </div>
                     <div class="form-check">
-                      <input class="form-check-input" id="delayed" v-model="field.update" value="3" type="radio" >
+                      <input class="form-check-input" id="delayed" v-model="field.update" value="Delayed" type="radio" >
                       <label class="form-check-label" >
                         Delayed
                       </label>
                     </div>
                     <div class="form-check">
-                      <input class="form-check-input" v-model="field.update" value="4" type="radio" >
+                      <input class="form-check-input" v-model="field.update" value="Not started" type="radio" >
                       <label class="form-check-label" >
                         Not started
                       </label>
                     </div>
                     <div class="form-check">
-                      <input class="form-check-input" v-model="field.update" value="5" type="radio" >
+                      <input class="form-check-input" v-model="field.update" value="No longer relevant" type="radio" >
                       <label class="form-check-label" >
                         No longer relevant
                       </label>
@@ -353,6 +357,7 @@ export default {
                     />
                   </div>
                 </div>
+
                 <div class="col-1" v-if="index > 2">
                   <div class="form-group">
                     <label style="visibility: hidden">hidden</label><br />
@@ -372,6 +377,26 @@ export default {
                 <span style="cursor: pointer" class="ml-1" @click="addField">
                   Click here to add a new goal
                 </span>
+              </div>
+              <div class="row">
+                <div class="col-12">
+                  <div class="form-group">
+                    <label for="op">
+                      Optional– other items to discuss (career opportunities, area of growth & development, etc.
+                    </label>
+                    <b-form-textarea
+                      id="option"
+                      no-resize
+                      rows="3"
+                      v-model="optional"
+                      placeholder="Optional"
+                      class="form-control"
+                      :class="{
+                        'is-invalid': submitted && $v.optional.$error,
+                      }"
+                    />
+                  </div>
+                </div>
               </div>
               <div class="row">
                 <div class="col-12">

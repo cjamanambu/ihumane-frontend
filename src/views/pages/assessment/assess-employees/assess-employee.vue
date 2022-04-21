@@ -113,12 +113,14 @@ export default {
       const url = `${this.ROUTES.selfAssessment}/get-self-assessments/${this.empId}`;
       await this.apiGet(url).then((res) => {
         const { data } = res;
-        if (data) {
+        //console.log(data.questions);
+        //if (data) {
 
           this.assessments = [];
-          this.assessStatus = data[0].sa_status;
-          data.forEach(async (datum) => {
-            this.gsID = datum.sa_gs_id;
+          this.assessStatus = data.questions[0].sa_status;
+          this.gsID = data.openGoal[0].gs_id;
+          data.questions.forEach(async (datum) => {
+
             const dat = {
               id: datum.sa_id,
               goal: datum.sa_comment,
@@ -132,8 +134,8 @@ export default {
             };
             this.assessments.push(dat);
           });
-          //console.log(this.assessments);
-        }
+          console.log(this.assessments);
+        //}
       });
     },
     async getSelfAssessmentMaster(){
@@ -553,7 +555,7 @@ export default {
                         v-if="!submitting"
                         class="btn btn-success btn-block mt-4"
                         type="submit"
-
+                        :disabled="assessStatus === 1 ? true : false"
                       >
                         Update
                       </b-button>
