@@ -37,9 +37,9 @@ export default {
         },
       ],
       texts: [
-        { id: 0, goal: null, challenge:null, accomplishment:null, support:null },
-        { id: 1, goal: null, challenge:null, accomplishment:null, support:null },
-        { id: 2, goal: null, challenge:null, accomplishment:null, support:null },
+        { id: 0, goal: null, challenge:null, accomplishment:null, support:null, next_step:null, update:null },
+        { id: 1, goal: null, challenge:null, accomplishment:null, support:null, next_step:null, update:null },
+        { id: 2, goal: null, challenge:null, accomplishment:null, support:null, next_step:null, update:null },
       ],
       endYearQuestions: [],
       openGoalActivity: null,
@@ -69,7 +69,7 @@ export default {
   },
   methods: {
     addField() {
-      this.texts.push({ id: this.count++, goal: null, challenge: null, accomplishment: null, support: null });
+      this.texts.push({ id: this.count++, goal: null, challenge: null, accomplishment: null, support: null, next_step:null, update:null });
       this.count++;
     },
     delField(index) {
@@ -94,6 +94,8 @@ export default {
               accomplishment: datum.sa_accomplishment,
               support: datum.sa_support_needed,
               status: datum.sa_status,
+              next_step: datum.sa_next_steps,
+              update:datum.sa_update,
             };
             this.texts.push(dat);
           });
@@ -155,6 +157,8 @@ export default {
           sa_challenge:field.challenge,
           sa_accomplishment:field.accomplishment,
           sa_support:field.support,
+          sa_next_step:field.next_step,
+          sa_update:field.update,
         };
         this.goals.push(data);
         return true;
@@ -251,6 +255,41 @@ export default {
                   </div>
                   <div class="form-group " style="margin-left: 30px;">
                     <label for="goal">
+                      Update <label for="" class="badge badge-danger">{{ index + 1 }}</label> <span class="text-danger">*</span>
+                    </label>
+                    <div class="form-check">
+                      <input class="form-check-input" v-model="field.update" checked value="1" type="radio" >
+                      <label class="form-check-label" >
+                        Complete
+                      </label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" id="on-track" v-model="field.update" value="2" type="radio" >
+                      <label class="form-check-label" >
+                        On track
+                      </label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" id="delayed" v-model="field.update" value="3" type="radio" >
+                      <label class="form-check-label" >
+                        Delayed
+                      </label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" v-model="field.update" value="4" type="radio" >
+                      <label class="form-check-label" >
+                        Not started
+                      </label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" v-model="field.update" value="5" type="radio" >
+                      <label class="form-check-label" >
+                        No longer relevant
+                      </label>
+                    </div>
+                  </div>
+                  <div class="form-group " style="margin-left: 30px;">
+                    <label for="goal">
                       Challenge <label for="" class="badge badge-danger">{{ index + 1 }}</label> <span class="text-danger">*</span>
                     </label>
                     <b-form-textarea
@@ -294,6 +333,22 @@ export default {
                       placeholder="Support needed"
                       :class="{
                         'is-invalid': submitted && $v.support.$error,
+                      }"
+                    />
+                  </div>
+                  <div class="form-group " style="margin-left: 30px;">
+                    <label for="goal">
+                      Next Step <label for="" class="badge badge-danger">{{ index + 1 }}</label> <span class="text-danger">*</span>
+                    </label>
+                    <b-form-textarea
+                      id="eya_question"
+                      no-resize
+                      rows="3"
+                      v-model="field.next_step"
+                      class="form-control"
+                      placeholder="Next step"
+                      :class="{
+                        'is-invalid': submitted && $v.next_step.$error,
                       }"
                     />
                   </div>
