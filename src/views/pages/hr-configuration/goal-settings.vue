@@ -488,13 +488,30 @@ export default {
           />
         </div>
 
-        <div v-if="gs_status">
+        <div v-if="gs_status == 1">
           <b-button
             v-if="!submitting"
             class="btn btn-danger btn-block mt-4"
             type="submit"
           >
             Close Activity
+          </b-button>
+          <b-button
+            v-else
+            disabled
+            class="btn btn-success btn-block mt-4"
+            type="submit"
+          >
+            Closing...
+          </b-button>
+        </div>
+        <div v-else-if="gs_status == 0">
+          <b-button
+            v-if="!submitting"
+            class="btn btn-success btn-block mt-4"
+            type="submit"
+          >
+            Open Activity
           </b-button>
           <b-button
             v-else
