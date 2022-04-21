@@ -20,11 +20,13 @@ export default {
 
   mounted() {
     this.empId = this.$route.params.empid;
+    this.fetchEmployee();
     this.getOpenGoalSetting();
     this.getSelfAssessment();
     this.getEndYearAssessment();
     this.getRatings();
-    this.fetchEmployee();
+
+    this.authuser = this.getEmployee.emp_id;
   },
   validations: {
     start: { required },
@@ -48,7 +50,10 @@ export default {
           active: true,
         },
       ],
+      authuser:null,
       texts: [{ id: 0, goal: null }],
+      assessStatus:0,
+      //supervisor:null,
       year: null,
       endYearQuestions: [],
       openGoalActivity: null,
@@ -108,8 +113,11 @@ export default {
       const url = `${this.ROUTES.selfAssessment}/get-self-assessments/${this.empId}`;
       await this.apiGet(url).then((res) => {
         const { data } = res;
+
         if (data) {
+          //console.log(data[0]);
           this.assessments = [];
+          this.assessStatus = data[0].sa_status;
           data.forEach(async (datum) => {
             this.gsID = datum.sa_gs_id;
             const dat = {
@@ -123,10 +131,19 @@ export default {
         }
       });
     },
+    async getSelfAssessmentMaster(){
+      //const urls = `${this.ROUTES.selfAssessment}/get-self-assessment-master/${this.$route.params.empid}/${this.gsID}`;
+      /*await this.apiGet(urls).then(async (res) => {
+       // const { data } = res;
+        //console.log(data)
+
+      });*/
+    },
     async getEndYearAssessment() {
       const urls = `${this.ROUTES.goalSetting}/get-open-goal-setting`;
       await this.apiGet(urls).then(async (res) => {
         const { data } = res;
+        //console.log(data)
         if (data.length > 0) {
           const url = `${this.ROUTES.selfAssessment}/get-end-questions/${
             this.empId
@@ -159,7 +176,7 @@ export default {
       const url = `${this.ROUTES.goalSetting}/get-open-goal-setting`;
       this.apiGet(url).then((res) => {
         const { data } = res;
-        console.log(data);
+        //console.log(data);
         if (data.length > 0) {
           this.openGoalActivity = parseInt(data[0].gs_activity);
           this.openGoalActivityId = parseInt(data[0].gs_id);
@@ -208,10 +225,10 @@ export default {
 
       const employeeID = this.$route.params.empid;
       const gsId = this.gsID;
-      const url = `${this.ROUTES.selfAssessment}/process-assessment`;
+      const url = `${this.ROUTES.selfAssessment}/approve-assessment/${employeeID}/${gsId}`;
       const data = {
-        goalId: gsId,
-        employee:employeeID,
+        gs_id: gsId,
+        emp_id:employeeID,
         //supervisor:this.getEmployee.emp_id
       };
       this.apiPost(url, data, "Could not process request").then(() => {
@@ -225,8 +242,9 @@ export default {
       const employeeID = this.$route.params.empid;
       const url = `${this.ROUTES.employee}/get-employee/${employeeID}`;
       this.apiGet(url, "Get Employee Error").then((res) => {
-        //console.log(res.data);
         this.currentEmployee = res.data;
+        //console.log('Supervisor: '+this.supervisor);
+
       });
     },
   },
@@ -280,6 +298,7 @@ export default {
                               id="eya_question"
                               no-resize
                               rows="3"
+                              :readonly="assessStatus === 1 ? true : false"
                               v-model="field.goal"
                               class="form-control"
                               :class="{
@@ -298,6 +317,7 @@ export default {
                           v-if="!submitting"
                           class="btn btn-success btn-block mt-4"
                           type="submit"
+                          :disabled="assessStatus === 1 ? true : false"
                         >
                           Update
                         </b-button>
@@ -365,15 +385,17 @@ export default {
                 </div>
               </div>
             </div>
-            <div class="card">
+
+            <div class="card" v-if="authuser === currentEmployee.emp_supervisor_id">
               <div class="card-body">
                 <form @submit.prevent="processAssessment">
                   <div class="btn-group d-flex ">
-                    <button class="btn btn-success btn-sm"> <i class="mdi mdi-check mr-2"></i> Approve</button>
+                    <button class="btn btn-success btn-sm" :disabled="assessStatus === 1 ? true : false"> <i class="mdi mdi-check mr-2"></i> Approve </button>
                   </div>
                 </form>
               </div>
             </div>
+
           </div>
         </div>
       </div>
@@ -423,6 +445,7 @@ export default {
                         v-if="!submitting"
                         class="btn btn-success btn-block mt-4"
                         type="submit"
+
                       >
                         Update
                       </b-button>
