@@ -18,7 +18,6 @@ export default {
   mounted() {
     this.getOpenGoalSetting();
     this.getSelfAssessment();
-
   },
   data() {
     return {
@@ -37,9 +36,48 @@ export default {
         },
       ],
       texts: [
-        { id: 0, goal: null, challenge:null, accomplishment:null, support:null, next_step:null, update:null },
-        { id: 1, goal: null, challenge:null, accomplishment:null, support:null, next_step:null, update:null },
-        { id: 2, goal: null, challenge:null, accomplishment:null, support:null, next_step:null, update:null },
+        {
+          id: 0,
+          goal: "",
+          goalEdit: false,
+          challenge: "",
+          challengeEdit: false,
+          accomplishment: "",
+          accomplishmentEdit: false,
+          support: "",
+          supportEdit: false,
+          next_step: "",
+          nextStepEdit: null,
+          update: "",
+        },
+        {
+          id: 1,
+          goal: "",
+          goalEdit: false,
+          challenge: "",
+          challengeEdit: false,
+          accomplishment: "",
+          accomplishmentEdit: false,
+          support: "",
+          supportEdit: false,
+          next_step: "",
+          nextStepEdit: null,
+          update: "",
+        },
+        {
+          id: 2,
+          goal: "",
+          goalEdit: false,
+          challenge: "",
+          challengeEdit: false,
+          accomplishment: "",
+          accomplishmentEdit: false,
+          support: "",
+          supportEdit: false,
+          next_step: "",
+          nextStepEdit: null,
+          update: "",
+        },
       ],
       endYearQuestions: [],
       openGoalActivity: null,
@@ -70,10 +108,24 @@ export default {
   },
   methods: {
     addField() {
-      this.texts.push({ id: this.count++, goal: null, challenge: null, accomplishment: null, support: null, next_step:null, update:null });
+      this.texts.push({
+        id: this.count++,
+        goal: "",
+        goalEdit: false,
+        challenge: "",
+        challengeEdit: false,
+        accomplishment: "",
+        accomplishmentEdit: false,
+        support: "",
+        supportEdit: false,
+        next_step: "",
+        nextStepEdit: null,
+        update: "",
+      });
       this.count++;
     },
     delField(index) {
+      console.log(index);
       if (index > 0) {
         this.texts.splice(index, 1);
       }
@@ -93,12 +145,17 @@ export default {
             const dat = {
               id: datum.sa_id,
               goal: datum.sa_comment,
+              goalEdit: false,
               challenge: datum.sa_challenges,
+              challengeEdit: false,
               accomplishment: datum.sa_accomplishment,
+              accomplishmentEdit: false,
               support: datum.sa_support_needed,
+              supportEdit: false,
               status: datum.sa_status,
               next_step: datum.sa_next_steps,
-              update:datum.sa_update,
+              nextStepEdit: null,
+              update: datum.sa_update,
             };
             this.texts.push(dat);
           });
@@ -132,7 +189,6 @@ export default {
         }
         const data = {
           sa_comment: field.goal,
-
         };
         this.goals.push(data);
         return true;
@@ -157,12 +213,12 @@ export default {
         }
         const data = {
           sa_comment: field.goal,
-          sa_challenges:field.challenge,
-          sa_accomplishment:field.accomplishment,
-          sa_support_needed:field.support,
-          sa_next_steps:field.next_step,
-          sa_update:field.update,
-          optional:this.optional,
+          sa_challenges: field.challenge,
+          sa_accomplishment: field.accomplishment,
+          sa_support_needed: field.support,
+          sa_next_steps: field.next_step,
+          sa_update: field.update,
+          optional: this.optional,
         };
         this.goals.push(data);
         return true;
@@ -175,8 +231,21 @@ export default {
       }
     },
   },
+  directives: {
+    focus: {
+      inserted(el) {
+        el.focus();
+      },
+    },
+  },
 };
 </script>
+
+<style>
+textarea {
+  resize: none;
+}
+</style>
 
 <template>
   <Layout>
@@ -240,141 +309,264 @@ export default {
               </p>
             </div>
             <form @submit.prevent="submitMidYearChecking">
-              <div class="row" v-for="(field, index) in texts" :key="index">
-                <div class="col">
-                  <div class="form-group">
-                    <label for="goal">
-                      Goal {{ index + 1 }} <span class="text-danger">*</span>
-                    </label>
-                    <b-form-textarea
-                      id="eya_question"
-                      no-resize
-                      rows="3"
-                      v-model="field.goal"
-                      class="form-control"
-                      :class="{
-                        'is-invalid': submitted && $v.goal.$error,
-                      }"
-                    />
-                  </div>
-                  <div class="form-group " style="margin-left: 30px;">
-                    <label for="goal">
-                      Update <label for="" class="badge badge-danger">{{ index + 1 }}</label> <span class="text-danger">*</span>
-                    </label>
-                    <div class="form-check">
-                      <input class="form-check-input" v-model="field.update" checked value="Complete" type="radio" >
-                      <label class="form-check-label" >
-                        Complete
-                      </label>
-                    </div>
-                    <div class="form-check">
-                      <input class="form-check-input" id="on-track" v-model="field.update" value="On track" type="radio" >
-                      <label class="form-check-label" >
-                        On track
-                      </label>
-                    </div>
-                    <div class="form-check">
-                      <input class="form-check-input" id="delayed" v-model="field.update" value="Delayed" type="radio" >
-                      <label class="form-check-label" >
-                        Delayed
-                      </label>
-                    </div>
-                    <div class="form-check">
-                      <input class="form-check-input" v-model="field.update" value="Not started" type="radio" >
-                      <label class="form-check-label" >
-                        Not started
-                      </label>
-                    </div>
-                    <div class="form-check">
-                      <input class="form-check-input" v-model="field.update" value="No longer relevant" type="radio" >
-                      <label class="form-check-label" >
-                        No longer relevant
-                      </label>
-                    </div>
-                  </div>
-                  <div class="form-group " style="margin-left: 30px;">
-                    <label for="goal">
-                      Challenge <label for="" class="badge badge-danger">{{ index + 1 }}</label> <span class="text-danger">*</span>
-                    </label>
-                    <b-form-textarea
-                      id="eya_question"
-                      no-resize
-                      rows="3"
-                      v-model="field.challenge"
-                      placeholder="Challenge"
-                      class="form-control"
-                      :class="{
-                        'is-invalid': submitted && $v.challenge.$error,
-                      }"
-                    />
-                  </div>
-                  <div class="form-group " style="margin-left: 30px;">
-                    <label for="goal">
-                      Accomplishment <label for="" class="badge badge-danger">{{ index + 1 }}</label> <span class="text-danger">*</span>
-                    </label>
-                    <b-form-textarea
-                      id="eya_question"
-                      no-resize
-                      rows="3"
-                      v-model="field.accomplishment"
-                      placeholder="Accomplishment"
-                      class="form-control"
-                      :class="{
-                        'is-invalid': submitted && $v.accomplishment.$error,
-                      }"
-                    />
-                  </div>
-                  <div class="form-group " style="margin-left: 30px;">
-                    <label for="goal">
-                      Support Needed <label for="" class="badge badge-danger">{{ index + 1 }}</label> <span class="text-danger">*</span>
-                    </label>
-                    <b-form-textarea
-                      id="eya_question"
-                      no-resize
-                      rows="3"
-                      v-model="field.support"
-                      class="form-control"
-                      placeholder="Support needed"
-                      :class="{
-                        'is-invalid': submitted && $v.support.$error,
-                      }"
-                    />
-                  </div>
-                  <div class="form-group " style="margin-left: 30px;">
-                    <label for="goal">
-                      Next Step <label for="" class="badge badge-danger">{{ index + 1 }}</label> <span class="text-danger">*</span>
-                    </label>
-                    <b-form-textarea
-                      id="eya_question"
-                      no-resize
-                      rows="3"
-                      v-model="field.next_step"
-                      class="form-control"
-                      placeholder="Next step"
-                      :class="{
-                        'is-invalid': submitted && $v.next_step.$error,
-                      }"
-                    />
-                  </div>
-                </div>
-
-                <div class="col-1" v-if="index > 2">
-                  <div class="form-group">
-                    <label style="visibility: hidden">hidden</label><br />
-                    <button
-                      type="button"
-                      class="btn btn-danger btn-block"
-                      @click="delField(index)"
+              <b-table-simple hover responsive bordered outlined>
+                <b-thead head-variant="dark">
+                  <b-tr>
+                    <b-th>S/n</b-th>
+                    <b-th>Goal/Project</b-th>
+                    <b-th>Update</b-th>
+                    <b-th>Accomplishments</b-th>
+                    <b-th>Challenges</b-th>
+                    <b-th>Support Needed</b-th>
+                    <b-th>Next Steps</b-th>
+                    <b-th></b-th>
+                  </b-tr>
+                </b-thead>
+                <b-tbody>
+                  <b-tr v-for="(field, index) in texts" :key="index">
+                    <b-td style="width: 1%">
+                      {{ index + 1 }}
+                    </b-td>
+                    <b-td
+                      @click="field.goalEdit = true"
+                      style="width: 19%; cursor: pointer"
                     >
-                      DEL
-                    </button>
-                  </div>
-                </div>
-              </div>
+                      <textarea
+                        type="text"
+                        v-if="field.goalEdit"
+                        v-model="field.goal"
+                        rows="6"
+                        @blur="
+                          field.goalEdit = false;
+                          $emit('update');
+                        "
+                        @keyup.enter="
+                          field.goalEdit = false;
+                          $emit('update');
+                        "
+                        @keyup.esc="
+                          field.goalEdit = false;
+                          $emit('update');
+                        "
+                        v-focus
+                        class="form-control"
+                      />
+                      <span v-else>
+                        <span v-if="field.goal">
+                          {{ field.goal }}
+                        </span>
+                        <em style="font-size: 0.8em" v-else>
+                          click to enter goal...
+                        </em>
+                      </span>
+                    </b-td>
+                    <b-td style="width: 11%">
+                      <div class="form-group">
+                        <div class="form-check">
+                          <input
+                            class="form-check-input"
+                            v-model="field.update"
+                            checked
+                            value="Complete"
+                            type="radio"
+                          />
+                          <label class="form-check-label"> Complete </label>
+                        </div>
+                        <div class="form-check">
+                          <input
+                            class="form-check-input"
+                            id="on-track"
+                            v-model="field.update"
+                            value="On track"
+                            type="radio"
+                          />
+                          <label class="form-check-label"> On track </label>
+                        </div>
+                        <div class="form-check">
+                          <input
+                            class="form-check-input"
+                            id="delayed"
+                            v-model="field.update"
+                            value="Delayed"
+                            type="radio"
+                          />
+                          <label class="form-check-label"> Delayed </label>
+                        </div>
+                        <div class="form-check">
+                          <input
+                            class="form-check-input"
+                            v-model="field.update"
+                            value="Not started"
+                            type="radio"
+                          />
+                          <label class="form-check-label"> Not started </label>
+                        </div>
+                        <div class="form-check">
+                          <input
+                            class="form-check-input"
+                            v-model="field.update"
+                            value="No longer relevant"
+                            type="radio"
+                          />
+                          <label class="form-check-label">
+                            No longer relevant
+                          </label>
+                        </div>
+                      </div>
+                    </b-td>
+                    <b-td
+                      @click="field.accomplishmentEdit = true"
+                      style="width: 17%; cursor: pointer"
+                    >
+                      <textarea
+                        type="text"
+                        v-if="field.accomplishmentEdit"
+                        v-model="field.accomplishment"
+                        rows="6"
+                        @blur="
+                          field.accomplishmentEdit = false;
+                          $emit('update');
+                        "
+                        @keyup.enter="
+                          field.accomplishmentEdit = false;
+                          $emit('update');
+                        "
+                        @keyup.esc="
+                          field.accomplishmentEdit = false;
+                          $emit('update');
+                        "
+                        v-focus
+                        class="form-control"
+                      />
+                      <span v-else>
+                        <span v-if="field.accomplishment">
+                          {{ field.accomplishment }}
+                        </span>
+                        <em style="font-size: 0.8em" v-else>
+                          click to enter accomplishments...
+                        </em>
+                      </span>
+                    </b-td>
+                    <b-td
+                      @click="field.challengeEdit = true"
+                      style="width: 17%; cursor: pointer"
+                    >
+                      <textarea
+                        type="text"
+                        v-if="field.challengeEdit"
+                        v-model="field.challenge"
+                        rows="6"
+                        @blur="
+                          field.challengeEdit = false;
+                          $emit('update');
+                        "
+                        @keyup.enter="
+                          field.challengeEdit = false;
+                          $emit('update');
+                        "
+                        @keyup.esc="
+                          field.challengeEdit = false;
+                          $emit('update');
+                        "
+                        v-focus
+                        class="form-control"
+                      />
+                      <span v-else>
+                        <span v-if="field.challenge">
+                          {{ field.challenge }}
+                        </span>
+                        <em style="font-size: 0.8em" v-else>
+                          click to enter challenges...
+                        </em>
+                      </span>
+                    </b-td>
+                    <b-td
+                      @click="field.supportEdit = true"
+                      style="width: 17%; cursor: pointer"
+                    >
+                      <textarea
+                        type="text"
+                        v-if="field.supportEdit"
+                        v-model="field.support"
+                        rows="6"
+                        @blur="
+                          field.supportEdit = false;
+                          $emit('update');
+                        "
+                        @keyup.enter="
+                          field.supportEdit = false;
+                          $emit('update');
+                        "
+                        @keyup.esc="
+                          field.supportEdit = false;
+                          $emit('update');
+                        "
+                        v-focus
+                        class="form-control"
+                      />
+                      <span v-else>
+                        <span v-if="field.support">
+                          {{ field.support }}
+                        </span>
+                        <em style="font-size: 0.8em" v-else>
+                          click to enter support needed...
+                        </em>
+                      </span>
+                    </b-td>
+                    <b-td
+                      @click="field.nextStepEdit = true"
+                      style="width: 17%; cursor: pointer"
+                    >
+                      <textarea
+                        type="text"
+                        v-if="field.nextStepEdit"
+                        v-model="field.next_step"
+                        rows="6"
+                        @blur="
+                          field.nextStepEdit = false;
+                          $emit('update');
+                        "
+                        @keyup.enter="
+                          field.nextStepEdit = false;
+                          $emit('update');
+                        "
+                        @keyup.esc="
+                          field.nextStepEdit = false;
+                          $emit('update');
+                        "
+                        v-focus
+                        class="form-control"
+                      />
+                      <span v-else>
+                        <span v-if="field.next_step">
+                          {{ field.next_step }}
+                        </span>
+                        <em style="font-size: 0.8em" v-else>
+                          click to enter next steps...
+                        </em>
+                      </span>
+                    </b-td>
+                    <b-td style="width: 1%">
+                      <button
+                        v-if="index > 2"
+                        type="button"
+                        class="btn btn-sm btn-danger"
+                        @click="delField(index)"
+                      >
+                        DEL
+                      </button>
+                    </b-td>
+                  </b-tr>
+                </b-tbody>
+              </b-table-simple>
               <div class="alert alert-info d-flex mt-3">
                 <i class="ri-error-warning-line mr-2"></i>
                 You must submit a minimum of 3 goals.
-                <span style="cursor: pointer" class="ml-1" @click="addField">
+                <span
+                  style="cursor: pointer; text-decoration: underline"
+                  class="ml-1"
+                  @click="addField"
+                >
                   Click here to add a new goal
                 </span>
               </div>
@@ -382,7 +574,8 @@ export default {
                 <div class="col-12">
                   <div class="form-group">
                     <label for="op">
-                      Optional– other items to discuss (career opportunities, area of growth & development, etc.
+                      Optional – other items to discuss (career opportunities,
+                      area of growth & development, etc.
                     </label>
                     <b-form-textarea
                       id="option"
@@ -418,6 +611,227 @@ export default {
                 </div>
               </div>
             </form>
+
+            <!--            <form @submit.prevent="submitMidYearChecking">-->
+            <!--              <div class="row" v-for="(field, index) in texts" :key="index">-->
+            <!--                <div class="col">-->
+            <!--                  <div class="form-group">-->
+            <!--                    <label for="goal">-->
+            <!--                      Goal {{ index + 1 }} <span class="text-danger">*</span>-->
+            <!--                    </label>-->
+            <!--                    <b-form-textarea-->
+            <!--                      id="eya_question"-->
+            <!--                      no-resize-->
+            <!--                      rows="3"-->
+            <!--                      v-model="field.goal"-->
+            <!--                      class="form-control"-->
+            <!--                      :class="{-->
+            <!--                        'is-invalid': submitted && $v.goal.$error,-->
+            <!--                      }"-->
+            <!--                    />-->
+            <!--                  </div>-->
+            <!--                  <div class="form-group" style="margin-left: 30px">-->
+            <!--                    <label for="goal">-->
+            <!--                      Update-->
+            <!--                      <label for="" class="badge badge-danger">{{-->
+            <!--                        index + 1-->
+            <!--                      }}</label>-->
+            <!--                      <span class="text-danger">*</span>-->
+            <!--                    </label>-->
+            <!--                    <div class="form-check">-->
+            <!--                      <input-->
+            <!--                        class="form-check-input"-->
+            <!--                        v-model="field.update"-->
+            <!--                        checked-->
+            <!--                        value="Complete"-->
+            <!--                        type="radio"-->
+            <!--                      />-->
+            <!--                      <label class="form-check-label"> Complete </label>-->
+            <!--                    </div>-->
+            <!--                    <div class="form-check">-->
+            <!--                      <input-->
+            <!--                        class="form-check-input"-->
+            <!--                        id="on-track"-->
+            <!--                        v-model="field.update"-->
+            <!--                        value="On track"-->
+            <!--                        type="radio"-->
+            <!--                      />-->
+            <!--                      <label class="form-check-label"> On track </label>-->
+            <!--                    </div>-->
+            <!--                    <div class="form-check">-->
+            <!--                      <input-->
+            <!--                        class="form-check-input"-->
+            <!--                        id="delayed"-->
+            <!--                        v-model="field.update"-->
+            <!--                        value="Delayed"-->
+            <!--                        type="radio"-->
+            <!--                      />-->
+            <!--                      <label class="form-check-label"> Delayed </label>-->
+            <!--                    </div>-->
+            <!--                    <div class="form-check">-->
+            <!--                      <input-->
+            <!--                        class="form-check-input"-->
+            <!--                        v-model="field.update"-->
+            <!--                        value="Not started"-->
+            <!--                        type="radio"-->
+            <!--                      />-->
+            <!--                      <label class="form-check-label"> Not started </label>-->
+            <!--                    </div>-->
+            <!--                    <div class="form-check">-->
+            <!--                      <input-->
+            <!--                        class="form-check-input"-->
+            <!--                        v-model="field.update"-->
+            <!--                        value="No longer relevant"-->
+            <!--                        type="radio"-->
+            <!--                      />-->
+            <!--                      <label class="form-check-label">-->
+            <!--                        No longer relevant-->
+            <!--                      </label>-->
+            <!--                    </div>-->
+            <!--                  </div>-->
+            <!--                  <div class="form-group" style="margin-left: 30px">-->
+            <!--                    <label for="goal">-->
+            <!--                      Challenge-->
+            <!--                      <label for="" class="badge badge-danger">{{-->
+            <!--                        index + 1-->
+            <!--                      }}</label>-->
+            <!--                      <span class="text-danger">*</span>-->
+            <!--                    </label>-->
+            <!--                    <b-form-textarea-->
+            <!--                      id="eya_question"-->
+            <!--                      no-resize-->
+            <!--                      rows="3"-->
+            <!--                      v-model="field.challenge"-->
+            <!--                      placeholder="Challenge"-->
+            <!--                      class="form-control"-->
+            <!--                      :class="{-->
+            <!--                        'is-invalid': submitted && $v.challenge.$error,-->
+            <!--                      }"-->
+            <!--                    />-->
+            <!--                  </div>-->
+            <!--                  <div class="form-group" style="margin-left: 30px">-->
+            <!--                    <label for="goal">-->
+            <!--                      Accomplishment-->
+            <!--                      <label for="" class="badge badge-danger">{{-->
+            <!--                        index + 1-->
+            <!--                      }}</label>-->
+            <!--                      <span class="text-danger">*</span>-->
+            <!--                    </label>-->
+            <!--                    <b-form-textarea-->
+            <!--                      id="eya_question"-->
+            <!--                      no-resize-->
+            <!--                      rows="3"-->
+            <!--                      v-model="field.accomplishment"-->
+            <!--                      placeholder="Accomplishment"-->
+            <!--                      class="form-control"-->
+            <!--                      :class="{-->
+            <!--                        'is-invalid': submitted && $v.accomplishment.$error,-->
+            <!--                      }"-->
+            <!--                    />-->
+            <!--                  </div>-->
+            <!--                  <div class="form-group" style="margin-left: 30px">-->
+            <!--                    <label for="goal">-->
+            <!--                      Support Needed-->
+            <!--                      <label for="" class="badge badge-danger">{{-->
+            <!--                        index + 1-->
+            <!--                      }}</label>-->
+            <!--                      <span class="text-danger">*</span>-->
+            <!--                    </label>-->
+            <!--                    <b-form-textarea-->
+            <!--                      id="eya_question"-->
+            <!--                      no-resize-->
+            <!--                      rows="3"-->
+            <!--                      v-model="field.support"-->
+            <!--                      class="form-control"-->
+            <!--                      placeholder="Support needed"-->
+            <!--                      :class="{-->
+            <!--                        'is-invalid': submitted && $v.support.$error,-->
+            <!--                      }"-->
+            <!--                    />-->
+            <!--                  </div>-->
+            <!--                  <div class="form-group" style="margin-left: 30px">-->
+            <!--                    <label for="goal">-->
+            <!--                      Next Step-->
+            <!--                      <label for="" class="badge badge-danger">{{-->
+            <!--                        index + 1-->
+            <!--                      }}</label>-->
+            <!--                      <span class="text-danger">*</span>-->
+            <!--                    </label>-->
+            <!--                    <b-form-textarea-->
+            <!--                      id="eya_question"-->
+            <!--                      no-resize-->
+            <!--                      rows="3"-->
+            <!--                      v-model="field.next_step"-->
+            <!--                      class="form-control"-->
+            <!--                      placeholder="Next step"-->
+            <!--                      :class="{-->
+            <!--                        'is-invalid': submitted && $v.next_step.$error,-->
+            <!--                      }"-->
+            <!--                    />-->
+            <!--                  </div>-->
+            <!--                </div>-->
+
+            <!--                <div class="col-1" v-if="index > 2">-->
+            <!--                  <div class="form-group">-->
+            <!--                    <label style="visibility: hidden">hidden</label><br />-->
+            <!--                    <button-->
+            <!--                      type="button"-->
+            <!--                      class="btn btn-danger btn-block"-->
+            <!--                      @click="delField(index)"-->
+            <!--                    >-->
+            <!--                      DEL-->
+            <!--                    </button>-->
+            <!--                  </div>-->
+            <!--                </div>-->
+            <!--              </div>-->
+            <!--              <div class="alert alert-info d-flex mt-3">-->
+            <!--                <i class="ri-error-warning-line mr-2"></i>-->
+            <!--                You must submit a minimum of 3 goals.-->
+            <!--                <span style="cursor: pointer" class="ml-1" @click="addField">-->
+            <!--                  Click here to add a new goal-->
+            <!--                </span>-->
+            <!--              </div>-->
+            <!--              <div class="row">-->
+            <!--                <div class="col-12">-->
+            <!--                  <div class="form-group">-->
+            <!--                    <label for="op">-->
+            <!--                      Optional – other items to discuss (career opportunities,-->
+            <!--                      area of growth & development, etc.-->
+            <!--                    </label>-->
+            <!--                    <b-form-textarea-->
+            <!--                      id="option"-->
+            <!--                      no-resize-->
+            <!--                      rows="3"-->
+            <!--                      v-model="optional"-->
+            <!--                      placeholder="Optional"-->
+            <!--                      class="form-control"-->
+            <!--                      :class="{-->
+            <!--                        'is-invalid': submitted && $v.optional.$error,-->
+            <!--                      }"-->
+            <!--                    />-->
+            <!--                  </div>-->
+            <!--                </div>-->
+            <!--              </div>-->
+            <!--              <div class="row">-->
+            <!--                <div class="col-12">-->
+            <!--                  <b-button-->
+            <!--                    v-if="!submitting"-->
+            <!--                    class="btn btn-success btn-block mt-4"-->
+            <!--                    type="submit"-->
+            <!--                  >-->
+            <!--                    Submit-->
+            <!--                  </b-button>-->
+            <!--                  <b-button-->
+            <!--                    v-else-->
+            <!--                    disabled-->
+            <!--                    class="btn btn-success btn-block mt-4"-->
+            <!--                    type="submit"-->
+            <!--                  >-->
+            <!--                    Submitting...-->
+            <!--                  </b-button>-->
+            <!--                </div>-->
+            <!--              </div>-->
+            <!--            </form>-->
           </div>
         </div>
       </div>
