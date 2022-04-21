@@ -84,7 +84,8 @@ export default {
       const url = `${this.ROUTES.selfAssessment}/get-self-assessment-master/${empId}`;
       this.apiGet(url).then((res) => {
         const { data } = res;
-        data.emp.forEach((ass, index)=>{
+
+        data.emp.map((ass, index)=>{
           let activity = null;
           switch(parseInt(ass.goal.gs_activity)){
             case 1:
@@ -101,7 +102,7 @@ export default {
             sn:++index,
             target:`${new Date(ass.goal.gs_from).toDateString()} - ${ new Date(ass.goal.gs_to).toDateString()}`,
             status: parseInt(ass.sam_status) === 1 ? 'Approved' : 'Pending',
-            type_of_activity:activity,
+            type_of_activity: activity,
             year:ass.goal.gs_year,
             date_published:new Date(ass.createdAt).toDateString(),
             officer:`${ass.supervisor.emp_first_name} ${ass.supervisor.emp_last_name} - ${ass.supervisor.emp_unique_id}`,
@@ -127,12 +128,14 @@ export default {
       this.totalRows = filteredItems.length;
       this.currentPage = 1;
     },
-    selectRow(row) {
-      row = row[0];
-      this.travelAppID = row.travelapp_id;
+    selectEmployee(employee) {
+      employee = employee[0];
+      this.employeeId = employee.sam_emp_id;
       this.$router.push({
-        name: "travel-application-details",
-        params: { travelAppID: this.travelAppID },
+        name: "assess-employee",
+        params: {
+          empid: this.employeeId,
+        },
       });
     },
   },
@@ -318,7 +321,7 @@ export default {
                 @filtered="onFiltered"
                 show-empty
                 select-mode="single"
-                @row-selected="selectRow"
+                @row-selected="selectEmployee"
               >
               </b-table>
             </div>
