@@ -51,4 +51,13 @@ export default [
     component: () =>
       import("@/views/pages/assessment/assess-employees/assess-employee"),
   },
+  {
+    path: "/assessment-details/:empid",
+    name: "assessment-details",
+    meta: {
+      authRequired: true,
+    },
+    component: () =>
+      import("@/views/pages/assessment/self-assessment/assessment-detail"),
+  },
 ];

@@ -81,12 +81,12 @@ export default {
       const url = `${this.ROUTES.selfAssessment}/get-self-assessments/${this.getEmployee.emp_id}`;
       await this.apiGet(url).then((res) => {
         const { data } = res;
-        if (data.length) {
+        if (data.questions.length) {
           this.texts = [];
-          data.forEach(async (datum) => {
+          this.gsID = data.openGoal[0].gs_id;
+          data.questions.forEach(async (datum) => {
             this.selfAssessmentStatus = true;
             this.prefillStatus = true;
-            this.gsID = datum.sa_gs_id;
             const dat = {
               id: datum.sa_id,
               goal: datum.sa_comment,

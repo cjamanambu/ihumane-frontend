@@ -367,6 +367,7 @@ export default {
             type="date"
             v-model="currentFrom"
             class="form-control"
+            disabled
           />
         </div>
         <div class="form-group">
@@ -376,6 +377,7 @@ export default {
             type="date"
             v-model="currentTo"
             class="form-control"
+            disabled
             :class="{
               'is-invalid': submitted && $v.gs_to.$error,
             }"
