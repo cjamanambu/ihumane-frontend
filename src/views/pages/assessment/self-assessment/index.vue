@@ -132,7 +132,7 @@ export default {
       employee = employee[0];
       this.employeeId = employee.sam_emp_id;
       this.$router.push({
-        name: "assess-employee",
+        name: "assessment-details",
         params: {
           empid: this.employeeId,
         },

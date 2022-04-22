@@ -7,7 +7,7 @@ import { required } from "vuelidate/lib/validators";
 
 export default {
   page: {
-    title: "Assess Employee",
+    title: "Assessment Details",
     meta: [{ name: "description", content: appConfig.description }],
   },
   components: {
@@ -35,7 +35,7 @@ export default {
   },
   data() {
     return {
-      title: "Assess Employee",
+      title: "Assessment Details",
       items: [
         {
           text: "IHUMANE",
@@ -116,25 +116,25 @@ export default {
         //console.log(data.questions);
         //if (data) {
 
-          this.assessments = [];
-          this.assessStatus = data.questions[0].sa_status;
-          this.gsID = data.openGoal[0].gs_id;
-          data.questions.forEach(async (datum) => {
+        this.assessments = [];
+        this.assessStatus = data.questions[0].sa_status;
+        this.gsID = data.openGoal[0].gs_id;
+        data.questions.forEach(async (datum) => {
 
-            const dat = {
-              id: datum.sa_id,
-              goal: datum.sa_comment,
-              response: datum.sa_response,
-              update: datum.sa_update,
-              challenge: datum.sa_challenges,
-              next_step: datum.sa_next_steps,
-              support: datum.sa_support_needed,
-              accomplishment: datum.sa_accomplishment,
-              status: parseInt(datum.sa_status),
-            };
-            this.assessments.push(dat);
-          });
-          console.log(this.assessments);
+          const dat = {
+            id: datum.sa_id,
+            goal: datum.sa_comment,
+            response: datum.sa_response,
+            update: datum.sa_update,
+            challenge: datum.sa_challenges,
+            next_step: datum.sa_next_steps,
+            support: datum.sa_support_needed,
+            accomplishment: datum.sa_accomplishment,
+            status: parseInt(datum.sa_status),
+          };
+          this.assessments.push(dat);
+        });
+        console.log(this.assessments);
         //}
       });
     },
@@ -269,8 +269,8 @@ export default {
         class="btn btn-success"
         @click="$router.push({ name: 'assess-employees' })"
       >
-        <i class="mdi mdi-plus mr-2"></i>
-        Assess Employees
+        <i class="mdi mdi-skip-backward mr-2"></i>
+        Self Assessment
       </b-button>
     </div>
     <scale-loader v-if="apiBusy" />
@@ -296,54 +296,15 @@ export default {
                       <div class="row">
                         <div class="col-12">
                           <div class="form-group">
-                            <label for="goal">
+                            <label for="goal" class="bg-light p-1">
                               Goal {{ index + 1 }}
                               <span class="text-danger">*</span>
                             </label>
-                            <b-form-textarea
-                              id="eya_question"
-                              no-resize
-                              rows="3"
-                              :readonly="assessStatus === 1 ? true : false"
-                              v-model="field.goal"
-                              class="form-control"
-                              :class="{
-                                'is-invalid': submitted && $v.goal.$error,
-                              }"
-                            />
+                            <p style="margin-left: 30px!important;" v-html="field.goal"></p>
                           </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                  <div class="row">
-                    <div class="col-lg-12">
-                      <b-form-group>
-                        <b-button
-                          v-if="!submitting"
-                          class="btn btn-success btn-block mt-4"
-                          type="submit"
-                          :disabled="assessStatus === 1 ? true : false"
-                        >
-                          Update
-                        </b-button>
-                        <b-button
-                          v-else
-                          disabled
-                          class="btn btn-success btn-block mt-4"
-                          type="submit"
-                        >
-                          Updating...
-                        </b-button>
-                      </b-form-group>
-                    </div>
-                    <!--                    <div class="col-lg-4">-->
-                    <!--                      <b-form-group>-->
-                    <!--                        <b-button class="btn btn-warning btn-block mt-4">-->
-                    <!--                          Approve-->
-                    <!--                        </b-button>-->
-                    <!--                      </b-form-group>-->
-                    <!--                    </div>-->
                   </div>
                 </form>
                 <div class="row" v-else>
@@ -411,7 +372,7 @@ export default {
             <div class="card">
               <div class="card-body">
                 <div class="p-3 bg-light mb-4">
-                  <h5 class="font-size-14 mb-0">Mid Year Checking </h5>
+                  <h5 class="font-size-14 mb-0">Mid Year Checking</h5>
                 </div>
                 <form
                   v-if="assessments.length > 0"
@@ -426,125 +387,13 @@ export default {
                       <div class="row">
                         <div class="col-12">
                           <div class="form-group">
-                            <label for="goal">
+                            <label for="goal" class="bg-light p-1">
                               Goal {{ index + 1 }}
                               <span class="text-danger">*</span>
                             </label>
-                            <b-form-textarea
-                              id="eya_question"
-                              no-resize
-                              rows="3"
-                              v-model="field.goal"
-                              :disabled="assessStatus === 1 ? true : false"
-                              class="form-control"
-                              :class="{
-                                'is-invalid': submitted && $v.goal.$error,
-                              }"
-                            />
+                            <p style="margin-left: 30px!important;" v-html="field.goal"></p>
                           </div>
-                          <div class="form-group " style="margin-left: 30px;">
-                            <label for="goal">
-                              Update <label for="" class="badge badge-danger">{{ index + 1 }}</label> <span class="text-danger">*</span>
-                            </label>
-                            <div class="form-check">
-                              <input class="form-check-input" v-model="field.update" checked value="1" type="radio" :disabled="assessStatus === 1 ? true : false" >
-                              <label class="form-check-label" >
-                                Complete
-                              </label>
-                            </div>
-                            <div class="form-check">
-                              <input class="form-check-input" id="on-track" v-model="field.update" value="2" type="radio" :disabled="assessStatus === 1 ? true : false" >
-                              <label class="form-check-label" >
-                                On track
-                              </label>
-                            </div>
-                            <div class="form-check">
-                              <input class="form-check-input" id="delayed" v-model="field.update" value="3" type="radio" :disabled="assessStatus === 1 ? true : false" >
-                              <label class="form-check-label" >
-                                Delayed
-                              </label>
-                            </div>
-                            <div class="form-check">
-                              <input class="form-check-input" v-model="field.update" value="4" type="radio" :disabled="assessStatus === 1 ? true : false" >
-                              <label class="form-check-label" >
-                                Not started
-                              </label>
-                            </div>
-                            <div class="form-check">
-                              <input class="form-check-input" v-model="field.update" value="5" type="radio" :disabled="assessStatus === 1 ? true : false" >
-                              <label class="form-check-label" >
-                                No longer relevant
-                              </label>
-                            </div>
-                          </div>
-                          <div class="form-group " style="margin-left: 30px;">
-                            <label for="goal">
-                              Challenge <label for="" class="badge badge-danger">{{ index + 1 }}</label> <span class="text-danger">*</span>
-                            </label>
-                            <b-form-textarea
-                              id="eya_question"
-                              no-resize
-                              rows="3"
-                              :disabled="assessStatus === 1 ? true : false"
-                              v-model="field.challenge"
-                              placeholder="Challenge"
-                              class="form-control"
-                              :class="{
-                        'is-invalid': submitted && $v.challenge.$error,
-                      }"
-                            />
-                          </div>
-                          <div class="form-group " style="margin-left: 30px;">
-                            <label for="goal">
-                              Accomplishment <label for="" class="badge badge-danger">{{ index + 1 }}</label> <span class="text-danger">*</span>
-                            </label>
-                            <b-form-textarea
-                              id="eya_question"
-                              no-resize
-                              rows="3"
-                              :disabled="assessStatus === 1 ? true : false"
-                              v-model="field.accomplishment"
-                              placeholder="Accomplishment"
-                              class="form-control"
-                              :class="{
-                        'is-invalid': submitted && $v.accomplishment.$error,
-                      }"
-                            />
-                          </div>
-                          <div class="form-group " style="margin-left: 30px;">
-                            <label for="goal">
-                              Support Needed <label for="" class="badge badge-danger">{{ index + 1 }}</label> <span class="text-danger">*</span>
-                            </label>
-                            <b-form-textarea
-                              id="eya_question"
-                              no-resize
-                              rows="3"
-                              :disabled="assessStatus === 1 ? true : false"
-                              v-model="field.support"
-                              class="form-control"
-                              placeholder="Support needed"
-                              :class="{
-                        'is-invalid': submitted && $v.support.$error,
-                      }"
-                            />
-                          </div>
-                          <div class="form-group " style="margin-left: 30px;">
-                            <label for="goal">
-                              Next Step <label for="" class="badge badge-danger">{{ index + 1 }}</label> <span class="text-danger">*</span>
-                            </label>
-                            <b-form-textarea
-                              id="eya_question"
-                              no-resize
-                              rows="3"
-                              :disabled="assessStatus === 1 ? true : false"
-                              v-model="field.next_step"
-                              class="form-control"
-                              placeholder="Next step"
-                              :class="{
-                        'is-invalid': submitted && $v.next_step.$error,
-                      }"
-                            />
-                          </div>
+
                         </div>
                       </div>
                     </div>
