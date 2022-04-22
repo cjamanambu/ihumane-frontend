@@ -373,37 +373,14 @@ textarea {
                       {{ index + 1 }}
                     </b-td>
                     <b-td
-                      @click="field.goalEdit = true"
-                      style="width: 19%; cursor: pointer"
+                      style="width: 19%;"
                     >
                       <textarea
                         type="text"
-                        v-if="field.goalEdit"
                         v-model="field.goal"
                         rows="6"
-                        @blur="
-                          field.goalEdit = false;
-                          $emit('update');
-                        "
-                        @keyup.enter="
-                          field.goalEdit = false;
-                          $emit('update');
-                        "
-                        @keyup.esc="
-                          field.goalEdit = false;
-                          $emit('update');
-                        "
-                        v-focus
                         class="form-control"
                       />
-                      <span v-else>
-                        <span v-if="field.goal">
-                          {{ field.goal }}
-                        </span>
-                        <em style="font-size: 0.8em" v-else>
-                          click to enter goal...
-                        </em>
-                      </span>
                     </b-td>
                     <b-td style="width: 11%">
                       <div class="form-group">
@@ -460,136 +437,44 @@ textarea {
                       </div>
                     </b-td>
                     <b-td
-                      @click="field.accomplishmentEdit = true"
-                      style="width: 17%; cursor: pointer"
+                      style="width: 17%;"
                     >
                       <textarea
                         type="text"
-                        v-if="field.accomplishmentEdit"
                         v-model="field.accomplishment"
                         rows="6"
-                        @blur="
-                          field.accomplishmentEdit = false;
-                          $emit('update');
-                        "
-                        @keyup.enter="
-                          field.accomplishmentEdit = false;
-                          $emit('update');
-                        "
-                        @keyup.esc="
-                          field.accomplishmentEdit = false;
-                          $emit('update');
-                        "
-                        v-focus
                         class="form-control"
                       />
-                      <span v-else>
-                        <span v-if="field.accomplishment">
-                          {{ field.accomplishment }}
-                        </span>
-                        <em style="font-size: 0.8em" v-else>
-                          click to enter accomplishments...
-                        </em>
-                      </span>
                     </b-td>
                     <b-td
-                      @click="field.challengeEdit = true"
-                      style="width: 17%; cursor: pointer"
+                      style="width: 17%"
                     >
                       <textarea
                         type="text"
-                        v-if="field.challengeEdit"
                         v-model="field.challenge"
                         rows="6"
-                        @blur="
-                          field.challengeEdit = false;
-                          $emit('update');
-                        "
-                        @keyup.enter="
-                          field.challengeEdit = false;
-                          $emit('update');
-                        "
-                        @keyup.esc="
-                          field.challengeEdit = false;
-                          $emit('update');
-                        "
-                        v-focus
                         class="form-control"
                       />
-                      <span v-else>
-                        <span v-if="field.challenge">
-                          {{ field.challenge }}
-                        </span>
-                        <em style="font-size: 0.8em" v-else>
-                          click to enter challenges...
-                        </em>
-                      </span>
                     </b-td>
                     <b-td
-                      @click="field.supportEdit = true"
-                      style="width: 17%; cursor: pointer"
+                      style="width: 17%;"
                     >
                       <textarea
                         type="text"
-                        v-if="field.supportEdit"
                         v-model="field.support"
                         rows="6"
-                        @blur="
-                          field.supportEdit = false;
-                          $emit('update');
-                        "
-                        @keyup.enter="
-                          field.supportEdit = false;
-                          $emit('update');
-                        "
-                        @keyup.esc="
-                          field.supportEdit = false;
-                          $emit('update');
-                        "
-                        v-focus
                         class="form-control"
                       />
-                      <span v-else>
-                        <span v-if="field.support">
-                          {{ field.support }}
-                        </span>
-                        <em style="font-size: 0.8em" v-else>
-                          click to enter support needed...
-                        </em>
-                      </span>
                     </b-td>
                     <b-td
-                      @click="field.nextStepEdit = true"
                       style="width: 17%; cursor: pointer"
                     >
                       <textarea
                         type="text"
-                        v-if="field.nextStepEdit"
                         v-model="field.next_step"
                         rows="6"
-                        @blur="
-                          field.nextStepEdit = false;
-                          $emit('update');
-                        "
-                        @keyup.enter="
-                          field.nextStepEdit = false;
-                          $emit('update');
-                        "
-                        @keyup.esc="
-                          field.nextStepEdit = false;
-                          $emit('update');
-                        "
-                        v-focus
                         class="form-control"
                       />
-                      <span v-else>
-                        <span v-if="field.next_step">
-                          {{ field.next_step }}
-                        </span>
-                        <em style="font-size: 0.8em" v-else>
-                          click to enter next steps...
-                        </em>
-                      </span>
                     </b-td>
                     <b-td style="width: 1%">
                       <button

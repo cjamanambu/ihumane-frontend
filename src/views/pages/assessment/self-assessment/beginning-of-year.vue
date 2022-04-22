@@ -64,6 +64,7 @@ export default {
       employeeRating: null,
       checkOpenGoal: 0,
       newAssessment: false,
+      assessStatus:0,
       gsID: null,
     };
   },
@@ -84,6 +85,7 @@ export default {
         if (data.questions.length) {
           this.texts = [];
           this.gsID = data.openGoal[0].gs_id;
+          this.assessStatus = data.questions[0].sa_status;
           data.questions.forEach(async (datum) => {
             this.selfAssessmentStatus = true;
             this.prefillStatus = true;
@@ -193,7 +195,7 @@ export default {
         <div class="card">
           <div class="card-body">
             <div class="p-3 bg-light mb-4">
-              <h5 class="font-size-14 mb-0">Goal Setting Form</h5>
+              <h5 class="font-size-14 mb-0">Goal Setting Form </h5>
             </div>
             <div class="mb-3">
               <h5 class="mb-2">
@@ -238,14 +240,15 @@ export default {
                 <div class="col">
                   <div class="form-group">
                     <label for="goal">
-                      Goal {{ index + 1 }} <span class="text-danger">*</span>
+                      Goal {{ index + 1 }} {{ assessStatus }}<span class="text-danger">* </span>
                     </label>
                     <b-form-textarea
                       id="eya_question"
                       no-resize
                       rows="3"
                       v-model="field.goal"
-                      class="form-control"
+                      :readonly="assessStatus === 1 ? true : false"
+                      class="form-control "
                       :class="{
                         'is-invalid': submitted && $v.goal.$error,
                       }"
