@@ -267,7 +267,7 @@ export default {
     <div class="d-flex justify-content-end mb-3">
       <b-button
         class="btn btn-success"
-        @click="$router.push({ name: 'assess-employees' })"
+        @click="$router.push({ name: 'self-assessment' })"
       >
         <i class="mdi mdi-skip-backward mr-2"></i>
         Self Assessment
