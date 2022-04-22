@@ -240,7 +240,7 @@ export default {
                 <div class="col">
                   <div class="form-group">
                     <label for="goal">
-                      Goal {{ index + 1 }} {{ assessStatus }}<span class="text-danger">* </span>
+                      Goal {{ index + 1 }} <span class="text-danger">* </span>
                     </label>
                     <b-form-textarea
                       id="eya_question"
@@ -307,6 +307,7 @@ export default {
                       no-resize
                       rows="3"
                       v-model="field.goal"
+                      :readonly="assessStatus === 1 ? true : false"
                       class="form-control"
                       :class="{
                         'is-invalid': submitted && $v.goal.$error,
