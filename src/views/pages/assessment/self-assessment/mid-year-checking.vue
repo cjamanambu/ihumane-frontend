@@ -134,34 +134,30 @@ export default {
       const url = `${this.ROUTES.selfAssessment}/get-self-assessments/${this.getEmployee.emp_id}`;
       await this.apiGet(url).then((res) => {
         const { data } = res;
-        if (data) {
-          console.log(data);
+        if (data.questions.length) {
           this.texts = [];
           this.gsID = data.openGoal[0].gs_id;
           data.questions.forEach(async (datum) => {
             this.selfAssessmentStatus = true;
             this.prefillStatus = true;
-
             const dat = {
               id: datum.sa_id,
               goal: datum.sa_comment,
-              goalEdit: false,
-              challenge: datum.sa_challenges,
-              challengeEdit: false,
-              accomplishment: datum.sa_accomplishment,
-              accomplishmentEdit: false,
-              support: datum.sa_support_needed,
-              supportEdit: false,
               status: datum.sa_status,
-              next_step: datum.sa_next_steps,
-              nextStepEdit: null,
-              update: datum.sa_update,
             };
             this.texts.push(dat);
           });
+        } else {
+          this.newAssessment = true;
+          this.texts = [
+            { id: 0, goal: null },
+            { id: 1, goal: null },
+            { id: 2, goal: null },
+          ];
         }
       });
     },
+
     getOpenGoalSetting() {
       const url = `${this.ROUTES.goalSetting}/get-open-goal-setting`;
       this.apiGet(url).then((res) => {
@@ -230,6 +226,9 @@ export default {
         });
       }
     },
+    test() {
+      console.log('clicked')
+    },
   },
   directives: {
     focus: {
@@ -255,7 +254,7 @@ textarea {
         class="btn btn-success"
         @click="$router.push({ name: 'self-assessment' })"
       >
-        <i class="mdi mdi-plus mr-2"></i>
+        <i class="mdi mdi-skip-backward mr-2"></i>
         Self Assessment
       </b-button>
     </div>

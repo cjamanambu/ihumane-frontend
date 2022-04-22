@@ -411,7 +411,7 @@ export default {
             <div class="card">
               <div class="card-body">
                 <div class="p-3 bg-light mb-4">
-                  <h5 class="font-size-14 mb-0">Mid Year Checking</h5>
+                  <h5 class="font-size-14 mb-0">Mid Year Checking </h5>
                 </div>
                 <form
                   v-if="assessments.length > 0"

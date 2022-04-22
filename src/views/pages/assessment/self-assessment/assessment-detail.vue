@@ -387,125 +387,13 @@ export default {
                       <div class="row">
                         <div class="col-12">
                           <div class="form-group">
-                            <label for="goal">
+                            <label for="goal" class="bg-light p-1">
                               Goal {{ index + 1 }}
                               <span class="text-danger">*</span>
                             </label>
-                            <b-form-textarea
-                              id="eya_question"
-                              no-resize
-                              rows="3"
-                              v-model="field.goal"
-                              :disabled="assessStatus === 1 ? true : false"
-                              class="form-control"
-                              :class="{
-                                'is-invalid': submitted && $v.goal.$error,
-                              }"
-                            />
+                            <p style="margin-left: 30px!important;" v-html="field.goal"></p>
                           </div>
-                          <div class="form-group " style="margin-left: 30px;">
-                            <label for="goal">
-                              Update <label for="" class="badge badge-danger">{{ index + 1 }}</label> <span class="text-danger">*</span>
-                            </label>
-                            <div class="form-check">
-                              <input class="form-check-input" v-model="field.update" checked value="1" type="radio" :disabled="assessStatus === 1 ? true : false" >
-                              <label class="form-check-label" >
-                                Complete
-                              </label>
-                            </div>
-                            <div class="form-check">
-                              <input class="form-check-input" id="on-track" v-model="field.update" value="2" type="radio" :disabled="assessStatus === 1 ? true : false" >
-                              <label class="form-check-label" >
-                                On track
-                              </label>
-                            </div>
-                            <div class="form-check">
-                              <input class="form-check-input" id="delayed" v-model="field.update" value="3" type="radio" :disabled="assessStatus === 1 ? true : false" >
-                              <label class="form-check-label" >
-                                Delayed
-                              </label>
-                            </div>
-                            <div class="form-check">
-                              <input class="form-check-input" v-model="field.update" value="4" type="radio" :disabled="assessStatus === 1 ? true : false" >
-                              <label class="form-check-label" >
-                                Not started
-                              </label>
-                            </div>
-                            <div class="form-check">
-                              <input class="form-check-input" v-model="field.update" value="5" type="radio" :disabled="assessStatus === 1 ? true : false" >
-                              <label class="form-check-label" >
-                                No longer relevant
-                              </label>
-                            </div>
-                          </div>
-                          <div class="form-group " style="margin-left: 30px;">
-                            <label for="goal">
-                              Challenge <label for="" class="badge badge-danger">{{ index + 1 }}</label> <span class="text-danger">*</span>
-                            </label>
-                            <b-form-textarea
-                              id="eya_question"
-                              no-resize
-                              rows="3"
-                              :disabled="assessStatus === 1 ? true : false"
-                              v-model="field.challenge"
-                              placeholder="Challenge"
-                              class="form-control"
-                              :class="{
-                        'is-invalid': submitted && $v.challenge.$error,
-                      }"
-                            />
-                          </div>
-                          <div class="form-group " style="margin-left: 30px;">
-                            <label for="goal">
-                              Accomplishment <label for="" class="badge badge-danger">{{ index + 1 }}</label> <span class="text-danger">*</span>
-                            </label>
-                            <b-form-textarea
-                              id="eya_question"
-                              no-resize
-                              rows="3"
-                              :disabled="assessStatus === 1 ? true : false"
-                              v-model="field.accomplishment"
-                              placeholder="Accomplishment"
-                              class="form-control"
-                              :class="{
-                        'is-invalid': submitted && $v.accomplishment.$error,
-                      }"
-                            />
-                          </div>
-                          <div class="form-group " style="margin-left: 30px;">
-                            <label for="goal">
-                              Support Needed <label for="" class="badge badge-danger">{{ index + 1 }}</label> <span class="text-danger">*</span>
-                            </label>
-                            <b-form-textarea
-                              id="eya_question"
-                              no-resize
-                              rows="3"
-                              :disabled="assessStatus === 1 ? true : false"
-                              v-model="field.support"
-                              class="form-control"
-                              placeholder="Support needed"
-                              :class="{
-                        'is-invalid': submitted && $v.support.$error,
-                      }"
-                            />
-                          </div>
-                          <div class="form-group " style="margin-left: 30px;">
-                            <label for="goal">
-                              Next Step <label for="" class="badge badge-danger">{{ index + 1 }}</label> <span class="text-danger">*</span>
-                            </label>
-                            <b-form-textarea
-                              id="eya_question"
-                              no-resize
-                              rows="3"
-                              :disabled="assessStatus === 1 ? true : false"
-                              v-model="field.next_step"
-                              class="form-control"
-                              placeholder="Next step"
-                              :class="{
-                        'is-invalid': submitted && $v.next_step.$error,
-                      }"
-                            />
-                          </div>
+
                         </div>
                       </div>
                     </div>
