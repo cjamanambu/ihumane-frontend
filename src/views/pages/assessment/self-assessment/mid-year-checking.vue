@@ -15,9 +15,9 @@ export default {
   computed: {
     ...authComputed,
   },
-  mounted() {
-    this.getOpenGoalSetting();
-    this.getSelfAssessment();
+  async mounted() {
+    await this.getOpenGoalSetting();
+    await this.getSelfAssessment();
   },
   data() {
     return {
@@ -104,6 +104,8 @@ export default {
       employeeRating: null,
       checkOpenGoal: 0,
       gsID: null,
+      activeGoalId:null,
+
     };
   },
   methods: {
@@ -125,16 +127,33 @@ export default {
       this.count++;
     },
     delField(index) {
-      console.log(index);
+      //console.log(index);
       if (index > 0) {
         this.texts.splice(index, 1);
       }
     },
-    async getSelfAssessment() {
-      const url = `${this.ROUTES.selfAssessment}/get-self-assessments/${this.getEmployee.emp_id}`;
+    async getOpenGoalSetting() {
+      const url = `${this.ROUTES.goalSetting}/get-open-goal-setting`;
       await this.apiGet(url).then((res) => {
         const { data } = res;
-        if (data.questions.length) {
+        this.activeGoalId = data[0].gs_id;
+        if (data.length > 0) {
+          this.openGoalActivity = parseInt(data[0].gs_activity);
+          this.openGoalActivityId = parseInt(data[0].gs_id);
+          this.openGoalActivityFrom = data[0].gs_from;
+          this.openGoalActivityTo = data[0].gs_to;
+          this.openGoalActivityYear = data[0].gs_year;
+          this.checkOpenGoal = 1;
+        }
+      });
+    },
+    async getSelfAssessment() {
+      let dataLength = 0;
+      const url = `${this.ROUTES.selfAssessment}/get-self-assessment/${this.getEmployee.emp_id}/${this.activeGoalId}`;
+      await this.apiGet(url).then((res) => {
+        const { data } = res;
+        if (data.questions.length > 0) {
+          dataLength = data.questions.length;
           this.texts = [];
           this.gsID = data.openGoal[0].gs_id;
           data.questions.forEach(async (datum) => {
@@ -143,7 +162,11 @@ export default {
             const dat = {
               id: datum.sa_id,
               goal: datum.sa_comment,
-              status: datum.sa_status,
+              update: datum.sa_status,
+              accomplishment:datum.sa_accomplishment,
+              next_step:datum.sa_next_steps,
+              challenge:datum.sa_challenges,
+              support:datum.sa_support_needed,
             };
             this.texts.push(dat);
           });
@@ -156,22 +179,45 @@ export default {
           ];
         }
       });
+      if(dataLength <= 0 ){
+        const prevUrl = `${this.ROUTES.selfAssessment}/get-self-assessments/${this.getEmployee.emp_id}`;
+        await this.apiGet(prevUrl).then((res) => {
+          const { data } = res;
+          if (data.questions.length > 0) {
+            dataLength = data.questions.length;
+            this.texts = [];
+            this.gsID = data.openGoal[0].gs_id;
+            data.questions.forEach(async (datum) => {
+              this.selfAssessmentStatus = true;
+              this.prefillStatus = true;
+              if(datum.sa_status == 0){
+                const dat = {
+                  id: datum.sa_id,
+                  goal: datum.sa_comment,
+                  update: datum.sa_status,
+                  accomplishment:datum.sa_accomplishment,
+                  next_step:datum.sa_next_steps,
+                  challenge:datum.sa_challenges,
+                  support:datum.sa_support_needed,
+                };
+                this.texts.push(dat);
+              }
+
+            });
+          } else {
+            this.newAssessment = true;
+            this.texts = [
+              { id: 0, goal: null },
+              { id: 1, goal: null },
+              { id: 2, goal: null },
+            ];
+          }
+        });
+      }
+
     },
 
-    getOpenGoalSetting() {
-      const url = `${this.ROUTES.goalSetting}/get-open-goal-setting`;
-      this.apiGet(url).then((res) => {
-        const { data } = res;
-        if (data.length > 0) {
-          this.openGoalActivity = parseInt(data[0].gs_activity);
-          this.openGoalActivityId = parseInt(data[0].gs_id);
-          this.openGoalActivityFrom = data[0].gs_from;
-          this.openGoalActivityTo = data[0].gs_to;
-          this.openGoalActivityYear = data[0].gs_year;
-          this.checkOpenGoal = 1;
-        }
-      });
-    },
+
     submitNewBeginning() {
       const employeeID = this.getEmployee.emp_id;
       const url = `${this.ROUTES.selfAssessment}/add-self-assessment/${employeeID}/${this.gsID}`;
@@ -366,7 +412,7 @@ textarea {
                             class="form-check-input"
                             v-model="field.update"
                             checked
-                            value="Complete"
+                            value="field.update"
                             type="radio"
                           />
                           <label class="form-check-label"> Complete </label>
