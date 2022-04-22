@@ -7,6 +7,15 @@ export default [
     },
     component: () => import("@/views/pages/payroll-routine/process-payroll"),
   },
+
+  {
+    path: "/approve-payroll",
+    name: "approve-payroll",
+    meta: {
+      authRequired: true,
+    },
+    component: () => import("@/views/pages/payroll-routine/approve-payroll"),
+  },
   {
     path: "/view-payslip/:empID",
     name: "view-payslip",
@@ -23,5 +32,14 @@ export default [
       authRequired: true,
     },
     component: () => import("@/views/pages/payroll-routine/emolument-location"),
+  },
+
+  {
+    path: "/approve-emolument-location/:locationId",
+    name: "approve-emolument-location",
+    meta: {
+      authRequired: true,
+    },
+    component: () => import("@/views/pages/payroll-routine/approve-emolument-location"),
   },
 ];
