@@ -620,7 +620,7 @@ textarea {
                   <div class="form-group">
                     <label for="op">
                       Optional – other items to discuss (career opportunities,
-                      area of growth & development, etc.
+                      area of growth & development, etc.)
                     </label>
                     <b-form-textarea
                       id="option"
