@@ -2,7 +2,7 @@
 import Layout from "@/views/layouts/main";
 import PageHeader from "@/components/page-header";
 import appConfig from "@/app.config";
-import { required } from "vuelidate/lib/validators";
+//import { required } from "vuelidate/lib/validators";
 
 export default {
   page: {
@@ -16,13 +16,13 @@ export default {
   mounted() {
     this.refreshTable();
   },
-  validations: {
-    //gs_from: { required },
-    currentFrom: { required },
-    //gs_to: { required },
-    currentTo: { required },
-    gs_activity: { required },
-  },
+  // validations: {
+  //   //gs_from: { required },
+  //   currentFrom: { required },
+  //   //gs_to: { required },
+  //   currentTo: { required },
+  //   gs_activity: { required },
+  // },
   methods: {
     async refreshTable() {
       await this.apiGet(this.ROUTES.goalSetting, "Get Goal Setting Error").then(
@@ -61,7 +61,7 @@ export default {
       this.gs_activity = null;
       this.gs_from = null;
       this.gs_to = null;
-      this.$v.$reset();
+      // this.$v.$reset();
     },
     selectGoalSetting(goalSetting) {
       goalSetting = goalSetting[0];
@@ -74,54 +74,42 @@ export default {
       this.$refs["update-goal-setting"].show();
       this.$refs["goal-setting-table"].clearSelected();
     },
-    submitNew() {
+    async submitNew() {
       this.submitted = true;
-      this.$v.$touch();
-      if (this.$v.$invalid) {
-        this.apiFormHandler("Invalid Goal Setting");
-      } else {
-        const data = {
-          gs_from: this.currentFrom,//this.gs_from,
-          gs_to: this.currentTo,//this.gs_to,
-          // gs_year: this.currentGSY,
-          gs_activity: String(this.gs_activity),
-        };
-        const url = `${this.ROUTES.goalSetting}/add-goal-setting`;
-        this.apiPost(url, data, "Add goal setting error").then((res) => {
-          this.apiResponseHandler(`${res.data}`, "New Goal Setting added");
-          this.refreshTable();
-          this.$v.$reset();
-          this.$refs["add-goal-setting"].hide();
-        });
-      }
+      const data = {
+        gs_activity: String(this.gs_activity),
+      };
+      const url = `${this.ROUTES.goalSetting}/add-goal-setting`;
+      this.apiPost(url, data, "Add goal setting error").then(async (res) => {
+        this.apiResponseHandler(`${res.data}`, "New Goal Setting added");
+        await this.refreshTable();
+      });
+      this.$refs["add-goal-setting"].hide();
+
+      //this.$v.$reset();
+
     },
     submitUpdate() {
       this.submitted = true;
-      this.$v.$touch();
-      if (this.$v.$invalid) {
-        this.apiFormHandler("Invalid Goal Setting");
-      } else {
-        const data = {
-          gs_from: this.gs_from,
-          gs_to: this.gs_to,
-          gs_year: this.currentGSY,
-          gs_activity: this.gs_activity,
-          gs_status: this.gs_status,
-        };
-        const url = `${this.ROUTES.goalSetting}/close-goal-setting/${this.gs_id}`;
-        this.apiPatch(url, data, "Close Goal Setting Error").then((res) => {
-          this.apiResponseHandler(`${res.data}`, "Close Goal Setting");
-          this.refreshTable();
-          this.$v.$reset();
-          this.$refs["update-goal-setting"].hide();
-        });
-      }
+      const data = {
+        gs_from: this.gs_from,
+        gs_to: this.gs_to,
+        gs_year: this.currentGSY,
+        gs_activity: this.gs_activity,
+        gs_status: this.gs_status,
+      };
+      const url = `${this.ROUTES.goalSetting}/close-goal-setting/${this.gs_id}`;
+      this.apiPatch(url, data, "Close Goal Setting Error").then(async (res) => {
+        this.apiResponseHandler(`${res.data}`, "Close Goal Setting");
+        await this.refreshTable();
+        this.$refs["update-goal-setting"].hide();
+      });
     },
     resetGSYForm() {
       this.gsy = "";
       this.$v.reset();
     },
-    submitGSY() {
+    async submitGSY() {
       const data = {
         gsy_year: this.gsy,
         gsy_from: this.period_from,
@@ -131,13 +119,15 @@ export default {
       this.apiPost(url, data, "Add Goal Setting Year Error").then((res) => {
         if (res.data) {
           this.apiResponseHandler(
-            `Goal Setting Year has been set successfully`,
-            "New Goal Setting Year Set"
+              `Goal Setting Year has been set successfully`,
+              "New Goal Setting Year Set"
           );
-          this.refreshGSY();
-          this.setGSY = false;
+
         }
+
       });
+      await this.refreshGSY();
+      this.setGSY = false;
     },
   },
   data() {
@@ -225,7 +215,7 @@ export default {
             </h5>
           </template>
           <h5 class="card-title mt-0" v-if="currentGSY">
-            {{ currentGSY }}
+            {{ currentGSY }} - ({{ currentFrom }} -> {{ currentTo }})
           </h5>
           <p class="card-text update-mtr" @click="setGSY = true">
             Update Goal Setting Year
@@ -361,9 +351,9 @@ export default {
     >
       <form @submit.prevent="submitNew">
         <div class="form-group">
-          <label for="gs_from"> From <span class="text-danger">*</span> </label>
+          <label> From <span class="text-danger">*</span> </label>
           <input
-            id="gs_from"
+
             type="date"
             v-model="currentFrom"
             class="form-control"
@@ -371,16 +361,13 @@ export default {
           />
         </div>
         <div class="form-group">
-          <label for="gs_to"> To  <span class="text-danger">*</span> </label>
+          <label > To  <span class="text-danger">*</span> </label>
           <input
-            id="gs_to"
+
             type="date"
             v-model="currentTo"
             class="form-control"
             disabled
-            :class="{
-              'is-invalid': submitted && $v.gs_to.$error,
-            }"
           />
         </div>
         <div class="form-group">
@@ -403,9 +390,7 @@ export default {
             id="gs_activity"
             v-model="gs_activity"
             :options="gs_activities"
-            :class="{
-              'is-invalid': submitted && $v.gs_activity.$error,
-            }"
+
           />
         </div>
 
@@ -428,7 +413,7 @@ export default {
     </b-modal>
     <b-modal
       ref="update-goal-setting"
-      title="Close Goal Setting"
+      title="Update Goal Setting"
       hide-footer
       centered
       title-class="font-18"
@@ -445,9 +430,7 @@ export default {
             v-model="currentFrom"
             class="form-control"
             disabled
-            :class="{
-              'is-invalid': submitted && $v.gs_from.$error,
-            }"
+
           />
         </div>
         <div class="form-group">
@@ -458,9 +441,7 @@ export default {
             v-model="currentTo"
             class="form-control"
             disabled
-            :class="{
-              'is-invalid': submitted && $v.gs_to.$error,
-            }"
+
           />
         </div>
         <div class="form-group">
@@ -484,9 +465,7 @@ export default {
             v-model="gs_activity"
             :options="gs_activities"
             disabled
-            :class="{
-              'is-invalid': submitted && $v.gs_activity.$error,
-            }"
+
           />
         </div>
 
