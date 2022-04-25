@@ -157,7 +157,7 @@ export default {
       const url = `${this.ROUTES.selfAssessment}/get-self-assessment/${this.empId}/${this.activeGoalId}`;
       await this.apiGet(url).then((res) => {
         const { data } = res;
-        console.log(data.questions);
+        //console.log(data.questions);
         if (data.questions.length > 0) {
           this.texts = [];
           this.gsID = data.openGoal[0].gs_id;
@@ -367,7 +367,6 @@ export default {
       const data = {
         gs_id: gsId,
         emp_id:employeeID,
-        //supervisor:this.getEmployee.emp_id
       };
       this.apiPost(url, data, "Could not process request").then(() => {
         this.apiResponseHandler("Process Complete", "Employee self-assessment completed.");
@@ -542,6 +541,9 @@ export default {
         <div class="row">
           <div class="col-lg-8">
             <div class="card">
+              <div class="p-3 bg-light mb-4">
+                <h5 class="font-size-14 mb-0">Mid-Year Checking </h5>
+              </div>
               <div class="card-body">
                 <form v-if="texts.length > 0" @submit.prevent="submitMidYearChecking">
                   <b-table-simple hover responsive bordered outlined>
