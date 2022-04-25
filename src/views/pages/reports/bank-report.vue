@@ -27,9 +27,10 @@ export default {
         pym_location: parseFloat(this.location),
       };
       const url = `${this.ROUTES.salary}/pay-order`;
-      this.apiPost(url, data, "Generate Bank Schedule Report").then((res) => {
-        const { data } = res;
-        data.forEach((payOrder, index) => {
+      this.apiPost(url, data, "Generate Bank Schedule Report").then(async (res) => {
+        const {data} = res;
+        const newData = await this.sortArrayOfObjects(data)
+        newData.forEach((payOrder, index) => {
           this.locationName = payOrder.location;
           let payOrderObj = {
             sn: ++index,
@@ -55,9 +56,9 @@ export default {
             this.jsonFields["T7 NUMBER"] = "employeeUniqueId";
           } else if (newField === "t6_code") {
             this.jsonFields["LOCATION"] = "location";
-          }else if (newField === "t3_code") {
+          } else if (newField === "t3_code") {
             this.jsonFields["SECTOR"] = "sector";
-          }else if (newField === "employeeName") {
+          } else if (newField === "employeeName") {
             this.jsonFields["EMPLOYEE NAME"] = newField;
           } else if (newField === "accountNumber") {
             this.jsonFields["ACCOUNT NUMBER"] = newField;
@@ -71,7 +72,7 @@ export default {
             this.jsonFields["MONTH"] = newField;
           } else if (newField === "year") {
             this.jsonFields["YEAR"] = newField;
-          }  else {
+          } else {
             this.jsonFields[newField.toUpperCase()] = newField;
           }
         });
@@ -101,6 +102,19 @@ export default {
       }
       return ret;
     },
+    async sortArrayOfObjects(array) {
+      return array.sort(function (a, b) {
+
+        let matchesA = a.employeeUniqueId.match(/(\d+)/);
+        matchesA = parseInt(matchesA[0])
+
+        let matchesB = b.employeeUniqueId.match(/(\d+)/);
+        matchesB = parseInt(matchesB[0])
+
+        return matchesA - matchesB;
+      })
+    },
+
   },
   data() {
     return {

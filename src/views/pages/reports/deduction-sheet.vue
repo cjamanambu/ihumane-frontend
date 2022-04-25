@@ -56,9 +56,10 @@ export default {
         pym_year: parseFloat(this.period[1]),
       };
       const url = `${this.ROUTES.salary}/deduction-report`;
-      this.apiPost(url, data, "Generate Deduction Report").then((res) => {
-        const { data } = res;
-        data.forEach((deduction, index) => {
+      this.apiPost(url, data, "Generate Deduction Report").then(async (res) => {
+        const {data} = res;
+        const newData = await this.sortArrayOfObjects(data)
+        newData.forEach((deduction, index) => {
           let deductionObj = {
             sn: ++index,
             employeeUniqueId: deduction.employeeUniqueId,
@@ -67,11 +68,11 @@ export default {
           };
           deduction.deductions.forEach((deduction) => {
             deductionObj[deduction.paymentName] = this.apiValueHandler(
-              deduction.amount.toFixed(2)
+                deduction.amount.toFixed(2)
             );
           });
           deductionObj["totalDeduction"] = this.apiValueHandler(
-            deduction.totalDeduction.toFixed(2)
+              deduction.totalDeduction.toFixed(2)
           );
           this.deductions.push(deductionObj);
         });
@@ -112,6 +113,20 @@ export default {
         }
       });
     },
+
+    async sortArrayOfObjects(array) {
+      return array.sort(function (a, b) {
+
+        let matchesA = a.employeeUniqueId.match(/(\d+)/);
+        matchesA = parseInt(matchesA[0])
+
+        let matchesB = b.employeeUniqueId.match(/(\d+)/);
+        matchesB = parseInt(matchesB[0])
+
+        return matchesA - matchesB;
+      })
+    },
+
   },
   data() {
     return {
