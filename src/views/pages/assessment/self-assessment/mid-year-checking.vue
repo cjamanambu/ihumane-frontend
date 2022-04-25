@@ -136,8 +136,9 @@ export default {
       const url = `${this.ROUTES.goalSetting}/get-open-goal-setting`;
       await this.apiGet(url).then((res) => {
         const { data } = res;
-        this.activeGoalId = data[0].gs_id;
+       // console.log(data[0].gs_id);
         if (data.length > 0) {
+          this.activeGoalId = parseInt(data[0].gs_id);
           this.openGoalActivity = parseInt(data[0].gs_activity);
           this.openGoalActivityId = parseInt(data[0].gs_id);
           this.openGoalActivityFrom = data[0].gs_from;
@@ -148,12 +149,10 @@ export default {
       });
     },
     async getSelfAssessment() {
-      let dataLength = 0;
       const url = `${this.ROUTES.selfAssessment}/get-self-assessment/${this.getEmployee.emp_id}/${this.activeGoalId}`;
       await this.apiGet(url).then((res) => {
         const { data } = res;
         if (data.questions.length > 0) {
-          dataLength = data.questions.length;
           this.texts = [];
           this.gsID = data.openGoal[0].gs_id;
           data.questions.forEach(async (datum) => {
@@ -162,15 +161,40 @@ export default {
             const dat = {
               id: datum.sa_id,
               goal: datum.sa_comment,
-              update: datum.sa_status,
+              update: datum.sa_update,
               accomplishment:datum.sa_accomplishment,
               next_step:datum.sa_next_steps,
               challenge:datum.sa_challenges,
               support:datum.sa_support_needed,
             };
             this.texts.push(dat);
+            console.log(this.texts);
           });
         } else {
+          const prevUrl = `${this.ROUTES.selfAssessment}/prefill-goal-setting/${this.getEmployee.emp_id}`;
+           this.apiGet(prevUrl).then((res) => {
+            const { data } = res;
+              this.texts = [];
+              this.gsID = parseInt(data[0].sa_gs_id);
+
+              data.forEach(async (datum) => {
+                this.selfAssessmentStatus = true;
+                this.prefillStatus = true;
+                  const dat = {
+                    id: datum.sa_id,
+                    goal: datum.sa_comment,
+                    update: datum.sa_update,
+                    accomplishment:datum.sa_accomplishment,
+                    next_step:datum.sa_next_steps,
+                    challenge:datum.sa_challenges,
+                    support:datum.sa_support_needed,
+                  };
+                  this.texts.push(dat);
+
+              });
+
+          });
+
           this.newAssessment = true;
           this.texts = [
             { id: 0, goal: null },
@@ -179,7 +203,7 @@ export default {
           ];
         }
       });
-      if(dataLength <= 0 ){
+      /*if(dataLength <= 0 ){
         const prevUrl = `${this.ROUTES.selfAssessment}/get-self-assessments/${this.getEmployee.emp_id}`;
         await this.apiGet(prevUrl).then((res) => {
           const { data } = res;
@@ -213,14 +237,15 @@ export default {
             ];
           }
         });
-      }
+      }*/
 
     },
 
 
     submitNewBeginning() {
+
       const employeeID = this.getEmployee.emp_id;
-      const url = `${this.ROUTES.selfAssessment}/add-self-assessment/${employeeID}/${this.gsID}`;
+      const url = `${this.ROUTES.selfAssessment}/add-self-assessment/${employeeID}/${this.activeGoalId}`;
       this.goals = [];
       let validForm = true;
       this.texts.every(async (field) => {
@@ -244,7 +269,7 @@ export default {
     },
     submitMidYearChecking() {
       const employeeID = this.getEmployee.emp_id;
-      const url = `${this.ROUTES.selfAssessment}/add-self-assessment-mid-year/${employeeID}/${this.gsID}`;
+      const url = `${this.ROUTES.selfAssessment}/add-self-assessment-mid-year/${employeeID}/${this.activeGoalId}`;
       this.goals = [];
       let validForm = true;
       this.texts.every(async (field) => {
@@ -263,6 +288,7 @@ export default {
           optional: this.optional,
         };
         this.goals.push(data);
+
         return true;
       });
       if (validForm) {
@@ -272,8 +298,8 @@ export default {
         });
       }
     },
-    test() {
-      console.log('clicked')
+    test(event) {
+      console.log(event.target.value)
     },
   },
   directives: {
@@ -388,29 +414,34 @@ textarea {
                           <input
                             class="form-check-input"
                             v-model="field.update"
-                            checked
-                            value="field.update"
+                            value="Complete"
                             type="radio"
+                            :name="index"
+                            :checked="field.update === 'Complete' "
                           />
                           <label class="form-check-label"> Complete </label>
                         </div>
                         <div class="form-check">
                           <input
                             class="form-check-input"
-                            id="on-track"
+                            id="complete"
                             v-model="field.update"
                             value="On track"
+                            :checked="field.update === 'On track'  "
                             type="radio"
+                            :name="index"
                           />
                           <label class="form-check-label"> On track </label>
                         </div>
                         <div class="form-check">
                           <input
                             class="form-check-input"
-                            id="delayed"
+                            id="on-track"
                             v-model="field.update"
                             value="Delayed"
                             type="radio"
+                            :name="index"
+                            :checked="field.update === 'Delayed' "
                           />
                           <label class="form-check-label"> Delayed </label>
                         </div>
@@ -420,8 +451,10 @@ textarea {
                             v-model="field.update"
                             value="Not started"
                             type="radio"
+                            :name="index"
+                            :checked="field.update "
                           />
-                          <label class="form-check-label"> Not started </label>
+                          <label class="form-check-label"> Not started  </label>
                         </div>
                         <div class="form-check">
                           <input
@@ -429,6 +462,8 @@ textarea {
                             v-model="field.update"
                             value="No longer relevant"
                             type="radio"
+                            :name="index"
+                            :checked="field.update === 'No longer relevant'  "
                           />
                           <label class="form-check-label">
                             No longer relevant
