@@ -148,7 +148,7 @@ export default {
     },
     updateBeginning() {
       const employeeID = this.getEmployee.emp_id;
-      const url = `${this.ROUTES.selfAssessment}/update-assessment/${employeeID}/${this.gsID}`;
+      const url = `${this.ROUTES.selfAssessment}/add-self-assessment/${employeeID}/${this.openGoalActivityId}`;
       this.goals = [];
       let validForm = true;
       this.texts.every(async (field) => {
@@ -240,7 +240,7 @@ export default {
                 <div class="col">
                   <div class="form-group">
                     <label for="goal">
-                      Goal {{ index + 1 }} {{ assessStatus }}<span class="text-danger">* </span>
+                      Goal {{ index + 1 }} <span class="text-danger">* </span>
                     </label>
                     <b-form-textarea
                       id="eya_question"
@@ -295,7 +295,7 @@ export default {
                 </div>
               </div>
             </form>
-            <form v-else @submit.prevent="updateBeginning">
+            <form v-else @submit.prevent="submitNewBeginning">
               <div class="row" v-for="(field, index) in texts" :key="index">
                 <div class="col">
                   <div class="form-group">
@@ -307,6 +307,7 @@ export default {
                       no-resize
                       rows="3"
                       v-model="field.goal"
+                      :readonly="assessStatus === 1 ? true : false"
                       class="form-control"
                       :class="{
                         'is-invalid': submitted && $v.goal.$error,
