@@ -82,6 +82,7 @@ export default {
       const url = `${this.ROUTES.selfAssessment}/get-self-assessments/${this.getEmployee.emp_id}`;
       await this.apiGet(url).then((res) => {
         const { data } = res;
+        //console.log(data);
         if (data.questions.length) {
           this.texts = [];
           this.gsID = data.openGoal[0].gs_id;
@@ -328,7 +329,7 @@ export default {
                   </div>
                 </div>
               </div>
-              <div class="alert alert-info d-flex mt-3">
+              <div class="alert alert-info d-flex mt-3" v-if="assessStatus !== 1 ">
                 <i class="ri-error-warning-line mr-2"></i>
                 You must submit a minimum of 3 goals.
                 <span style="cursor: pointer" class="ml-1" @click="addField">
@@ -341,6 +342,7 @@ export default {
                     v-if="!submitting"
                     class="btn btn-success btn-block mt-4"
                     type="submit"
+                    :disabled="assessStatus === 1 ? true : false"
                   >
                     Submit
                   </b-button>

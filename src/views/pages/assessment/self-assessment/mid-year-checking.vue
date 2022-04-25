@@ -136,7 +136,6 @@ export default {
       const url = `${this.ROUTES.goalSetting}/get-open-goal-setting`;
       await this.apiGet(url).then((res) => {
         const { data } = res;
-       // console.log(data[0].gs_id);
         if (data.length > 0) {
           this.activeGoalId = parseInt(data[0].gs_id);
           this.openGoalActivity = parseInt(data[0].gs_activity);
@@ -168,7 +167,7 @@ export default {
               support:datum.sa_support_needed,
             };
             this.texts.push(dat);
-            console.log(this.texts);
+            //console.log(this.texts);
           });
         } else {
           const prevUrl = `${this.ROUTES.selfAssessment}/prefill-goal-setting/${this.getEmployee.emp_id}`;
@@ -203,41 +202,7 @@ export default {
           ];
         }
       });
-      /*if(dataLength <= 0 ){
-        const prevUrl = `${this.ROUTES.selfAssessment}/get-self-assessments/${this.getEmployee.emp_id}`;
-        await this.apiGet(prevUrl).then((res) => {
-          const { data } = res;
-          if (data.questions.length > 0) {
-            dataLength = data.questions.length;
-            this.texts = [];
-            this.gsID = data.openGoal[0].gs_id;
-            data.questions.forEach(async (datum) => {
-              this.selfAssessmentStatus = true;
-              this.prefillStatus = true;
-              if(datum.sa_status == 0){
-                const dat = {
-                  id: datum.sa_id,
-                  goal: datum.sa_comment,
-                  update: datum.sa_status,
-                  accomplishment:datum.sa_accomplishment,
-                  next_step:datum.sa_next_steps,
-                  challenge:datum.sa_challenges,
-                  support:datum.sa_support_needed,
-                };
-                this.texts.push(dat);
-              }
 
-            });
-          } else {
-            this.newAssessment = true;
-            this.texts = [
-              { id: 0, goal: null },
-              { id: 1, goal: null },
-              { id: 2, goal: null },
-            ];
-          }
-        });
-      }*/
 
     },
 
