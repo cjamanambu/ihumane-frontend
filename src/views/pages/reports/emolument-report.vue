@@ -58,38 +58,39 @@ export default {
         pmyl_location_id: parseFloat(this.location),
       };
       const url = `${this.ROUTES.salary}/pull-emolument`;
-      this.apiPost(url, data, "Generate Emolument Report").then((res) => {
-        const { data } = res;
-        data.forEach((emolument, index) => {
+      this.apiPost(url, data, "Generate Emolument Report").then(async (res) => {
+        const {data} = res;
+        const newData = await this.sortArrayOfObjects(data)
+        newData.forEach((emolument, index) => {
           let emolumentObj = {
             sn: ++index,
             employeeUniqueId: emolument.employeeUniqueId,
             employeeName: emolument.employeeName,
             location: emolument.location,
             sector: emolument.sector,
-            jobRole: emolument.jobRole,
-            salaryGrade: emolument.salaryGrade,
+            jobDescription: emolument.jobRole,
+            salaryBand: emolument.salaryGrade,
             contractStartDate: emolument.employeeStartDate,
             contractEndDate: emolument.empEndDate
           };
           emolument.incomes.forEach((income) => {
             emolumentObj[income.paymentName] = this.apiValueHandler(
-              income.amount.toFixed(2)
+                income.amount.toFixed(2)
             );
           });
           emolument.deductions.forEach((deduction) => {
             emolumentObj[deduction.paymentName] = this.apiValueHandler(
-              deduction.amount.toFixed(2)
+                deduction.amount.toFixed(2)
             );
           });
           emolumentObj["grossSalary"] = this.apiValueHandler(
-            emolument.grossSalary.toFixed(2)
+              emolument.grossSalary.toFixed(2)
           );
           emolumentObj["totalDeduction"] = this.apiValueHandler(
-            emolument.totalDeduction.toFixed(2)
+              emolument.totalDeduction.toFixed(2)
           );
           emolumentObj["netSalary"] = this.apiValueHandler(
-            emolument.netSalary.toFixed(2)
+              emolument.netSalary.toFixed(2)
           );
           this.newEmoluments.push(emolumentObj);
         });
@@ -130,6 +131,19 @@ export default {
         }
       });
     },
+    async sortArrayOfObjects(array) {
+      return array.sort(function (a, b) {
+
+        let matchesA = a.employeeUniqueId.match(/(\d+)/);
+        matchesA = parseInt(matchesA[0])
+
+        let matchesB = b.employeeUniqueId.match(/(\d+)/);
+        matchesB = parseInt(matchesB[0])
+
+        return matchesA - matchesB;
+      })
+    },
+
   },
   data() {
     return {
@@ -166,8 +180,8 @@ export default {
         "employeeName",
         "sector",
         "location",
-        "jobRole",
-        "salaryGrade",
+        "jobDescription",
+        "salaryBand",
         "contractStartDate",
         "contractEndDate"
       ],
@@ -307,7 +321,7 @@ export default {
                     {{ row.value }}
                   </span>
                 </template>
-                <template #cell(jobRole)="row">
+                <template #cell(jobDescription)="row">
                   <span class="text-nowrap">
                     {{ row.value }}
                   </span>

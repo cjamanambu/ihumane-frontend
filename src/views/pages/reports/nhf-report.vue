@@ -155,11 +155,12 @@ export default {
         "employeeName",
         "sector",
          "location",
+        "nhf_number",
         "month",
         "year",
         "employee_gross",
         "nhf_contribution",
-        "nhf_number"
+
       ],
       incomeFields: [],
       deductionFields: [],
