@@ -18,13 +18,13 @@ export default {
     ...authComputed,
   },
 
-  async mounted() {
-     this.empId = this.$route.params.empid;
-    await this.fetchEmployee();
-    await this.getOpenGoalSetting();
-    await this.getSelfAssessment();
-    await this.getEndYearAssessment();
-    await this.getRatings();
+  mounted() {
+    this.empId = this.$route.params.empid;
+    this.fetchEmployee();
+    this.getOpenGoalSetting();
+    this.getSelfAssessment();
+    this.getEndYearAssessment();
+    this.getRatings();
 
     this.authuser = this.getEmployee.emp_id;
   },
@@ -51,57 +51,13 @@ export default {
         },
       ],
       authuser:null,
-      texts: [
-        {
-          id: 0,
-          goal: "",
-          goalEdit: false,
-          challenge: "",
-          challengeEdit: false,
-          accomplishment: "",
-          accomplishmentEdit: false,
-          support: "",
-          supportEdit: false,
-          next_step: "",
-          nextStepEdit: null,
-          update: "",
-        },
-        {
-          id: 1,
-          goal: "",
-          goalEdit: false,
-          challenge: "",
-          challengeEdit: false,
-          accomplishment: "",
-          accomplishmentEdit: false,
-          support: "",
-          supportEdit: false,
-          next_step: "",
-          nextStepEdit: null,
-          update: "",
-        },
-        {
-          id: 2,
-          goal: "",
-          goalEdit: false,
-          challenge: "",
-          challengeEdit: false,
-          accomplishment: "",
-          accomplishmentEdit: false,
-          support: "",
-          supportEdit: false,
-          next_step: "",
-          nextStepEdit: null,
-          update: "",
-        },
-      ],
+      texts: [{ id: 0, goal: null }],
       assessStatus:0,
       //supervisor:null,
       year: null,
       endYearQuestions: [],
       openGoalActivity: null,
       openGoalActivityId: null,
-      activeGoalId: null,
       rating: null,
       ratingStatus: null,
       ratings: [],
@@ -155,15 +111,16 @@ export default {
     },
     async getSelfAssessment() {
       const url = `${this.ROUTES.selfAssessment}/prefill-goal-setting/${this.empId}`;
-      //const url = `${this.ROUTES.selfAssessment}/get-self-assessment/${this.empId}/${this.activeGoalId}`;
       await this.apiGet(url).then((res) => {
         const { data } = res;
-        console.log("Before");
-        console.log(data);
+        //if (data) {
+
         this.assessments = [];
-        //this.assessStatus = data[0].sa_status;
-        data.forEach( (datum) => {
-           const dat = {
+        this.assessStatus = data[0].sa_status;
+        this.gsID = data[0].sa_gs_id;
+        data.forEach(async (datum) => {
+
+          const dat = {
             id: datum.sa_id,
             goal: datum.sa_comment,
             response: datum.sa_response,
@@ -174,14 +131,12 @@ export default {
             accomplishment: datum.sa_accomplishment,
             status: parseInt(datum.sa_status),
           };
-          this.texts.push(dat);
+          this.assessments.push(dat);
         });
-        console.log('aft');
-        console.log(this.texts);
+        console.log(this.assessments);
         //}
       });
     },
-
     async getSelfAssessmentMaster(){
       //const urls = `${this.ROUTES.selfAssessment}/get-self-assessment-master/${this.$route.params.empid}/${this.gsID}`;
       /*await this.apiGet(urls).then(async (res) => {
@@ -194,7 +149,7 @@ export default {
       const urls = `${this.ROUTES.goalSetting}/get-open-goal-setting`;
       await this.apiGet(urls).then(async (res) => {
         const { data } = res;
-
+        //console.log(data)
         if (data.length > 0) {
           const url = `${this.ROUTES.selfAssessment}/get-end-questions/${
             this.empId
@@ -223,46 +178,15 @@ export default {
         }
       });
     },
-    async getOpenGoalSetting() {
+    getOpenGoalSetting() {
       const url = `${this.ROUTES.goalSetting}/get-open-goal-setting`;
-      await this.apiGet(url).then((res) => {
-        const {data} = res;
+      this.apiGet(url).then((res) => {
+        const { data } = res;
         if (data.length > 0) {
-          this.activeGoalId = parseInt(data[0].gs_id);
           this.openGoalActivity = parseInt(data[0].gs_activity);
           this.openGoalActivityId = parseInt(data[0].gs_id);
         }
       });
-    },
-    submitMidYearChecking() {
-      const employeeID = this.empId;
-      const url = `${this.ROUTES.selfAssessment}/add-self-assessment-mid-year/${employeeID}/${this.openGoalActivityId}`;
-      this.goals = [];
-      let validForm = true;
-      this.texts.every(async (field) => {
-        if (field.goal === "" || !field.goal) {
-          this.apiFormHandler("Invalid Goal Fields");
-          validForm = false;
-          return false;
-        }
-        const data = {
-          sa_comment: field.goal,
-          sa_challenges: field.challenge,
-          sa_accomplishment: field.accomplishment,
-          sa_support_needed: field.support,
-          sa_next_steps: field.next_step,
-          sa_update: field.update,
-          optional: this.optional,
-        };
-        this.goals.push(data);
-        return true;
-      });
-      if (validForm) {
-        this.apiPost(url, this.goals, "Add goals Error").then(() => {
-          this.apiResponseHandler("Process Complete", "Goals Added");
-          this.getSelfAssessment();
-        });
-      }
     },
     update() {
       const url = `${this.ROUTES.endYearRating}/add-rating`;
@@ -277,31 +201,6 @@ export default {
       this.apiResponseHandler("Process Complete", "Employee Rated");
       this.getRatings();
       this.getEndYearAssessment();
-    },
-    submitNewBeginning() {
-      const employeeID = this.empId;
-      //console.log("EmpID: "+employeeID);
-      const url = `${this.ROUTES.selfAssessment}/add-self-assessment/${employeeID}/${this.openGoalActivityId}`;
-      this.goals = [];
-      let validForm = true;
-      this.texts.every(async (field) => {
-        if (field.goal === "" || !field.goal) {
-          this.apiFormHandler("Invalid Goal Fields");
-          validForm = false;
-          return false;
-        }
-        const data = {
-          sa_comment: field.goal,
-        };
-        this.goals.push(data);
-        return true;
-      });
-      if (validForm) {
-        this.apiPost(url, this.goals, "Add goals Error").then(() => {
-          this.apiResponseHandler("Process Complete", "Goals Added");
-          this.getSelfAssessment();
-        });
-      }
     },
     updateGoals() {
       const employeeID = this.$route.params.empid;
@@ -345,11 +244,13 @@ export default {
 
 
     },
-    async fetchEmployee() {
+    fetchEmployee() {
       const employeeID = this.$route.params.empid;
       const url = `${this.ROUTES.employee}/get-employee/${employeeID}`;
-      await this.apiGet(url, "Get Employee Error").then((res) => {
+      this.apiGet(url, "Get Employee Error").then((res) => {
         this.currentEmployee = res.data;
+        //console.log('Supervisor: '+this.supervisor);
+
       });
     },
   },
@@ -383,12 +284,12 @@ export default {
                   <h5 class="font-size-14 mb-0">Beginning of the Year</h5>
                 </div>
                 <form
-                  v-if="texts.length > 0"
-                  @submit.prevent="submitNewBeginning"
+                  v-if="assessments.length > 0"
+                  @submit.prevent="updateGoals"
                 >
                   <div
                     class="row"
-                    v-for="(field, index) in texts"
+                    v-for="(field, index) in assessments"
                     :key="index"
                   >
                     <div class="col-lg-12">
@@ -505,196 +406,56 @@ export default {
         </div>
       </div>
       <div v-else-if="openGoalActivity === 2">
-
         <div class="row">
           <div class="col-lg-8">
             <div class="card">
               <div class="card-body">
-                <form v-if="texts.length > 0" @submit.prevent="submitMidYearChecking">
-                  <b-table-simple hover responsive bordered outlined>
-                    <b-thead head-variant="dark">
-                      <b-tr>
-                        <b-th>S/n</b-th>
-                        <b-th>Goal/Project</b-th>
-                        <b-th>Update</b-th>
-                        <b-th>Accomplishments </b-th>
-                        <b-th>Challenges</b-th>
-                        <b-th>Support Needed</b-th>
-                        <b-th>Next Steps </b-th>
-                        <b-th></b-th>
-                      </b-tr>
-                    </b-thead>
-                    <b-tbody>
-                      <b-tr v-for="(field, index) in texts" :key="index">
-                        <b-td style="width: 1%">
-                          {{ index + 1 }}
-                        </b-td>
-                        <b-td
-                          style="width: 19%;"
-                        >
-                      <textarea
-                        type="text"
-                        v-model="field.goal"
-                        rows="6"
-                        class="form-control"
-                      />
-                        </b-td>
-                        <b-td style="width: 11%">
+                <div class="p-3 bg-light mb-4">
+                  <h5 class="font-size-14 mb-0">Mid Year Checking </h5>
+                </div>
+                <form
+                  v-if="assessments.length > 0"
+                  @submit.prevent="updateGoals"
+                >
+                  <div
+                    class="row"
+                    v-for="(field, index) in assessments"
+                    :key="index"
+                  >
+                    <div class="col-lg-12">
+                      <div class="row">
+                        <div class="col-12">
                           <div class="form-group">
-                            <div class="form-check">
-                              <input
-                                class="form-check-input"
-                                v-model="field.update"
-                                value="Complete"
-                                type="radio"
-                                :name="index"
-                                :checked="field.update === 'Complete' "
-                              />
-                              <label class="form-check-label"> Complete </label>
-                            </div>
-                            <div class="form-check">
-                              <input
-                                class="form-check-input"
-                                id="complete"
-                                v-model="field.update"
-                                value="On track"
-                                :checked="field.update === 'On track'  "
-                                type="radio"
-                                :name="index"
-                              />
-                              <label class="form-check-label"> On track </label>
-                            </div>
-                            <div class="form-check">
-                              <input
-                                class="form-check-input"
-                                id="on-track"
-                                v-model="field.update"
-                                value="Delayed"
-                                type="radio"
-                                :name="index"
-                                :checked="field.update === 'Delayed' "
-                              />
-                              <label class="form-check-label"> Delayed </label>
-                            </div>
-                            <div class="form-check">
-                              <input
-                                class="form-check-input"
-                                v-model="field.update"
-                                value="Not started"
-                                type="radio"
-                                :name="index"
-                                :checked="field.update "
-                              />
-                              <label class="form-check-label"> Not started  </label>
-                            </div>
-                            <div class="form-check">
-                              <input
-                                class="form-check-input"
-                                v-model="field.update"
-                                value="No longer relevant"
-                                type="radio"
-                                :name="index"
-                                :checked="field.update === 'No longer relevant'  "
-                              />
-                              <label class="form-check-label">
-                                No longer relevant
-                              </label>
-                            </div>
+                            <label for="goal">
+                              Goal {{ index + 1 }}
+                              <span class="text-danger">*</span>
+                            </label>
+                            <b-form-textarea
+                              id="eya_question"
+                              no-resize
+                              rows="3"
+                              v-model="field.goal"
+                              :disabled="assessStatus === 1 ? true : false"
+                              class="form-control"
+                              :class="{
+                                'is-invalid': submitted && $v.goal.$error,
+                              }"
+                            />
                           </div>
-                        </b-td>
-                        <b-td
-                          style="width: 17%;"
-                        >
-                      <textarea
-                        type="text"
-                        v-model="field.accomplishment"
-                        rows="6"
-                        class="form-control"
-                      />
-                        </b-td>
-                        <b-td
-                          style="width: 17%"
-                        >
-                      <textarea
-                        type="text"
-                        v-model="field.challenge"
-                        rows="6"
-                        class="form-control"
-                      />
-                        </b-td>
-                        <b-td
-                          style="width: 17%;"
-                        >
-                      <textarea
-                        type="text"
-                        v-model="field.support"
-                        rows="6"
-                        class="form-control"
-                      />
-                        </b-td>
-                        <b-td
-                          style="width: 17%; cursor: pointer"
-                        >
-                      <textarea
-                        type="text"
-                        v-model="field.next_step"
-                        rows="6"
-                        class="form-control"
-                      />
-                        </b-td>
-                        <b-td style="width: 1%">
-                          <button
-                            v-if="index > 2"
-                            type="button"
-                            class="btn btn-sm btn-danger"
-                            @click="delField(index)"
-                          >
-                            DEL
-                          </button>
-                        </b-td>
-                      </b-tr>
-                    </b-tbody>
-                  </b-table-simple>
-                  <div class="alert alert-info d-flex mt-3">
-                    <i class="ri-error-warning-line mr-2"></i>
-                    You must submit a minimum of 3 goals.
-                    <span
-                      style="cursor: pointer; text-decoration: underline"
-                      class="ml-1"
-                      @click="addField"
-                    >
-                  Click here to add a new goal
-                </span>
-                  </div>
-                  <div class="row">
-                    <div class="col-12">
-                      <div class="form-group">
-                        <label for="op">
-                          Optional – other items to discuss (career opportunities,
-                          area of growth & development, etc.)
-                        </label>
-                        <b-form-textarea
-                          id="option"
-                          no-resize
-                          rows="3"
-                          v-model="optional"
-                          placeholder="Optional"
-                          class="form-control"
-                          :class="{
-                        'is-invalid': submitted && $v.optional.$error,
-                      }"
-                        />
+
+                        </div>
                       </div>
                     </div>
                   </div>
                   <div class="row">
-                    <div class="col-12">
+                    <div class="col-lg-12">
                       <b-button
                         v-if="!submitting"
                         class="btn btn-success btn-block mt-4"
                         type="submit"
+                        :disabled="assessStatus === 1 ? true : false"
                       >
-                        Submit
+                        Update
                       </b-button>
                       <b-button
                         v-else
@@ -702,9 +463,16 @@ export default {
                         class="btn btn-success btn-block mt-4"
                         type="submit"
                       >
-                        Submitting...
+                        Updating...
                       </b-button>
                     </div>
+                    <!--                    <div class="col-lg-4">-->
+                    <!--                      <b-form-group>-->
+                    <!--                        <b-button class="btn btn-warning btn-block mt-4">-->
+                    <!--                          Approve-->
+                    <!--                        </b-button>-->
+                    <!--                      </b-form-group>-->
+                    <!--                    </div>-->
                   </div>
                 </form>
                 <div class="row" v-else>
