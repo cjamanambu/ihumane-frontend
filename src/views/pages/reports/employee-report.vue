@@ -30,9 +30,10 @@ export default {
         type: this.$route.params.type,
       };
       const url = `${this.ROUTES.employee}/get-employee-report`;
-      this.apiPost(url, data, "Generate Employee Report").then((res) => {
-        const { data } = res;
-        data.forEach((employee, index) => {
+      this.apiPost(url, data, "Generate Employee Report").then(async (res) => {
+        const {data} = res;
+        const newData = await this.sortArrayOfObjects(data)
+        newData.forEach((employee, index) => {
           let employeeObj = {
             sn: ++index,
             emp_unique_id: employee.emp_unique_id,
@@ -43,28 +44,28 @@ export default {
             emp_personal_email: employee.emp_personal_email,
             emp_phone_no: employee.emp_phone_no,
             sector: employee.sector
-              ? `${employee.sector.department_name} - ${employee.sector.d_t3_code}`
-              : null,
+                ? `${employee.sector.department_name} - ${employee.sector.d_t3_code}`
+                : null,
             location: employee.location
-              ? `${employee.location.location_name} - ${employee.location.l_t6_code}`
-              : null,
+                ? `${employee.location.location_name} - ${employee.location.l_t6_code}`
+                : null,
             jobrole: employee.jobrole.job_role,
             unit: employee.emp_unit_name,
             supervisor: employee.supervisor
-              ? `${employee.supervisor.emp_first_name} ${employee.supervisor.emp_last_name} - ${employee.supervisor.emp_unique_id}`
-              : null,
+                ? `${employee.supervisor.emp_first_name} ${employee.supervisor.emp_last_name} - ${employee.supervisor.emp_unique_id}`
+                : null,
             start_date: employee.emp_hire_date
-              ? `${new Date(employee.emp_hire_date).toDateString()}`
-              : null,
+                ? `${new Date(employee.emp_hire_date).toDateString()}`
+                : null,
             end_date: employee.emp_contract_end_date
-              ? `${new Date(employee.emp_contract_end_date).toDateString()}`
-              : null,
+                ? `${new Date(employee.emp_contract_end_date).toDateString()}`
+                : null,
             stop_date: employee.emp_stop_date
-              ? `${new Date(employee.emp_stop_date)}`
-              : null,
+                ? `${new Date(employee.emp_stop_date)}`
+                : null,
             employment_date: employee.emp_employment_date
-              ? `${new Date(employee.emp_employment_date)}`
-              : null,
+                ? `${new Date(employee.emp_employment_date)}`
+                : null,
             suspension_reason: employee.emp_suspension_reason,
             dob: employee.emp_dob ? `${new Date(employee.emp_dob)}` : null,
             sex: employee.emp_sex,
@@ -88,8 +89,8 @@ export default {
             cost_center: employee.emp_cost_center,
             tax_amount: employee.emp_tax_amount,
             gross: employee.emp_gross
-              ? this.apiValueHandler(employee.emp_gross.toFixed(2))
-              : this.apiValueHandler(0.0),
+                ? this.apiValueHandler(employee.emp_gross.toFixed(2))
+                : this.apiValueHandler(0.0),
             bvn: employee.emp_bvn,
             account_no: employee.emp_account_no,
             bank: employee.bank ? employee.bank.bank_name : null,
@@ -190,6 +191,19 @@ export default {
         });
       });
     },
+    async sortArrayOfObjects(array) {
+      return array.sort(function (a, b) {
+
+        let matchesA = a.employeeUniqueId.match(/(\d+)/);
+        matchesA = parseInt(matchesA[0])
+
+        let matchesB = b.employeeUniqueId.match(/(\d+)/);
+        matchesB = parseInt(matchesB[0])
+
+        return matchesA - matchesB;
+      })
+    },
+
     onFiltered(filteredItems) {
       // Trigger pagination to update the number of buttons/pages due to filtering
       this.totalRows = filteredItems.length;
