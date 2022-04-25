@@ -228,7 +228,6 @@ export default {
       }
     },
     processAssessment(){
-
       const employeeID = this.$route.params.empid;
       const gsId = this.gsID;
       const url = `${this.ROUTES.selfAssessment}/approve-assessment/${employeeID}/${gsId}`;
@@ -239,7 +238,9 @@ export default {
       };
       this.apiPost(url, data, "Could not process request").then(() => {
         this.apiResponseHandler("Process Complete", "Employee self-assessment completed.");
-
+        this.$router.push({
+          name: "assess-employees",
+        });
       });
 
 
@@ -304,7 +305,7 @@ export default {
                               id="eya_question"
                               no-resize
                               rows="3"
-                              :readonly="assessStatus === 1 ? true : false"
+                              :readonly="assessStatus === 1"
                               v-model="field.goal"
                               class="form-control"
                               :class="{
@@ -323,7 +324,7 @@ export default {
                           v-if="!submitting"
                           class="btn btn-success btn-block mt-4"
                           type="submit"
-                          :disabled="assessStatus === 1 ? true : false"
+                          :disabled="assessStatus === 1"
                         >
                           Update
                         </b-button>
@@ -396,7 +397,7 @@ export default {
               <div class="card-body">
                 <form @submit.prevent="processAssessment">
                   <div class="btn-group d-flex ">
-                    <button class="btn btn-success btn-sm" :disabled="assessStatus === 1 ? true : false"> <i class="mdi mdi-check mr-2"></i> Approve </button>
+                    <button class="btn btn-success btn-sm" :disabled="assessStatus === 1"> <i class="mdi mdi-check mr-2"></i> Approve </button>
                   </div>
                 </form>
               </div>

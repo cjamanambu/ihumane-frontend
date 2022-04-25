@@ -323,6 +323,26 @@ export default {
                 select-mode="single"
                 @row-selected="selectEmployee"
               >
+
+                <template #cell(status)="row">
+                  <p class="mb-0">
+                    <span
+                        class="badge badge-primary badge-pill"
+                        v-if="row.item.status === 'Approved'"
+                    >
+                  Approved
+                </span>
+
+                    <span
+                        class="badge badge-warning badge-pill"
+                        v-if="row.item.status === 'Pending'"
+                    >
+                  Pending
+                </span>
+
+                  </p>
+
+                </template>
               </b-table>
             </div>
             <div class="row">
