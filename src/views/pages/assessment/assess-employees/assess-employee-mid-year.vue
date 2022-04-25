@@ -157,9 +157,12 @@ export default {
       const url = `${this.ROUTES.selfAssessment}/get-self-assessment/${this.empId}/${this.activeGoalId}`;
       await this.apiGet(url).then((res) => {
         const { data } = res;
+        console.log(data.questions);
         if (data.questions.length > 0) {
           this.texts = [];
           this.gsID = data.openGoal[0].gs_id;
+          this.gsID = data.openGoal[0].gs_id;
+          this.assessStatus = data.questions[0].sa_status;
           data.questions.forEach(async (datum) => {
             this.selfAssessmentStatus = true;
             this.prefillStatus = true;
@@ -181,7 +184,7 @@ export default {
             const { data } = res;
             this.texts = [];
             this.gsID = parseInt(data[0].sa_gs_id);
-
+            this.assessStatus = data[0].sa_status;
             data.forEach(async (datum) => {
               this.selfAssessmentStatus = true;
               this.prefillStatus = true;
@@ -211,125 +214,7 @@ export default {
 
 
     },
-    /*async getSelfAssessment() {
-      const url = `${this.ROUTES.selfAssessment}/get-self-assessment/${this.getEmployee.emp_id}/${this.activeGoalId}`;
-      await this.apiGet(url).then((res) => {
-        const { data } = res;
-        if (data.questions.length > 0) {
-          this.texts = [];
-          this.gsID = data.openGoal[0].gs_id;
-          data.questions.forEach(async (datum) => {
-            this.selfAssessmentStatus = true;
-            this.prefillStatus = true;
-            const dat = {
-              id: datum.sa_id,
-              goal: datum.sa_comment,
-              update: datum.sa_update,
-              accomplishment:datum.sa_accomplishment,
-              next_step:datum.sa_next_steps,
-              challenge:datum.sa_challenges,
-              support:datum.sa_support_needed,
-            };
-            this.texts.push(dat);
-            //console.log(this.texts);
-          });
-        } else {
-          const prevUrl = `${this.ROUTES.selfAssessment}/prefill-goal-setting/${this.empId}`;
-          this.apiGet(prevUrl).then((res) => {
-            const { data } = res;
-            this.texts = [];
-            this.gsID = parseInt(data[0].sa_gs_id);
 
-            data.forEach(async (datum) => {
-              this.selfAssessmentStatus = true;
-              this.prefillStatus = true;
-              const dat = {
-                id: datum.sa_id,
-                goal: datum.sa_comment,
-                update: datum.sa_update,
-                accomplishment:datum.sa_accomplishment,
-                next_step:datum.sa_next_steps,
-                challenge:datum.sa_challenges,
-                support:datum.sa_support_needed,
-              };
-              this.texts.push(dat);
-
-            });
-
-          });
-
-          this.newAssessment = true;
-          this.texts = [
-            { id: 0, goal: null },
-            { id: 1, goal: null },
-            { id: 2, goal: null },
-          ];
-        }
-      });
-
-
-    },*/
-    /*async getSelfAssessment() {
-      const wind = this.openGoalActivity;
-      if(parseInt(wind) === 1 ){
-        //const url = `${this.ROUTES.selfAssessment}/prefill-goal-setting/${this.empId}`;
-        const url = `${this.ROUTES.selfAssessment}/get-self-assessment/${this.empId}/${this.openGoalActivityId}`;
-        await this.apiGet(url).then((res) => {
-          const { data } = res;
-          if (data.questions.length > 0) {
-            this.texts = [];
-            this.assessStatus = data.questions[0].sa_status;
-            this.gsID = data.openGoal[0].gs_id;
-            data.questions.forEach(async (datum) => {
-              this.selfAssessmentStatus = true;
-              this.prefillStatus = true;
-              const dat = {
-                id: datum.sa_id,
-                goal: datum.sa_comment,
-                update: datum.sa_update,
-                accomplishment:datum.sa_accomplishment,
-                next_step:datum.sa_next_steps,
-                challenge:datum.sa_challenges,
-                support:datum.sa_support_needed,
-              };
-              this.texts.push(dat);
-
-            });
-            //console.log(this.texts);
-          }
-        });
-      }else if(parseInt(wind) === 2){
-        const url = `${this.ROUTES.selfAssessment}/prefill-goal-setting/${this.empId}`;
-        //const url = `${this.ROUTES.selfAssessment}/get-self-assessment/${this.empId}/${this.openGoalActivityId}`;
-        await this.apiGet(url).then((res) => {
-          const { data } = res;
-
-          if (data.length > 0) {
-            this.texts = [];
-            this.assessStatus = data[0].sa_status;
-            console.log("Status: "+this.assessStatus);
-            data.forEach(async (datum) => {
-              this.selfAssessmentStatus = true;
-              this.prefillStatus = true;
-              const dat = {
-                id: datum.sa_id,
-                goal: datum.sa_comment,
-                update: datum.sa_update,
-                accomplishment:datum.sa_accomplishment,
-                next_step:datum.sa_next_steps,
-                challenge:datum.sa_challenges,
-                support:datum.sa_support_needed,
-              };
-              this.texts.push(dat);
-
-            });
-            //console.log(this.texts);
-          }
-        });
-      }
-
-
-    },*/
     async getSelfAssessmentMaster(){
       //const urls = `${this.ROUTES.selfAssessment}/get-self-assessment-master/${this.$route.params.empid}/${this.gsID}`;
       /*await this.apiGet(urls).then(async (res) => {
@@ -685,6 +570,7 @@ export default {
                         v-model="field.goal"
                         rows="6"
                         class="form-control"
+                        :readonly="assessStatus === 1 ? true : false"
                       />
                         </b-td>
                         <b-td style="width: 11%">
@@ -696,6 +582,7 @@ export default {
                                 value="Complete"
                                 type="radio"
                                 :name="index"
+                                :disabled="assessStatus === 1 ? true : false"
                                 :checked="field.update === 'Complete' "
                               />
                               <label class="form-check-label"> Complete </label>
@@ -707,6 +594,7 @@ export default {
                                 v-model="field.update"
                                 value="On track"
                                 :checked="field.update === 'On track'  "
+                                :disabled="assessStatus === 1 ? true : false"
                                 type="radio"
                                 :name="index"
                               />
@@ -721,6 +609,7 @@ export default {
                                 type="radio"
                                 :name="index"
                                 :checked="field.update === 'Delayed' "
+                                :disabled="assessStatus === 1 ? true : false"
                               />
                               <label class="form-check-label"> Delayed </label>
                             </div>
@@ -732,6 +621,7 @@ export default {
                                 type="radio"
                                 :name="index"
                                 :checked="field.update "
+                                :disabled="assessStatus === 1 ? true : false"
                               />
                               <label class="form-check-label"> Not started  </label>
                             </div>
@@ -743,6 +633,7 @@ export default {
                                 type="radio"
                                 :name="index"
                                 :checked="field.update === 'No longer relevant'  "
+                                :disabled="assessStatus === 1 ? true : false"
                               />
                               <label class="form-check-label">
                                 No longer relevant
@@ -758,6 +649,7 @@ export default {
                         v-model="field.accomplishment"
                         rows="6"
                         class="form-control"
+                        :readonly="assessStatus === 1 ? true : false"
                       />
                         </b-td>
                         <b-td
@@ -768,6 +660,7 @@ export default {
                         v-model="field.challenge"
                         rows="6"
                         class="form-control"
+                        :readonly="assessStatus === 1 ? true : false"
                       />
                         </b-td>
                         <b-td
@@ -778,6 +671,7 @@ export default {
                         v-model="field.support"
                         rows="6"
                         class="form-control"
+                        :readonly="assessStatus === 1 ? true : false"
                       />
                         </b-td>
                         <b-td
@@ -788,9 +682,10 @@ export default {
                         v-model="field.next_step"
                         rows="6"
                         class="form-control"
+                        :readonly="assessStatus === 1 ? true : false"
                       />
                         </b-td>
-                        <b-td style="width: 1%">
+                        <b-td style="width: 1%" v-if="assessStatus === 0">
                           <button
                             v-if="index > 2"
                             type="button"
@@ -803,7 +698,7 @@ export default {
                       </b-tr>
                     </b-tbody>
                   </b-table-simple>
-                  <div class="alert alert-info d-flex mt-3">
+                  <div class="alert alert-info d-flex mt-3" v-if="assessStatus !== 1">
                     <i class="ri-error-warning-line mr-2"></i>
                     You must submit a minimum of 3 goals.
                     <span
@@ -841,6 +736,7 @@ export default {
                         v-if="!submitting"
                         class="btn btn-success btn-block mt-4"
                         type="submit"
+                        :disabled="assessStatus === 1"
                       >
                         Submit
                       </b-button>
