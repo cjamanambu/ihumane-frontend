@@ -27,9 +27,10 @@ export default {
         pym_location: parseFloat(this.location),
       };
       const url = `${this.ROUTES.salary}/nhf-report`;
-      this.apiPost(url, data, "Generate nhf Report").then((res) => {
-        const { data } = res;
-        data.forEach((nhf, index) => {
+      this.apiPost(url, data, "Generate nhf Report").then(async (res) => {
+        const {data} = res;
+        const newData = await this.sortArrayOfObjects(data)
+        newData.forEach((nhf, index) => {
           this.locationName = nhf.location;
           // let pensionEmployeeContribution;
           // let pensionEmployeeContribution;
@@ -41,8 +42,8 @@ export default {
             employeeName: nhf.employeeName,
             sector: nhf.sector,
             location: nhf.location,
-            employee_gross: this.apiValueHandler(nhf.adjustedGross.toFixed(2))  ?? '0.00',
-            nhf_contribution: this.apiValueHandler(nhf.nhfArray[0].Amount.toFixed(2))  ?? '0.00',
+            employee_gross: this.apiValueHandler(nhf.adjustedGross.toFixed(2)) ?? '0.00',
+            nhf_contribution: this.apiValueHandler(nhf.nhfArray[0].Amount.toFixed(2)) ?? '0.00',
             month: nhf.month,
             year: nhf.year,
             nhf_number: nhf.pin,
@@ -82,6 +83,19 @@ export default {
         }
       });
     },
+    async sortArrayOfObjects(array) {
+      return array.sort(function (a, b) {
+
+        let matchesA = a.employeeUniqueId.match(/(\d+)/);
+        matchesA = parseInt(matchesA[0])
+
+        let matchesB = b.employeeUniqueId.match(/(\d+)/);
+        matchesB = parseInt(matchesB[0])
+
+        return matchesA - matchesB;
+      })
+    },
+
     onFiltered(filteredItems) {
       // Trigger pagination to update the number of buttons/pages due to filtering
       this.totalRows = filteredItems.length;
@@ -141,11 +155,12 @@ export default {
         "employeeName",
         "sector",
          "location",
+        "nhf_number",
         "month",
         "year",
         "employee_gross",
         "nhf_contribution",
-        "nhf_number"
+
       ],
       incomeFields: [],
       deductionFields: [],

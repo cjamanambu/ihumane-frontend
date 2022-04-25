@@ -3,10 +3,11 @@ import Layout from "@/views/layouts/main";
 import PageHeader from "@/components/page-header";
 import appConfig from "@/app.config";
 import JsonExcel from "vue-json-excel";
+
 export default {
   page: {
     title: "Deduction Report",
-    meta: [{ name: "description", content: appConfig.description }],
+    meta: [{name: "description", content: appConfig.description}],
   },
   components: {
     Layout,
@@ -21,10 +22,10 @@ export default {
       this.paymentDefinitions = [];
       this.deduction = this.$route.params.pdID;
       this.apiGet(
-        this.ROUTES.paymentDefinition,
-        "Get Payment Definitions Error"
+          this.ROUTES.paymentDefinition,
+          "Get Payment Definitions Error"
       ).then(async (res) => {
-        const { data } = res;
+        const {data} = res;
         this.paymentDefinitions = data;
         await this.processFields(data);
         this.newFields.push(...this.deductionFields);
@@ -33,9 +34,9 @@ export default {
             this.jsonFields["S/N"] = newField;
           } else if (newField === "t7_number") {
             this.jsonFields["T7 NUMBER"] = "employeeUniqueId";
-          }else if (newField === "t6_code") {
+          } else if (newField === "t6_code") {
             this.jsonFields["T6 CODE"] = "location";
-          }else if (newField === "t3_code") {
+          } else if (newField === "t3_code") {
             this.jsonFields["T3 CODE"] = "sector";
           } else if (newField === "employeeName") {
             this.jsonFields["EMPLOYEE NAME"] = newField;
@@ -52,6 +53,18 @@ export default {
         await this.refreshTable();
       });
     },
+
+    // dynamicSort(property) {
+    //   let sortOrder = 1;
+    //   if (property[0] === "-") {
+    //     sortOrder = -1;
+    //     property = property.substr(1);
+    //   }
+    //   return function (a, b) {
+    //     const result = (a[property] < b[property]) ? -1 : (a[property] > b[property]) ? 1 : 0;
+    //     return result * sortOrder;
+    //   }
+    // },
     refreshTable() {
       this.period = this.$route.params.period;
       this.period = this.period.split("-");
@@ -62,11 +75,14 @@ export default {
         pd_id: parseFloat(this.deduction),
       };
       const url = `${this.ROUTES.salary}/deduction-report-type`;
-      this.apiPost(url, data, "Generate Deduction Report").then((res) => {
-        const { data } = res;
+
+      this.apiPost(url, data, "Generate Deduction Report").then(async (res) => {
+        const {data} = res;
         console.log(data)
         this.deductionSum = 0;
-        data.forEach((deduction, index) => {
+        const newData = await this.sortArrayOfObjects(data)
+
+        newData.forEach((deduction, index) => {
           let deductionObj = {
             sn: ++index,
             employeeUniqueId: deduction.employeeUniqueId,
@@ -80,7 +96,7 @@ export default {
           deduction.deductions.forEach((deduction) => {
             this.deductionSum += deduction.amount;
             deductionObj[deduction.paymentName] = this.apiValueHandler(
-              deduction.amount.toFixed(2)
+                deduction.amount.toFixed(2)
             );
           });
 
@@ -126,6 +142,32 @@ export default {
       });
 
     },
+
+    async sortArrayOfObjects(array) {
+      return array.sort(function (a, b) {
+
+        let matchesA = a.employeeUniqueId.match(/(\d+)/);
+        matchesA = parseInt(matchesA[0])
+
+        let matchesB = b.employeeUniqueId.match(/(\d+)/);
+        matchesB = parseInt(matchesB[0])
+
+        return matchesA - matchesB;
+      })
+    },
+
+
+    // dynamicSort(property) {
+    //   let sortOrder = 1;
+    //   if (property[0] === "-") {
+    //     sortOrder = -1;
+    //     property = property.substr(1);
+    //   }
+    //   return function (a, b) {
+    //     const result = (a[property] < b[property]) ? -1 : (a[property] > b[property]) ? 1 : 0;
+    //     return result * sortOrder;
+    //   }
+    // }
   },
   data() {
     return {
@@ -153,9 +195,9 @@ export default {
       pageOptions: [10, 25, 50, 100],
       filter: null,
       filterOn: [],
-      sortBy: "sn",
+      sortBy: "t7_number",
       sortDesc: false,
-      newFields: ["sn", "t7_number", "t6_code",  "t3_code", "employeeName", "month", "year"],
+      newFields: ["sn", "t7_number", "t6_code", "t3_code", "employeeName", "month", "year"],
       incomeFields: [],
       deductionFields: [],
       jsonFields: {},
@@ -169,14 +211,14 @@ export default {
 
 <template>
   <Layout>
-    <PageHeader :title="title" :items="items" />
+    <PageHeader :title="title" :items="items"/>
     <div class="d-flex justify-content-end mb-3">
       <b-button class="btn btn-success" @click="$router.push('/reports')">
         <i class="mdi mdi-plus mr-2"></i>
         Reports
       </b-button>
     </div>
-    <scale-loader v-if="apiBusy" />
+    <scale-loader v-if="apiBusy"/>
     <div v-else class="row">
       <div class="col-12">
         <div class="card">
@@ -189,10 +231,10 @@ export default {
               </h5>
               <span class="font-size-12 text-success">
                 <JsonExcel
-                  style="cursor: pointer"
-                  :data="filtered"
-                  :fields="jsonFields"
-                  :name="`Deduction_Report_${deductionName}(${period[0]}-${period[1]}).xls`"
+                    style="cursor: pointer"
+                    :data="filtered"
+                    :fields="jsonFields"
+                    :name="`Deduction_Report_${deductionName}(${period[0]}-${period[1]}).xls`"
                 >
                   Export to Excel
                 </JsonExcel>
@@ -204,9 +246,9 @@ export default {
                   <label class="d-inline-flex align-items-center">
                     Show&nbsp;
                     <b-form-select
-                      v-model="perPage"
-                      size="sm"
-                      :options="pageOptions"
+                        v-model="perPage"
+                        size="sm"
+                        :options="pageOptions"
                     ></b-form-select
                     >&nbsp;entries
                   </label>
@@ -214,17 +256,17 @@ export default {
               </div>
               <div class="col-sm-12 col-md-3 text-md-right">
                 <b-form-group
-                  label="Filter On"
-                  label-cols-sm="7"
-                  label-align-sm="right"
-                  label-size="sm"
-                  class="mb-0"
-                  v-slot="{ ariaDescribedby }"
+                    label="Filter On"
+                    label-cols-sm="7"
+                    label-align-sm="right"
+                    label-size="sm"
+                    class="mb-0"
+                    v-slot="{ ariaDescribedby }"
                 >
                   <b-form-checkbox-group
-                    v-model="filterOn"
-                    :aria-describedby="ariaDescribedby"
-                    class="mt-1"
+                      v-model="filterOn"
+                      :aria-describedby="ariaDescribedby"
+                      class="mt-1"
                   >
                     <b-form-checkbox value="location">Location</b-form-checkbox>
                   </b-form-checkbox-group>
@@ -233,16 +275,16 @@ export default {
               <!-- Search -->
               <div class="col-sm-12 col-md-3">
                 <div
-                  id="tickets-table_filter"
-                  class="dataTables_filter text-md-right"
+                    id="tickets-table_filter"
+                    class="dataTables_filter text-md-right"
                 >
                   <label class="d-inline-flex align-items-center">
                     Search:
                     <b-form-input
-                      v-model="filter"
-                      type="search"
-                      placeholder="Search..."
-                      class="form-control form-control-sm ml-2"
+                        v-model="filter"
+                        type="search"
+                        placeholder="Search..."
+                        class="form-control form-control-sm ml-2"
                     ></b-form-input>
                   </label>
                 </div>
@@ -252,22 +294,22 @@ export default {
             <!-- Table -->
             <div class="table-responsive mb-0" v-if="deductions.length">
               <b-table
-                ref="deduction-table"
-                bordered
-                hover
-                small
-                :items="deductions"
-                :fields="newFields"
-                striped
-                responsive="lg"
-                :per-page="perPage"
-                :current-page="currentPage"
-                :sort-by.sync="sortBy"
-                :sort-desc.sync="sortDesc"
-                :filter="filter"
-                :filter-included-fields="filterOn"
-                @filtered="onFiltered"
-                show-empty
+                  ref="deduction-table"
+                  bordered
+                  hover
+                  small
+                  :items="deductions"
+                  :fields="newFields"
+                  striped
+                  responsive="lg"
+                  :per-page="perPage"
+                  :current-page="currentPage"
+                  :sort-by.sync="sortBy"
+                  :sort-desc.sync="sortDesc"
+                  :filter="filter"
+                  :filter-included-fields="filterOn"
+                  @filtered="onFiltered"
+                  show-empty
               >
                 <template #cell(sn)="row">
                   <span>
@@ -329,14 +371,14 @@ export default {
             <div class="row">
               <div class="col">
                 <div
-                  class="dataTables_paginate paging_simple_numbers float-right"
+                    class="dataTables_paginate paging_simple_numbers float-right"
                 >
                   <ul class="pagination pagination-rounded mb-0">
                     <!-- pagination -->
                     <b-pagination
-                      v-model="currentPage"
-                      :total-rows="totalRows"
-                      :per-page="perPage"
+                        v-model="currentPage"
+                        :total-rows="totalRows"
+                        :per-page="perPage"
                     ></b-pagination>
                   </ul>
                 </div>

@@ -247,7 +247,7 @@ export default {
                       no-resize
                       rows="3"
                       v-model="field.goal"
-                      :readonly="assessStatus === 1 ? true : false"
+                      :readonly="assessStatus === 1"
                       class="form-control "
                       :class="{
                         'is-invalid': submitted && $v.goal.$error,
@@ -268,33 +268,37 @@ export default {
                   </div>
                 </div>
               </div>
-              <div class="alert alert-info d-flex mt-3">
-                <i class="ri-error-warning-line mr-2"></i>
-                You must submit a minimum of 3 goals.
-                <span style="cursor: pointer" class="ml-1" @click="addField">
+              <div v-if="assessStatus === 0">
+                <div class="alert alert-info d-flex mt-3">
+                  <i class="ri-error-warning-line mr-2"></i>
+                  You must submit a minimum of 3 goals.
+                  <span style="cursor: pointer" class="ml-1" @click="addField">
                   Click here to add a new goal
                 </span>
-              </div>
-              <div class="row">
-                <div class="col-12">
-                  <b-button
-                    v-if="!submitting"
-                    class="btn btn-success btn-block mt-4"
-                    type="submit"
-                  >
-                    Submit
-                  </b-button>
-                  <b-button
-                    v-else
-                    disabled
-                    class="btn btn-success btn-block mt-4"
-                    type="submit"
-                  >
-                    Submitting...
-                  </b-button>
+                </div>
+                <div class="row">
+                  <div class="col-12">
+                    <b-button
+                        v-if="!submitting"
+                        class="btn btn-success btn-block mt-4"
+                        type="submit"
+                    >
+                      Submit
+                    </b-button>
+                    <b-button
+                        v-else
+                        disabled
+                        class="btn btn-success btn-block mt-4"
+                        type="submit"
+                    >
+                      Submitting...
+                    </b-button>
+                  </div>
                 </div>
               </div>
+
             </form>
+
             <form v-else @submit.prevent="submitNewBeginning">
               <div class="row" v-for="(field, index) in texts" :key="index">
                 <div class="col">
@@ -307,7 +311,7 @@ export default {
                       no-resize
                       rows="3"
                       v-model="field.goal"
-                      :readonly="assessStatus === 1 ? true : false"
+                      :readonly="assessStatus === 1"
                       class="form-control"
                       :class="{
                         'is-invalid': submitted && $v.goal.$error,
@@ -328,30 +332,32 @@ export default {
                   </div>
                 </div>
               </div>
-              <div class="alert alert-info d-flex mt-3">
-                <i class="ri-error-warning-line mr-2"></i>
-                You must submit a minimum of 3 goals.
-                <span style="cursor: pointer" class="ml-1" @click="addField">
+              <div v-if="assessStatus === 0">
+                <div class="alert alert-info d-flex mt-3">
+                  <i class="ri-error-warning-line mr-2"></i>
+                  You must submit a minimum of 3 goals.
+                  <span style="cursor: pointer" class="ml-1" @click="addField">
                   Click here to add a new goal
                 </span>
-              </div>
-              <div class="row">
-                <div class="col-12">
-                  <b-button
-                    v-if="!submitting"
-                    class="btn btn-success btn-block mt-4"
-                    type="submit"
-                  >
-                    Submit
-                  </b-button>
-                  <b-button
-                    v-else
-                    disabled
-                    class="btn btn-success btn-block mt-4"
-                    type="submit"
-                  >
-                    Submitting...
-                  </b-button>
+                </div>
+                <div class="row">
+                  <div class="col-12">
+                    <b-button
+                        v-if="!submitting"
+                        class="btn btn-success btn-block mt-4"
+                        type="submit"
+                    >
+                      Submit
+                    </b-button>
+                    <b-button
+                        v-else
+                        disabled
+                        class="btn btn-success btn-block mt-4"
+                        type="submit"
+                    >
+                      Submitting...
+                    </b-button>
+                  </div>
                 </div>
               </div>
             </form>
