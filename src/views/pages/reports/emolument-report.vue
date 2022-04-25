@@ -68,7 +68,7 @@ export default {
             employeeName: emolument.employeeName,
             location: emolument.location,
             sector: emolument.sector,
-            jobDescription: emolument.jobRole,
+            jobTitle: emolument.jobRole,
             salaryBand: emolument.salaryGrade,
             contractStartDate: emolument.employeeStartDate,
             contractEndDate: emolument.empEndDate
@@ -180,7 +180,7 @@ export default {
         "employeeName",
         "sector",
         "location",
-        "jobDescription",
+        "jobTitle",
         "salaryBand",
         "contractStartDate",
         "contractEndDate"
@@ -321,7 +321,7 @@ export default {
                     {{ row.value }}
                   </span>
                 </template>
-                <template #cell(jobDescription)="row">
+                <template #cell(jobTitle)="row">
                   <span class="text-nowrap">
                     {{ row.value }}
                   </span>
