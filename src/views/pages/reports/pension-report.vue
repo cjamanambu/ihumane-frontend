@@ -152,15 +152,16 @@ export default {
         "employeeName",
         "sector",
          "location",
+        "pfa",
+        "pension_number",
         "month",
         "year",
           "employee_gross",
         "pension_employee_contribution",
         "pension_employer_contribution",
         "voluntary_pension",
-         "total",
-        "pfa",
-        "pension_number"
+         "total"
+
       ],
       incomeFields: [],
       deductionFields: [],

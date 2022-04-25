@@ -7,7 +7,7 @@ import { required } from "vuelidate/lib/validators";
 
 export default {
   page: {
-    title: "Assess Employee",
+    title: "Assess Employee (Mid-year)",
     meta: [{ name: "description", content: appConfig.description }],
   },
   components: {
@@ -19,7 +19,7 @@ export default {
   },
 
   async mounted() {
-     this.empId = this.$route.params.empid;
+    this.empId = this.$route.params.empid;
     await this.fetchEmployee();
     await this.getOpenGoalSetting();
     await this.getSelfAssessment();
@@ -154,34 +154,182 @@ export default {
       });
     },
     async getSelfAssessment() {
-      const url = `${this.ROUTES.selfAssessment}/prefill-goal-setting/${this.empId}`;
-      //const url = `${this.ROUTES.selfAssessment}/get-self-assessment/${this.empId}/${this.activeGoalId}`;
+      const url = `${this.ROUTES.selfAssessment}/get-self-assessment/${this.empId}/${this.activeGoalId}`;
       await this.apiGet(url).then((res) => {
         const { data } = res;
-        console.log("Before");
-        console.log(data);
-        this.assessments = [];
-        //this.assessStatus = data[0].sa_status;
-        data.forEach( (datum) => {
-           const dat = {
-            id: datum.sa_id,
-            goal: datum.sa_comment,
-            response: datum.sa_response,
-            update: datum.sa_update,
-            challenge: datum.sa_challenges,
-            next_step: datum.sa_next_steps,
-            support: datum.sa_support_needed,
-            accomplishment: datum.sa_accomplishment,
-            status: parseInt(datum.sa_status),
-          };
-          this.texts.push(dat);
-        });
-        console.log('aft');
-        console.log(this.texts);
-        //}
-      });
-    },
+        if (data.questions.length > 0) {
+          this.texts = [];
+          this.gsID = data.openGoal[0].gs_id;
+          data.questions.forEach(async (datum) => {
+            this.selfAssessmentStatus = true;
+            this.prefillStatus = true;
+            const dat = {
+              id: datum.sa_id,
+              goal: datum.sa_comment,
+              update: datum.sa_update,
+              accomplishment:datum.sa_accomplishment,
+              next_step:datum.sa_next_steps,
+              challenge:datum.sa_challenges,
+              support:datum.sa_support_needed,
+            };
+            this.texts.push(dat);
+            //console.log(this.texts);
+          });
+        } else {
+          const prevUrl = `${this.ROUTES.selfAssessment}/prefill-goal-setting/${this.empId}`;
+          this.apiGet(prevUrl).then((res) => {
+            const { data } = res;
+            this.texts = [];
+            this.gsID = parseInt(data[0].sa_gs_id);
 
+            data.forEach(async (datum) => {
+              this.selfAssessmentStatus = true;
+              this.prefillStatus = true;
+              const dat = {
+                id: datum.sa_id,
+                goal: datum.sa_comment,
+                update: datum.sa_update,
+                accomplishment:datum.sa_accomplishment,
+                next_step:datum.sa_next_steps,
+                challenge:datum.sa_challenges,
+                support:datum.sa_support_needed,
+              };
+              this.texts.push(dat);
+
+            });
+
+          });
+
+          this.newAssessment = true;
+          this.texts = [
+            { id: 0, goal: null },
+            { id: 1, goal: null },
+            { id: 2, goal: null },
+          ];
+        }
+      });
+
+
+    },
+    /*async getSelfAssessment() {
+      const url = `${this.ROUTES.selfAssessment}/get-self-assessment/${this.getEmployee.emp_id}/${this.activeGoalId}`;
+      await this.apiGet(url).then((res) => {
+        const { data } = res;
+        if (data.questions.length > 0) {
+          this.texts = [];
+          this.gsID = data.openGoal[0].gs_id;
+          data.questions.forEach(async (datum) => {
+            this.selfAssessmentStatus = true;
+            this.prefillStatus = true;
+            const dat = {
+              id: datum.sa_id,
+              goal: datum.sa_comment,
+              update: datum.sa_update,
+              accomplishment:datum.sa_accomplishment,
+              next_step:datum.sa_next_steps,
+              challenge:datum.sa_challenges,
+              support:datum.sa_support_needed,
+            };
+            this.texts.push(dat);
+            //console.log(this.texts);
+          });
+        } else {
+          const prevUrl = `${this.ROUTES.selfAssessment}/prefill-goal-setting/${this.empId}`;
+          this.apiGet(prevUrl).then((res) => {
+            const { data } = res;
+            this.texts = [];
+            this.gsID = parseInt(data[0].sa_gs_id);
+
+            data.forEach(async (datum) => {
+              this.selfAssessmentStatus = true;
+              this.prefillStatus = true;
+              const dat = {
+                id: datum.sa_id,
+                goal: datum.sa_comment,
+                update: datum.sa_update,
+                accomplishment:datum.sa_accomplishment,
+                next_step:datum.sa_next_steps,
+                challenge:datum.sa_challenges,
+                support:datum.sa_support_needed,
+              };
+              this.texts.push(dat);
+
+            });
+
+          });
+
+          this.newAssessment = true;
+          this.texts = [
+            { id: 0, goal: null },
+            { id: 1, goal: null },
+            { id: 2, goal: null },
+          ];
+        }
+      });
+
+
+    },*/
+    /*async getSelfAssessment() {
+      const wind = this.openGoalActivity;
+      if(parseInt(wind) === 1 ){
+        //const url = `${this.ROUTES.selfAssessment}/prefill-goal-setting/${this.empId}`;
+        const url = `${this.ROUTES.selfAssessment}/get-self-assessment/${this.empId}/${this.openGoalActivityId}`;
+        await this.apiGet(url).then((res) => {
+          const { data } = res;
+          if (data.questions.length > 0) {
+            this.texts = [];
+            this.assessStatus = data.questions[0].sa_status;
+            this.gsID = data.openGoal[0].gs_id;
+            data.questions.forEach(async (datum) => {
+              this.selfAssessmentStatus = true;
+              this.prefillStatus = true;
+              const dat = {
+                id: datum.sa_id,
+                goal: datum.sa_comment,
+                update: datum.sa_update,
+                accomplishment:datum.sa_accomplishment,
+                next_step:datum.sa_next_steps,
+                challenge:datum.sa_challenges,
+                support:datum.sa_support_needed,
+              };
+              this.texts.push(dat);
+
+            });
+            //console.log(this.texts);
+          }
+        });
+      }else if(parseInt(wind) === 2){
+        const url = `${this.ROUTES.selfAssessment}/prefill-goal-setting/${this.empId}`;
+        //const url = `${this.ROUTES.selfAssessment}/get-self-assessment/${this.empId}/${this.openGoalActivityId}`;
+        await this.apiGet(url).then((res) => {
+          const { data } = res;
+
+          if (data.length > 0) {
+            this.texts = [];
+            this.assessStatus = data[0].sa_status;
+            console.log("Status: "+this.assessStatus);
+            data.forEach(async (datum) => {
+              this.selfAssessmentStatus = true;
+              this.prefillStatus = true;
+              const dat = {
+                id: datum.sa_id,
+                goal: datum.sa_comment,
+                update: datum.sa_update,
+                accomplishment:datum.sa_accomplishment,
+                next_step:datum.sa_next_steps,
+                challenge:datum.sa_challenges,
+                support:datum.sa_support_needed,
+              };
+              this.texts.push(dat);
+
+            });
+            //console.log(this.texts);
+          }
+        });
+      }
+
+
+    },*/
     async getSelfAssessmentMaster(){
       //const urls = `${this.ROUTES.selfAssessment}/get-self-assessment-master/${this.$route.params.empid}/${this.gsID}`;
       /*await this.apiGet(urls).then(async (res) => {
@@ -194,7 +342,7 @@ export default {
       const urls = `${this.ROUTES.goalSetting}/get-open-goal-setting`;
       await this.apiGet(urls).then(async (res) => {
         const { data } = res;
-
+        //console.log(data)
         if (data.length > 0) {
           const url = `${this.ROUTES.selfAssessment}/get-end-questions/${
             this.empId
@@ -517,7 +665,7 @@ export default {
                         <b-th>S/n</b-th>
                         <b-th>Goal/Project</b-th>
                         <b-th>Update</b-th>
-                        <b-th>Accomplishments </b-th>
+                        <b-th>Accomplishments</b-th>
                         <b-th>Challenges</b-th>
                         <b-th>Support Needed</b-th>
                         <b-th>Next Steps </b-th>
