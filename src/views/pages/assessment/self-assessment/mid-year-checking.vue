@@ -79,6 +79,7 @@ export default {
           update: "",
         },
       ],
+      assessStatus:0,
       endYearQuestions: [],
       openGoalActivity: null,
       openGoalActivityYear: null,
@@ -154,6 +155,7 @@ export default {
         if (data.questions.length > 0) {
           this.texts = [];
           this.gsID = data.openGoal[0].gs_id;
+          this.assessStatus = data.questions[0].sa_status;
           data.questions.forEach(async (datum) => {
             this.selfAssessmentStatus = true;
             this.prefillStatus = true;
@@ -175,7 +177,7 @@ export default {
             const { data } = res;
               this.texts = [];
               this.gsID = parseInt(data[0].sa_gs_id);
-
+             this.assessStatus = data[0].sa_status;
               data.forEach(async (datum) => {
                 this.selfAssessmentStatus = true;
                 this.prefillStatus = true;
@@ -371,6 +373,7 @@ textarea {
                         v-model="field.goal"
                         rows="6"
                         class="form-control"
+                        :readonly="assessStatus === 1 ? true : false"
                       />
                     </b-td>
                     <b-td style="width: 11%">
@@ -383,6 +386,7 @@ textarea {
                             type="radio"
                             :name="index"
                             :checked="field.update === 'Complete' "
+                            :disabled="assessStatus === 1 ? true : false"
                           />
                           <label class="form-check-label"> Complete </label>
                         </div>
@@ -393,6 +397,7 @@ textarea {
                             v-model="field.update"
                             value="On track"
                             :checked="field.update === 'On track'  "
+                            :disabled="assessStatus === 1 ? true : false"
                             type="radio"
                             :name="index"
                           />
@@ -407,6 +412,7 @@ textarea {
                             type="radio"
                             :name="index"
                             :checked="field.update === 'Delayed' "
+                            :disabled="assessStatus === 1 ? true : false"
                           />
                           <label class="form-check-label"> Delayed </label>
                         </div>
@@ -418,6 +424,7 @@ textarea {
                             type="radio"
                             :name="index"
                             :checked="field.update "
+                            :disabled="assessStatus === 1 ? true : false"
                           />
                           <label class="form-check-label"> Not started  </label>
                         </div>
@@ -429,6 +436,7 @@ textarea {
                             type="radio"
                             :name="index"
                             :checked="field.update === 'No longer relevant'  "
+                            :disabled="assessStatus === 1 ? true : false"
                           />
                           <label class="form-check-label">
                             No longer relevant
@@ -444,6 +452,7 @@ textarea {
                         v-model="field.accomplishment"
                         rows="6"
                         class="form-control"
+                        :readonly="assessStatus === 1 ? true : false"
                       />
                     </b-td>
                     <b-td
@@ -454,6 +463,7 @@ textarea {
                         v-model="field.challenge"
                         rows="6"
                         class="form-control"
+                        :readonly="assessStatus === 1 ? true : false"
                       />
                     </b-td>
                     <b-td
@@ -464,6 +474,7 @@ textarea {
                         v-model="field.support"
                         rows="6"
                         class="form-control"
+                        :readonly="assessStatus === 1 ? true : false"
                       />
                     </b-td>
                     <b-td
@@ -474,13 +485,15 @@ textarea {
                         v-model="field.next_step"
                         rows="6"
                         class="form-control"
+                        :readonly="assessStatus === 1 ? true : false"
                       />
                     </b-td>
-                    <b-td style="width: 1%">
+                    <b-td style="width: 1%" v-if="assessStatus === 0">
                       <button
                         v-if="index > 2"
                         type="button"
                         class="btn btn-sm btn-danger"
+
                         @click="delField(index)"
                       >
                         DEL
@@ -489,7 +502,7 @@ textarea {
                   </b-tr>
                 </b-tbody>
               </b-table-simple>
-              <div class="alert alert-info d-flex mt-3">
+              <div class="alert alert-info d-flex mt-3" v-if="assessStatus === 0 ">
                 <i class="ri-error-warning-line mr-2"></i>
                 You must submit a minimum of 3 goals.
                 <span
@@ -510,6 +523,7 @@ textarea {
                     <b-form-textarea
                       id="option"
                       no-resize
+                      :readonly="assessStatus === 1 ? true : false"
                       rows="3"
                       v-model="optional"
                       placeholder="Optional"
@@ -527,6 +541,7 @@ textarea {
                     v-if="!submitting"
                     class="btn btn-success btn-block mt-4"
                     type="submit"
+                    :disabled="assessStatus === 1 ? true : false"
                   >
                     Submit
                   </b-button>
