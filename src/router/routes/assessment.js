@@ -52,6 +52,15 @@ export default [
       import("@/views/pages/assessment/assess-employees/assess-employee"),
   },
   {
+    path: "/mid-year-assess-employee/:empid/:gsId",
+    name: "mid-year-assess-employee",
+    meta: {
+      authRequired: true,
+    },
+    component: () =>
+      import("@/views/pages/assessment/assess-employees/assess-employee-mid-year"),
+  },
+  {
     path: "/assessment-details/:empid",
     name: "assessment-details",
     meta: {

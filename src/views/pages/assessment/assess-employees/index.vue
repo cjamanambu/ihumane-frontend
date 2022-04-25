@@ -18,7 +18,8 @@ export default {
     ...authComputed,
   },
 
-  mounted() {
+  async mounted() {
+    await this.getOpenGoalSetting();
     this.refreshTable();
   },
   validations: {
@@ -43,6 +44,9 @@ export default {
           active: true,
         },
       ],
+      activeGoalId:null,
+      openGoalActivity:null,
+      openGoalActivityId:null,
       employees: [],
       supervisor_assessments: [],
       employeeId: null,
@@ -92,14 +96,43 @@ export default {
       this.currentPage = 1;
     },
     selectEmployee(employee) {
-
+      let gsId = employee[0].sam_gs_id
       employee = employee[0].employee;
       this.employeeId = employee.emp_id;
-      this.$router.push({
-        name: "assess-employee",
-        params: {
-          empid: this.employeeId,
-        },
+
+      if(parseInt(gsId) === 1){
+        this.$router.push({
+          name: "assess-employee",
+          params: {
+            empid: this.employeeId,
+          },
+        });
+      }else if(parseInt(gsId) === 2){
+        this.$router.push({
+          name: "mid-year-assess-employee",
+          params: {
+            empid: this.employeeId,
+            gsId:2
+          },
+        });
+      }
+
+    },
+    async getOpenGoalSetting() {
+      const url = `${this.ROUTES.goalSetting}/get-open-goal-setting`;
+      await this.apiGet(url).then((res) => {
+        const { data } = res;
+        if (data.length > 0) {
+
+          this.activeGoalId = parseInt(data[0].gs_id);
+          this.openGoalActivity = parseInt(data[0].gs_activity);
+          this.openGoalActivityId = parseInt(data[0].gs_id);
+          this.openGoalActivityFrom = data[0].gs_from;
+          this.openGoalActivityTo = data[0].gs_to;
+          this.openGoalActivityYear = data[0].gs_year;
+          this.checkOpenGoal = 1;
+
+        }
       });
     },
     refreshTable() {
@@ -133,6 +166,7 @@ export default {
             target:`${new Date(ass.goal.gs_from).toDateString()} - ${ new Date(ass.goal.gs_to).toDateString()}`,
             status: parseInt(ass.sam_status) === 1 ? 'Approved' : 'Pending',
             type_of_activity:activity,
+            gsId:ass.sam_gs_id,
             year:ass.goal.gs_year,
             date_published:new Date(ass.createdAt).toDateString(),
             officer:`${ass.employee.emp_first_name} ${ass.employee.emp_last_name} - ${ass.employee.emp_unique_id}`,

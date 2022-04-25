@@ -82,6 +82,7 @@ export default {
       const url = `${this.ROUTES.selfAssessment}/get-self-assessments/${this.getEmployee.emp_id}`;
       await this.apiGet(url).then((res) => {
         const { data } = res;
+        //console.log(data);
         if (data.questions.length) {
           this.texts = [];
           this.gsID = data.openGoal[0].gs_id;
@@ -332,13 +333,39 @@ export default {
                   </div>
                 </div>
               </div>
-              <div v-if="assessStatus === 0">
+              <div class="alert alert-info d-flex mt-3" >
+                <i class="ri-error-warning-line mr-2"></i>
+                You must submit a minimum of 3 goals.
+                <span style="cursor: pointer" class="ml-1" @click="addField">
+
                 <div class="alert alert-info d-flex mt-3">
                   <i class="ri-error-warning-line mr-2"></i>
                   You must submit a minimum of 3 goals.
-                  <span style="cursor: pointer" class="ml-1" @click="addField">
-                  Click here to add a new goal
+                    <span style="cursor: pointer" class="ml-1" @click="addField">
+                    Click here to add a new goal
+                  </span>
+                </div>
                 </span>
+              </div>
+
+              <div class="row">
+                <div class="col-12">
+                  <b-button
+                    v-if="!submitting"
+                    class="btn btn-success btn-block mt-4"
+                    type="submit"
+                    :disabled="assessStatus === 1 ? true : false"
+                  >
+                    Submit
+                  </b-button>
+                  <b-button
+                    v-else
+                    disabled
+                    class="btn btn-success btn-block mt-4"
+                    type="submit"
+                  >
+                    Submitting...
+                  </b-button>
                 </div>
                 <div class="row">
                   <div class="col-12">
@@ -360,6 +387,7 @@ export default {
                   </div>
                 </div>
               </div>
+
             </form>
           </div>
         </div>
