@@ -84,7 +84,7 @@ export default {
       const url = `${this.ROUTES.selfAssessment}/get-self-assessment-master/${empId}`;
       this.apiGet(url).then((res) => {
         const { data } = res;
-        console.log(data);
+        //console.log(data);
 
         data.emp.map((ass, index)=>{
           let activity = null;
