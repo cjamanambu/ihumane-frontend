@@ -96,7 +96,8 @@ export default {
       this.currentPage = 1;
     },
     selectEmployee(employee) {
-      let gsId = employee[0].sam_gs_id
+      //console.log(employee);
+      const gsId = employee[0].gsId;
       employee = employee[0].employee;
       this.employeeId = employee.emp_id;
 
@@ -166,7 +167,7 @@ export default {
             target:`${new Date(ass.goal.gs_from).toDateString()} - ${ new Date(ass.goal.gs_to).toDateString()}`,
             status: parseInt(ass.sam_status) === 1 ? 'Approved' : 'Pending',
             type_of_activity:activity,
-            gsId:ass.sam_gs_id,
+            gsId:ass.goal.gs_activity,
             year:ass.goal.gs_year,
             date_published:new Date(ass.createdAt).toDateString(),
             officer:`${ass.employee.emp_first_name} ${ass.employee.emp_last_name} - ${ass.employee.emp_unique_id}`,
