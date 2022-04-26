@@ -152,9 +152,11 @@ export default {
       const url = `${this.ROUTES.selfAssessment}/get-self-assessment/${this.getEmployee.emp_id}/${this.activeGoalId}`;
       await this.apiGet(url).then((res) => {
         const { data } = res;
+        //console.log(data);
         if (data.questions.length > 0) {
           this.texts = [];
           this.gsID = data.openGoal[0].gs_id;
+          this.optional = data.master?.sam_optional;
           this.assessStatus = data.questions[0].sa_status;
           data.questions.forEach(async (datum) => {
             this.selfAssessmentStatus = true;
@@ -208,6 +210,36 @@ export default {
 
     },
 
+    async getSelfAssessmentMaster(){
+      const url = `${this.ROUTES.selfAssessment}/get-master-self-assessment/${this.getEmployee.emp_id}/${this.activeGoalId}`;
+      await this.apiGet(url).then((res) => {
+        const { data } = res;
+        console.log(data);
+        /*if (data.questions.length > 0) {
+          this.texts = [];
+          this.gsID = data.openGoal[0].gs_id;
+          //this.optional = data.master?.sam_optional;
+          this.assessStatus = data.questions[0].sa_status;
+          data.questions.forEach(async (datum) => {
+            this.selfAssessmentStatus = true;
+            this.prefillStatus = true;
+            const dat = {
+              id: datum.sa_id,
+              goal: datum.sa_comment,
+              update: datum.sa_update,
+              accomplishment:datum.sa_accomplishment,
+              next_step:datum.sa_next_steps,
+              challenge:datum.sa_challenges,
+              support:datum.sa_support_needed,
+            };
+            this.texts.push(dat);
+
+          });
+        } */
+      });
+
+
+    },
 
     submitNewBeginning() {
 

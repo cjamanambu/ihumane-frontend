@@ -158,7 +158,6 @@ export default {
       const url = `${this.ROUTES.selfAssessment}/get-self-assessment/${this.empId}/${this.activeGoalId}`;
       await this.apiGet(url).then((res) => {
         const { data } = res;
-        //console.log(data.questions);
         if (data.questions.length > 0) {
           this.texts = [];
           this.gsID = data.openGoal[0].gs_id;
