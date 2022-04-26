@@ -152,7 +152,6 @@ export default {
       const url = `${this.ROUTES.selfAssessment}/get-self-assessment/${this.getEmployee.emp_id}/${this.activeGoalId}`;
       await this.apiGet(url).then((res) => {
         const { data } = res;
-        console.log(data);
         if (data.questions.length > 0) {
           this.texts = [];
           this.gsID = data.openGoal[0].gs_id;
@@ -176,6 +175,7 @@ export default {
         } else {
           const prevUrl = `${this.ROUTES.selfAssessment}/prefill-goal-setting/${this.getEmployee.emp_id}`;
            this.apiGet(prevUrl).then((res) => {
+
             const { data } = res;
               this.texts = [];
               this.gsID = parseInt(data[0].sa_gs_id);
