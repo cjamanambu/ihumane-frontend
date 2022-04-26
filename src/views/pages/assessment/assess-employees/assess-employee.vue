@@ -133,7 +133,7 @@ export default {
           };
           this.assessments.push(dat);
         });
-        console.log(this.assessments);
+        //console.log(this.assessments);
         //}
       });
     },
