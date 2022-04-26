@@ -361,9 +361,7 @@ export default {
       }
     },
      processAssessment(){
-       this.$router.push({
-         name: "assess-employees",
-       });
+
       const employeeID = this.$route.params.empid;
       const gsId = this.gsID;
       const url = `${this.ROUTES.selfAssessment}/approve-assessment/${employeeID}/${gsId}`;
@@ -371,9 +369,10 @@ export default {
         gs_id: gsId,
         emp_id:employeeID,
       };
-       this.apiPost(url, data, "Could not process request").then((res) => {
-        console.log(res)
+       this.apiPost(url, data, "Could not process request").then(() => {
         this.apiResponseHandler("Process Complete", "Employee self-assessment completed.");
+         //this.$router.push("/assess-employees");
+          location.reload();
       });
 
 
@@ -505,7 +504,7 @@ export default {
                                 type="radio"
                                 :name="index"
                                 :checked="field.update === 'No longer relevant'  "
-                                :disabled="assessStatus === 1 ? true : false"
+                                :disabled="assessStatus === 1"
                               />
                               <label class="form-check-label">
                                 No longer relevant
@@ -672,7 +671,9 @@ export default {
               <div class="card-body">
                 <form @submit.prevent="processAssessment">
                   <div class="btn-group d-flex ">
-                    <button class="btn btn-success btn-sm" :disabled="assessStatus === 1 ? true : false"> <i class="mdi mdi-check mr-2"></i> Approve </button>
+                    <button class="btn btn-success btn-sm"
+                            :disabled="assessStatus === 1"
+                    > <i class="mdi mdi-check mr-2"></i> Approve </button>
                   </div>
                 </form>
               </div>
