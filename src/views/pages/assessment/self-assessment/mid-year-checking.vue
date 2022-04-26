@@ -86,7 +86,6 @@ export default {
       openGoalActivityFrom: null,
       openGoalActivityTo: null,
       openGoalActivityId: null,
-      optional: null,
       goals: [],
       start: "",
       end: "",
@@ -106,6 +105,7 @@ export default {
       checkOpenGoal: 0,
       gsID: null,
       activeGoalId:null,
+      optional:null,
 
     };
   },
@@ -152,10 +152,12 @@ export default {
       const url = `${this.ROUTES.selfAssessment}/get-self-assessment/${this.getEmployee.emp_id}/${this.activeGoalId}`;
       await this.apiGet(url).then((res) => {
         const { data } = res;
+        console.log(data);
         if (data.questions.length > 0) {
           this.texts = [];
           this.gsID = data.openGoal[0].gs_id;
           this.assessStatus = data.questions[0].sa_status;
+          this.optional = data.master?.sam_optional;
           data.questions.forEach(async (datum) => {
             this.selfAssessmentStatus = true;
             this.prefillStatus = true;

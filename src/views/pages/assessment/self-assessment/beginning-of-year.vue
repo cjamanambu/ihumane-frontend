@@ -320,13 +320,14 @@ export default {
                     />
                   </div>
                 </div>
-                <div class="col-1" v-if="index > 2">
+                <div class="col-1" v-if="index > 2" >
                   <div class="form-group">
                     <label style="visibility: hidden">hidden</label><br />
                     <button
                       type="button"
                       class="btn btn-danger btn-block"
                       @click="delField(index)"
+                      v-if="assessStatus === 0"
                     >
                       DEL
                     </button>

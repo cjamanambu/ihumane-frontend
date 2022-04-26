@@ -116,6 +116,7 @@ export default {
       count: 0,
       selfAssessmentStatus: false,
       prefillStatus: false,
+      optional: null,
       selfAssessmentGoals: [],
       endYearAssessments: [],
       assessments: [],
@@ -162,6 +163,7 @@ export default {
           this.texts = [];
           this.gsID = data.openGoal[0].gs_id;
           this.gsID = data.openGoal[0].gs_id;
+          this.optional = data.master?.sam_optional;
           this.assessStatus = data.questions[0].sa_status;
           data.questions.forEach(async (datum) => {
             this.selfAssessmentStatus = true;
@@ -562,6 +564,7 @@ export default {
                             type="button"
                             class="btn btn-sm btn-danger"
                             @click="delField(index)"
+                            style="display: none;"
                           >
                             DEL
                           </button>
