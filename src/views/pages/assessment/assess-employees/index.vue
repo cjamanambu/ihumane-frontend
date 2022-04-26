@@ -170,7 +170,7 @@ export default {
             gsId:ass.goal.gs_activity,
             year:ass.goal.gs_year,
             date_published:new Date(ass.createdAt).toDateString(),
-            officer:`${ass.employee.emp_first_name} ${ass.employee.emp_last_name} - ${ass.employee.emp_unique_id}`,
+            officer:`${ass.employee?.emp_first_name} ${ass.employee?.emp_last_name} - ${ass.employee?.emp_unique_id}`,
             ...ass}
           this.supervisor_assessments.push(supData);
         })
