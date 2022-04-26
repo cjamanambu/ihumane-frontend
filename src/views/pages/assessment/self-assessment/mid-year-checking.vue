@@ -169,7 +169,7 @@ export default {
               support:datum.sa_support_needed,
             };
             this.texts.push(dat);
-            //console.log(this.texts);
+
           });
         } else {
           const prevUrl = `${this.ROUTES.selfAssessment}/prefill-goal-setting/${this.getEmployee.emp_id}`;
@@ -177,7 +177,7 @@ export default {
             const { data } = res;
               this.texts = [];
               this.gsID = parseInt(data[0].sa_gs_id);
-             this.assessStatus = data[0].sa_status;
+             this.assessStatus = 0; //data[0].sa_status;
               data.forEach(async (datum) => {
                 this.selfAssessmentStatus = true;
                 this.prefillStatus = true;

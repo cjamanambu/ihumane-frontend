@@ -82,7 +82,7 @@ export default {
       const url = `${this.ROUTES.selfAssessment}/get-self-assessments/${this.getEmployee.emp_id}`;
       await this.apiGet(url).then((res) => {
         const { data } = res;
-        //console.log(data);
+
         if (data.questions.length) {
           this.texts = [];
           this.gsID = data.openGoal[0].gs_id;
