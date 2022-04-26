@@ -84,6 +84,7 @@ export default {
       const url = `${this.ROUTES.selfAssessment}/get-self-assessment-master/${empId}`;
       this.apiGet(url).then((res) => {
         const { data } = res;
+        console.log(data);
 
         data.emp.map((ass, index)=>{
           let activity = null;
@@ -105,7 +106,7 @@ export default {
             type_of_activity: activity,
             year:ass.goal.gs_year,
             date_published:new Date(ass.createdAt).toDateString(),
-            officer:`${ass.supervisor.emp_first_name} ${ass.supervisor.emp_last_name} - ${ass.supervisor.emp_unique_id}`,
+            officer:`${ass.supervisor?.emp_first_name} ${ass.supervisor?.emp_last_name} - ${ass.supervisor?.emp_unique_id}`,
             ...ass}
           this.assessments.push(localData);
         })
@@ -129,7 +130,7 @@ export default {
       this.currentPage = 1;
     },
     selectEmployee(employee) {
-      console.log(employee);
+      //console.log(employee);
       let gsPeriod = employee[0].goal.gs_activity;
       let gsId = employee[0].goal.gs_id;
       employee = employee[0];
