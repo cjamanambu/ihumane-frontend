@@ -360,7 +360,10 @@ export default {
         });
       }
     },
-    processAssessment(){
+     processAssessment(){
+       this.$router.push({
+         name: "assess-employees",
+       });
       const employeeID = this.$route.params.empid;
       const gsId = this.gsID;
       const url = `${this.ROUTES.selfAssessment}/approve-assessment/${employeeID}/${gsId}`;
@@ -368,11 +371,9 @@ export default {
         gs_id: gsId,
         emp_id:employeeID,
       };
-      this.apiPost(url, data, "Could not process request").then(() => {
+       this.apiPost(url, data, "Could not process request").then((res) => {
+        console.log(res)
         this.apiResponseHandler("Process Complete", "Employee self-assessment completed.");
-        this.$router.push({
-          name: "assess-employees",
-        });
       });
 
 
