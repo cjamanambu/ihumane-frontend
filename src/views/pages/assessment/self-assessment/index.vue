@@ -129,14 +129,29 @@ export default {
       this.currentPage = 1;
     },
     selectEmployee(employee) {
+      console.log(employee);
+      let gsPeriod = employee[0].goal.gs_activity;
+      let gsId = employee[0].goal.gs_id;
       employee = employee[0];
       this.employeeId = employee.sam_emp_id;
-      this.$router.push({
-        name: "assessment-details",
-        params: {
-          empid: this.employeeId,
-        },
-      });
+      if(parseInt(gsPeriod) === 1){
+        this.$router.push({
+          name: "assessment-details",
+          params: {
+            empid: this.employeeId,
+            gsId:gsId
+          },
+        });
+      }else if(parseInt(gsPeriod) === 2){
+        this.$router.push({
+          name: "assess-mid-year-details",
+          params: {
+            empid: this.employeeId,
+            gsId:2
+          },
+        });
+      }
+
     },
   },
 };

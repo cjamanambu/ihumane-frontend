@@ -61,7 +61,16 @@ export default [
       import("@/views/pages/assessment/assess-employees/assess-employee-mid-year"),
   },
   {
-    path: "/assessment-details/:empid",
+    path: "/assess-mid-year-details/:empid/:gsId",
+    name: "assess-mid-year-details",
+    meta: {
+      authRequired: true,
+    },
+    component: () =>
+      import("@/views/pages/assessment/self-assessment/assess-mid-year-details"),
+  },
+  {
+    path: "/assessment-details/:empid/:gsId",
     name: "assessment-details",
     meta: {
       authRequired: true,
