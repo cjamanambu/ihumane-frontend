@@ -315,14 +315,14 @@ export default {
                 </template>
 
 
-                <template #cell(employee_gross)="row">
-                  <span class="text-nowrap">
+                <template #cell(gross)="row">
+                  <span class="float-right">
                     {{ row.value }}
                   </span>
                 </template>
 
-                <template #cell(tax_contribution)="row">
-                  <span class="text-nowrap">
+                <template #cell(tax)="row">
+                  <span class="float-right">
                     {{ row.value }}
                   </span>
                 </template>

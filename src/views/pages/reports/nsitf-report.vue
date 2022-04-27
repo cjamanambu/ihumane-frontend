@@ -38,11 +38,11 @@ export default {
           //   if(typeof pensionArray[0])
           let nsitfObj = {
             sn: ++index,
-            employee_unique_id: nsitf.employeeUniqueId,
+            t7: nsitf.employeeUniqueId,
             employeeName: nsitf.employeeName,
             sector: nsitf.sector,
-            location: nsitf.location,
-            employee_gross: this.apiValueHandler(nsitf.adjustedGross.toFixed(2)) ?? '0.00',
+            t6: nsitf.location,
+            gross: this.apiValueHandler(nsitf.adjustedGross.toFixed(2)) ?? '0.00',
             nsitf_contribution: this.apiValueHandler(nsitf.nsitfArray[0].Amount.toFixed(2)) ?? '0.00',
             month: nsitf.month,
             year: nsitf.year,
@@ -59,16 +59,16 @@ export default {
         let key = field;
         if (key === "sn") {
           this.jsonFields["S/N"] = key;
-        } else if (key === "employee_unique_id") {
+        } else if (key === "t7") {
           this.jsonFields["T7 NUMBER"] = key;
         } else if (key === "employeeName") {
           this.jsonFields["NAME"] = key;
         }  else if (key === "sector") {
           this.jsonFields["SECTOR"] = key;
-        }else if (key === "location") {
+        }else if (key === "t6") {
           this.jsonFields["LOCATION"] = key;
-        } else if (key === "employee_gross") {
-          this.jsonFields["EMPLOYEE GROSS"] = key;
+        } else if (key === "gross") {
+          this.jsonFields["GROSS"] = key;
         } else if (key === "nsitf_contribution") {
           this.jsonFields["nsitf CONTRIBUTION"] = key;
         } else if (key === "total") {
@@ -148,13 +148,13 @@ export default {
       sortDesc: false,
       newFields: [
         "sn",
-        "employee_unique_id",
+        "t7",
         "employeeName",
         "sector",
-        "location",
+        "t6",
         "month",
         "year",
-        "employee_gross",
+        "gross",
         "nsitf_contribution",
 
       ],
@@ -311,14 +311,14 @@ export default {
                 </template>
 
 
-                <template #cell(employee_gross)="row">
-                  <span class="text-nowrap">
+                <template #cell(gross)="row">
+                  <span class="float-right">
                     {{ row.value }}
                   </span>
                 </template>
 
                 <template #cell(nsitf_contribution)="row">
-                  <span class="text-nowrap">
+                  <span class="float-right">
                     {{ row.value }}
                   </span>
                 </template>
