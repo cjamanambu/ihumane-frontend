@@ -61,10 +61,10 @@ export default {
         { key: "sn", label: "S/n", sortable: true },
         {
           key: "target",
-          label: "Goal",
+          label: "Goal Setting Period",
           sortable: true,
         },
-        { key: "year", label: "Year", sortable: true },
+        { key: "year", label: "Goal Setting Year", sortable: true },
         { key: "type_of_activity", label: "Activity Type", sortable: true },
         { key: "officer", label: "Supervisor", sortable: true },
         { key: "status", label: "Status", sortable: true },
