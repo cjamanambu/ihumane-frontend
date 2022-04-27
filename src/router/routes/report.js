@@ -72,4 +72,22 @@ export default [
     },
     component: () => import("@/views/pages/reports/nhf-report"),
   },
+
+  {
+    path: "/reports/tax-report/:period/:locationID",
+    name: "tax-report",
+    meta: {
+      authRequired: true,
+    },
+    component: () => import("@/views/pages/reports/tax-report"),
+  },
+
+  {
+    path: "/reports/nsitf-report/:period/:locationID",
+    name: "nsitf-report",
+    meta: {
+      authRequired: true,
+    },
+    component: () => import("@/views/pages/reports/nsitf-report"),
+  },
 ];
