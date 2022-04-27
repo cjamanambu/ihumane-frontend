@@ -5,7 +5,7 @@ import appConfig from "@/app.config";
 import JsonExcel from "vue-json-excel";
 export default {
   page: {
-    title: "Tax Report",
+    title: "NSITF Report",
     meta: [{ name: "description", content: appConfig.description }],
   },
   components: {
@@ -26,32 +26,31 @@ export default {
         pym_year: parseFloat(this.period[1]),
         pym_location: parseFloat(this.location),
       };
-      const url = `${this.ROUTES.salary}/tax-report`;
-      this.apiPost(url, data, "Generate tax Report").then(async (res) => {
+      const url = `${this.ROUTES.salary}/nsitf-report`;
+      this.apiPost(url, data, "Generate NSITF Report").then(async (res) => {
         const {data} = res;
         const newData = await this.sortArrayOfObjects(data)
-        newData.forEach((tax, index) => {
-          this.locationName = tax.location;
+        newData.forEach((nsitf, index) => {
+          this.locationName = nsitf.location;
           // let pensionEmployeeContribution;
           // let pensionEmployeeContribution;
           // let voluntaryPension;
           //   if(typeof pensionArray[0])
-          let taxObj = {
+          let nsitfObj = {
             sn: ++index,
-            employee_unique_id: tax.employeeUniqueId,
-            employeeName: tax.employeeName,
-            sector: tax.sector,
-            location: tax.location,
-            employee_gross: this.apiValueHandler(tax.adjustedGross.toFixed(2)) ?? '0.00',
-            tax_contribution: this.apiValueHandler(tax.taxArray[0].Amount.toFixed(2)) ?? '0.00',
-            month: tax.month,
-            year: tax.year,
-            paye_number: tax.employeePaye
+            employee_unique_id: nsitf.employeeUniqueId,
+            employeeName: nsitf.employeeName,
+            sector: nsitf.sector,
+            location: nsitf.location,
+            employee_gross: this.apiValueHandler(nsitf.adjustedGross.toFixed(2)) ?? '0.00',
+            nsitf_contribution: this.apiValueHandler(nsitf.nsitfArray[0].Amount.toFixed(2)) ?? '0.00',
+            month: nsitf.month,
+            year: nsitf.year,
           };
-          this.taxs.push(taxObj);
+          this.nsitfs.push(nsitfObj);
         });
-        this.filtered = this.taxs;
-        this.totalRows = this.taxs.length;
+        this.filtered = this.nsitfs;
+        this.totalRows = this.nsitfs.length;
 
 
       });
@@ -70,16 +69,14 @@ export default {
           this.jsonFields["LOCATION"] = key;
         } else if (key === "employee_gross") {
           this.jsonFields["EMPLOYEE GROSS"] = key;
-        } else if (key === "tax_contribution") {
-          this.jsonFields["TAX CONTRIBUTION"] = key;
+        } else if (key === "nsitf_contribution") {
+          this.jsonFields["nsitf CONTRIBUTION"] = key;
         } else if (key === "total") {
           this.jsonFields["TOTAL"] = key;
         }else if (key === "month") {
           this.jsonFields["MONTH"] = key;
         }else if (key === "year") {
           this.jsonFields["YEAR"] = key;
-        }else if (key === "paye_number") {
-          this.jsonFields["PAYE NUMBER"] = key;
         }
       });
     },
@@ -123,7 +120,7 @@ export default {
   },
   data() {
     return {
-      title: "Tax Report",
+      title: "nsitf Report",
       items: [
         {
           text: "IHUMANE",
@@ -139,7 +136,7 @@ export default {
       ],
       period: null,
       filtered: [],
-      taxs: [],
+      nsitfs: [],
       paymentDefinitions: [],
       totalRows: 1,
       currentPage: 1,
@@ -155,11 +152,10 @@ export default {
         "employeeName",
         "sector",
         "location",
-        "paye_number",
         "month",
         "year",
         "employee_gross",
-        "tax_contribution",
+        "nsitf_contribution",
 
       ],
       incomeFields: [],
@@ -188,7 +184,7 @@ export default {
           <div class="card-body">
             <div class="p-3 bg-light mb-4 d-flex justify-content-between">
               <h5 class="font-size-14 mb-0" v-if="period">
-                Tax Report for
+                NSITF Report for
                 {{ locationName }} in Payroll Period:
                 {{ (parseInt(period[0]) - 1) | getMonth }}
                 {{ period[1] }}
@@ -196,9 +192,9 @@ export default {
               <span class="font-size-12 text-success">
                 <JsonExcel
                   style="cursor: pointer"
-                  :data="taxs"
+                  :data="nsitfs"
                   :fields="jsonFields"
-                  :name="`tax_Report_${locationName}(${period[0]}-${period[1]}).xls`"
+                  :name="`nsitf_Report_${locationName}(${period[0]}-${period[1]}).xls`"
                 >
                   Export to Excel
                 </JsonExcel>
@@ -256,13 +252,13 @@ export default {
               <!-- End search -->
             </div>
             <!-- Table -->
-            <div class="table-responsive mb-0" v-if="taxs.length">
+            <div class="table-responsive mb-0" v-if="nsitfs.length">
               <b-table
                 ref="deduction-table"
                 bordered
                 hover
                 small
-                :items="taxs"
+                :items="nsitfs"
                 :fields="newFields"
                 striped
                 responsive="lg"
@@ -321,7 +317,7 @@ export default {
                   </span>
                 </template>
 
-                <template #cell(tax_contribution)="row">
+                <template #cell(nsitf_contribution)="row">
                   <span class="text-nowrap">
                     {{ row.value }}
                   </span>
