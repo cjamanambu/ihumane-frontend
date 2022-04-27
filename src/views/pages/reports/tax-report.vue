@@ -38,12 +38,12 @@ export default {
           //   if(typeof pensionArray[0])
           let taxObj = {
             sn: ++index,
-            employee_unique_id: tax.employeeUniqueId,
+            t7: tax.employeeUniqueId,
             employeeName: tax.employeeName,
             sector: tax.sector,
-            location: tax.location,
-            employee_gross: this.apiValueHandler(tax.adjustedGross.toFixed(2)) ?? '0.00',
-            tax_contribution: this.apiValueHandler(tax.taxArray[0].Amount.toFixed(2)) ?? '0.00',
+            t6: tax.location,
+            gross: this.apiValueHandler(tax.adjustedGross.toFixed(2)) ?? '0.00',
+            tax: this.apiValueHandler(tax.taxArray[0].Amount.toFixed(2)) ?? '0.00',
             month: tax.month,
             year: tax.year,
             paye_number: tax.employeePaye
@@ -60,18 +60,18 @@ export default {
         let key = field;
         if (key === "sn") {
           this.jsonFields["S/N"] = key;
-        } else if (key === "employee_unique_id") {
+        } else if (key === "t7") {
           this.jsonFields["T7 NUMBER"] = key;
         } else if (key === "employeeName") {
           this.jsonFields["NAME"] = key;
         }  else if (key === "sector") {
           this.jsonFields["SECTOR"] = key;
-        }else if (key === "location") {
-          this.jsonFields["LOCATION"] = key;
-        } else if (key === "employee_gross") {
-          this.jsonFields["EMPLOYEE GROSS"] = key;
-        } else if (key === "tax_contribution") {
-          this.jsonFields["TAX CONTRIBUTION"] = key;
+        }else if (key === "t6") {
+          this.jsonFields["T6 NUMBER"] = key;
+        } else if (key === "gross") {
+          this.jsonFields["GROSS"] = key;
+        } else if (key === "tax") {
+          this.jsonFields["TAX"] = key;
         } else if (key === "total") {
           this.jsonFields["TOTAL"] = key;
         }else if (key === "month") {
@@ -151,15 +151,15 @@ export default {
       sortDesc: false,
       newFields: [
         "sn",
-        "employee_unique_id",
+        "t7",
         "employeeName",
         "sector",
-        "location",
+        "t6",
         "paye_number",
         "month",
         "year",
-        "employee_gross",
-        "tax_contribution",
+        "gross",
+        "tax",
 
       ],
       incomeFields: [],
