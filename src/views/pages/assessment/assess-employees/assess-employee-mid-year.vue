@@ -117,6 +117,7 @@ export default {
       selfAssessmentStatus: false,
       prefillStatus: false,
       optional: null,
+      sam_discussion_held_on: null,
       selfAssessmentGoals: [],
       endYearAssessments: [],
       assessments: [],
@@ -163,6 +164,7 @@ export default {
           this.gsID = data.openGoal[0].gs_id;
           this.gsID = data.openGoal[0].gs_id;
           this.optional = data.master?.sam_optional;
+          this.sam_discussion_held_on =  new Date(data.master?.sam_discussion_held_on).toISOString().substr(0,10);
           this.assessStatus = data.questions[0].sa_status;
           data.questions.forEach(async (datum) => {
             this.selfAssessmentStatus = true;
@@ -287,6 +289,7 @@ export default {
           sa_next_steps: field.next_step,
           sa_update: field.update,
           optional: this.optional,
+          sam_discussion_held_on: this.sam_discussion_held_on,
         };
         this.goals.push(data);
         return true;
@@ -583,6 +586,12 @@ export default {
                 </span>
                   </div>
                   <div class="row">
+                    <div class="col-md-4">
+                      <div class="form-group">
+                        <label for="">Discussion Held on:</label>
+                        <input type="date" v-model="sam_discussion_held_on" placeholder="Discussion Held On" class="form-control">
+                      </div>
+                    </div>
                     <div class="col-12">
                       <div class="form-group">
                         <label for="op">
