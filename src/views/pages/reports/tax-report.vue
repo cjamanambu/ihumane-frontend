@@ -42,7 +42,7 @@ export default {
             employeeName: tax.employeeName,
             sector: tax.sector,
             t6: tax.location,
-            gross: this.apiValueHandler(tax.adjustedGross.toFixed(2)) ?? '0.00',
+            gross: this.apiValueHandler(tax.adjustedGrossII.toFixed(2)) ?? '0.00',
             tax: this.apiValueHandler(tax.taxArray[0].Amount.toFixed(2)) ?? '0.00',
             month: tax.month,
             year: tax.year,

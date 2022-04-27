@@ -42,7 +42,7 @@ export default {
             employeeName: nsitf.employeeName,
             sector: nsitf.sector,
             t6: nsitf.location,
-            gross: this.apiValueHandler(nsitf.adjustedGross.toFixed(2)) ?? '0.00',
+            gross: this.apiValueHandler(nsitf.adjustedGrossII.toFixed(2)) ?? '0.00',
             nsitf_contribution: this.apiValueHandler(nsitf.nsitfArray[0].Amount.toFixed(2)) ?? '0.00',
             month: nsitf.month,
             year: nsitf.year,
