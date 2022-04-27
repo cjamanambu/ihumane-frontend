@@ -10,12 +10,14 @@ import BankOrder from "./components/bank-order";
 import EmployeeReport from "./components/employee-report";
 import PensionReport from "./components/pension-report";
 import NhfReport from "./components/nhf-report";
+import TaxReport from "./components/tax-report";
 export default {
   page: {
     title: "Reports",
     meta: [{ name: "description", content: appConfig.description }],
   },
   components: {
+    TaxReport,
     Layout,
     PageHeader,
     Emolument,
@@ -101,6 +103,9 @@ export default {
         </div>
         <div class="col-md-4">
           <NhfReport />
+        </div>
+        <div class="col-md-4">
+          <TaxReport />
         </div>
       </div>
       <div class="p-3 bg-light mb-4 d-flex justify-content-between">
