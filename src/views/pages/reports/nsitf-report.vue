@@ -130,7 +130,7 @@ export default {
           href: "/",
         },
         {
-          text: "NHF Report",
+          text: "NSITF Report",
           active: true,
         },
       ],

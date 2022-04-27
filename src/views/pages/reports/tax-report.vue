@@ -133,7 +133,7 @@ export default {
           href: "/",
         },
         {
-          text: "NHF Report",
+          text: "TAX Report",
           active: true,
         },
       ],
