@@ -27,9 +27,10 @@ export default {
         pym_location: parseFloat(this.location),
       };
       const url = `${this.ROUTES.salary}/pension-report`;
-      this.apiPost(url, data, "Generate Pension Report").then((res) => {
-        const { data } = res;
-        data.forEach((pension, index) => {
+      this.apiPost(url, data, "Generate Pension Report").then(async (res) => {
+        const {data} = res;
+        const newData = await this.sortArrayOfObjects(data)
+        newData.forEach((pension, index) => {
           this.locationName = pension.location;
           // let pensionEmployeeContribution;
           // let pensionEmployeeContribution;
@@ -42,9 +43,9 @@ export default {
             employeeName: pension.employeeName,
             sector: pension.sector,
             location: pension.location,
-            employee_gross: this.apiValueHandler(pension.adjustedGrossII.toFixed(2))  ?? '0.00',
-            pension_employee_contribution: this.apiValueHandler(pension.pensionArray[0].Amount.toFixed(2))  ?? '0.00',
-            pension_employer_contribution:this.apiValueHandler(pension.pensionArray[1].Amount.toFixed(2)) ?? '0.00',
+            employee_gross: this.apiValueHandler(pension.adjustedGrossII.toFixed(2)) ?? '0.00',
+            pension_employee_contribution: this.apiValueHandler(pension.pensionArray[0].Amount.toFixed(2)) ?? '0.00',
+            pension_employer_contribution: this.apiValueHandler(pension.pensionArray[1].Amount.toFixed(2)) ?? '0.00',
             voluntary_pension: this.apiValueHandler(pension.pensionArray[2].Amount.toFixed(2)) ?? '0.00',
             total: this.apiValueHandler(pension.totalPension.toFixed(2)) ?? '0.00',
             month: pension.month,
@@ -117,6 +118,20 @@ export default {
       }
       return ret;
     },
+
+    async sortArrayOfObjects(array) {
+      return array.sort(function (a, b) {
+
+        let matchesA = a.employeeUniqueId.match(/(\d+)/);
+        matchesA = parseInt(matchesA[0])
+
+        let matchesB = b.employeeUniqueId.match(/(\d+)/);
+        matchesB = parseInt(matchesB[0])
+
+        return matchesA - matchesB;
+      })
+    },
+
   },
   data() {
     return {
