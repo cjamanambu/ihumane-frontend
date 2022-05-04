@@ -90,4 +90,21 @@ export default [
     },
     component: () => import("@/views/pages/reports/nsitf-report"),
   },
+  {
+    path: "/reports/approved-salary-routine/:period",
+    name: "approved-salary-routine",
+    meta: {
+      authRequired: true,
+    },
+    component: () => import("@/views/pages/reports/approved-salary-routine"),
+  },
+
+  {
+    path: "/view-approved-salary-routine/:locationId",
+    name: "view-approved-salary-routine",
+    meta: {
+      authRequired: true,
+    },
+    component: () => import("@/views/pages/reports/view-approved-salary-routine"),
+  },
 ];
