@@ -30,7 +30,7 @@ export default {
   },
   data() {
     return {
-      notifications:[],
+      notifications: [],
       languages: [
         {
           flag: require("@/assets/images/flags/us.jpg"),
@@ -62,8 +62,8 @@ export default {
     };
   },
   methods: {
-    getEmployeeNotifications(){
-      let employeeID = this.getEmployee.emp_id
+    getEmployeeNotifications() {
+      let employeeID = this.getEmployee.emp_id;
       const url = `${this.ROUTES.notifications}/${employeeID}`;
       this.apiGet(url, "Get Notifications Error").then((res) => {
         const { data } = res;
@@ -282,8 +282,12 @@ export default {
             </div>
           </div>
           <simplebar style="max-height: 230px">
-
-            <a href class="text-reset notification-item" v-for="notify in notifications" :key="notify.n_id">
+            <a
+              href
+              class="text-reset notification-item"
+              v-for="notify in notifications"
+              :key="notify.n_id"
+            >
               <div class="media">
                 <div class="avatar-xs mr-3">
                   <span
@@ -308,8 +312,6 @@ export default {
                 </div>
               </div>
             </a>
-
-
           </simplebar>
           <div class="p-2 border-top">
             <a
