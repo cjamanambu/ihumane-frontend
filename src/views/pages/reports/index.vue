@@ -12,12 +12,15 @@ import PensionReport from "./components/pension-report";
 import NhfReport from "./components/nhf-report";
 import TaxReport from "./components/tax-report";
 import NsitfReport from "./components/nsitf-report";
+import ApprovedRoutine from "./components/approved-routine";
+
 export default {
   page: {
     title: "Reports",
     meta: [{ name: "description", content: appConfig.description }],
   },
   components: {
+    ApprovedRoutine,
     NsitfReport,
     TaxReport,
     Layout,
@@ -111,6 +114,9 @@ export default {
         </div>
         <div class="col-md-4">
           <NsitfReport />
+        </div>
+        <div class="col-md-4">
+          <ApprovedRoutine />
         </div>
       </div>
       <div class="p-3 bg-light mb-4 d-flex justify-content-between">
