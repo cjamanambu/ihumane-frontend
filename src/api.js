@@ -69,4 +69,5 @@ export const ROUTES = {
   hrFocalPoint: `hr-focal-point`,
   leaveDoc: `leavedoc`,
   notifications: `notifications`,
+  endYearResponse: `end-year-response`,
 };
