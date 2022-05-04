@@ -100,7 +100,7 @@ export default [
   },
 
   {
-    path: "/view-approved-salary-routine/:locationId",
+    path: "/view-approved-salary-routine/:locationId/:month/:year",
     name: "view-approved-salary-routine",
     meta: {
       authRequired: true,

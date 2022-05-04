@@ -17,7 +17,7 @@ export default [
     component: () => import("@/views/pages/payroll-routine/approve-payroll"),
   },
   {
-    path: "/view-payslip/:empID",
+    path: "/view-payslip/:empID/:month/:year",
     name: "view-payslip",
     meta: {
       authRequired: true,
