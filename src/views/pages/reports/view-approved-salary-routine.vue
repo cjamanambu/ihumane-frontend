@@ -68,15 +68,19 @@ export default {
     },
     refreshTable() {
       let locationId = this.$route.params.locationId;
+      let year = this.$route.params.year;
+      let month = this.$route.params.month;
+      this.period[0] = month;
+      this.period[1] = year;
       // this.period = this.$route.params.period.split("-");
       // this.location = this.$route.params.locationID;
-      // let data = {
-      //   pym_month: parseFloat(this.period[0]),
-      //   pym_year: parseFloat(this.period[1]),
-      //   pmyl_location_id: parseFloat(this.location),
-      // };
-      const url = `${this.ROUTES.salary}/pull-emolument/${locationId}`;
-      this.apiGet(url, "Generate Emolument Report").then(async (res) => {
+      let data = {
+        pym_month: parseInt(month),
+        pym_year: parseInt(year),
+        pmyl_location_id: locationId,
+      };
+      const url = `${this.ROUTES.salary}/pull-emolument`;
+      this.apiPost(url, data, "Generate Emolument Report").then(async (res) => {
         const {data} = res;
         const newData = await this.sortArrayOfObjects(data)
         newData.forEach((emolument, index) => {
@@ -173,7 +177,10 @@ export default {
       row = row[0];
       console.log(row)
       let empID = row.employeeId;
-      this.$router.push({ name: "view-payslip", params: { empID } });
+      let year = this.period[1];
+      let month = this.period[0];
+
+      this.$router.push({ name: "view-payslip", params: { empID, month, year } });
       this.$refs["emolument-table"].clearSelected();
     },
   },

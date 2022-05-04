@@ -5,7 +5,7 @@ import appConfig from "@/app.config";
 //import JsonExcel from "vue-json-excel";
 export default {
   page: {
-    title: "Variation Report",
+    title: "Approved Salary Report",
     meta: [{ name: "description", content: appConfig.description }],
   },
   components: {
@@ -21,13 +21,19 @@ export default {
     selectRow(row) {
       row = row[0];
       let locationId = row.locationId;
-      this.$router.push({ name: "view-approved-salary-routine", params: { locationId } });
+      this.period = this.$route.params.period;
+      this.period = this.period.split("-");
+      let month = this.period[0]
+      let year = this.period[1]
+
+      this.$router.push({ name: "view-approved-salary-routine", params: { locationId, month, year } });
       this.$refs["payrollSummaryTable"].clearSelected();
     },
 
     async fetchPayrollRoutine() {
       this.period = this.$route.params.period;
       this.period = this.period.split("-");
+
       let data = {
         pym_month: parseFloat(this.period[0]),
         pym_year: parseFloat(this.period[1]),
