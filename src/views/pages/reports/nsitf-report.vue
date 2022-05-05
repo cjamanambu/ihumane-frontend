@@ -5,7 +5,7 @@ import appConfig from "@/app.config";
 import JsonExcel from "vue-json-excel";
 export default {
   page: {
-    title: "Pension Report",
+    title: "NSITF Report",
     meta: [{ name: "description", content: appConfig.description }],
   },
   components: {
@@ -26,37 +26,31 @@ export default {
         pym_year: parseFloat(this.period[1]),
         pym_location: parseFloat(this.location),
       };
-      const url = `${this.ROUTES.salary}/pension-report`;
-      this.apiPost(url, data, "Generate Pension Report").then(async (res) => {
+      const url = `${this.ROUTES.salary}/nsitf-report`;
+      this.apiPost(url, data, "Generate NSITF Report").then(async (res) => {
         const {data} = res;
         const newData = await this.sortArrayOfObjects(data)
-        newData.forEach((pension, index) => {
-          this.locationName = pension.location;
+        newData.forEach((nsitf, index) => {
+          this.locationName = nsitf.location;
           // let pensionEmployeeContribution;
           // let pensionEmployeeContribution;
           // let voluntaryPension;
-          //
           //   if(typeof pensionArray[0])
-          let pensionObj = {
+          let nsitfObj = {
             sn: ++index,
-            employee_unique_id: pension.employeeUniqueId,
-            employeeName: pension.employeeName,
-            sector: pension.sector,
-            location: pension.location,
-            employee_gross: this.apiValueHandler(pension.adjustedGrossII.toFixed(2)) ?? '0.00',
-            pension_employee_contribution: this.apiValueHandler(pension.pensionArray[0].Amount.toFixed(2)) ?? '0.00',
-            pension_employer_contribution: this.apiValueHandler(pension.pensionArray[1].Amount.toFixed(2)) ?? '0.00',
-            voluntary_pension: this.apiValueHandler(pension.pensionArray[2].Amount.toFixed(2)) ?? '0.00',
-            total: this.apiValueHandler(pension.totalPension.toFixed(2)) ?? '0.00',
-            month: pension.month,
-            year: pension.year,
-            pfa: pension.pfa,
-            pension_number: pension.pin,
+            t7: nsitf.employeeUniqueId,
+            employeeName: nsitf.employeeName,
+            sector: nsitf.sector,
+            t6: nsitf.location,
+            gross: this.apiValueHandler(nsitf.adjustedGrossII.toFixed(2)) ?? '0.00',
+            nsitf_contribution: this.apiValueHandler(nsitf.nsitfArray[0].Amount.toFixed(2)) ?? '0.00',
+            month: nsitf.month,
+            year: nsitf.year,
           };
-          this.pensions.push(pensionObj);
+          this.nsitfs.push(nsitfObj);
         });
-        this.filtered = this.pensions;
-        this.totalRows = this.pensions.length;
+        this.filtered = this.nsitfs;
+        this.totalRows = this.nsitfs.length;
 
 
       });
@@ -65,35 +59,40 @@ export default {
         let key = field;
         if (key === "sn") {
           this.jsonFields["S/N"] = key;
-        } else if (key === "employee_unique_id") {
+        } else if (key === "t7") {
           this.jsonFields["T7 NUMBER"] = key;
         } else if (key === "employeeName") {
           this.jsonFields["NAME"] = key;
         }  else if (key === "sector") {
           this.jsonFields["SECTOR"] = key;
-        }else if (key === "location") {
+        }else if (key === "t6") {
           this.jsonFields["LOCATION"] = key;
-        } else if (key === "employee_gross") {
-          this.jsonFields["EMPLOYEE GROSS"] = key;
-        } else if (key === "pension_employee_contribution") {
-          this.jsonFields["EMPLOYEE CONTRIBUTION"] = key;
-        } else if (key === "pension_employer_contribution") {
-          this.jsonFields["EMPLOYER CONTRIBUTION"] = key;
-        } else if (key === "voluntary_pension") {
-          this.jsonFields["VOLUNTARY PENSION"] = key;
-        }else if (key === "total") {
+        } else if (key === "gross") {
+          this.jsonFields["GROSS"] = key;
+        } else if (key === "nsitf_contribution") {
+          this.jsonFields["nsitf CONTRIBUTION"] = key;
+        } else if (key === "total") {
           this.jsonFields["TOTAL"] = key;
         }else if (key === "month") {
           this.jsonFields["MONTH"] = key;
         }else if (key === "year") {
           this.jsonFields["YEAR"] = key;
-        }else if (key === "pfa") {
-          this.jsonFields["PFA"] = key;
-        }else if (key === "pension_number") {
-          this.jsonFields["PENSION NUMBER"] = key;
         }
       });
     },
+    async sortArrayOfObjects(array) {
+      return array.sort(function (a, b) {
+
+        let matchesA = a.employeeUniqueId.match(/(\d+)/);
+        matchesA = parseInt(matchesA[0])
+
+        let matchesB = b.employeeUniqueId.match(/(\d+)/);
+        matchesB = parseInt(matchesB[0])
+
+        return matchesA - matchesB;
+      })
+    },
+
     onFiltered(filteredItems) {
       // Trigger pagination to update the number of buttons/pages due to filtering
       this.totalRows = filteredItems.length;
@@ -118,24 +117,10 @@ export default {
       }
       return ret;
     },
-
-    async sortArrayOfObjects(array) {
-      return array.sort(function (a, b) {
-
-        let matchesA = a.employeeUniqueId.match(/(\d+)/);
-        matchesA = parseInt(matchesA[0])
-
-        let matchesB = b.employeeUniqueId.match(/(\d+)/);
-        matchesB = parseInt(matchesB[0])
-
-        return matchesA - matchesB;
-      })
-    },
-
   },
   data() {
     return {
-      title: "Pension Report",
+      title: "nsitf Report",
       items: [
         {
           text: "IHUMANE",
@@ -145,13 +130,13 @@ export default {
           href: "/",
         },
         {
-          text: "Pension Report",
+          text: "NSITF Report",
           active: true,
         },
       ],
       period: null,
       filtered: [],
-      pensions: [],
+      nsitfs: [],
       paymentDefinitions: [],
       totalRows: 1,
       currentPage: 1,
@@ -163,19 +148,14 @@ export default {
       sortDesc: false,
       newFields: [
         "sn",
-        "employee_unique_id",
+        "t7",
         "employeeName",
         "sector",
-         "location",
-        "pfa",
-        "pension_number",
+        "t6",
         "month",
         "year",
-          "employee_gross",
-        "pension_employee_contribution",
-        "pension_employer_contribution",
-        "voluntary_pension",
-         "total"
+        "gross",
+        "nsitf_contribution",
 
       ],
       incomeFields: [],
@@ -204,7 +184,7 @@ export default {
           <div class="card-body">
             <div class="p-3 bg-light mb-4 d-flex justify-content-between">
               <h5 class="font-size-14 mb-0" v-if="period">
-                Pension Report for
+                NSITF Report for
                 {{ locationName }} in Payroll Period:
                 {{ (parseInt(period[0]) - 1) | getMonth }}
                 {{ period[1] }}
@@ -212,9 +192,9 @@ export default {
               <span class="font-size-12 text-success">
                 <JsonExcel
                   style="cursor: pointer"
-                  :data="pensions"
+                  :data="nsitfs"
                   :fields="jsonFields"
-                  :name="`Pension_Report_${locationName}(${period[0]}-${period[1]}).xls`"
+                  :name="`nsitf_Report_${locationName}(${period[0]}-${period[1]}).xls`"
                 >
                   Export to Excel
                 </JsonExcel>
@@ -272,13 +252,13 @@ export default {
               <!-- End search -->
             </div>
             <!-- Table -->
-            <div class="table-responsive mb-0" v-if="pensions.length">
+            <div class="table-responsive mb-0" v-if="nsitfs.length">
               <b-table
                 ref="deduction-table"
                 bordered
                 hover
                 small
-                :items="pensions"
+                :items="nsitfs"
                 :fields="newFields"
                 striped
                 responsive="lg"
@@ -331,39 +311,19 @@ export default {
                 </template>
 
 
-                <template #cell(employee_gross)="row">
-                  <span class="text-nowrap">
+                <template #cell(gross)="row">
+                  <span class="float-right">
                     {{ row.value }}
                   </span>
                 </template>
 
-                <template #cell(pension_employee_contribution)="row">
-                  <span class="text-nowrap">
-                    {{ row.value }}
-                  </span>
-                </template>
-                <template #cell(pension_employee_contribution)="row">
-                  <span class="text-nowrap">
-                    {{ row.value }}
-                  </span>
-                </template>
-                <template #cell(voluntary_pension)="row">
-                  <span class="text-nowrap">
+                <template #cell(nsitf_contribution)="row">
+                  <span class="float-right">
                     {{ row.value }}
                   </span>
                 </template>
 
-                <template #cell(total)="row">
-                  <span class="text-nowrap">
-                    {{ row.value }}
-                  </span>
-                </template>
-                <template #cell(pfa)="row">
-                  <span class="text-nowrap">
-                    {{ row.value }}
-                  </span>
-                </template>
-                <template #cell(pension_number)="row">
+                <template #cell(paye_number)="row">
                   <span class="text-nowrap">
                     {{ row.value }}
                   </span>

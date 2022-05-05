@@ -21,8 +21,11 @@ export default {
   validations: {
     pmyDate: { required },
   },
+  async mounted() {
+    //await this.fetchPMY();
+  },
   methods: {
-    fetchPMY() {
+    async fetchPMY() {
       this.apiGet(
         this.ROUTES.payrollMonthYear,
         "Get Payroll Month & Year Error"
@@ -39,16 +42,33 @@ export default {
       let data, pym_month, pym_year;
       if (this.useCurrent) {
         this.submitting = true;
-        // no validation required
-        this.fetchPMY();
-        const url = `${this.ROUTES.salary}/pull-salary-routine/${this.getEmployee.emp_id}`;
-        await this.apiGet(url, "View Payslip Error").then((res) => {
-          const { data } = res;
-          if (data) {
-            this.payslipData = data;
+
+        this.apiGet(
+            this.ROUTES.payrollMonthYear,
+            "Get Payroll Month & Year Error"
+        ).then((res) => {
+          if (res.data) {
+            const { pym_year, pym_month } = res.data;
+            data = {
+              pym_month: pym_month,
+              pym_year:  pym_year
+            }
+            const url = `${this.ROUTES.salary}/pull-salary-routine/${this.getEmployee.emp_id}`;
+            this.apiPost(url, data, "View Payslip Error").then((res) => {
+              const { data } = res;
+              if (data) {
+                this.payslipData = data;
+                this.pmyMonth = pym_month;
+                this.pmyYear = pym_year;
+              }
+            });
+            this.submitting = false;
+            // this.pmyMonth = pym_month;
+            // this.pmyYear = pym_year;
           }
         });
-        this.submitting = false;
+
+
       } else {
         this.submitted = true;
         this.$v.$touch();

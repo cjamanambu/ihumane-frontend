@@ -40,8 +40,12 @@ export default {
   },
   methods: {
     async fetchPayslip() {
+      const data = {
+        pym_month: parseInt(this.$route.params.month),
+        pym_year: parseInt(this.$route.params.year)
+      }
       const url = `${this.ROUTES.salary}/pull-salary-routine/${this.$route.params.empID}`;
-      await this.apiGet(url, "Get Payslip Error").then((res) => {
+      await this.apiPost(url, data, "Get Payslip Error").then((res) => {
         const { data } = res;
         if (data) {
           this.payslipData = data;
@@ -393,24 +397,20 @@ export default {
                   <div class="col-lg-6">
 
                     <div v-if="payslipData">
-                      <div
-                          class="d-flex justify-content-between"
-                          v-for="(income, index) in payslipData.employersIncomes"
-                          :key="index"
-                      >
-                        <p class="mb-1">{{ income.paymentName }}</p>
-                        <p class="mb-1">
-                          =N= {{ income.amount.toLocaleString() }}
-                        </p>
-                      </div>
+<!--                      <div-->
+<!--                          class="d-flex justify-content-between"-->
+<!--                          v-for="(income, index) in payslipData.employersIncomes"-->
+<!--                          :key="index"-->
+<!--                      >-->
+<!--                        <p class="mb-1">{{ income.paymentName }}</p>-->
+<!--                        <p class="mb-1">-->
+<!--                          =N= {{ income.amount.toLocaleString() }}-->
+<!--                        </p>-->
+<!--                      </div>-->
                     </div>
 
 
                     <div class="d-flex justify-content-between">
-
-
-
-
 
                       <h6>PENSION (EMPLOYER CONTRIBUTION)</h6>
                       <p class="text-capitalize">

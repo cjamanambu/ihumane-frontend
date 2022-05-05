@@ -72,4 +72,39 @@ export default [
     },
     component: () => import("@/views/pages/reports/nhf-report"),
   },
+
+  {
+    path: "/reports/tax-report/:period/:locationID",
+    name: "tax-report",
+    meta: {
+      authRequired: true,
+    },
+    component: () => import("@/views/pages/reports/tax-report"),
+  },
+
+  {
+    path: "/reports/nsitf-report/:period/:locationID",
+    name: "nsitf-report",
+    meta: {
+      authRequired: true,
+    },
+    component: () => import("@/views/pages/reports/nsitf-report"),
+  },
+  {
+    path: "/reports/approved-salary-routine/:period",
+    name: "approved-salary-routine",
+    meta: {
+      authRequired: true,
+    },
+    component: () => import("@/views/pages/reports/approved-salary-routine"),
+  },
+
+  {
+    path: "/view-approved-salary-routine/:locationId/:month/:year",
+    name: "view-approved-salary-routine",
+    meta: {
+      authRequired: true,
+    },
+    component: () => import("@/views/pages/reports/view-approved-salary-routine"),
+  },
 ];
