@@ -45,7 +45,11 @@ export default {
         await this.apiGet(url, "View Payslip Error").then((res) => {
           const { data } = res;
           if (data) {
-            this.payslipData = data;
+            if (data === "No Salary for Employee") {
+              this.apiResponseHandler(data, "View Payslip");
+            } else {
+              this.payslipData = data;
+            }
           }
         });
         this.submitting = false;
@@ -169,26 +173,23 @@ export default {
                 <div class="row">
                   <div class="col-6">
                     <h5 class="font-size-14 mb-0">
-                      Employee Pay Slip ({{ (parseInt(pmyMonth) - 1) | getMonth }}
+                      Employee Pay Slip ({{
+                        (parseInt(pmyMonth) - 1) | getMonth
+                      }}
                       {{ pmyYear }})
                     </h5>
                   </div>
                   <div class="col-6 float-right">
                     <span
-
-                        class="text-success float-right"
-                        style="cursor: pointer"
-                        @click="generateReport"
+                      class="text-success float-right"
+                      style="cursor: pointer"
+                      @click="generateReport"
                     >
-                  Generate PDF
-                </span>
+                      Generate PDF
+                    </span>
                   </div>
                 </div>
-
-
-
               </div>
-
 
               <div class="row">
                 <div class="col-lg-6">
@@ -240,9 +241,9 @@ export default {
                   </div>
                   <div v-if="payslipData">
                     <div
-                        class="d-flex justify-content-between"
-                        v-for="(income, index) in payslipData.incomes"
-                        :key="index"
+                      class="d-flex justify-content-between"
+                      v-for="(income, index) in payslipData.incomes"
+                      :key="index"
                     >
                       <p class="mb-1">{{ income.paymentName }}</p>
                       <p class="mb-1">
@@ -259,9 +260,9 @@ export default {
                   </div>
                   <div v-if="payslipData">
                     <div
-                        class="d-flex justify-content-between"
-                        v-for="(deduction, index) in payslipData.deductions"
-                        :key="index"
+                      class="d-flex justify-content-between"
+                      v-for="(deduction, index) in payslipData.deductions"
+                      :key="index"
                     >
                       <p class="mb-1">{{ deduction.paymentName }}</p>
                       <p class="mb-1">
@@ -277,8 +278,8 @@ export default {
                   <div class="d-flex justify-content-between">
                     <h6>GROSS PAY</h6>
                     <p
-                        class="text-capitalize border-top border-bottom d-inline"
-                        v-if="payslipData"
+                      class="text-capitalize border-top border-bottom d-inline"
+                      v-if="payslipData"
                     >
                       =N= {{ payslipData.grossSalary.toLocaleString() }}
                     </p>
@@ -288,8 +289,8 @@ export default {
                   <div class="d-flex justify-content-between">
                     <h6>TOTAL DEDUCTIONS</h6>
                     <p
-                        class="text-capitalize border-top border-bottom d-inline"
-                        v-if="payslipData"
+                      class="text-capitalize border-top border-bottom d-inline"
+                      v-if="payslipData"
                     >
                       =N= {{ payslipData.totalDeduction.toLocaleString() }}
                     </p>
@@ -298,8 +299,8 @@ export default {
                     <h6>NET PAY</h6>
                     <b>
                       <p
-                          class="text-capitalize border-top border-bottom d-inline"
-                          v-if="payslipData"
+                        class="text-capitalize border-top border-bottom d-inline"
+                        v-if="payslipData"
                       >
                         =N= {{ payslipData.netSalary.toLocaleString() }}
                       </p>
@@ -313,9 +314,9 @@ export default {
                 <div class="col-lg-6">
                   <div v-if="payslipData">
                     <div
-                        class="d-flex justify-content-between"
-                        v-for="(income, index) in payslipData.employersIncomes"
-                        :key="index"
+                      class="d-flex justify-content-between"
+                      v-for="(income, index) in payslipData.employersIncomes"
+                      :key="index"
                     >
                       <p class="mb-1">{{ income.paymentName }}</p>
                       <p class="mb-1">
@@ -413,9 +414,9 @@ export default {
                       </div>
                       <div v-if="payslipData">
                         <div
-                            class="d-flex justify-content-between"
-                            v-for="(income, index) in payslipData.incomes"
-                            :key="index"
+                          class="d-flex justify-content-between"
+                          v-for="(income, index) in payslipData.incomes"
+                          :key="index"
                         >
                           <p class="mb-1">{{ income.paymentName }}</p>
                           <p class="mb-1">
@@ -432,9 +433,9 @@ export default {
                       </div>
                       <div v-if="payslipData">
                         <div
-                            class="d-flex justify-content-between"
-                            v-for="(deduction, index) in payslipData.deductions"
-                            :key="index"
+                          class="d-flex justify-content-between"
+                          v-for="(deduction, index) in payslipData.deductions"
+                          :key="index"
                         >
                           <p class="mb-1">{{ deduction.paymentName }}</p>
                           <p class="mb-1">
@@ -450,8 +451,8 @@ export default {
                       <div class="d-flex justify-content-between">
                         <h6>GROSS PAY</h6>
                         <p
-                            class="text-capitalize border-top border-bottom d-inline"
-                            v-if="payslipData"
+                          class="text-capitalize border-top border-bottom d-inline"
+                          v-if="payslipData"
                         >
                           =N= {{ payslipData.grossSalary.toLocaleString() }}
                         </p>
@@ -461,8 +462,8 @@ export default {
                       <div class="d-flex justify-content-between">
                         <h6>TOTAL DEDUCTIONS</h6>
                         <p
-                            class="text-capitalize border-top border-bottom d-inline"
-                            v-if="payslipData"
+                          class="text-capitalize border-top border-bottom d-inline"
+                          v-if="payslipData"
                         >
                           =N= {{ payslipData.totalDeduction.toLocaleString() }}
                         </p>
@@ -471,8 +472,8 @@ export default {
                         <h6>NET PAY</h6>
                         <b>
                           <p
-                              class="text-capitalize border-top border-bottom d-inline"
-                              v-if="payslipData"
+                            class="text-capitalize border-top border-bottom d-inline"
+                            v-if="payslipData"
                           >
                             =N= {{ payslipData.netSalary.toLocaleString() }}
                           </p>
@@ -486,9 +487,11 @@ export default {
                     <div class="col-lg-6">
                       <div v-if="payslipData">
                         <div
-                            class="d-flex justify-content-between"
-                            v-for="(income, index) in payslipData.employersIncomes"
-                            :key="index"
+                          class="d-flex justify-content-between"
+                          v-for="(
+                            income, index
+                          ) in payslipData.employersIncomes"
+                          :key="index"
                         >
                           <p class="mb-1">{{ income.paymentName }}</p>
                           <p class="mb-1">
