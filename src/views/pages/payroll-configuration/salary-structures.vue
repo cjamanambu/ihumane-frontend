@@ -22,7 +22,7 @@ export default {
       newValue.match(/\./g) === null
         ? (count = 0)
         : (count = newValue.match(/\./g));
-      console.log(count);
+      //console.log(count);
       if (count.length > 1) {
         result = "";
       } else {
@@ -92,11 +92,13 @@ export default {
       return `${text}`;
     },
     refreshTable() {
+      alert('okay');
       this.apiGet(
         this.ROUTES.salaryStructure,
         "Get Salary Structures Error"
       ).then((res) => {
         const { data } = res;
+        //console.log(data);
         data.forEach((salaryStructure, index) => {
           this.salaryStructures[index] = {
             sn: ++index,
