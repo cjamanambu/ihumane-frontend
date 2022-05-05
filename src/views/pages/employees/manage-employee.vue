@@ -114,6 +114,8 @@ export default {
           this.emp_emergency_contact = data.emp_emergency_contact;
           this.job_role_id = data.emp_job_role_id;
           this.gender = data.emp_sex;
+          this.emp_t7 = data.emp_unique_id;
+          this.emp_account_status = data.emp_status;
           this.emp_bvn = data.emp_bvn;
           this.religion = data.emp_religion;
           this.emp_pension = data.emp_pension;
@@ -482,6 +484,8 @@ export default {
       emp_contract_end_date: null,
       emp_grade_level: null,
       emp_passport: null,
+      emp_t7: null,
+      emp_account_status: null,
       locations: [],
       location: [],
       location_id: null,
@@ -711,6 +715,14 @@ export default {
                     </div>
                   </div>
                   <div class="row">
+                    <div class="col-md-6">
+                      <h5 class="mt-2"> <span class="text-success font-size-12 ms-2"> <span class="text-muted">T7: </span>{{ emp_t7 }}</span>
+                      </h5>
+                    </div>
+                    <div class="col-md-6">
+                      <h5 class="mt-2"> <span class="text-success font-size-12 ms-2"> <span class="text-muted">Account Status: </span>{{ parseInt(emp_account_status) === 1 ? 'Active' : 'Inactive'}}</span>
+                      </h5>
+                    </div>
                     <div class="col-md-6">
                       <h5 class="mt-2"> <span class="text-success font-size-12 ms-2"> <span class="text-muted">Job Role: </span>{{ job_role_text }}</span>
                       </h5>
