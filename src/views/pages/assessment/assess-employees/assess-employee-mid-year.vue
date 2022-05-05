@@ -35,7 +35,7 @@ export default {
   },
   data() {
     return {
-      title: "Assess Employee",
+      title: "Assess Employee (Mid-year)",
       items: [
         {
           text: "IHUMANE",
@@ -45,12 +45,12 @@ export default {
           href: "/",
         },
         {
-          text: "Assess Employee",
+          text: "Assess Employee (Mid-year)",
           href: "/assess-employee",
           active: true,
         },
       ],
-      authuser:null,
+      authuser: null,
       texts: [
         {
           id: 0,
@@ -95,7 +95,7 @@ export default {
           update: "",
         },
       ],
-      assessStatus:0,
+      assessStatus: 0,
       //supervisor:null,
       year: null,
       endYearQuestions: [],
@@ -164,7 +164,11 @@ export default {
           this.gsID = data.openGoal[0].gs_id;
           this.gsID = data.openGoal[0].gs_id;
           this.optional = data.master?.sam_optional;
-          this.sam_discussion_held_on =  new Date(data.master?.sam_discussion_held_on).toISOString().substr(0,10);
+          this.sam_discussion_held_on = new Date(
+            data.master?.sam_discussion_held_on
+          )
+            .toISOString()
+            .substr(0, 10);
           this.assessStatus = data.questions[0].sa_status;
           data.questions.forEach(async (datum) => {
             this.selfAssessmentStatus = true;
@@ -173,10 +177,10 @@ export default {
               id: datum.sa_id,
               goal: datum.sa_comment,
               update: datum.sa_update,
-              accomplishment:datum.sa_accomplishment,
-              next_step:datum.sa_next_steps,
-              challenge:datum.sa_challenges,
-              support:datum.sa_support_needed,
+              accomplishment: datum.sa_accomplishment,
+              next_step: datum.sa_next_steps,
+              challenge: datum.sa_challenges,
+              support: datum.sa_support_needed,
             };
             this.texts.push(dat);
             //console.log(this.texts);
@@ -195,15 +199,13 @@ export default {
                 id: datum.sa_id,
                 goal: datum.sa_comment,
                 update: datum.sa_update,
-                accomplishment:datum.sa_accomplishment,
-                next_step:datum.sa_next_steps,
-                challenge:datum.sa_challenges,
-                support:datum.sa_support_needed,
+                accomplishment: datum.sa_accomplishment,
+                next_step: datum.sa_next_steps,
+                challenge: datum.sa_challenges,
+                support: datum.sa_support_needed,
               };
               this.texts.push(dat);
-
             });
-
           });
 
           this.newAssessment = true;
@@ -214,11 +216,9 @@ export default {
           ];
         }
       });
-
-
     },
 
-    async getSelfAssessmentMaster(){
+    async getSelfAssessmentMaster() {
       //const urls = `${this.ROUTES.selfAssessment}/get-self-assessment-master/${this.$route.params.empid}/${this.gsID}`;
       /*await this.apiGet(urls).then(async (res) => {
        // const { data } = res;
@@ -262,7 +262,7 @@ export default {
     async getOpenGoalSetting() {
       const url = `${this.ROUTES.goalSetting}/get-open-goal-setting`;
       await this.apiGet(url).then((res) => {
-        const {data} = res;
+        const { data } = res;
         if (data.length > 0) {
           this.activeGoalId = parseInt(data[0].gs_id);
           this.openGoalActivity = parseInt(data[0].gs_activity);
@@ -364,22 +364,22 @@ export default {
         });
       }
     },
-     processAssessment(){
-
+    processAssessment() {
       const employeeID = this.$route.params.empid;
       const gsId = this.gsID;
       const url = `${this.ROUTES.selfAssessment}/approve-assessment/${employeeID}/${gsId}`;
       const data = {
         gs_id: gsId,
-        emp_id:employeeID,
+        emp_id: employeeID,
       };
-       this.apiPost(url, data, "Could not process request").then(() => {
-        this.apiResponseHandler("Process Complete", "Employee self-assessment completed.");
-         //this.$router.push("/assess-employees");
-          location.reload();
+      this.apiPost(url, data, "Could not process request").then(() => {
+        this.apiResponseHandler(
+          "Process Complete",
+          "Employee self-assessment completed."
+        );
+        //this.$router.push("/assess-employees");
+        location.reload();
       });
-
-
     },
     async fetchEmployee() {
       const employeeID = this.$route.params.empid;
@@ -415,10 +415,13 @@ export default {
           <div class="col-lg-8">
             <div class="card">
               <div class="p-3 bg-light mb-4">
-                <h5 class="font-size-14 mb-0">Mid-Year Checking </h5>
+                <h5 class="font-size-14 mb-0">Mid-Year Checking</h5>
               </div>
               <div class="card-body">
-                <form v-if="texts.length > 0" @submit.prevent="submitMidYearChecking">
+                <form
+                  v-if="texts.length > 0"
+                  @submit.prevent="submitMidYearChecking"
+                >
                   <b-table-simple hover responsive bordered outlined>
                     <b-thead head-variant="dark">
                       <b-tr>
@@ -437,16 +440,14 @@ export default {
                         <b-td style="width: 1%">
                           {{ index + 1 }}
                         </b-td>
-                        <b-td
-                          style="width: 19%;"
-                        >
-                      <textarea
-                        type="text"
-                        v-model="field.goal"
-                        rows="6"
-                        class="form-control"
-                        :readonly="assessStatus === 1 ? true : false"
-                      />
+                        <b-td style="width: 19%">
+                          <textarea
+                            type="text"
+                            v-model="field.goal"
+                            rows="6"
+                            class="form-control"
+                            :readonly="assessStatus === 1 ? true : false"
+                          />
                         </b-td>
                         <b-td style="width: 11%">
                           <div class="form-group">
@@ -458,7 +459,7 @@ export default {
                                 type="radio"
                                 :name="index"
                                 :disabled="assessStatus === 1 ? true : false"
-                                :checked="field.update === 'Complete' "
+                                :checked="field.update === 'Complete'"
                               />
                               <label class="form-check-label"> Complete </label>
                             </div>
@@ -468,7 +469,7 @@ export default {
                                 id="complete"
                                 v-model="field.update"
                                 value="On track"
-                                :checked="field.update === 'On track'  "
+                                :checked="field.update === 'On track'"
                                 :disabled="assessStatus === 1 ? true : false"
                                 type="radio"
                                 :name="index"
@@ -483,7 +484,7 @@ export default {
                                 value="Delayed"
                                 type="radio"
                                 :name="index"
-                                :checked="field.update === 'Delayed' "
+                                :checked="field.update === 'Delayed'"
                                 :disabled="assessStatus === 1 ? true : false"
                               />
                               <label class="form-check-label"> Delayed </label>
@@ -495,10 +496,12 @@ export default {
                                 value="Not started"
                                 type="radio"
                                 :name="index"
-                                :checked="field.update "
+                                :checked="field.update"
                                 :disabled="assessStatus === 1 ? true : false"
                               />
-                              <label class="form-check-label"> Not started  </label>
+                              <label class="form-check-label">
+                                Not started
+                              </label>
                             </div>
                             <div class="form-check">
                               <input
@@ -507,7 +510,7 @@ export default {
                                 value="No longer relevant"
                                 type="radio"
                                 :name="index"
-                                :checked="field.update === 'No longer relevant'  "
+                                :checked="field.update === 'No longer relevant'"
                                 :disabled="assessStatus === 1"
                               />
                               <label class="form-check-label">
@@ -516,49 +519,41 @@ export default {
                             </div>
                           </div>
                         </b-td>
-                        <b-td
-                          style="width: 17%;"
-                        >
-                      <textarea
-                        type="text"
-                        v-model="field.accomplishment"
-                        rows="6"
-                        class="form-control"
-                        :readonly="assessStatus === 1 ? true : false"
-                      />
+                        <b-td style="width: 17%">
+                          <textarea
+                            type="text"
+                            v-model="field.accomplishment"
+                            rows="6"
+                            class="form-control"
+                            :readonly="assessStatus === 1 ? true : false"
+                          />
                         </b-td>
-                        <b-td
-                          style="width: 17%"
-                        >
-                      <textarea
-                        type="text"
-                        v-model="field.challenge"
-                        rows="6"
-                        class="form-control"
-                        :readonly="assessStatus === 1 ? true : false"
-                      />
+                        <b-td style="width: 17%">
+                          <textarea
+                            type="text"
+                            v-model="field.challenge"
+                            rows="6"
+                            class="form-control"
+                            :readonly="assessStatus === 1 ? true : false"
+                          />
                         </b-td>
-                        <b-td
-                          style="width: 17%;"
-                        >
-                      <textarea
-                        type="text"
-                        v-model="field.support"
-                        rows="6"
-                        class="form-control"
-                        :readonly="assessStatus === 1 ? true : false"
-                      />
+                        <b-td style="width: 17%">
+                          <textarea
+                            type="text"
+                            v-model="field.support"
+                            rows="6"
+                            class="form-control"
+                            :readonly="assessStatus === 1 ? true : false"
+                          />
                         </b-td>
-                        <b-td
-                          style="width: 17%; cursor: pointer"
-                        >
-                      <textarea
-                        type="text"
-                        v-model="field.next_step"
-                        rows="6"
-                        class="form-control"
-                        :readonly="assessStatus === 1 ? true : false"
-                      />
+                        <b-td style="width: 17%; cursor: pointer">
+                          <textarea
+                            type="text"
+                            v-model="field.next_step"
+                            rows="6"
+                            class="form-control"
+                            :readonly="assessStatus === 1 ? true : false"
+                          />
                         </b-td>
                         <b-td style="width: 1%" v-if="assessStatus === 0">
                           <button
@@ -566,7 +561,7 @@ export default {
                             type="button"
                             class="btn btn-sm btn-danger"
                             @click="delField(index)"
-                            style="display: none;"
+                            style="display: none"
                           >
                             DEL
                           </button>
@@ -574,7 +569,10 @@ export default {
                       </b-tr>
                     </b-tbody>
                   </b-table-simple>
-                  <div class="alert alert-info d-flex mt-3" v-if="assessStatus !== 1">
+                  <div
+                    class="alert alert-info d-flex mt-3"
+                    v-if="assessStatus !== 1"
+                  >
                     <i class="ri-error-warning-line mr-2"></i>
                     You must submit a minimum of 3 goals.
                     <span
@@ -582,21 +580,26 @@ export default {
                       class="ml-1"
                       @click="addField"
                     >
-                  Click here to add a new goal
-                </span>
+                      Click here to add a new goal
+                    </span>
                   </div>
                   <div class="row">
                     <div class="col-md-4">
                       <div class="form-group">
                         <label for="">Discussion Held on:</label>
-                        <input type="date" v-model="sam_discussion_held_on" placeholder="Discussion Held On" class="form-control">
+                        <input
+                          type="date"
+                          v-model="sam_discussion_held_on"
+                          placeholder="Discussion Held On"
+                          class="form-control"
+                        />
                       </div>
                     </div>
                     <div class="col-12">
                       <div class="form-group">
                         <label for="op">
-                          Optional – other items to discuss (career opportunities,
-                          area of growth & development, etc.)
+                          Optional – other items to discuss (career
+                          opportunities, area of growth & development, etc.)
                         </label>
                         <b-form-textarea
                           id="option"
@@ -606,8 +609,8 @@ export default {
                           placeholder="Optional"
                           class="form-control"
                           :class="{
-                        'is-invalid': submitted && $v.optional.$error,
-                      }"
+                            'is-invalid': submitted && $v.optional.$error,
+                          }"
                         />
                       </div>
                     </div>
@@ -673,18 +676,24 @@ export default {
                   <p>{{ currentEmployee.sector.d_t3_code }}</p>
                 </div>
                 <div class="d-flex justify-content-between">
-                  <p class="mb-0">T6 Code </p>
+                  <p class="mb-0">T6 Code</p>
                   <p class="mb-0">{{ currentEmployee.location.l_t6_code }}</p>
                 </div>
               </div>
             </div>
-            <div class="card" v-if="authuser === currentEmployee.emp_supervisor_id">
+            <div
+              class="card"
+              v-if="authuser === currentEmployee.emp_supervisor_id"
+            >
               <div class="card-body">
                 <form @submit.prevent="processAssessment">
-                  <div class="btn-group d-flex ">
-                    <button class="btn btn-success btn-sm"
-                            :disabled="assessStatus === 1"
-                    > <i class="mdi mdi-check mr-2"></i> Approve </button>
+                  <div class="btn-group d-flex">
+                    <button
+                      class="btn btn-success btn-sm"
+                      :disabled="assessStatus === 1"
+                    >
+                      <i class="mdi mdi-check mr-2"></i> Approve
+                    </button>
                   </div>
                 </form>
               </div>
@@ -692,7 +701,6 @@ export default {
           </div>
         </div>
       </div>
-
     </div>
   </Layout>
 </template>

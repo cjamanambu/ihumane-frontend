@@ -58,7 +58,20 @@ export default [
       authRequired: true,
     },
     component: () =>
-      import("@/views/pages/assessment/assess-employees/assess-employee-mid-year"),
+      import(
+        "@/views/pages/assessment/assess-employees/assess-employee-mid-year"
+      ),
+  },
+  {
+    path: "/assess-end-year-details/:empid",
+    name: "assess-end-year-details",
+    meta: {
+      authRequired: true,
+    },
+    component: () =>
+      import(
+        "@/views/pages/assessment/self-assessment/assess-end-year-details"
+      ),
   },
   {
     path: "/assess-mid-year-details/:empid/:gsId",
@@ -67,7 +80,9 @@ export default [
       authRequired: true,
     },
     component: () =>
-      import("@/views/pages/assessment/self-assessment/assess-mid-year-details"),
+      import(
+        "@/views/pages/assessment/self-assessment/assess-mid-year-details"
+      ),
   },
   {
     path: "/assessment-details/:empid/:gsId",

@@ -75,6 +75,7 @@ export default {
       endOfYearResponse: [],
       eyr_strength: null,
       eyr_growth_area: null,
+      approvedStatus: false,
       prefilled: false,
       prefilledData: null,
       prefilledStrength: null,
@@ -173,14 +174,33 @@ export default {
       this.apiGet(url).then((res) => {
         const { data } = res;
         if (data.length) {
-          this.prefilled = true;
-          this.prefilledMidYearData = data.filter((entry) => {
+          // this.prefilled = false;
+          data.every((entry) => {
+            if (entry.eyr_status === 1) {
+              this.approvedStatus = true;
+              return false;
+            }
+            return true;
+          });
+          this.midYearCheckingQuestions = data.filter((entry) => {
             return entry.eyr_type === 1;
           });
-          this.prefilledStrength = data[0].eyr_strength;
-          this.prefilledGrowthArea = data[0].eyr_growth_area;
-          this.prefilledEndOfYearData = data.filter((entry) => {
+          this.midYearCheckingQuestions.forEach((question, index) => {
+            this.midYearCheckingQuestions[index] = {
+              ...question,
+              sa_comment: question.eyr_goal,
+            };
+          });
+          this.eyr_strength = data[0].eyr_strength;
+          this.eyr_growth_area = data[0].eyr_growth_area;
+          this.endOfYearQuestions = data.filter((entry) => {
             return entry.eyr_type === 2;
+          });
+          this.endOfYearQuestions.forEach((question, index) => {
+            this.endOfYearQuestions[index] = {
+              ...question,
+              eya_question: question.eyr_goal,
+            };
           });
         } else {
           this.prefilled = false;
@@ -367,7 +387,7 @@ export default {
             <div class="p-3 bg-light mb-4">
               <h5 class="font-size-14 mb-0">Employee Reflection</h5>
             </div>
-            <div v-if="prefilled">
+            <div v-if="approvedStatus">
               <div>
                 <p>
                   <strong class="font-size-14 mb-0">Reflection:</strong>
@@ -393,7 +413,7 @@ export default {
                   </b-thead>
                   <b-tbody>
                     <b-tr
-                      v-for="(data, index) in prefilledMidYearData"
+                      v-for="(data, index) in midYearCheckingQuestions"
                       :key="index"
                     >
                       <b-td style="width: 1%">
@@ -422,7 +442,7 @@ export default {
                     type="text"
                     rows="4"
                     class="form-control"
-                    v-model="prefilledStrength"
+                    v-model="eyr_strength"
                     readonly
                   />
                 </div>
@@ -443,7 +463,7 @@ export default {
                     type="text"
                     rows="4"
                     class="form-control"
-                    v-model="prefilledGrowthArea"
+                    v-model="eyr_growth_area"
                     readonly
                   />
                 </div>
@@ -455,11 +475,11 @@ export default {
                 <ul class="mt-2">
                   <li
                     class="mb-3 w-75"
-                    v-for="(question, index) in prefilledEndOfYearData"
+                    v-for="(question, index) in endOfYearQuestions"
                     :key="index"
                   >
                     <div class="d-flex justify-content-between">
-                      <div>{{ question.eyr_goal }}</div>
+                      <div>{{ question.eya_question }}</div>
                       <div>
                         <b-form-radio-group
                           :options="endOfYearQuestionOptions"
@@ -605,7 +625,7 @@ export default {
       </div>
       <div v-else class="col-12">
         <div class="alert alert-info">
-          The mid-year checking review period is currently closed.
+          The end of year review period is currently closed.
         </div>
       </div>
     </div>
