@@ -19,11 +19,13 @@ export default {
   validations: {
     name: { required },
     description: { required },
+    rating_period: { required },
   },
   methods: {
     refreshTable() {
       this.apiGet(this.ROUTES.rating, "Get Ratings Error").then((res) => {
         const { data } = res;
+        //console.log(data);
         this.ratings = data;
         this.totalRows = this.ratings.length;
       });
@@ -56,6 +58,7 @@ export default {
         const data = {
           rating_name: this.name,
           rating_desc: this.description,
+          rating_period:this.rating_period
         };
         const url = `${this.ROUTES.rating}/add-rating`;
         this.apiPost(url, data, "Add Rating Error").then((res) => {
@@ -75,6 +78,7 @@ export default {
         const data = {
           rating_name: this.name,
           rating_desc: this.description,
+          rating_period: this.rating_period
         };
         const url = `${this.ROUTES.rating}/update-rating/${this.ratingID}`;
         this.apiPatch(url, data, "Update Rating Error").then((res) => {
@@ -114,12 +118,14 @@ export default {
       fields: [
         { key: "rating_id", label: "ID", sortable: true },
         { key: "rating_name", label: "Rating", sortable: true },
+        { key: "rating_time_period", label: "Period", sortable: true },
         { key: "rating_desc", label: "Description", sortable: true },
       ],
       submitted: false,
       ratingID: null,
       name: null,
-      description: null,
+      description: 'Description',
+      rating_period:null,
     };
   },
 };
@@ -193,7 +199,11 @@ export default {
                 select-mode="single"
                 @row-selected="selectRow"
               >
+                <template #cell(rating_time_period)="row">
+                  <span> {{ row.value === 1 ? 'Beginning Year' : row.value === 2 ? 'Mid-Year' : 'End of Year' }} </span>
+                </template>
               </b-table>
+
             </div>
             <div class="row">
               <div class="col">
@@ -225,12 +235,13 @@ export default {
     >
       <form @submit.prevent="submitNew">
         <div class="form-group">
-          <label for="name"> Rating <span class="text-danger">*</span> </label>
+          <label for="name"> Rating Name<span class="text-danger">*</span> </label>
           <input
             id="name"
             type="text"
             v-model="name"
             class="form-control"
+            placeholder="Rating Name"
             :class="{
               'is-invalid': submitted && $v.name.$error,
             }"
@@ -241,13 +252,27 @@ export default {
             Description <span class="text-danger">*</span>
           </label>
           <textarea
-            id="min"
+            id="description"
             v-model="description"
             class="form-control"
+            placeholder="Description"
             :class="{
               'is-invalid': submitted && $v.description.$error,
             }"
           />
+        </div>
+        <div class="form-group">
+          <label for="min">
+            Time Period <span class="text-danger">*</span>
+          </label>
+          <select name="rating_period" v-model="rating_period" id="rating_period" class="form-control"
+                  :class="{
+              'is-invalid': submitted && $v.rating_period.$error,
+            }">
+            <option value="1">Beginning of Year</option>
+            <option value="2">Mid-Year</option>
+            <option value="3">End of Year</option>
+          </select>
         </div>
         <b-button
           v-if="!submitting"
@@ -276,7 +301,7 @@ export default {
     >
       <form @submit.prevent="submitUpdate">
         <div class="form-group">
-          <label for="name"> Rating <span class="text-danger">*</span> </label>
+          <label for="name"> Rating Name <span class="text-danger">*</span> </label>
           <input
             id="name"
             type="text"

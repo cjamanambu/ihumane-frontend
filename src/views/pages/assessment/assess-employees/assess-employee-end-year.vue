@@ -2,6 +2,7 @@
 import Layout from "@/views/layouts/main";
 import PageHeader from "@/components/page-header";
 import appConfig from "@/app.config";
+import {required} from "vuelidate/lib/validators";
 export default {
   page: {
     title: "Assess Employee (End of Year)",
@@ -16,6 +17,12 @@ export default {
     this.fetchEmployee();
     await this.getOpenGoalSetting();
     await this.prefillAssessment();
+    await this.getRating();
+  },
+  validations: {
+    strength: { required },
+    growth_area: { required },
+    rating: { required },
   },
   data() {
     return {
@@ -49,6 +56,7 @@ export default {
       eyr_strength: null,
       eyr_growth_area: null,
       currentEmployee: null,
+      goalMasterId:null,
     };
   },
   methods: {
@@ -66,10 +74,20 @@ export default {
         }
       });
     },
+    async getRating(){
+      const url = `${this.ROUTES.rating}`;
+      await this.apiGet(url).then((res) => {
+        const { data } = res;
+
+        console.log(data);
+      });
+    },
     async prefillAssessment() {
       let url = `${this.ROUTES.endYearResponse}/get-end-year/${this.empId}/${this.openGoalActivityId}`;
       this.apiGet(url).then((res) => {
         const { data } = res;
+        this.goalMasterId = data[0].eyr_master_id;
+        console.log(this.goalMasterId);
         if (data.length) {
           this.midYearCheckingQuestions = data.filter((entry) => {
             return entry.eyr_type === 1;
@@ -101,6 +119,29 @@ export default {
         this.currentEmployee = res.data;
       });
     },
+
+    submitManagerEvaluation(){
+      this.submitted = true;
+      this.$v.$touch();
+      if (this.$v.$invalid) {
+        this.apiFormHandler("Invalid Submission...");
+      } else {
+        const data = {
+          strength: this.strength,
+          growth_area: this.growth_area,
+          rating:this.rating,
+          master:this.goalMasterId,
+          additional_comment: this.additional_comment
+        };
+        const url = `${this.ROUTES.endYearResponse}/supervisor-end-year-response`;
+        this.apiPost(url, data, " Error submitting response").then((res) => {
+          this.apiResponseHandler(`${res.data}`, "Response submitted!");
+          this.refreshTable();
+          this.$v.$reset();
+          location.reload();
+        });
+      }
+    }
   },
 };
 </script>
@@ -289,47 +330,52 @@ export default {
                 and/or areas they should focus on in the year ahead.
               </p>
             </div>
-            <div class="mt-5">
-              <p>
-                <strong class="font-size-14 mb-0">Strength (required):</strong>
-                Think about this employee’s achievements and identify an area of
-                strength that you have observed in them. An example of a
-                strength may be a task or process that comes easily to your
-                employee, and something that excites/motivates them.
-              </p>
-              <div class="form-group">
-                <textarea type="text" rows="4" class="form-control" />
+            <form @submit.prevent="submitManagerEvaluation">
+              <div class="mt-5">
+                <p>
+                  <strong class="font-size-14 mb-0">Strength (required):</strong>
+                  Think about this employee’s achievements and identify an area of
+                  strength that you have observed in them. An example of a
+                  strength may be a task or process that comes easily to your
+                  employee, and something that excites/motivates them.
+                </p>
+                <div class="form-group">
+                  <textarea type="text" rows="4" class="form-control" />
+                </div>
               </div>
-            </div>
-            <div class="mt-5">
-              <p>
+              <div class="mt-5">
+                <p>
+                  <strong class="font-size-14 mb-0">
+                    Growth Area (required):
+                  </strong>
+                  Identify an area of growth you wish this employee to focus on in
+                  the next 6 months. This may be a task or process your employee
+                  finds particularly challenging, or something they need to learn
+                  more about in order to excel in their role.
+                </p>
+                <div class="form-group">
+                  <textarea type="text" rows="4" class="form-control" />
+                </div>
+              </div>
+              <div class="mt-5">
                 <strong class="font-size-14 mb-0">
-                  Growth Area (required):
+                  Select a rating for this employee (required):
                 </strong>
-                Identify an area of growth you wish this employee to focus on in
-                the next 6 months. This may be a task or process your employee
-                finds particularly challenging, or something they need to learn
-                more about in order to excel in their role.
-              </p>
-              <div class="form-group">
-                <textarea type="text" rows="4" class="form-control" />
               </div>
-            </div>
-            <div class="mt-5">
-              <strong class="font-size-14 mb-0">
-                Select a rating for this employee (required):
-              </strong>
-            </div>
-            <div class="mt-5">
-              <p>
-                <strong class="font-size-14 mb-0">
-                  Additional comments:
-                </strong>
-              </p>
-              <div class="form-group">
-                <textarea type="text" rows="4" class="form-control" />
+              <div class="mt-5">
+                <p>
+                  <strong class="font-size-14 mb-0">
+                    Additional comments:
+                  </strong>
+                </p>
+                <div class="form-group">
+                  <textarea type="text" rows="4" class="form-control" />
+                </div>
               </div>
-            </div>
+              <div class="form-group">
+                <button class="btn btn-primary">Submit</button>
+              </div>
+            </form>
           </div>
         </div>
       </div>

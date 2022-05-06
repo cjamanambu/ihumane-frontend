@@ -290,7 +290,7 @@ export default {
           sa_comment: field.goal,
         };
         this.goals.push(data);
-        console.log("goals", this.goals);
+        //console.log("goals", this.goals);
       });
       this.apiPatch(url, this.goals, "Update goals Error").then(() => {
         this.apiResponseHandler("Process Complete", "Goals Updated");
