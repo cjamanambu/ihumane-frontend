@@ -63,6 +63,17 @@ export default [
       ),
   },
   {
+    path: "/end-year-assess-employee/:empid",
+    name: "end-year-assess-employee",
+    meta: {
+      authRequired: true,
+    },
+    component: () =>
+      import(
+        "@/views/pages/assessment/assess-employees/assess-employee-end-year"
+      ),
+  },
+  {
     path: "/assess-end-year-details/:empid",
     name: "assess-end-year-details",
     meta: {
