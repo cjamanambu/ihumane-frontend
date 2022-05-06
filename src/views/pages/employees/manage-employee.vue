@@ -642,8 +642,11 @@ export default {
                 <div class="row text-center mt-2">
                   <div class="col-sm-6">
                     <div class="d-grid">
-                      <button type="button" @click="$refs['deactivate-employee'].show()" class="btn btn-danger waves-effect waves-light mt-2">
+                      <button type="button" v-if="parseInt(emp_account_status) !== 0" @click="$refs['deactivate-employee'].show()" class="btn btn-danger waves-effect waves-light mt-2">
                         <i class="mdi mdi-cancel me-2"></i> Deactivate
+                      </button>
+                      <button type="button" v-else @click="$refs['activate-employee'].show()" class="btn btn-success waves-effect waves-light mt-2">
+                        <i class="mdi mdi-check me-2"></i> Activate
                       </button>
                     </div>
                   </div>
@@ -796,6 +799,45 @@ export default {
     <b-modal
       ref="deactivate-employee"
       title="Deactivate Employee"
+      hide-footer
+      centered
+      title-class="font-18"
+      @hidden="resetForm"
+    >
+      <form @submit.prevent="suspendEmployee">
+        <div class="form-group">
+          <label for="suspensionReason">
+            Suspension Reason <span class="text-danger">*</span>
+          </label>
+          <textarea
+            id="suspensionReason"
+            type="text"
+            v-model="emp_suspension_reason"
+            class="form-control"
+          />
+        </div>
+
+        <b-button
+          v-if="!submitting"
+          class="btn btn-success btn-block mt-4"
+          type="submit"
+        >
+          Submit
+        </b-button>
+        <b-button
+          v-else
+          disabled
+          class="btn btn-success btn-block mt-4"
+          type="submit"
+        >
+          Submitting...
+        </b-button>
+      </form>
+    </b-modal>
+
+    <b-modal
+      ref="activate-employee"
+      title="Activate Employee"
       hide-footer
       centered
       title-class="font-18"
