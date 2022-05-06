@@ -14,6 +14,7 @@ export default {
     JsonExcel,
   },
   async mounted() {
+    await this.fetchPMY();
     await this.fetchPaymentDefinitions();
   },
   methods: {
@@ -59,10 +60,11 @@ export default {
       //   pmyl_location_id: parseFloat(this.location),
       // };
       const url = `${this.ROUTES.salary}/pull-emolument/${locationId}`;
-      this.apiGet(url, "Generate Emolument Report").then((res) => {
-        const { data } = res;
-        console.table(data);
-        data.forEach((emolument, index) => {
+      this.apiGet(url, "Generate Emolument Report").then(async (res) => {
+        const {data} = res;
+        const newData = await this.sortArrayOfObjects(data)
+
+        newData.forEach((emolument, index) => {
           let emolumentObj = {
             sn: ++index,
             employeeId: emolument.employeeId,
@@ -133,14 +135,44 @@ export default {
         }
       });
     },
+    async sortArrayOfObjects(array) {
+      return array.sort(function (a, b) {
 
+        let matchesA = a.employeeUniqueId.match(/(\d+)/);
+        matchesA = parseInt(matchesA[0])
+
+        let matchesB = b.employeeUniqueId.match(/(\d+)/);
+        matchesB = parseInt(matchesB[0])
+
+        return matchesA - matchesB;
+      })
+    },
     selectRow(row) {
       row = row[0];
       console.log(row);
       let empID = row.employeeId;
-      this.$router.push({ name: "view-payslip", params: { empID } });
+      let year = parseInt(this.pmyYear);
+      let month = parseInt(this.pmyMonth);
+      this.$router.push({ name: "view-payslip", params: { empID, month, year } });
       this.$refs["emolument-table"].clearSelected();
     },
+
+    async fetchPMY() {
+      this.apiGet(
+          this.ROUTES.payrollMonthYear,
+          "Get Payroll Month & Year Error"
+      ).then((res) => {
+        if (res.data) {
+          const { pym_year, pym_month } = res.data;
+          this.pmyMonth = pym_month;
+          this.pmyYear = pym_year;
+          this.period[1] = pym_year;
+          this.period[0] = pym_month;
+        }
+      });
+    },
+
+
   },
   data() {
     return {
@@ -166,6 +198,8 @@ export default {
       totalRows: 1,
       currentPage: 1,
       perPage: 10,
+      pmyMonth: 0,
+      pmyYear: 0,
       pageOptions: [10, 25, 50, 100],
       filter: null,
       filterOn: [],
