@@ -79,7 +79,7 @@ export default {
           update: "",
         },
       ],
-      assessStatus:0,
+      assessStatus: 0,
       endYearQuestions: [],
       openGoalActivity: null,
       openGoalActivityYear: null,
@@ -106,8 +106,7 @@ export default {
       employeeRating: null,
       checkOpenGoal: 0,
       gsID: null,
-      activeGoalId:null,
-
+      activeGoalId: null,
     };
   },
   methods: {
@@ -158,7 +157,11 @@ export default {
           this.texts = [];
           this.gsID = data.openGoal[0].gs_id;
           this.optional = data.master?.sam_optional;
-          this.sam_discussion_held_on =  new Date(data.master?.sam_discussion_held_on).toISOString().substr(0,10);
+          this.sam_discussion_held_on = new Date(
+            data.master?.sam_discussion_held_on
+          )
+            .toISOString()
+            .substr(0, 10);
           this.assessStatus = data.questions[0].sa_status;
           data.questions.forEach(async (datum) => {
             this.selfAssessmentStatus = true;
@@ -167,13 +170,12 @@ export default {
               id: datum.sa_id,
               goal: datum.sa_comment,
               update: datum.sa_update,
-              accomplishment:datum.sa_accomplishment,
-              next_step:datum.sa_next_steps,
-              challenge:datum.sa_challenges,
-              support:datum.sa_support_needed,
+              accomplishment: datum.sa_accomplishment,
+              next_step: datum.sa_next_steps,
+              challenge: datum.sa_challenges,
+              support: datum.sa_support_needed,
             };
             this.texts.push(dat);
-
           });
         } else {
           const prevUrl = `${this.ROUTES.selfAssessment}/prefill-goal-setting/${this.getEmployee.emp_id}`;
@@ -189,15 +191,13 @@ export default {
                 id: datum.sa_id,
                 goal: datum.sa_comment,
                 update: datum.sa_update,
-                accomplishment:datum.sa_accomplishment,
-                next_step:datum.sa_next_steps,
-                challenge:datum.sa_challenges,
-                support:datum.sa_support_needed,
+                accomplishment: datum.sa_accomplishment,
+                next_step: datum.sa_next_steps,
+                challenge: datum.sa_challenges,
+                support: datum.sa_support_needed,
               };
               this.texts.push(dat);
-
             });
-
           });
 
           this.newAssessment = true;
@@ -208,11 +208,9 @@ export default {
           ];
         }
       });
-
-
     },
 
-    async getSelfAssessmentMaster(){
+    async getSelfAssessmentMaster() {
       const url = `${this.ROUTES.selfAssessment}/get-master-self-assessment/${this.getEmployee.emp_id}/${this.activeGoalId}`;
       await this.apiGet(url).then((res) => {
         const { data } = res;
@@ -239,12 +237,9 @@ export default {
           });
         } */
       });
-
-
     },
 
     submitNewBeginning() {
-
       const employeeID = this.getEmployee.emp_id;
       const url = `${this.ROUTES.selfAssessment}/add-self-assessment/${employeeID}/${this.activeGoalId}`;
       this.goals = [];
@@ -301,7 +296,7 @@ export default {
       }
     },
     test(event) {
-      console.log(event.target.value)
+      console.log(event.target.value);
     },
   },
   directives: {
@@ -334,10 +329,7 @@ textarea {
     </div>
     <scale-loader v-if="apiBusy" />
     <div v-else class="row">
-      <div
-        v-if="openGoalActivity === 2 && parseInt(checkOpenGoal) === 1"
-        class="col-lg-12"
-      >
+      <div class="col-lg-12">
         <div class="card">
           <div class="card-body">
             <div class="p-3 bg-light mb-4">
@@ -400,9 +392,7 @@ textarea {
                     <b-td style="width: 1%">
                       {{ index + 1 }}
                     </b-td>
-                    <b-td
-                      style="width: 19%;"
-                    >
+                    <b-td style="width: 19%">
                       <textarea
                         type="text"
                         v-model="field.goal"
@@ -420,7 +410,7 @@ textarea {
                             value="Complete"
                             type="radio"
                             :name="index"
-                            :checked="field.update === 'Complete' "
+                            :checked="field.update === 'Complete'"
                             :disabled="assessStatus === 1 ? true : false"
                           />
                           <label class="form-check-label"> Complete </label>
@@ -431,7 +421,7 @@ textarea {
                             id="complete"
                             v-model="field.update"
                             value="On track"
-                            :checked="field.update === 'On track'  "
+                            :checked="field.update === 'On track'"
                             :disabled="assessStatus === 1 ? true : false"
                             type="radio"
                             :name="index"
@@ -446,7 +436,7 @@ textarea {
                             value="Delayed"
                             type="radio"
                             :name="index"
-                            :checked="field.update === 'Delayed' "
+                            :checked="field.update === 'Delayed'"
                             :disabled="assessStatus === 1 ? true : false"
                           />
                           <label class="form-check-label"> Delayed </label>
@@ -458,10 +448,10 @@ textarea {
                             value="Not started"
                             type="radio"
                             :name="index"
-                            :checked="field.update "
+                            :checked="field.update"
                             :disabled="assessStatus === 1 ? true : false"
                           />
-                          <label class="form-check-label"> Not started  </label>
+                          <label class="form-check-label"> Not started </label>
                         </div>
                         <div class="form-check">
                           <input
@@ -470,7 +460,7 @@ textarea {
                             value="No longer relevant"
                             type="radio"
                             :name="index"
-                            :checked="field.update === 'No longer relevant'  "
+                            :checked="field.update === 'No longer relevant'"
                             :disabled="assessStatus === 1 ? true : false"
                           />
                           <label class="form-check-label">
@@ -479,9 +469,7 @@ textarea {
                         </div>
                       </div>
                     </b-td>
-                    <b-td
-                      style="width: 17%;"
-                    >
+                    <b-td style="width: 17%">
                       <textarea
                         type="text"
                         v-model="field.accomplishment"
@@ -490,9 +478,7 @@ textarea {
                         :readonly="assessStatus === 1 ? true : false"
                       />
                     </b-td>
-                    <b-td
-                      style="width: 17%"
-                    >
+                    <b-td style="width: 17%">
                       <textarea
                         type="text"
                         v-model="field.challenge"
@@ -501,9 +487,7 @@ textarea {
                         :readonly="assessStatus === 1 ? true : false"
                       />
                     </b-td>
-                    <b-td
-                      style="width: 17%;"
-                    >
+                    <b-td style="width: 17%">
                       <textarea
                         type="text"
                         v-model="field.support"
@@ -512,9 +496,7 @@ textarea {
                         :readonly="assessStatus === 1 ? true : false"
                       />
                     </b-td>
-                    <b-td
-                      style="width: 17%; cursor: pointer"
-                    >
+                    <b-td style="width: 17%; cursor: pointer">
                       <textarea
                         type="text"
                         v-model="field.next_step"
@@ -528,7 +510,6 @@ textarea {
                         v-if="index > 2"
                         type="button"
                         class="btn btn-sm btn-danger"
-
                         @click="delField(index)"
                       >
                         DEL
@@ -537,7 +518,10 @@ textarea {
                   </b-tr>
                 </b-tbody>
               </b-table-simple>
-              <div class="alert alert-info d-flex mt-3" v-if="assessStatus === 0 ">
+              <div
+                class="alert alert-info d-flex mt-3"
+                v-if="assessStatus === 0"
+              >
                 <i class="ri-error-warning-line mr-2"></i>
                 You must submit a minimum of 3 goals.
                 <span
@@ -552,7 +536,12 @@ textarea {
                 <div class="col-md-4">
                   <div class="form-group">
                     <label for="">Discussion Held on:</label>
-                    <input type="date" v-model="sam_discussion_held_on" placeholder="Discussion Held On" class="form-control">
+                    <input
+                      type="date"
+                      v-model="sam_discussion_held_on"
+                      placeholder="Discussion Held On"
+                      class="form-control"
+                    />
                   </div>
                 </div>
                 <div class="col-12">
@@ -597,15 +586,19 @@ textarea {
                 </div>
               </div>
             </form>
-
           </div>
         </div>
       </div>
-      <div v-else class="col-12">
-        <div class="alert alert-info">
-          The mid-year checking review period is currently closed.
-        </div>
-      </div>
+      <!--      <div-->
+      <!--        v-if="openGoalActivity === 2 && parseInt(checkOpenGoal) === 1"-->
+      <!--        class="col-lg-12"-->
+      <!--      >-->
+      <!--      </div>-->
+      <!--      <div v-else class="col-12">-->
+      <!--        <div class="alert alert-info">-->
+      <!--          The mid-year checking review period is currently closed.-->
+      <!--        </div>-->
+      <!--      </div>-->
     </div>
   </Layout>
 </template>
