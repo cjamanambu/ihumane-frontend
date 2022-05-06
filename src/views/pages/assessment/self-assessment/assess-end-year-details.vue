@@ -37,6 +37,12 @@ export default {
           active: true,
         },
       ],
+      openGoalActivity: null,
+      openGoalActivityYear: null,
+      openGoalActivityFrom: null,
+      openGoalActivityTo: null,
+      openGoalActivityId: null,
+      checkOpenGoal: 0,
       empId: null,
       endOfYearQuestions: null,
       midYearCheckingQuestions: null,
@@ -44,6 +50,8 @@ export default {
         { text: "Yes", value: "yes" },
         { text: "No", value: "no" },
       ],
+      eyr_strength: null,
+      eyr_growth_area: null,
     };
   },
   methods: {
