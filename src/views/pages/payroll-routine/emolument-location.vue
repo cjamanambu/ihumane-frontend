@@ -61,6 +61,7 @@ export default {
       const url = `${this.ROUTES.salary}/pull-emolument/${locationId}`;
       this.apiGet(url, "Generate Emolument Report").then((res) => {
         const { data } = res;
+        console.table(data);
         data.forEach((emolument, index) => {
           let emolumentObj = {
             sn: ++index,
@@ -72,27 +73,26 @@ export default {
             jobRole: emolument.jobRole,
             salaryGrade: emolument.salaryGrade,
             contractStartDate: emolument.employeeStartDate,
-            contractEndDate: emolument.empEndDate
-
+            contractEndDate: emolument.empEndDate,
           };
           emolument.incomes.forEach((income) => {
             emolumentObj[income.paymentName] = this.apiValueHandler(
-                income.amount.toFixed(2)
+              income.amount.toFixed(2)
             );
           });
           emolument.deductions.forEach((deduction) => {
             emolumentObj[deduction.paymentName] = this.apiValueHandler(
-                deduction.amount.toFixed(2)
+              deduction.amount.toFixed(2)
             );
           });
           emolumentObj["grossSalary"] = this.apiValueHandler(
-              emolument.grossSalary.toFixed(2)
+            emolument.grossSalary.toFixed(2)
           );
           emolumentObj["totalDeduction"] = this.apiValueHandler(
-              emolument.totalDeduction.toFixed(2)
+            emolument.totalDeduction.toFixed(2)
           );
           emolumentObj["netSalary"] = this.apiValueHandler(
-              emolument.netSalary.toFixed(2)
+            emolument.netSalary.toFixed(2)
           );
           this.newEmoluments.push(emolumentObj);
         });
@@ -136,7 +136,7 @@ export default {
 
     selectRow(row) {
       row = row[0];
-      console.log(row)
+      console.log(row);
       let empID = row.employeeId;
       this.$router.push({ name: "view-payslip", params: { empID } });
       this.$refs["emolument-table"].clearSelected();
@@ -178,9 +178,9 @@ export default {
         "sector",
         "location",
         "jobRole",
-         "salaryGrade",
+        "salaryGrade",
         "contractStartDate",
-        "contractEndDate"
+        "contractEndDate",
       ],
       incomeFields: [],
       deductionFields: [],
@@ -195,7 +195,10 @@ export default {
   <Layout>
     <PageHeader :title="title" :items="items" />
     <div class="d-flex justify-content-end mb-3">
-      <b-button class="btn btn-success" @click="$router.push('/process-payroll')">
+      <b-button
+        class="btn btn-success"
+        @click="$router.push('/process-payroll')"
+      >
         <i class="mdi mdi-skip-backward mr-2"></i>
         Back
       </b-button>
@@ -213,10 +216,10 @@ export default {
               </h5>
               <span class="font-size-12 text-success">
                 <JsonExcel
-                    style="cursor: pointer"
-                    :data="filtered"
-                    :fields="jsonFields"
-                    :name="`Emolument_Report(${period[0]}-${period[1]}).xls`"
+                  style="cursor: pointer"
+                  :data="filtered"
+                  :fields="jsonFields"
+                  :name="`Emolument_Report(${period[0]}-${period[1]}).xls`"
                 >
                   Export to Excel
                 </JsonExcel>
@@ -228,9 +231,9 @@ export default {
                   <label class="d-inline-flex align-items-center">
                     Show&nbsp;
                     <b-form-select
-                        v-model="perPage"
-                        size="sm"
-                        :options="pageOptions"
+                      v-model="perPage"
+                      size="sm"
+                      :options="pageOptions"
                     ></b-form-select
                     >&nbsp;entries
                   </label>
@@ -240,16 +243,16 @@ export default {
               <!-- Search -->
               <div class="col-sm-12 col-md-3">
                 <div
-                    id="tickets-table_filter"
-                    class="dataTables_filter text-md-right"
+                  id="tickets-table_filter"
+                  class="dataTables_filter text-md-right"
                 >
                   <label class="d-inline-flex align-items-center">
                     Search:
                     <b-form-input
-                        v-model="filter"
-                        type="search"
-                        placeholder="Search..."
-                        class="form-control form-control-sm ml-2"
+                      v-model="filter"
+                      type="search"
+                      placeholder="Search..."
+                      class="form-control form-control-sm ml-2"
                     ></b-form-input>
                   </label>
                 </div>
@@ -259,25 +262,25 @@ export default {
             <!-- Table -->
             <div class="table-responsive mb-0" v-if="newEmoluments.length">
               <b-table
-                  selectable
-                  ref="emolument-table"
-                  bordered
-                  hover
-                  small
-                  :items="newEmoluments"
-                  :fields="newFields"
-                  striped
-                  responsive="lg"
-                  :per-page="perPage"
-                  :current-page="currentPage"
-                  :sort-by.sync="sortBy"
-                  :sort-desc.sync="sortDesc"
-                  :filter="filter"
-                  :filter-included-fields="filterOn"
-                  @filtered="onFiltered"
-                  select-mode="single"
-                  @row-selected="selectRow"
-                  show-empty
+                selectable
+                ref="emolument-table"
+                bordered
+                hover
+                small
+                :items="newEmoluments"
+                :fields="newFields"
+                striped
+                responsive="lg"
+                :per-page="perPage"
+                :current-page="currentPage"
+                :sort-by.sync="sortBy"
+                :sort-desc.sync="sortDesc"
+                :filter="filter"
+                :filter-included-fields="filterOn"
+                @filtered="onFiltered"
+                select-mode="single"
+                @row-selected="selectRow"
+                show-empty
               >
                 <template #cell(sn)="row">
                   <span>
@@ -315,8 +318,8 @@ export default {
                 <template #cell(grossSalary)="row">
                   <span class="float-right">
                     {{ row.value }}
-                  </span>
-                </template><template #cell(netSalary)="row">
+                  </span> </template
+                ><template #cell(netSalary)="row">
                   <span class="float-right">
                     {{ row.value }}
                   </span>
@@ -331,14 +334,14 @@ export default {
             <div class="row">
               <div class="col">
                 <div
-                    class="dataTables_paginate paging_simple_numbers float-right"
+                  class="dataTables_paginate paging_simple_numbers float-right"
                 >
                   <ul class="pagination pagination-rounded mb-0">
                     <!-- pagination -->
                     <b-pagination
-                        v-model="currentPage"
-                        :total-rows="totalRows"
-                        :per-page="perPage"
+                      v-model="currentPage"
+                      :total-rows="totalRows"
+                      :per-page="perPage"
                     ></b-pagination>
                   </ul>
                 </div>
