@@ -76,9 +76,10 @@ export default {
       //   pmyl_location_id: parseFloat(this.location),
       // };
       const url = `${this.ROUTES.salary}/pull-emolument/${locationId}`;
-      this.apiGet(url, "Generate Emolument Report").then((res) => {
-        const { data } = res;
-        data.forEach((emolument, index) => {
+      this.apiGet(url, "Generate Emolument Report").then(async (res) => {
+        const {data} = res;
+        const newData = await this.sortArrayOfObjects(data)
+        newData.forEach((emolument, index) => {
           let emolumentObj = {
             sn: ++index,
             employeeId: emolument.employeeId,
@@ -140,6 +141,19 @@ export default {
         }
       }
       return ret;
+    },
+
+    async sortArrayOfObjects(array) {
+      return array.sort(function (a, b) {
+
+        let matchesA = a.employeeUniqueId.match(/(\d+)/);
+        matchesA = parseInt(matchesA[0])
+
+        let matchesB = b.employeeUniqueId.match(/(\d+)/);
+        matchesB = parseInt(matchesB[0])
+
+        return matchesA - matchesB;
+      })
     },
 
     async processFields(data) {
