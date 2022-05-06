@@ -117,7 +117,12 @@ export default {
           },
         });
       } else {
-        this.$router.push({});
+        this.$router.push({
+          name: "end-year-assess-employee",
+          params: {
+            empid: this.employeeId,
+          },
+        });
       }
     },
     async getOpenGoalSetting() {
