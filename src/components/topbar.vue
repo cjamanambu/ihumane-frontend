@@ -77,7 +77,7 @@ export default {
       const url = `${this.ROUTES.notifications}/${employeeID}`;
       this.apiGet(url, "Get Notifications Error").then((res) => {
         const { data } = res;
-        console.log({ data });
+        //console.log({ data });
         data.forEach((notification) => {
           this.notifications.push(notification);
         });

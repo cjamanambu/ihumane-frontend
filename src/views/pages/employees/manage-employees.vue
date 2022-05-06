@@ -74,6 +74,7 @@ export default {
         { key: "name", label: "Name", sortable: true },
         { key: "email", label: "Email", sortable: true },
         { key: "emp_phone_no", label: "Phone", sortable: true },
+        { key: "emp_status", label: "Account Status", sortable: true },
         {
           key: "sector",
           label: "T3 Code (Sector)",
@@ -181,6 +182,17 @@ export default {
                     {{ row.value.d_t3_code }}
                   </p>
                   <small>{{ row.value.department_name }}</small>
+                </template>
+                <template #cell(emp_status)="row">
+                  <div
+                    class="badge badge-success badge-pill"
+                    v-if="row.value === 1"
+                  >
+                    Active
+                  </div>
+                  <div class="badge badge-danger badge-pill" v-else>
+                    Inactive
+                  </div>
                 </template>
                 <template #cell(location)="row">
                   <p class="mb-0">

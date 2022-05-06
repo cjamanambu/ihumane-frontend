@@ -55,8 +55,8 @@ export default {
       filterOn: [],
       sortBy: "sn",
       sortDesc: false,
-      posted_on:null,
-      audience:null,
+      posted_on: null,
+      audience: null,
       fields: [
         { key: "sn", label: "S/n", sortable: true },
         {
@@ -74,24 +74,26 @@ export default {
           sortable: true,
         },
       ],
-
     };
   },
   methods: {
-
-    getSelfAssessmentMaster(){
+    getSelfAssessmentMaster() {
       const empId = this.getEmployee.emp_id;
+      const supervisor = this.getEmployee.supervisor;
+      const officer = `${supervisor.emp_first_name} ${supervisor.emp_last_name} - ${supervisor.emp_unique_id}`;
+      console.log("employee", this.getEmployee);
       const url = `${this.ROUTES.selfAssessment}/get-self-assessment-master/${empId}`;
       this.apiGet(url).then((res) => {
         const { data } = res;
         //console.log(data);
+        console.log(data.emp);
 
-        data.emp.map((ass, index)=>{
+        data.emp.map((ass, index) => {
           let activity = null;
-          switch(parseInt(ass.goal.gs_activity)){
+          switch (parseInt(ass.goal.gs_activity)) {
             case 1:
-            activity = "Beginning of Year";
-            break;
+              activity = "Beginning of Year";
+              break;
             case 2:
               activity = "Mid-Year";
               break;
@@ -100,18 +102,22 @@ export default {
               break;
           }
           let localData = {
-            sn:++index,
-            target:`${new Date(ass.goal.gs_from).toDateString()} - ${ new Date(ass.goal.gs_to).toDateString()}`,
-            status: parseInt(ass.sam_status) === 1 ? 'Approved' : 'Pending',
+            sn: ++index,
+            target: `${new Date(ass.goal.gs_from).toDateString()} - ${new Date(
+              ass.goal.gs_to
+            ).toDateString()}`,
+            status: parseInt(ass.sam_status) === 1 ? "Approved" : "Pending",
             type_of_activity: activity,
-            year:ass.goal.gs_year,
-            date_published:new Date(ass.createdAt).toDateString(),
-            officer:`${ass.supervisor?.emp_first_name} ${ass.supervisor?.emp_last_name} - ${ass.supervisor?.emp_unique_id}`,
-            ...ass}
+            year: ass.goal.gs_year,
+            date_published: new Date(ass.createdAt).toDateString(),
+            officer:
+              parseInt(ass.sam_status) === 1
+                ? `${ass.supervisor?.emp_first_name} ${ass.supervisor?.emp_last_name} - ${ass.supervisor?.emp_unique_id}`
+                : officer,
+            ...ass,
+          };
           this.assessments.push(localData);
-        })
-
-
+        });
       });
     },
     getOpenGoalSetting() {
@@ -135,24 +141,30 @@ export default {
       let gsId = employee[0].goal.gs_id;
       employee = employee[0];
       this.employeeId = employee.sam_emp_id;
-      if(parseInt(gsPeriod) === 1){
+      if (parseInt(gsPeriod) === 1) {
         this.$router.push({
           name: "assessment-details",
           params: {
             empid: this.employeeId,
-            gsId:gsId
+            gsId: gsId,
           },
         });
-      }else if(parseInt(gsPeriod) === 2){
+      } else if (parseInt(gsPeriod) === 2) {
         this.$router.push({
           name: "assess-mid-year-details",
           params: {
             empid: this.employeeId,
-            gsId:2
+            gsId: 2,
+          },
+        });
+      } else {
+        this.$router.push({
+          name: "assess-end-year-details",
+          params: {
+            empid: this.employeeId,
           },
         });
       }
-
     },
   },
 };
@@ -277,12 +289,13 @@ export default {
       </div>
     </div>
 
-
     <div class="row">
       <div class="col-12">
         <div class="card">
           <div class="card-header">
-            <h6 class="text-uppercase">Previously Submitted Self-assessments</h6>
+            <h6 class="text-uppercase">
+              Previously Submitted Self-assessments
+            </h6>
           </div>
           <div class="card-body">
             <div class="row mt-4">
@@ -339,25 +352,22 @@ export default {
                 select-mode="single"
                 @row-selected="selectEmployee"
               >
-
                 <template #cell(status)="row">
                   <p class="mb-0">
                     <span
-                        class="badge badge-primary badge-pill"
-                        v-if="row.item.status === 'Approved'"
+                      class="badge badge-primary badge-pill"
+                      v-if="row.item.status === 'Approved'"
                     >
-                  Approved
-                </span>
+                      Approved
+                    </span>
 
                     <span
-                        class="badge badge-warning badge-pill"
-                        v-if="row.item.status === 'Pending'"
+                      class="badge badge-warning badge-pill"
+                      v-if="row.item.status === 'Pending'"
                     >
-                  Pending
-                </span>
-
+                      Pending
+                    </span>
                   </p>
-
                 </template>
               </b-table>
             </div>
@@ -381,7 +391,5 @@ export default {
         </div>
       </div>
     </div>
-
-
   </Layout>
 </template>

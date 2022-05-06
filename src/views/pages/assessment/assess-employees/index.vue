@@ -44,9 +44,9 @@ export default {
           active: true,
         },
       ],
-      activeGoalId:null,
-      openGoalActivity:null,
-      openGoalActivityId:null,
+      activeGoalId: null,
+      openGoalActivity: null,
+      openGoalActivityId: null,
       employees: [],
       supervisor_assessments: [],
       employeeId: null,
@@ -101,30 +101,35 @@ export default {
       employee = employee[0].employee;
       this.employeeId = employee.emp_id;
 
-      if(parseInt(gsId) === 1){
+      if (parseInt(gsId) === 1) {
         this.$router.push({
           name: "assess-employee",
           params: {
             empid: this.employeeId,
           },
         });
-      }else if(parseInt(gsId) === 2){
+      } else if (parseInt(gsId) === 2) {
         this.$router.push({
           name: "mid-year-assess-employee",
           params: {
             empid: this.employeeId,
-            gsId:2
+            gsId: 2,
+          },
+        });
+      } else {
+        this.$router.push({
+          name: "end-year-assess-employee",
+          params: {
+            empid: this.employeeId,
           },
         });
       }
-
     },
     async getOpenGoalSetting() {
       const url = `${this.ROUTES.goalSetting}/get-open-goal-setting`;
       await this.apiGet(url).then((res) => {
         const { data } = res;
         if (data.length > 0) {
-
           this.activeGoalId = parseInt(data[0].gs_id);
           this.openGoalActivity = parseInt(data[0].gs_activity);
           this.openGoalActivityId = parseInt(data[0].gs_id);
@@ -132,7 +137,6 @@ export default {
           this.openGoalActivityTo = data[0].gs_to;
           this.openGoalActivityYear = data[0].gs_year;
           this.checkOpenGoal = 1;
-
         }
       });
     },
@@ -149,9 +153,9 @@ export default {
         }*/
 
         //supervisor
-        data.forEach((ass, index)=>{
+        data.forEach((ass, index) => {
           let activity = null;
-          switch(parseInt(ass.goal.gs_activity)){
+          switch (parseInt(ass.goal.gs_activity)) {
             case 1:
               activity = "Beginning of Year";
               break;
@@ -163,18 +167,20 @@ export default {
               break;
           }
           let supData = {
-            sn:++index,
-            target:`${new Date(ass.goal.gs_from).toDateString()} - ${ new Date(ass.goal.gs_to).toDateString()}`,
-            status: parseInt(ass.sam_status) === 1 ? 'Approved' : 'Pending',
-            type_of_activity:activity,
-            gsId:ass.goal.gs_activity,
-            year:ass.goal.gs_year,
-            date_published:new Date(ass.createdAt).toDateString(),
-            officer:`${ass.employee?.emp_first_name} ${ass.employee?.emp_last_name} - ${ass.employee?.emp_unique_id}`,
-            ...ass}
+            sn: ++index,
+            target: `${new Date(ass.goal.gs_from).toDateString()} - ${new Date(
+              ass.goal.gs_to
+            ).toDateString()}`,
+            status: parseInt(ass.sam_status) === 1 ? "Approved" : "Pending",
+            type_of_activity: activity,
+            gsId: ass.goal.gs_activity,
+            year: ass.goal.gs_year,
+            date_published: new Date(ass.createdAt).toDateString(),
+            officer: `${ass.employee?.emp_first_name} ${ass.employee?.emp_last_name} - ${ass.employee?.emp_unique_id}`,
+            ...ass,
+          };
           this.supervisor_assessments.push(supData);
-        })
-
+        });
       });
     },
   },
@@ -191,105 +197,106 @@ export default {
     <scale-loader v-if="apiBusy" />
     <div v-else class="row">
       <div class="col-12">
-          <div class="card">
-            <div class="card-header">
-              <h6 class="text-uppercase">Supervisor</h6>
-            </div>
-            <div class="card-body">
-              <div class="row mt-4">
-                <div class="col-sm-12 col-md-6">
-                  <div id="tickets-table_length-supervisor" class="dataTables_length">
-                    <label class="d-inline-flex align-items-center">
-                      Show&nbsp;
-                      <b-form-select
-                        v-model="perPage"
-                        size="sm"
-                        :options="pageOptions"
-                      ></b-form-select
-                      >&nbsp;entries
-                    </label>
-                  </div>
-                </div>
-                <!-- Search -->
-                <div class="col-sm-12 col-md-6">
-                  <div
-                    id="tickets-table_filter-supervisor"
-                    class="dataTables_filter text-md-right"
-                  >
-                    <label class="d-inline-flex align-items-center">
-                      Search:
-                      <b-form-input
-                        v-model="filter"
-                        type="search"
-                        placeholder="Search..."
-                        class="form-control form-control-sm ml-2"
-                      ></b-form-input>
-                    </label>
-                  </div>
-                </div>
-                <!-- End search -->
-              </div>
-              <!-- Table -->
-              <div class="table-responsive mb-0">
-                <b-table
-                  ref="donor-table"
-                  bordered
-                  selectable
-                  hover
-                  :items="supervisor_assessments"
-                  :fields="sup_fields"
-                  responsive="sm"
-                  :per-page="perPage"
-                  :current-page="currentPage"
-                  :sort-by.sync="sortBy"
-                  :sort-desc.sync="sortDesc"
-                  :filter="filter"
-                  :filter-included-fields="filterOn"
-                  @filtered="onFiltered"
-                  show-empty
-                  select-mode="single"
-                  @row-selected="selectEmployee"
+        <div class="card">
+          <div class="card-header">
+            <h6 class="text-uppercase">Supervisor</h6>
+          </div>
+          <div class="card-body">
+            <div class="row mt-4">
+              <div class="col-sm-12 col-md-6">
+                <div
+                  id="tickets-table_length-supervisor"
+                  class="dataTables_length"
                 >
-                  <template #cell(status)="row">
-                    <p class="mb-0">
-                    <span
-                        class="badge badge-primary badge-pill"
-                        v-if="row.item.status === 'Approved'"
-                    >
-                  Approved
-                </span>
-
-                      <span
-                          class="badge badge-warning badge-pill"
-                          v-if="row.item.status === 'Pending'"
-                      >
-                  Pending
-                </span>
-
-                    </p>
-
-                  </template>
-                </b-table>
+                  <label class="d-inline-flex align-items-center">
+                    Show&nbsp;
+                    <b-form-select
+                      v-model="perPage"
+                      size="sm"
+                      :options="pageOptions"
+                    ></b-form-select
+                    >&nbsp;entries
+                  </label>
+                </div>
               </div>
-              <div class="row">
-                <div class="col">
-                  <div
-                    class="dataTables_paginate paging_simple_numbers float-right"
-                  >
-                    <ul class="pagination pagination-rounded mb-0">
-                      <!-- pagination -->
-                      <b-pagination
-                        v-model="currentPage"
-                        :total-rows="totalRows"
-                        :per-page="perPage"
-                      ></b-pagination>
-                    </ul>
-                  </div>
+              <!-- Search -->
+              <div class="col-sm-12 col-md-6">
+                <div
+                  id="tickets-table_filter-supervisor"
+                  class="dataTables_filter text-md-right"
+                >
+                  <label class="d-inline-flex align-items-center">
+                    Search:
+                    <b-form-input
+                      v-model="filter"
+                      type="search"
+                      placeholder="Search..."
+                      class="form-control form-control-sm ml-2"
+                    ></b-form-input>
+                  </label>
+                </div>
+              </div>
+              <!-- End search -->
+            </div>
+            <!-- Table -->
+            <div class="table-responsive mb-0">
+              <b-table
+                ref="donor-table"
+                bordered
+                selectable
+                hover
+                :items="supervisor_assessments"
+                :fields="sup_fields"
+                responsive="sm"
+                :per-page="perPage"
+                :current-page="currentPage"
+                :sort-by.sync="sortBy"
+                :sort-desc.sync="sortDesc"
+                :filter="filter"
+                :filter-included-fields="filterOn"
+                @filtered="onFiltered"
+                show-empty
+                select-mode="single"
+                @row-selected="selectEmployee"
+              >
+                <template #cell(status)="row">
+                  <p class="mb-0">
+                    <span
+                      class="badge badge-primary badge-pill"
+                      v-if="row.item.status === 'Approved'"
+                    >
+                      Approved
+                    </span>
+
+                    <span
+                      class="badge badge-warning badge-pill"
+                      v-if="row.item.status === 'Pending'"
+                    >
+                      Pending
+                    </span>
+                  </p>
+                </template>
+              </b-table>
+            </div>
+            <div class="row">
+              <div class="col">
+                <div
+                  class="dataTables_paginate paging_simple_numbers float-right"
+                >
+                  <ul class="pagination pagination-rounded mb-0">
+                    <!-- pagination -->
+                    <b-pagination
+                      v-model="currentPage"
+                      :total-rows="totalRows"
+                      :per-page="perPage"
+                    ></b-pagination>
+                  </ul>
                 </div>
               </div>
             </div>
           </div>
         </div>
+      </div>
     </div>
   </Layout>
 </template>
