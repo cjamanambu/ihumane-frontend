@@ -25,8 +25,9 @@ export default {
     refreshTable() {
       this.apiGet(this.ROUTES.rating, "Get Ratings Error").then((res) => {
         const { data } = res;
-        //console.log(data);
-        this.ratings = data;
+        data.forEach((rating, index) => {
+          this.ratings[index] = { sn: ++index, ...rating };
+        });
         this.totalRows = this.ratings.length;
       });
     },
@@ -40,13 +41,19 @@ export default {
       this.ratingID = row.rating_id;
       this.name = row.rating_name;
       this.description = row.rating_desc;
-      this.$refs["edit-rating"].show();
+      this.status = row.rating_status;
+      if (row.rating_time_period === 3) {
+        this.$refs["edit-rating-status"].show();
+      } else {
+        this.$refs["edit-rating"].show();
+      }
       this.$refs["rating-table"].clearSelected();
     },
     resetForm() {
       this.ratingID = null;
       this.name = null;
       this.description = null;
+      this.status = null;
       this.$v.$reset();
     },
     submitNew() {
@@ -89,6 +96,17 @@ export default {
         });
       }
     },
+    submitUpdateStatus() {
+      const data = {
+        rating_status: this.status,
+      };
+      const url = `${this.ROUTES.rating}/update-end-year-rating-status/${this.ratingID}`;
+      this.apiPatch(url, data, "Update Rating Status Error").then((res) => {
+        this.apiResponseHandler(`${res.data}`, "Update Successful");
+        this.refreshTable();
+        this.$refs["edit-rating-status"].hide();
+      });
+    },
   },
   data() {
     return {
@@ -113,10 +131,10 @@ export default {
       pageOptions: [10, 25, 50, 100],
       filter: null,
       filterOn: [],
-      sortBy: "rating_id",
+      sortBy: "sn",
       sortDesc: false,
       fields: [
-        { key: "rating_id", label: "ID", sortable: true },
+        { key: "sn", label: "S/n", sortable: true },
         { key: "rating_name", label: "Rating", sortable: true },
         { key: "rating_time_period", label: "Period", sortable: true },
         { key: "rating_desc", label: "Description", sortable: true },
@@ -127,6 +145,7 @@ export default {
       name: null,
       description: "Description",
       rating_period: null,
+      status: null,
     };
   },
 };
@@ -209,6 +228,11 @@ export default {
                         ? "Mid-Year"
                         : "End of Year"
                     }}
+                  </span>
+                </template>
+                <template #cell(rating_status)="row">
+                  <span>
+                    {{ row.value === 1 ? "ACTIVE" : "INACTIVE" }}
                   </span>
                 </template>
               </b-table>
@@ -341,6 +365,46 @@ export default {
               'is-invalid': submitted && $v.description.$error,
             }"
           />
+        </div>
+        <b-button
+          v-if="!submitting"
+          class="btn btn-success btn-block mt-4"
+          type="submit"
+        >
+          Submit
+        </b-button>
+        <b-button
+          v-else
+          disabled
+          class="btn btn-success btn-block mt-4"
+          type="submit"
+        >
+          Submitting...
+        </b-button>
+      </form>
+    </b-modal>
+    <b-modal
+      ref="edit-rating-status"
+      title="Edit Rating Status"
+      hide-footer
+      centered
+      title-class="font-18"
+      @hidden="resetForm"
+    >
+      <form @submit.prevent="submitUpdateStatus">
+        <div class="form-group">
+          <label for="rating_status">
+            Rating Status <span class="text-danger">*</span>
+          </label>
+          <select
+            name="rating_status"
+            v-model="status"
+            id="rating_status"
+            class="form-control"
+          >
+            <option value="1">Active</option>
+            <option value="0">Inactive</option>
+          </select>
         </div>
         <b-button
           v-if="!submitting"
