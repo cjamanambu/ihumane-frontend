@@ -419,6 +419,17 @@ export default {
       this.submitted = false;
       this.fetchEmployee();
     },
+    async unsuspendEmployee() {
+      this.submitted = true;
+      let employeeID = this.$route.params.employeeID;
+      const url = `${this.ROUTES.employee}/unsuspend-employee/${employeeID}`;
+      this.apiPatch(url, "Unsuspend Employee Error").then();
+      this.apiResponseHandler("Process Complete", "Employee Suspended");
+      this.$refs["deactivate-employee"].hide();
+      this.fetchEmployee();
+      this.submitted = false;
+      this.fetchEmployee();
+    },
     resetForm() {
       this.emp_suspension_reason = null;
     },
@@ -843,25 +854,14 @@ export default {
       title-class="font-18"
       @hidden="resetForm"
     >
-      <form @submit.prevent="suspendEmployee">
-        <div class="form-group">
-          <label for="suspensionReason">
-            Suspension Reason <span class="text-danger">*</span>
-          </label>
-          <textarea
-            id="suspensionReason"
-            type="text"
-            v-model="emp_suspension_reason"
-            class="form-control"
-          />
-        </div>
-
+      <form @submit.prevent="unsuspendEmployee">
+        <p>Are you sure you want to activate this account <code>({{ emp_first_name }} {{emp_last_name}} {{emp_other_name}})</code> ? </p>
         <b-button
           v-if="!submitting"
           class="btn btn-success btn-block mt-4"
           type="submit"
         >
-          Submit
+          Activate Account
         </b-button>
         <b-button
           v-else
