@@ -419,6 +419,17 @@ export default {
       this.submitted = false;
       this.fetchEmployee();
     },
+    async unsuspendEmployee() {
+      this.submitted = true;
+      let employeeID = this.$route.params.employeeID;
+      const url = `${this.ROUTES.employee}/unsuspend-employee/${employeeID}`;
+      this.apiPatch(url, "Unsuspend Employee Error").then();
+      this.apiResponseHandler("Process Complete", "Employee Suspended");
+      this.$refs["deactivate-employee"].hide();
+      this.fetchEmployee();
+      this.submitted = false;
+      this.fetchEmployee();
+    },
     resetForm() {
       this.emp_suspension_reason = null;
     },
@@ -642,8 +653,11 @@ export default {
                 <div class="row text-center mt-2">
                   <div class="col-sm-6">
                     <div class="d-grid">
-                      <button type="button" @click="$refs['deactivate-employee'].show()" class="btn btn-danger waves-effect waves-light mt-2">
+                      <button type="button" v-if="parseInt(emp_account_status) !== 0" @click="$refs['deactivate-employee'].show()" class="btn btn-danger waves-effect waves-light mt-2">
                         <i class="mdi mdi-cancel me-2"></i> Deactivate
+                      </button>
+                      <button type="button" v-else @click="$refs['activate-employee'].show()" class="btn btn-success waves-effect waves-light mt-2">
+                        <i class="mdi mdi-check me-2"></i> Activate
                       </button>
                     </div>
                   </div>
@@ -820,6 +834,34 @@ export default {
           type="submit"
         >
           Submit
+        </b-button>
+        <b-button
+          v-else
+          disabled
+          class="btn btn-success btn-block mt-4"
+          type="submit"
+        >
+          Submitting...
+        </b-button>
+      </form>
+    </b-modal>
+
+    <b-modal
+      ref="activate-employee"
+      title="Activate Employee"
+      hide-footer
+      centered
+      title-class="font-18"
+      @hidden="resetForm"
+    >
+      <form @submit.prevent="unsuspendEmployee">
+        <p>Are you sure you want to activate this account <code>({{ emp_first_name }} {{emp_last_name}} {{emp_other_name}})</code> ? </p>
+        <b-button
+          v-if="!submitting"
+          class="btn btn-success btn-block mt-4"
+          type="submit"
+        >
+          Activate Account
         </b-button>
         <b-button
           v-else
