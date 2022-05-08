@@ -63,6 +63,7 @@ export default {
       strength: null,
       growth_area: null,
       additional_comment: null,
+      gsId: null,
     };
   },
   methods: {
@@ -84,7 +85,6 @@ export default {
       const url = `${this.ROUTES.rating}`;
       await this.apiGet(url).then((res) => {
         const { data } = res;
-
         console.log(data);
       });
     },
@@ -92,6 +92,7 @@ export default {
       let url = `${this.ROUTES.endYearResponse}/get-end-year/${this.empId}/${this.openGoalActivityId}`;
       this.apiGet(url).then((res) => {
         const { data } = res;
+        this.gsId = data[0].eyr_gs_id;
         this.goalMasterId = data[0].eyr_master_id;
         if (data.length) {
           this.midYearCheckingQuestions = data.filter((entry) => {
@@ -140,21 +141,27 @@ export default {
       if (this.$v.$invalid) {
         this.apiFormHandler("Invalid Submission...");
       } else {
+        const employeeID = this.$route.params.empid;
+        const gsId = this.gsId;
         const data = {
           strength: this.strength,
           growth_area: this.growth_area,
           rating: this.selectedRating,
           master: this.goalMasterId,
           additional_comment: this.additional_comment,
+          approve:this.approved,
+          employee:employeeID,
+          gsId: gsId,
+          supervisor:this.getEmployee.emp_id,
         };
         const url = `${this.ROUTES.endYearResponse}/supervisor-end-year-response`;
-        console.log({ url, data });
-        // this.apiPost(url, data, " Error submitting response").then((res) => {
-        //   this.apiResponseHandler(`${res.data}`, "Response submitted!");
-        //   this.refreshTable();
-        //   this.$v.$reset();
-        //   location.reload();
-        // });
+        //console.log({ data });
+         this.apiPost(url, data, " Error submitting response").then((res) => {
+           this.apiResponseHandler(`${res.data}`, "Response submitted!");
+           this.refreshTable();
+          this.$v.$reset();
+          location.reload();
+         });
       }
     },
   },
