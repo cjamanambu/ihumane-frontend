@@ -154,14 +154,14 @@ export default {
           gsId: gsId,
           supervisor:this.getEmployee.emp_id,
         };
-        //const url = `${this.ROUTES.endYearResponse}/supervisor-end-year-response`;
-        console.log({ data });
-        // this.apiPost(url, data, " Error submitting response").then((res) => {
-        //   this.apiResponseHandler(`${res.data}`, "Response submitted!");
-        //   this.refreshTable();
-        //   this.$v.$reset();
-        //   location.reload();
-        // });
+        const url = `${this.ROUTES.endYearResponse}/supervisor-end-year-response`;
+        //console.log({ data });
+         this.apiPost(url, data, " Error submitting response").then((res) => {
+           this.apiResponseHandler(`${res.data}`, "Response submitted!");
+           this.refreshTable();
+          this.$v.$reset();
+          location.reload();
+         });
       }
     },
   },
