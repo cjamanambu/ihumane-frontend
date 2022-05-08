@@ -46,6 +46,7 @@ export default {
       const url = `${this.ROUTES.goalSetting}/get-open-end-Year`;
       this.apiGet(url, "Get current year error").then((res) => {
         if (res) {
+          //console.log(res)
           const { data } = res;
           this.eya_year = data[0].eya_year;
           this.eyaYearStatus = true;
