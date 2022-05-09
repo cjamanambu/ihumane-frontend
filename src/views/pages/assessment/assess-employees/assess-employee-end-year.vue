@@ -198,7 +198,7 @@ export default {
     <scale-loader v-if="apiBusy" />
     <div v-else class="row">
       <div class="col-lg-6">
-        <div v-if="currentEmployee" class="card mb-4">
+        <div v-if="currentEmployee" class="card mb-4 bg-light">
           <div class="card-body">
             <div class="p-3 bg-light mb-4">
               <h5 class="font-size-14 mb-0">Employee Details</h5>
@@ -232,7 +232,7 @@ export default {
             </div>
           </div>
         </div>
-        <div class="card">
+        <div class="card bg-light">
           <div class="card-body">
             <div class="p-3 bg-light mb-4">
               <h5 class="font-size-14 mb-0">Employee Reflection</h5>

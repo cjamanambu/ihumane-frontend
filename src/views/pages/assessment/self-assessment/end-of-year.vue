@@ -396,7 +396,7 @@ export default {
       <div v-if="openGoalActivity === 3 && parseInt(checkOpenGoal) === 1">
         <div class="row">
           <div class="col-lg-6">
-            <div class="card mb-4">
+            <div class="card mb-4 bg-light">
               <div class="card-body">
                 <div class="p-3 bg-light mb-4">
                   <h5 class="font-size-14 mb-0">Supervisor Details</h5>
@@ -446,7 +446,7 @@ export default {
                 <!--                </div>-->
               </div>
             </div>
-            <div class="card">
+            <div class="card bg-light">
               <div class="card-body">
                 <div class="p-3 bg-light mb-4">
                   <h5 class="font-size-14 mb-0">Manager Evaluation</h5>
