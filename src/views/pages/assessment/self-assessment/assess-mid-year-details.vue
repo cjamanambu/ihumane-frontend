@@ -185,6 +185,7 @@ export default {
           const prevUrl = `${this.ROUTES.selfAssessment}/prefill-goal-setting/${this.getEmployee.emp_id}`;
           this.apiGet(prevUrl).then((res) => {
             const { data } = res;
+            console.log({ data });
             this.texts = [];
             this.gsID = parseInt(data[0].sa_gs_id);
             this.assessStatus = 0; //data[0].sa_status;
