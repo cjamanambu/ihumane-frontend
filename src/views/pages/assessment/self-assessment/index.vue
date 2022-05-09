@@ -81,12 +81,12 @@ export default {
       const empId = this.getEmployee.emp_id;
       const supervisor = this.getEmployee.supervisor;
       const officer = `${supervisor.emp_first_name} ${supervisor.emp_last_name} - ${supervisor.emp_unique_id}`;
-      console.log("employee", this.getEmployee);
+      //console.log("employee", this.getEmployee);
       const url = `${this.ROUTES.selfAssessment}/get-self-assessment-master/${empId}`;
       this.apiGet(url).then((res) => {
         const { data } = res;
         //console.log(data);
-        console.log(data.emp);
+        //console.log(data.emp);
 
         data.emp.map((ass, index) => {
           let activity = null;
@@ -108,6 +108,7 @@ export default {
             ).toDateString()}`,
             status: parseInt(ass.sam_status) === 1 ? "Approved" : "Pending",
             type_of_activity: activity,
+            masterId: ass.sam_id,
             year: ass.goal.gs_year,
             date_published: new Date(ass.createdAt).toDateString(),
             officer:
@@ -136,9 +137,11 @@ export default {
       this.currentPage = 1;
     },
     selectEmployee(employee) {
-      //console.log(employee);
+      //console.log(employee); sam_gs_id
       let gsPeriod = employee[0].goal.gs_activity;
       let gsId = employee[0].goal.gs_id;
+      let masterId = employee[0].masterId;
+      //console.log(masterId);
       employee = employee[0];
       this.employeeId = employee.sam_emp_id;
       if (parseInt(gsPeriod) === 1) {
@@ -154,7 +157,8 @@ export default {
           name: "assess-mid-year-details",
           params: {
             empid: this.employeeId,
-            gsId: 2,
+            gsId: gsId,
+            masterId:masterId
           },
         });
       } else {
