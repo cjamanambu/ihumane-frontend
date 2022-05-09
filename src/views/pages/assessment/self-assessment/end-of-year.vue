@@ -311,7 +311,6 @@ export default {
       this.apiGet(url, "Get Supervisor End Year Response Error").then((res) => {
         const { data } = res;
         this.supervisorResponse = data[0];
-        console.log(this.supervisorResponse);
       });
     },
     respond() {
@@ -627,7 +626,7 @@ export default {
                     </strong>
                     <ul class="mt-2">
                       <li
-                        class="mb-3 w-75"
+                        class="mb-3"
                         v-for="(question, index) in endOfYearQuestions"
                         :key="index"
                       >
