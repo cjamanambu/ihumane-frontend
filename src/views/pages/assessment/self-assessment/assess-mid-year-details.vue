@@ -19,7 +19,6 @@ export default {
     await this.getOpenGoalSetting();
     await this.getSelfAssessment();
     this.gsID = this.$route.params.gsId;
-    this.masterId = this.$route.params.masterId;
   },
   data() {
     return {
@@ -152,22 +151,23 @@ export default {
       });
     },
     async getSelfAssessment() {
+      this.masterId = this.$route.params.masterId;
       const url = `${this.ROUTES.selfAssessment}/get-self-assessment-by-master/${this.masterId}`;
       //const url = `${this.ROUTES.selfAssessment}/get-self-assessment/${this.getEmployee.emp_id}/${this.gsID}`;
       await this.apiGet(url).then((res) => {
         const { data } = res;
-        //console.log(data);
-        if (data.questions.length > 0) {
+        console.log({ data });
+        if (data.question.length > 0) {
           this.texts = [];
-          this.gsID = data.openGoal[0].gs_id;
+          // this.gsID = data.openGoal[0].gs_id;
           this.optional = data.master?.sam_optional;
           this.sam_discussion_held_on = new Date(
             data.master?.sam_discussion_held_on
           )
             .toISOString()
             .substr(0, 10);
-          this.assessStatus = data.questions[0].sa_status;
-          data.questions.forEach(async (datum) => {
+          this.assessStatus = data.question[0].sa_status;
+          data.question.forEach(async (datum) => {
             this.selfAssessmentStatus = true;
             this.prefillStatus = true;
             const dat = {
