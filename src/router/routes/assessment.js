@@ -85,7 +85,7 @@ export default [
       ),
   },
   {
-    path: "/assess-mid-year-details/:empid/:gsId",
+    path: "/assess-mid-year-details/:empid/:gsId/:masterId",
     name: "assess-mid-year-details",
     meta: {
       authRequired: true,
