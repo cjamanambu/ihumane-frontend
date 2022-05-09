@@ -18,6 +18,8 @@ export default {
   async mounted() {
     await this.getOpenGoalSetting();
     await this.getSelfAssessment();
+    this.gsID = this.$route.params.gsId;
+    this.masterId = this.$route.params.masterId;
   },
   data() {
     return {
@@ -80,6 +82,7 @@ export default {
         },
       ],
       assessStatus: 0,
+      masterId: null,
       endYearQuestions: [],
       openGoalActivity: null,
       openGoalActivityYear: null,
@@ -149,7 +152,8 @@ export default {
       });
     },
     async getSelfAssessment() {
-      const url = `${this.ROUTES.selfAssessment}/get-self-assessment/${this.getEmployee.emp_id}/${this.activeGoalId}`;
+      const url = `${this.ROUTES.selfAssessment}/get-self-assessment-by-master/${this.masterId}`;
+      //const url = `${this.ROUTES.selfAssessment}/get-self-assessment/${this.getEmployee.emp_id}/${this.gsID}`;
       await this.apiGet(url).then((res) => {
         const { data } = res;
         //console.log(data);
