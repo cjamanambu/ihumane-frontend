@@ -52,7 +52,7 @@ export default [
       import("@/views/pages/assessment/assess-employees/assess-employee"),
   },
   {
-    path: "/mid-year-assess-employee/:empid/:gsId",
+    path: "/mid-year-assess-employee/:empid/:gsId/:masterId",
     name: "mid-year-assess-employee",
     meta: {
       authRequired: true,
