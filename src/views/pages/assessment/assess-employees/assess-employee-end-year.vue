@@ -64,6 +64,7 @@ export default {
       growth_area: null,
       additional_comment: null,
       gsId: null,
+      status: 0,
     };
   },
   methods: {
@@ -145,6 +146,7 @@ export default {
         this.growth_area = endYearResponse.eysr_growth;
         this.selectedRating = endYearResponse.rating?.rating_id;
         this.additional_comment = endYearResponse.eysr_additional_comment;
+        this.status = endYearResponse.eysr_status;
       });
     },
     submitManagerEvaluation() {
@@ -382,6 +384,7 @@ export default {
                     type="text"
                     rows="4"
                     class="form-control"
+                    :readonly="status === 1"
                   />
                 </div>
               </div>
@@ -401,6 +404,7 @@ export default {
                     type="text"
                     rows="4"
                     class="form-control"
+                    :readonly="status === 1"
                   />
                 </div>
               </div>
@@ -437,21 +441,24 @@ export default {
                     type="text"
                     rows="4"
                     class="form-control"
+                    :readonly="status === 1"
                   />
                 </div>
               </div>
-              <b-form-checkbox
-                id="checkbox-1"
-                v-model="approved"
-                name="checkbox-1"
-                :value="1"
-                :unchecked-value="0"
-              >
-                Mark as approved
-              </b-form-checkbox>
+              <div v-if="status !== 1">
+                <b-form-checkbox
+                  id="checkbox-1"
+                  v-model="approved"
+                  name="checkbox-1"
+                  :value="1"
+                  :unchecked-value="0"
+                >
+                  Mark as approved
+                </b-form-checkbox>
 
-              <div class="form-group mt-3">
-                <button class="btn btn-success btn-block">Submit</button>
+                <div class="form-group mt-3">
+                  <button class="btn btn-success btn-block">Submit</button>
+                </div>
               </div>
             </form>
           </div>
