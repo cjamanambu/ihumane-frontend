@@ -20,6 +20,7 @@ export default {
     await this.getSelfAssessment();
     this.gsID = this.$route.params.gsId;
     this.masterId = this.$route.params.masterId;
+    //console.log(this.masterId);
   },
   data() {
     return {
@@ -156,7 +157,7 @@ export default {
       //const url = `${this.ROUTES.selfAssessment}/get-self-assessment/${this.getEmployee.emp_id}/${this.gsID}`;
       await this.apiGet(url).then((res) => {
         const { data } = res;
-        //console.log(data);
+        console.log(data);
         if (data.questions.length > 0) {
           this.texts = [];
           this.gsID = data.openGoal[0].gs_id;
