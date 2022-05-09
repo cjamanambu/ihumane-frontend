@@ -165,7 +165,7 @@ export default {
         console.log({ data });
         if (data.question.length > 0) {
           this.texts = [];
-          // this.gsID = data.openGoal[0].gs_id;
+          this.gsID = data.master?.sam_gs_id;
           this.optional = data.master?.sam_optional;
           this.sam_discussion_held_on = new Date(
             data.master?.sam_discussion_held_on
