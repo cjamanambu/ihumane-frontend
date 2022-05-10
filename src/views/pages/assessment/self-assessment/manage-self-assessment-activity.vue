@@ -18,6 +18,7 @@ export default {
     ...authComputed,
   },
   async mounted() {
+
     this.activity = this.$route.params.activity;
     if(parseInt(this.activity) === 1){
       await this.getSelfAssessment();
@@ -26,7 +27,7 @@ export default {
     }else{
       await this.prefillAssessment();
     }
-
+    await this.fetchEmployee();
   },
   validations: {
     start: { required },
@@ -75,6 +76,7 @@ export default {
       selfAssessmentGoals: [],
       endYearAssessments: [],
       assessments: [],
+      employee: [],
       prefillAssessments: [],
       currentEmployee: null,
       gsID: null,
@@ -103,6 +105,16 @@ export default {
     };
   },
   methods: {
+    async fetchEmployee() {
+      this.employeeId = this.$route.params.employee;
+      const url = `${this.ROUTES.employee}/get-employee/${this.employeeId}`;
+      this.apiGet(url, "Get Employee Error").then((res) => {
+        const { data } = res;
+        if (data) {
+          this.employee.push(data);
+        }
+      });
+    },
     async prefillAssessment() {
       this.selectedYear  = this.$route.params.year;
       this.employeeId = this.$route.params.employee;
@@ -181,6 +193,7 @@ export default {
       const url = `${this.ROUTES.selfAssessment}/get-self-assessment/${this.employeeId}/${this.activityId}`;
       await this.apiGet(url).then((res) => {
         const { data } = res;
+        console.log(data);
         this.assessments = [];
         this.assessStatus = data.questions[0].sa_status;
         this.gsID = data.openGoal[0].gs_id;
@@ -214,6 +227,17 @@ export default {
     <PageHeader :title="title" :items="items" />
     <scale-loader v-if="apiBusy" />
     <div class="row" v-else>
+      <div class="col-md-12 d-flex justify-content-end">
+        <div class=" mb-3">
+          <b-button
+            class="btn btn-secondary"
+            @click="$router.go(-1)"
+          >
+            <i class="mdi mdi-step-backward mr-2"></i>
+            Go Back
+          </b-button>
+        </div>
+      </div>
       <div class="col-md-12" >
         <div class="card">
           <div class="card-body">
@@ -235,43 +259,101 @@ export default {
             </div>
 
             <div class="row" v-if="parseInt(activity) === 3">
-              <div class="col-lg-6">
-                <div class="card mb-4">
-                  <div class="card-body">
-                    <div class="p-3 bg-light mb-4">
-                      <h5 class="font-size-14 mb-0">Supervisor Details</h5>
-                    </div>
-                    <div class="d-flex justify-content-between text-capitalize">
-                      <p>Employee Name</p>
-                      <p v-if="supervisorResponse">
-                        {{ supervisorResponse.supervisor.emp_first_name }}
-                        {{ supervisorResponse.supervisor.emp_last_name }}
-                      </p>
-                      <span v-else>-</span>
-                    </div>
-                    <div class="d-flex justify-content-between">
-                      <p>T7 Number</p>
-                      <p v-if="supervisorResponse">
-                        {{ supervisorResponse.supervisor.emp_unique_id }}
-                      </p>
-                      <span v-else>-</span>
-                    </div>
-                    <div class="d-flex justify-content-between">
-                      <p>Phone Number</p>
-                      <p v-if="supervisorResponse">
-                        {{ supervisorResponse.supervisor.emp_phone_no }}
-                      </p>
-                      <span v-else>-</span>
-                    </div>
-                    <div class="d-flex justify-content-between">
-                      <p>Office Email</p>
-                      <p v-if="supervisorResponse">
-                        {{ supervisorResponse.supervisor.emp_office_email }}
-                      </p>
-                      <span v-else>-</span>
+
+                <div class="col-6">
+                  <div class="card mb-4">
+                    <div class="card-body">
+                      <div class="p-3 bg-light mb-4">
+                        <h5 class="font-size-14 mb-0">Supervisor Details</h5>
+                      </div>
+                      <div class="d-flex justify-content-between text-capitalize">
+                        <p>Supervisor Name</p>
+                        <p >
+                          {{ employee[0].supervisor.emp_first_name }}
+                          {{ employee[0].supervisor.emp_last_name }}
+                        </p>
+                      </div>
+                      <div class="d-flex justify-content-between">
+                        <p>T7 Number</p>
+                        <p>
+                          {{ employee[0].supervisor.emp_unique_id }}
+                        </p>
+                      </div>
+                      <div class="d-flex justify-content-between">
+                        <p>Phone Number</p>
+                        <p>
+                          {{ employee[0].supervisor.emp_phone_no }}
+                        </p>
+                      </div>
+                      <div class="d-flex justify-content-between">
+                        <p>Office Email</p>
+                        <p>
+                          {{ employee[0].supervisor.emp_office_email }}
+                        </p>
+                      </div>
+                      <div class="d-flex justify-content-between">
+                        <p>Sector Code</p>
+                        <p>
+                          {{ employee[0].supervisor.sector.d_t3_code }}
+                        </p>
+                      </div>
+                      <div class="d-flex justify-content-between">
+                        <p>Location Code</p>
+                        <p>
+                          {{ employee[0].supervisor.location.l_t6_code }}
+                        </p>
+                      </div>
                     </div>
                   </div>
                 </div>
+                <div class="col-6">
+                  <div class="card mb-4">
+                    <div class="card-body">
+                      <div class="p-3 bg-light mb-4">
+                        <h5 class="font-size-14 mb-0">Employee Details</h5>
+                      </div>
+                      <div class="d-flex justify-content-between text-capitalize">
+                        <p>Employee Name</p>
+                        <p >
+                          {{ employee[0].emp_first_name }}
+                          {{ employee[0].emp_last_name }}
+                        </p>
+                      </div>
+                      <div class="d-flex justify-content-between">
+                        <p>T7 Number</p>
+                        <p>
+                          {{ employee[0].emp_unique_id }}
+                        </p>
+                      </div>
+                      <div class="d-flex justify-content-between">
+                        <p>Phone Number</p>
+                        <p>
+                          {{ employee[0].emp_phone_no }}
+                        </p>
+                      </div>
+                      <div class="d-flex justify-content-between">
+                        <p>Office Email</p>
+                        <p>
+                          {{ employee[0].emp_office_email }}
+                        </p>
+                      </div>
+                      <div class="d-flex justify-content-between">
+                        <p>Sector Code</p>
+                        <p>
+                          {{ employee[0].sector.d_t3_code }}
+                        </p>
+                      </div>
+                      <div class="d-flex justify-content-between">
+                        <p>Location Code</p>
+                        <p>
+                          {{ employee[0].location.l_t6_code }}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+              <div class="col-lg-6">
                 <div class="card">
                   <div class="card-body">
                     <div class="p-3 bg-light mb-4">
@@ -478,6 +560,100 @@ export default {
             >
               <div class="col-lg-12">
                 <div class="row">
+                  <div class="col-6">
+                    <div class="card mb-4">
+                      <div class="card-body">
+                        <div class="p-3 bg-light mb-4">
+                          <h5 class="font-size-14 mb-0">Supervisor Details</h5>
+                        </div>
+                        <div class="d-flex justify-content-between text-capitalize">
+                          <p>Supervisor Name</p>
+                          <p >
+                            {{ employee[0].supervisor.emp_first_name }}
+                            {{ employee[0].supervisor.emp_last_name }}
+                          </p>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                          <p>T7 Number</p>
+                          <p>
+                            {{ employee[0].supervisor.emp_unique_id }}
+                          </p>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                          <p>Phone Number</p>
+                          <p>
+                            {{ employee[0].supervisor.emp_phone_no }}
+                          </p>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                          <p>Office Email</p>
+                          <p>
+                            {{ employee[0].supervisor.emp_office_email }}
+                          </p>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                          <p>Sector Code</p>
+                          <p>
+                            {{ employee[0].supervisor.sector.d_t3_code }}
+                          </p>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                          <p>Location Code</p>
+                          <p>
+                            {{ employee[0].supervisor.location.l_t6_code }}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-6">
+                    <div class="card mb-4">
+                      <div class="card-body">
+                        <div class="p-3 bg-light mb-4">
+                          <h5 class="font-size-14 mb-0">Employee Details</h5>
+                        </div>
+                        <div class="d-flex justify-content-between text-capitalize">
+                          <p>Employee Name</p>
+                          <p >
+                            {{ employee[0].emp_first_name }}
+                            {{ employee[0].emp_last_name }}
+                          </p>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                          <p>T7 Number</p>
+                          <p>
+                            {{ employee[0].emp_unique_id }}
+                          </p>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                          <p>Phone Number</p>
+                          <p>
+                            {{ employee[0].emp_phone_no }}
+                          </p>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                          <p>Office Email</p>
+                          <p>
+                            {{ employee[0].emp_office_email }}
+                          </p>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                          <p>Sector Code</p>
+                          <p>
+                            {{ employee[0].sector.d_t3_code }}
+                          </p>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                          <p>Location Code</p>
+                          <p>
+                            {{ employee[0].location.l_t6_code }}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
                   <div class="col-12" v-for="(field, index) in assessments"
                        :key="index">
                     <div class="form-group">
@@ -494,6 +670,100 @@ export default {
               </div>
             </div>
             <div class="row" v-else-if="parseInt(activity) === 2">
+
+                <div class="col-6">
+                  <div class="card mb-4">
+                    <div class="card-body">
+                      <div class="p-3 bg-light mb-4">
+                        <h5 class="font-size-14 mb-0">Supervisor Details</h5>
+                      </div>
+                      <div class="d-flex justify-content-between text-capitalize">
+                        <p>Supervisor Name</p>
+                        <p >
+                          {{ employee[0].supervisor.emp_first_name }}
+                          {{ employee[0].supervisor.emp_last_name }}
+                        </p>
+                      </div>
+                      <div class="d-flex justify-content-between">
+                        <p>T7 Number</p>
+                        <p>
+                          {{ employee[0].supervisor.emp_unique_id }}
+                        </p>
+                      </div>
+                      <div class="d-flex justify-content-between">
+                        <p>Phone Number</p>
+                        <p>
+                          {{ employee[0].supervisor.emp_phone_no }}
+                        </p>
+                      </div>
+                      <div class="d-flex justify-content-between">
+                        <p>Office Email</p>
+                        <p>
+                          {{ employee[0].supervisor.emp_office_email }}
+                        </p>
+                      </div>
+                      <div class="d-flex justify-content-between">
+                        <p>Sector Code</p>
+                        <p>
+                          {{ employee[0].supervisor.sector.d_t3_code }}
+                        </p>
+                      </div>
+                      <div class="d-flex justify-content-between">
+                        <p>Location Code</p>
+                        <p>
+                          {{ employee[0].supervisor.location.l_t6_code }}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-6">
+                  <div class="card mb-4">
+                    <div class="card-body">
+                      <div class="p-3 bg-light mb-4">
+                        <h5 class="font-size-14 mb-0">Employee Details</h5>
+                      </div>
+                      <div class="d-flex justify-content-between text-capitalize">
+                        <p>Employee Name</p>
+                        <p >
+                          {{ employee[0].emp_first_name }}
+                          {{ employee[0].emp_last_name }}
+                        </p>
+                      </div>
+                      <div class="d-flex justify-content-between">
+                        <p>T7 Number</p>
+                        <p>
+                          {{ employee[0].emp_unique_id }}
+                        </p>
+                      </div>
+                      <div class="d-flex justify-content-between">
+                        <p>Phone Number</p>
+                        <p>
+                          {{ employee[0].emp_phone_no }}
+                        </p>
+                      </div>
+                      <div class="d-flex justify-content-between">
+                        <p>Office Email</p>
+                        <p>
+                          {{ employee[0].emp_office_email }}
+                        </p>
+                      </div>
+                      <div class="d-flex justify-content-between">
+                        <p>Sector Code</p>
+                        <p>
+                          {{ employee[0].sector.d_t3_code }}
+                        </p>
+                      </div>
+                      <div class="d-flex justify-content-between">
+                        <p>Location Code</p>
+                        <p>
+                          {{ employee[0].location.l_t6_code }}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
               <div class="col-lg-12">
                 <div class="card">
                   <div class="card-body">

@@ -99,6 +99,18 @@ export default {
     <PageHeader :title="title" :items="items" />
     <scale-loader v-if="apiBusy" />
     <div class="row" v-else>
+        <div class="col-md-12 d-flex justify-content-end">
+          <div class=" mb-3">
+            <b-button
+              class="btn btn-secondary"
+              @click="$router.go(-1)"
+            >
+              <i class="mdi mdi-step-backward mr-2"></i>
+              Go Back
+            </b-button>
+          </div>
+        </div>
+
       <div class="col-md-4" v-for="(period, index) in periods" :key="index">
         <div class="card">
           <div class="card-body">
