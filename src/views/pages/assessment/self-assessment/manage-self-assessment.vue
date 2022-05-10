@@ -26,7 +26,7 @@ export default {
         //console.log(data);
         data.forEach((assess, index) => {
           this.assessments[index] = { sn: ++index,
-            emp: `${assess.employee?.emp_first_name} ${assess.employee?.emp_last_name}`,
+            emp: `${assess.employee?.emp_first_name} ${assess.employee?.emp_last_name}  - ${assess.employee?.emp_unique_id}`,
             year: `${ assess.goal?.gs_year } `,
             //start_date: `${ new Date(assess.goal?.gs_from).toDateString() } `,
             gs_period: `${ new Date(assess.goal?.gs_from).toDateString() } - ${ new Date(assess.goal?.gs_to).toDateString() } `,
@@ -34,7 +34,7 @@ export default {
             empId: assess.employee.emp_id,
             gsId: assess.goal.gs_id,
             masterId: assess.sam_id,
-            supervisor: `${assess.supervisor?.emp_first_name} ${assess.supervisor?.emp_last_name}`,
+            supervisor: `${assess.supervisor?.emp_first_name} ${assess.supervisor?.emp_last_name} - ${assess.supervisor?.emp_unique_id}`,
           };
         });
         this.totalRows = this.assessments.length;
@@ -106,7 +106,16 @@ export default {
   <Layout>
     <PageHeader :title="title" :items="items" />
     <scale-loader v-if="apiBusy" />
-    <div v-else class="row">
+    <div v-else class="row d-flex justify-content-end">
+      <div class=" mb-3">
+        <b-button
+          class="btn btn-secondary"
+          @click="$router.go(-1)"
+        >
+          <i class="mdi mdi-step-backward mr-2"></i>
+          Go Back
+        </b-button>
+      </div>
       <div class="col-12">
         <div class="card">
           <div class="card-body">
