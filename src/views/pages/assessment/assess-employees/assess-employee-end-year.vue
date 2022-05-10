@@ -64,6 +64,7 @@ export default {
       growth_area: null,
       additional_comment: null,
       gsId: null,
+      status: 0,
     };
   },
   methods: {
@@ -90,10 +91,11 @@ export default {
     },
     async prefillAssessment() {
       let url = `${this.ROUTES.endYearResponse}/get-end-year/${this.empId}/${this.openGoalActivityId}`;
-      this.apiGet(url).then((res) => {
+      this.apiGet(url).then(async (res) => {
         const { data } = res;
         this.gsId = data[0].eyr_gs_id;
         this.goalMasterId = data[0].eyr_master_id;
+        await this.getSupervisorEndYearResponse();
         if (data.length) {
           this.midYearCheckingQuestions = data.filter((entry) => {
             return entry.eyr_type === 1;
@@ -135,6 +137,18 @@ export default {
     selectRating(rating) {
       this.selectedRating = rating;
     },
+    async getSupervisorEndYearResponse() {
+      const url = `${this.ROUTES.endYearResponse}/supervisor-end-year-response/${this.goalMasterId}`;
+      this.apiGet(url, "Get Supervisor End Year Response Error").then((res) => {
+        const { data } = res;
+        let endYearResponse = data[0];
+        this.strength = endYearResponse.eysr_strength;
+        this.growth_area = endYearResponse.eysr_growth;
+        this.selectedRating = endYearResponse.rating?.rating_id;
+        this.additional_comment = endYearResponse.eysr_additional_comment;
+        this.status = endYearResponse.eysr_status;
+      });
+    },
     submitManagerEvaluation() {
       this.submitted = true;
       this.$v.$touch();
@@ -146,22 +160,23 @@ export default {
         const data = {
           strength: this.strength,
           growth_area: this.growth_area,
-          rating: this.selectedRating,
+          rating: this.selectedRating.toString(),
           master: this.goalMasterId,
           additional_comment: this.additional_comment,
-          approve:this.approved,
-          employee:employeeID,
+          approve: this.approved,
+          employee: employeeID,
           gsId: gsId,
-          supervisor:this.getEmployee.emp_id,
+          supervisor: this.getEmployee.emp_id,
         };
         const url = `${this.ROUTES.endYearResponse}/supervisor-end-year-response`;
-        //console.log({ data });
-         this.apiPost(url, data, " Error submitting response").then((res) => {
-           this.apiResponseHandler(`${res.data}`, "Response submitted!");
-           this.refreshTable();
+        this.apiPost(url, data, " Error submitting response").then(() => {
+          this.apiResponseHandler(
+            `Supervisor Response Submitted`,
+            "Action Successful"
+          );
           this.$v.$reset();
-          location.reload();
-         });
+          this.getSupervisorEndYearResponse();
+        });
       }
     },
   },
@@ -369,6 +384,7 @@ export default {
                     type="text"
                     rows="4"
                     class="form-control"
+                    :readonly="status === 1"
                   />
                 </div>
               </div>
@@ -388,6 +404,7 @@ export default {
                     type="text"
                     rows="4"
                     class="form-control"
+                    :readonly="status === 1"
                   />
                 </div>
               </div>
@@ -424,21 +441,24 @@ export default {
                     type="text"
                     rows="4"
                     class="form-control"
+                    :readonly="status === 1"
                   />
                 </div>
               </div>
-              <b-form-checkbox
-                id="checkbox-1"
-                v-model="approved"
-                name="checkbox-1"
-                :value="1"
-                :unchecked-value="0"
-              >
-                Mark as approved
-              </b-form-checkbox>
+              <div v-if="status !== 1">
+                <b-form-checkbox
+                  id="checkbox-1"
+                  v-model="approved"
+                  name="checkbox-1"
+                  :value="1"
+                  :unchecked-value="0"
+                >
+                  Mark as approved
+                </b-form-checkbox>
 
-              <div class="form-group mt-3">
-                <button class="btn btn-success btn-block">Submit</button>
+                <div class="form-group mt-3">
+                  <button class="btn btn-success btn-block">Submit</button>
+                </div>
               </div>
             </form>
           </div>

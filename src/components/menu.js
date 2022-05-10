@@ -280,6 +280,12 @@ export const menuItems = [
     icon: "ri-calendar-event-line",
     link: "/manage-time-sheets",
   },
+  {
+    id: 31,
+    label: "Self Assessment",
+    icon: "ri-team-line",
+    link: "/self-assessment/backoffice",
+  },
   // {
   //   id: 29,
   //   label: "Self Assessment",

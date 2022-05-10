@@ -79,7 +79,7 @@ export default {
           update: "",
         },
       ],
-      assessStatus:0,
+      assessStatus: 0,
       endYearQuestions: [],
       openGoalActivity: null,
       openGoalActivityYear: null,
@@ -104,10 +104,9 @@ export default {
       employeeRating: null,
       checkOpenGoal: 0,
       gsID: null,
-      activeGoalId:null,
-      optional:null,
-      sam_discussion_held_on:null,
-
+      activeGoalId: null,
+      optional: null,
+      sam_discussion_held_on: null,
     };
   },
   methods: {
@@ -138,6 +137,7 @@ export default {
       const url = `${this.ROUTES.goalSetting}/get-open-goal-setting`;
       await this.apiGet(url).then((res) => {
         const { data } = res;
+        console.log({ data });
         if (data.length > 0) {
           this.activeGoalId = parseInt(data[0].gs_id);
           this.openGoalActivity = parseInt(data[0].gs_activity);
@@ -158,7 +158,11 @@ export default {
           this.gsID = data.openGoal[0].gs_id;
           this.assessStatus = data.questions[0].sa_status;
           this.optional = data.master?.sam_optional;
-          this.sam_discussion_held_on =  new Date(data.master?.sam_discussion_held_on).toISOString().substr(0,10);
+          this.sam_discussion_held_on = new Date(
+            data.master?.sam_discussion_held_on
+          )
+            .toISOString()
+            .substr(0, 10);
 
           data.questions.forEach(async (datum) => {
             this.selfAssessmentStatus = true;
@@ -167,38 +171,34 @@ export default {
               id: datum.sa_id,
               goal: datum.sa_comment,
               update: datum.sa_update,
-              accomplishment:datum.sa_accomplishment,
-              next_step:datum.sa_next_steps,
-              challenge:datum.sa_challenges,
-              support:datum.sa_support_needed,
+              accomplishment: datum.sa_accomplishment,
+              next_step: datum.sa_next_steps,
+              challenge: datum.sa_challenges,
+              support: datum.sa_support_needed,
             };
             this.texts.push(dat);
-
           });
         } else {
           const prevUrl = `${this.ROUTES.selfAssessment}/prefill-goal-setting/${this.getEmployee.emp_id}`;
-           this.apiGet(prevUrl).then((res) => {
-
+          this.apiGet(prevUrl).then((res) => {
             const { data } = res;
-              this.texts = [];
-              this.gsID = parseInt(data[0].sa_gs_id);
-             this.assessStatus = 0; //data[0].sa_status;
-              data.forEach(async (datum) => {
-                this.selfAssessmentStatus = true;
-                this.prefillStatus = true;
-                  const dat = {
-                    id: datum.sa_id,
-                    goal: datum.sa_comment,
-                    update: datum.sa_update,
-                    accomplishment:datum.sa_accomplishment,
-                    next_step:datum.sa_next_steps,
-                    challenge:datum.sa_challenges,
-                    support:datum.sa_support_needed,
-                  };
-                  this.texts.push(dat);
-
-              });
-
+            this.texts = [];
+            this.gsID = parseInt(data[0].sa_gs_id);
+            this.assessStatus = 0; //data[0].sa_status;
+            data.forEach(async (datum) => {
+              this.selfAssessmentStatus = true;
+              this.prefillStatus = true;
+              const dat = {
+                id: datum.sa_id,
+                goal: datum.sa_comment,
+                update: datum.sa_update,
+                accomplishment: datum.sa_accomplishment,
+                next_step: datum.sa_next_steps,
+                challenge: datum.sa_challenges,
+                support: datum.sa_support_needed,
+              };
+              this.texts.push(dat);
+            });
           });
 
           this.newAssessment = true;
@@ -209,13 +209,9 @@ export default {
           ];
         }
       });
-
-
     },
 
-
     submitNewBeginning() {
-
       const employeeID = this.getEmployee.emp_id;
       const url = `${this.ROUTES.selfAssessment}/add-self-assessment/${employeeID}/${this.activeGoalId}`;
       this.goals = [];
@@ -272,7 +268,7 @@ export default {
       }
     },
     test(event) {
-      console.log(event.target.value)
+      console.log(event.target.value);
     },
   },
   directives: {
@@ -371,9 +367,7 @@ textarea {
                     <b-td style="width: 1%">
                       {{ index + 1 }}
                     </b-td>
-                    <b-td
-                      style="width: 19%;"
-                    >
+                    <b-td style="width: 19%">
                       <textarea
                         type="text"
                         v-model="field.goal"
@@ -391,7 +385,7 @@ textarea {
                             value="Complete"
                             type="radio"
                             :name="index"
-                            :checked="field.update === 'Complete' "
+                            :checked="field.update === 'Complete'"
                             :disabled="assessStatus === 1 ? true : false"
                           />
                           <label class="form-check-label"> Complete </label>
@@ -402,7 +396,7 @@ textarea {
                             id="complete"
                             v-model="field.update"
                             value="On track"
-                            :checked="field.update === 'On track'  "
+                            :checked="field.update === 'On track'"
                             :disabled="assessStatus === 1 ? true : false"
                             type="radio"
                             :name="index"
@@ -417,7 +411,7 @@ textarea {
                             value="Delayed"
                             type="radio"
                             :name="index"
-                            :checked="field.update === 'Delayed' "
+                            :checked="field.update === 'Delayed'"
                             :disabled="assessStatus === 1 ? true : false"
                           />
                           <label class="form-check-label"> Delayed </label>
@@ -429,10 +423,10 @@ textarea {
                             value="Not started"
                             type="radio"
                             :name="index"
-                            :checked="field.update "
+                            :checked="field.update"
                             :disabled="assessStatus === 1 ? true : false"
                           />
-                          <label class="form-check-label"> Not started  </label>
+                          <label class="form-check-label"> Not started </label>
                         </div>
                         <div class="form-check">
                           <input
@@ -441,7 +435,7 @@ textarea {
                             value="No longer relevant"
                             type="radio"
                             :name="index"
-                            :checked="field.update === 'No longer relevant'  "
+                            :checked="field.update === 'No longer relevant'"
                             :disabled="assessStatus === 1 ? true : false"
                           />
                           <label class="form-check-label">
@@ -450,9 +444,7 @@ textarea {
                         </div>
                       </div>
                     </b-td>
-                    <b-td
-                      style="width: 17%;"
-                    >
+                    <b-td style="width: 17%">
                       <textarea
                         type="text"
                         v-model="field.accomplishment"
@@ -461,9 +453,7 @@ textarea {
                         :readonly="assessStatus === 1 ? true : false"
                       />
                     </b-td>
-                    <b-td
-                      style="width: 17%"
-                    >
+                    <b-td style="width: 17%">
                       <textarea
                         type="text"
                         v-model="field.challenge"
@@ -472,9 +462,7 @@ textarea {
                         :readonly="assessStatus === 1 ? true : false"
                       />
                     </b-td>
-                    <b-td
-                      style="width: 17%;"
-                    >
+                    <b-td style="width: 17%">
                       <textarea
                         type="text"
                         v-model="field.support"
@@ -483,9 +471,7 @@ textarea {
                         :readonly="assessStatus === 1 ? true : false"
                       />
                     </b-td>
-                    <b-td
-                      style="width: 17%; cursor: pointer"
-                    >
+                    <b-td style="width: 17%; cursor: pointer">
                       <textarea
                         type="text"
                         v-model="field.next_step"
@@ -499,7 +485,6 @@ textarea {
                         v-if="index > 2"
                         type="button"
                         class="btn btn-sm btn-danger"
-
                         @click="delField(index)"
                       >
                         DEL
@@ -508,7 +493,10 @@ textarea {
                   </b-tr>
                 </b-tbody>
               </b-table-simple>
-              <div class="alert alert-info d-flex mt-3" v-if="assessStatus === 0 ">
+              <div
+                class="alert alert-info d-flex mt-3"
+                v-if="assessStatus === 0"
+              >
                 <i class="ri-error-warning-line mr-2"></i>
                 You must submit a minimum of 3 goals.
                 <span
@@ -523,7 +511,12 @@ textarea {
                 <div class="col-md-4">
                   <div class="form-group">
                     <label for="">Discussion Held on:</label>
-                    <input type="date" v-model="sam_discussion_held_on" placeholder="Discussion Held On" class="form-control">
+                    <input
+                      type="date"
+                      v-model="sam_discussion_held_on"
+                      placeholder="Discussion Held On"
+                      class="form-control"
+                    />
                   </div>
                 </div>
                 <div class="col-12">
