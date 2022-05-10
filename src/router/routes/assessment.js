@@ -96,6 +96,40 @@ export default [
       ),
   },
   {
+    path: "/self-assessment/backoffice",
+    name: "self-assessment-backoffice",
+    meta: {
+      authRequired: true,
+    },
+    component: () =>
+      import(
+        "@/views/pages/assessment/self-assessment/manage-self-assessment"
+      ),
+  },
+  {
+    path: "/self-assessment/backoffice/:year/:employee",
+    name: "self-assessment-backoffice-breakdown",
+    meta: {
+      authRequired: true,
+    },
+    component: () =>
+      import(
+        "@/views/pages/assessment/self-assessment/manage-self-assessment-breakdown"
+      ),
+  },
+  {
+    path: "/self-assessment/backoffice/:activity/:year/:employee/:activityId/:masterId",
+    name: "self-assessment-backoffice-by-activity",
+    meta: {
+      authRequired: true,
+    },
+    component: () =>
+      import(
+        "@/views/pages/assessment/self-assessment/manage-self-assessment-activity"
+      ),
+  },
+
+  {
     path: "/assessment-details/:empid/:gsId",
     name: "assessment-details",
     meta: {

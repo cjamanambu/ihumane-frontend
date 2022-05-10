@@ -106,7 +106,7 @@ export default {
       this.apiGet(url, "Get Supervisor End Year Response Error").then((res) => {
         const { data } = res;
         this.supervisorResponse = data[0];
-        console.log(this.supervisorResponse);
+        //console.log(this.supervisorResponse);
       });
     },
   },
