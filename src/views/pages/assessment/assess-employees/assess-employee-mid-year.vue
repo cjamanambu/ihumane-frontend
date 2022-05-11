@@ -25,7 +25,6 @@ export default {
     await this.getSelfAssessment();
     await this.getEndYearAssessment();
     await this.getRatings();
-
     this.authuser = this.getEmployee.emp_id;
   },
   validations: {
@@ -298,9 +297,22 @@ export default {
         return true;
       });
       if (validForm) {
-        this.apiPost(url, this.goals, "Add goals Error").then(() => {
-          this.apiResponseHandler("Process Complete", "Goals Added");
-          this.getSelfAssessment();
+        this.apiPost(url, this.goals, "Add goals Error").then((res) => {
+          const { data } = res;
+          if (data) {
+            this.$router
+              .push({
+                name: "mid-year-assess-employee",
+                params: {
+                  empid: data.sam_emp_id,
+                  gsId: data.sam_gs_id,
+                  masterId: data.sam_id,
+                },
+              })
+              .then(() => {
+                this.apiResponseHandler("Process Complete", "Goals Updated");
+              });
+          }
         });
       }
     },
@@ -376,12 +388,12 @@ export default {
         emp_id: employeeID,
       };
       this.apiPost(url, data, "Could not process request").then(() => {
-        this.apiResponseHandler(
-          "Process Complete",
-          "Employee self-assessment completed."
-        );
-        //this.$router.push("/assess-employees");
-        location.reload();
+        this.$router.push({ name: "assess-employees" }).then(() => {
+          this.apiResponseHandler(
+            "Process Complete",
+            "Employee self-assessment completed."
+          );
+        });
       });
     },
     async fetchEmployee() {
@@ -563,7 +575,6 @@ export default {
                             v-if="index > 2"
                             type="button"
                             class="btn btn-sm btn-danger"
-                            @click="delField(index)"
                             style="display: none"
                           >
                             DEL
@@ -581,7 +592,6 @@ export default {
                     <span
                       style="cursor: pointer; text-decoration: underline"
                       class="ml-1"
-                      @click="addField"
                     >
                       Click here to add a new goal
                     </span>

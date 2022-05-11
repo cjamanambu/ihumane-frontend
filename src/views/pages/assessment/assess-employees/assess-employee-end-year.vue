@@ -65,6 +65,7 @@ export default {
       additional_comment: null,
       gsId: null,
       status: 0,
+      sam_discussion_held_on: null,
     };
   },
   methods: {
