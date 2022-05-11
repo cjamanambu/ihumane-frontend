@@ -261,6 +261,9 @@ export default {
                 <span class="badge badge-primary badge-pill" v-else>
                   End of Year
                 </span>
+                <span class="badge badge-primary badge-pill ml-3">
+                  {{ selectedYear }}
+                </span>
               </div>
             </div>
 
