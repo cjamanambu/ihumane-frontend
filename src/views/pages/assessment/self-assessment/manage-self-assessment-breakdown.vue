@@ -62,6 +62,7 @@ export default {
       selectedYear: null,
       employeeId: null,
       currentEmployee: null,
+      periodDetails: null,
     };
   },
   methods: {
@@ -71,7 +72,7 @@ export default {
       const url = `${this.ROUTES.selfAssessment}/get-all-emp-self-assessments/${this.employeeId}/${this.selectedYear}`;
       await this.apiGet(url).then((res) => {
         const { data } = res;
-
+        if (data.length) this.periodDetails = data[0];
         data.map((period, index) => {
           this.periods[index] = {
             activity: period.goal?.gs_activity,
@@ -150,6 +151,33 @@ export default {
                 <div class="d-flex justify-content-between">
                   <p class="mb-0">T6 Code</p>
                   <p class="mb-0">{{ currentEmployee.location.l_t6_code }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="card mb-4">
+              <div class="card-body">
+                <div class="p-3 bg-light mb-4">
+                  <h5 class="font-size-14 mb-0">Goal Setting Period Details</h5>
+                </div>
+                <div class="d-flex justify-content-between text-capitalize">
+                  <p>Goal Setting Year</p>
+                  <p>
+                    {{ periodDetails.goal.gs_year }}
+                  </p>
+                </div>
+                <div class="d-flex justify-content-between text-capitalize">
+                  <p>Goal Setting Period Start</p>
+                  <p>
+                    {{ periodDetails.goal.gs_from }}
+                  </p>
+                </div>
+                <div class="d-flex justify-content-between text-capitalize">
+                  <p>Goal Setting Period End</p>
+                  <p>
+                    {{ periodDetails.goal.gs_to }}
+                  </p>
                 </div>
               </div>
             </div>
