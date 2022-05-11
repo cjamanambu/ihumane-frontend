@@ -84,6 +84,7 @@ export default {
       currentEmployee: null,
       // statues: [{ value: 0, text: "Open" }, { value: 1, text: "Closed" }],
       gsID: null,
+      masterId: null,
     };
   },
   methods: {
@@ -114,9 +115,10 @@ export default {
       await this.apiGet(url).then((res) => {
         const { data } = res;
         //if (data) {
-
+        console.log({ data });
         this.assessments = [];
         this.assessStatus = data[0].sa_status;
+        this.masterId = data[0].sa_master_id;
         this.gsID = data[0].sa_gs_id;
         data.forEach(async (datum) => {
           const dat = {
@@ -203,7 +205,7 @@ export default {
     },
     updateGoals() {
       const employeeID = this.$route.params.empid;
-      const url = `${this.ROUTES.selfAssessment}/update-assessment/${employeeID}/${this.gsID}`;
+      const url = `${this.ROUTES.selfAssessment}/update-assessment/${employeeID}/${this.gsID}/${this.masterId}`;
       this.goals = [];
       let validForm = true;
       this.assessments.every(async (field) => {
