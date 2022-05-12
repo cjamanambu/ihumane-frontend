@@ -396,13 +396,16 @@ export default {
         emp_pension: this.emp_pension,
         emp_pension_no: this.emp_pension_no,
         emp_paye_no: this.emp_paye,
+        emp_nin: this.emp_nin,
+        emp_department_id: this.sector.value,
       };
-      //console.log(data);
-      this.apiPatch(url, data, "Update Employee Error").then();
+      console.log(data);
+      console.log(url);
+      /*this.apiPatch(url, data, "Update Employee Error").then();
       this.apiResponseHandler("Process Complete", "Employee Update");
       this.fetchEmployee();
       this.submitted = false;
-      this.fetchEmployee();
+      this.fetchEmployee();*/
     },
 
     async suspendEmployee() {
