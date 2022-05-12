@@ -143,12 +143,16 @@ export default {
       this.apiGet(url, "Get Supervisor End Year Response Error").then((res) => {
         const { data } = res;
         let endYearResponse = data[0];
-        console.log(data);
         this.strength = endYearResponse.eysr_strength;
         this.growth_area = endYearResponse.eysr_growth;
         this.selectedRating = endYearResponse.rating?.rating_id;
         this.additional_comment = endYearResponse.eysr_additional_comment;
         this.status = endYearResponse.eysr_status;
+        this.sam_discussion_held_on = new Date(
+          endYearResponse.selfAssessment.sam_discussion_held_on
+        )
+          .toISOString()
+          .substr(0, 10);
       });
     },
     submitManagerEvaluation() {
