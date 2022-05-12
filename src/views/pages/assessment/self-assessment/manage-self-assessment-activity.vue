@@ -100,6 +100,7 @@ export default {
       employeeId: null,
       activity: null,
       activityId: null,
+      sam_discussion_held_on: null,
     };
   },
   methods: {
@@ -154,6 +155,11 @@ export default {
         const { data } = res;
         this.supervisorResponse = data[0];
         //console.log(this.supervisorResponse);
+        this.sam_discussion_held_on = new Date(
+          this.supervisorResponse.selfAssessment.sam_discussion_held_on
+        )
+          .toISOString()
+          .substr(0, 10);
       });
     },
     async midYearAssessments() {
@@ -446,6 +452,22 @@ export default {
                           class="form-control"
                           readonly
                         />
+                      </div>
+                    </div>
+                    <div class="mt-5 mb-3">
+                      <div class="row">
+                        <div class="col-md-6">
+                          <div class="form-group">
+                            <label for="">Discussion held on:</label>
+                            <input
+                              type="date"
+                              v-model="sam_discussion_held_on"
+                              placeholder="Discussion Held On"
+                              class="form-control"
+                              readonly
+                            />
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
