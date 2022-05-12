@@ -99,6 +99,8 @@ export default {
       supervisorResponse: null,
 
       selectedYear: null,
+      selectedStart: null,
+      selectedEnd: null,
       employeeId: null,
       activity: null,
       activityId: null,
@@ -124,6 +126,9 @@ export default {
       this.apiGet(url).then(async (res) => {
         const { data } = res;
         if (data.length) {
+          //console.log(data)
+          this.selectedStart = localStorage.getItem("startDate");
+          this.selectedEnd = localStorage.getItem("endDate");
           this.gsId = data[0].eyr_gs_id;
           this.goalMasterId = data[0].eyr_master_id;
           await this.getSupervisorEndYearResponse();
@@ -159,6 +164,11 @@ export default {
       const url = `${this.ROUTES.selfAssessment}/get-self-assessment-by-master/${this.masterId}`;
       await this.apiGet(url).then((res) => {
         const { data } = res;
+        //console.log(data)
+        this.selectedStart = data.openGoal[0].gs_from;
+        this.selectedEnd = data.openGoal[0].gs_to;
+        localStorage.setItem("startDate", this.selectedStart);
+        localStorage.setItem("endDate", this.selectedEnd);
         if (data.question.length > 0) {
           this.texts = [];
           this.optional = data.master?.sam_optional;
@@ -193,11 +203,15 @@ export default {
       const url = `${this.ROUTES.selfAssessment}/get-self-assessment/${this.employeeId}/${this.activityId}`;
       await this.apiGet(url).then((res) => {
         const { data } = res;
-        console.log(data);
+        //console.log(data);
         this.assessments = [];
         this.assessStatus = data.questions[0].sa_status;
         this.gsID = data.openGoal[0].gs_id;
         this.selectedYear = data.openGoal[0].gs_year;
+        this.selectedStart = data.openGoal[0].gs_from;
+        this.selectedEnd = data.openGoal[0].gs_to;
+        localStorage.setItem("startDate", this.selectedStart);
+        localStorage.setItem("endDate", this.selectedEnd);
         data.questions.forEach(async (datum) => {
           const dat = {
             id: datum.sa_id,
@@ -259,7 +273,16 @@ export default {
             </div>
 
             <div class="row" v-if="parseInt(activity) === 3">
-
+              <div class="col-md-12">
+                <h5 class="mb-2">
+                  End of Year: {{ selectedYear }}
+                </h5> <br>
+                <h5 class="mb-1">
+                  Review Period
+                  {{ new Date(selectedStart).toDateString() }} -
+                  {{ new Date(selectedEnd).toDateString() }}
+                </h5>
+              </div>
                 <div class="col-6">
                   <div class="card mb-4">
                     <div class="card-body">
@@ -559,6 +582,14 @@ export default {
               v-else-if="parseInt(activity) === 1"
             >
               <div class="col-lg-12">
+                <h5 class="mb-2">
+                  Beginning of Year: {{ selectedYear }}
+                </h5>
+                <h5 class="mb-1">
+                  Review Period
+                  {{ new Date(selectedStart).toDateString() }} -
+                  {{ new Date(selectedEnd).toDateString() }}
+                </h5>
                 <div class="row">
                   <div class="col-6">
                     <div class="card mb-4">
@@ -772,12 +803,12 @@ export default {
                     </div>
                     <div class="mb-3">
                       <h5 class="mb-2">
-                        Mid Year Checking: {{ openGoalActivityYear }}
+                        Mid Year Checking: {{ selectedYear }}
                       </h5>
                       <h5 class="mb-1">
                         Review Period
-                        {{ new Date(openGoalActivityFrom).toDateString() }} -
-                        {{ new Date(openGoalActivityTo).toDateString() }}
+                        {{ new Date(selectedStart).toDateString() }} -
+                        {{ new Date(selectedEnd).toDateString() }}
                       </h5>
                       <p class="mt-3">
                         Work with your manager to discuss and agree on at least
