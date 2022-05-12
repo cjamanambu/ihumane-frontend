@@ -32,6 +32,8 @@ export default {
             gs_period: `${ new Date(assess.goal?.gs_from).toDateString() } - ${ new Date(assess.goal?.gs_to).toDateString() } `,
             //end_date: `${ new Date(assess.goal?.gs_to).toDateString() } `,
             empId: assess.employee.emp_id,
+            emp_sector: `${assess.employee.sector.d_t3_code}`,
+            emp_location: `${assess.employee.location.l_t6_code}`,
             gsId: assess.goal.gs_id,
             masterId: assess.sam_id,
             supervisor: `${assess.supervisor?.emp_first_name} ${assess.supervisor?.emp_last_name} - ${assess.supervisor?.emp_unique_id}`,
@@ -92,6 +94,9 @@ export default {
           label: "Year",
           sortable: true,
         },
+        { key: "emp_sector", label: "T3 Code", sortable: true },
+        { key: "emp_location", label: "T6 Code", sortable: true },
+
         { key: "supervisor", label: "Supervisor", sortable: true },
       ],
       leaveAppID: null,

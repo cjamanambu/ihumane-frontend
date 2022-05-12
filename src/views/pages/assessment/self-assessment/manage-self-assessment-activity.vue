@@ -97,6 +97,8 @@ export default {
       eyr_growth_area: null,
       supervisorResponse: null,
       selectedYear: null,
+      selectedStart: null,
+      selectedEnd: null,
       employeeId: null,
       activity: null,
       activityId: null,
@@ -122,6 +124,9 @@ export default {
       this.apiGet(url).then(async (res) => {
         const { data } = res;
         if (data.length) {
+          //console.log(data)
+          this.selectedStart = localStorage.getItem("startDate");
+          this.selectedEnd = localStorage.getItem("endDate");
           this.gsId = data[0].eyr_gs_id;
           this.goalMasterId = data[0].eyr_master_id;
           await this.getSupervisorEndYearResponse();
@@ -148,14 +153,6 @@ export default {
         }
       });
     },
-    async getSupervisorEndYearResponse() {
-      const url = `${this.ROUTES.endYearResponse}/supervisor-end-year-response/${this.goalMasterId}`;
-      this.apiGet(url, "Get Supervisor End Year Response Error").then((res) => {
-        const { data } = res;
-        this.supervisorResponse = data[0];
-        //console.log(this.supervisorResponse);
-      });
-    },
     async midYearAssessments() {
       this.masterId = this.$route.params.masterId;
       this.selectedYear = this.$route.params.year;
@@ -165,6 +162,11 @@ export default {
       const url = `${this.ROUTES.selfAssessment}/get-self-assessment-by-master/${this.masterId}`;
       await this.apiGet(url).then((res) => {
         const { data } = res;
+        //console.log(data)
+        this.selectedStart = data.openGoal[0].gs_from;
+        this.selectedEnd = data.openGoal[0].gs_to;
+        localStorage.setItem("startDate", this.selectedStart);
+        localStorage.setItem("endDate", this.selectedEnd);
         if (data.question.length > 0) {
           this.texts = [];
           this.optional = data.master?.sam_optional;
@@ -199,11 +201,15 @@ export default {
       const url = `${this.ROUTES.selfAssessment}/get-self-assessment/${this.employeeId}/${this.activityId}`;
       await this.apiGet(url).then((res) => {
         const { data } = res;
-        console.log(data);
+        //console.log(data);
         this.assessments = [];
         this.assessStatus = data.questions[0].sa_status;
         this.gsID = data.openGoal[0].gs_id;
         this.selectedYear = data.openGoal[0].gs_year;
+        this.selectedStart = data.openGoal[0].gs_from;
+        this.selectedEnd = data.openGoal[0].gs_to;
+        localStorage.setItem("startDate", this.selectedStart);
+        localStorage.setItem("endDate", this.selectedEnd);
         data.questions.forEach(async (datum) => {
           const dat = {
             id: datum.sa_id,
@@ -260,9 +266,6 @@ export default {
                 </span>
                 <span class="badge badge-primary badge-pill" v-else>
                   End of Year
-                </span>
-                <span class="badge badge-primary badge-pill ml-3">
-                  {{ selectedYear }}
                 </span>
               </div>
             </div>
@@ -360,6 +363,108 @@ export default {
                   </div>
                 </div>
               </div>
+              <div class="col-md-12">
+                <h5 class="mb-2">
+                  End of Year: {{ selectedYear }}
+                </h5> <br>
+                <h5 class="mb-1">
+                  Review Period
+                  {{ new Date(selectedStart).toDateString() }} -
+                  {{ new Date(selectedEnd).toDateString() }}
+                </h5>
+              </div>
+                <div class="col-6">
+                  <div class="card mb-4">
+                    <div class="card-body">
+                      <div class="p-3 bg-light mb-4">
+                        <h5 class="font-size-14 mb-0">Supervisor Details</h5>
+                      </div>
+                      <div class="d-flex justify-content-between text-capitalize">
+                        <p>Supervisor Name</p>
+                        <p >
+                          {{ employee[0].supervisor.emp_first_name }}
+                          {{ employee[0].supervisor.emp_last_name }}
+                        </p>
+                      </div>
+                      <div class="d-flex justify-content-between">
+                        <p>T7 Number</p>
+                        <p>
+                          {{ employee[0].supervisor.emp_unique_id }}
+                        </p>
+                      </div>
+                      <div class="d-flex justify-content-between">
+                        <p>Phone Number</p>
+                        <p>
+                          {{ employee[0].supervisor.emp_phone_no }}
+                        </p>
+                      </div>
+                      <div class="d-flex justify-content-between">
+                        <p>Office Email</p>
+                        <p>
+                          {{ employee[0].supervisor.emp_office_email }}
+                        </p>
+                      </div>
+                      <div class="d-flex justify-content-between">
+                        <p>Sector Code</p>
+                        <p>
+                          {{ employee[0].supervisor.sector.d_t3_code }}
+                        </p>
+                      </div>
+                      <div class="d-flex justify-content-between">
+                        <p>Location Code</p>
+                        <p>
+                          {{ employee[0].supervisor.location.l_t6_code }}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-6">
+                  <div class="card mb-4">
+                    <div class="card-body">
+                      <div class="p-3 bg-light mb-4">
+                        <h5 class="font-size-14 mb-0">Employee Details</h5>
+                      </div>
+                      <div class="d-flex justify-content-between text-capitalize">
+                        <p>Employee Name</p>
+                        <p >
+                          {{ employee[0].emp_first_name }}
+                          {{ employee[0].emp_last_name }}
+                        </p>
+                      </div>
+                      <div class="d-flex justify-content-between">
+                        <p>T7 Number</p>
+                        <p>
+                          {{ employee[0].emp_unique_id }}
+                        </p>
+                      </div>
+                      <div class="d-flex justify-content-between">
+                        <p>Phone Number</p>
+                        <p>
+                          {{ employee[0].emp_phone_no }}
+                        </p>
+                      </div>
+                      <div class="d-flex justify-content-between">
+                        <p>Office Email</p>
+                        <p>
+                          {{ employee[0].emp_office_email }}
+                        </p>
+                      </div>
+                      <div class="d-flex justify-content-between">
+                        <p>Sector Code</p>
+                        <p>
+                          {{ employee[0].sector.d_t3_code }}
+                        </p>
+                      </div>
+                      <div class="d-flex justify-content-between">
+                        <p>Location Code</p>
+                        <p>
+                          {{ employee[0].location.l_t6_code }}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
 
               <div class="col-lg-6">
                 <div class="card">
@@ -566,6 +671,14 @@ export default {
             </div>
             <div class="row" v-else-if="parseInt(activity) === 1">
               <div class="col-lg-12">
+                <h5 class="mb-2">
+                  Beginning of Year: {{ selectedYear }}
+                </h5>
+                <h5 class="mb-1">
+                  Review Period
+                  {{ new Date(selectedStart).toDateString() }} -
+                  {{ new Date(selectedEnd).toDateString() }}
+                </h5>
                 <div class="row">
                   <div class="col-6">
                     <div class="card mb-4">
@@ -786,12 +899,12 @@ export default {
                     </div>
                     <div class="mb-3">
                       <h5 class="mb-2">
-                        Mid Year Checking: {{ openGoalActivityYear }}
+                        Mid Year Checking: {{ selectedYear }}
                       </h5>
                       <h5 class="mb-1">
                         Review Period
-                        {{ new Date(openGoalActivityFrom).toDateString() }} -
-                        {{ new Date(openGoalActivityTo).toDateString() }}
+                        {{ new Date(selectedStart).toDateString() }} -
+                        {{ new Date(selectedEnd).toDateString() }}
                       </h5>
                       <p class="mt-3">
                         Work with your manager to discuss and agree on at least
