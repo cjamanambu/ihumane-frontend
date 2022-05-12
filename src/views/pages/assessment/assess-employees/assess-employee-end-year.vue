@@ -65,6 +65,7 @@ export default {
       additional_comment: null,
       gsId: null,
       status: 0,
+      sam_discussion_held_on: null,
     };
   },
   methods: {
@@ -142,6 +143,7 @@ export default {
       this.apiGet(url, "Get Supervisor End Year Response Error").then((res) => {
         const { data } = res;
         let endYearResponse = data[0];
+        console.log(data);
         this.strength = endYearResponse.eysr_strength;
         this.growth_area = endYearResponse.eysr_growth;
         this.selectedRating = endYearResponse.rating?.rating_id;
@@ -167,6 +169,7 @@ export default {
           employee: employeeID,
           gsId: gsId,
           supervisor: this.getEmployee.emp_id,
+          sam_discussion_held_on: this.sam_discussion_held_on,
         };
         const url = `${this.ROUTES.endYearResponse}/supervisor-end-year-response`;
         this.apiPost(url, data, " Error submitting response").then(() => {
@@ -182,7 +185,11 @@ export default {
   },
 };
 </script>
-
+<style>
+.bg-skyblue {
+  background-color: #87ceeb;
+}
+</style>
 <template>
   <Layout>
     <PageHeader :title="title" :items="items" />
@@ -198,7 +205,7 @@ export default {
     <scale-loader v-if="apiBusy" />
     <div v-else class="row">
       <div class="col-lg-6">
-        <div v-if="currentEmployee" class="card mb-4">
+        <div v-if="currentEmployee" class="card mb-4 bg-skyblue">
           <div class="card-body">
             <div class="p-3 bg-light mb-4">
               <h5 class="font-size-14 mb-0">Employee Details</h5>
@@ -232,7 +239,7 @@ export default {
             </div>
           </div>
         </div>
-        <div class="card">
+        <div class="card bg-skyblue">
           <div class="card-body">
             <div class="p-3 bg-light mb-4">
               <h5 class="font-size-14 mb-0">Employee Reflection</h5>
@@ -443,6 +450,22 @@ export default {
                     class="form-control"
                     :readonly="status === 1"
                   />
+                </div>
+              </div>
+              <div class="mt-5 mb-3">
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="">Discussion held on:</label>
+                      <input
+                        type="date"
+                        v-model="sam_discussion_held_on"
+                        placeholder="Discussion Held On"
+                        class="form-control"
+                        :readonly="status === 1"
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
               <div v-if="status !== 1">

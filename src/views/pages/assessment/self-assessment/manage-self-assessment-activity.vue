@@ -18,13 +18,12 @@ export default {
     ...authComputed,
   },
   async mounted() {
-
     this.activity = this.$route.params.activity;
-    if(parseInt(this.activity) === 1){
+    if (parseInt(this.activity) === 1) {
       await this.getSelfAssessment();
-    }else if(parseInt(this.activity) === 2){
+    } else if (parseInt(this.activity) === 2) {
       await this.midYearAssessments();
-    }else{
+    } else {
       await this.prefillAssessment();
     }
     await this.fetchEmployee();
@@ -97,7 +96,6 @@ export default {
       eyr_strength: null,
       eyr_growth_area: null,
       supervisorResponse: null,
-
       selectedYear: null,
       selectedStart: null,
       selectedEnd: null,
@@ -118,7 +116,7 @@ export default {
       });
     },
     async prefillAssessment() {
-      this.selectedYear  = this.$route.params.year;
+      this.selectedYear = this.$route.params.year;
       this.employeeId = this.$route.params.employee;
       this.activity = this.$route.params.activity;
       this.activityId = this.$route.params.activityId;
@@ -157,7 +155,7 @@ export default {
     },
     async midYearAssessments() {
       this.masterId = this.$route.params.masterId;
-      this.selectedYear  = this.$route.params.year;
+      this.selectedYear = this.$route.params.year;
       this.employeeId = this.$route.params.employee;
       this.activity = this.$route.params.activity;
       this.activityId = this.$route.params.activityId;
@@ -196,7 +194,7 @@ export default {
       });
     },
     async getSelfAssessment() {
-      this.selectedYear  = this.$route.params.year;
+      this.selectedYear = this.$route.params.year;
       this.employeeId = this.$route.params.employee;
       this.activity = this.$route.params.activity;
       this.activityId = this.$route.params.activityId;
@@ -242,28 +240,28 @@ export default {
     <scale-loader v-if="apiBusy" />
     <div class="row" v-else>
       <div class="col-md-12 d-flex justify-content-end">
-        <div class=" mb-3">
-          <b-button
-            class="btn btn-secondary"
-            @click="$router.go(-1)"
-          >
+        <div class="mb-3">
+          <b-button class="btn btn-secondary" @click="$router.go(-1)">
             <i class="mdi mdi-step-backward mr-2"></i>
             Go Back
           </b-button>
         </div>
       </div>
-      <div class="col-md-12" >
+      <div class="col-md-12">
         <div class="card">
           <div class="card-body">
             <div class="media mb-3">
               <div>
                 <span
                   class="badge badge-primary badge-pill"
-                  v-if=" parseInt(activity) === 1"
+                  v-if="parseInt(activity) === 1"
                 >
                   Beginning of Year
                 </span>
-                <span class="badge badge-primary badge-pill" v-else-if="parseInt(activity) === 2">
+                <span
+                  class="badge badge-primary badge-pill"
+                  v-else-if="parseInt(activity) === 2"
+                >
                   Mid-Year
                 </span>
                 <span class="badge badge-primary badge-pill" v-else>
@@ -273,6 +271,98 @@ export default {
             </div>
 
             <div class="row" v-if="parseInt(activity) === 3">
+              <div class="col-6">
+                <div class="card mb-4">
+                  <div class="card-body" v-if="employee[0]">
+                    <div class="p-3 bg-light mb-4">
+                      <h5 class="font-size-14 mb-0">Supervisor Details</h5>
+                    </div>
+                    <div class="d-flex justify-content-between text-capitalize">
+                      <p>Supervisor Name</p>
+                      <p>
+                        {{ employee[0].supervisor.emp_first_name }}
+                        {{ employee[0].supervisor.emp_last_name }}
+                      </p>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                      <p>T7 Number</p>
+                      <p>
+                        {{ employee[0].supervisor.emp_unique_id }}
+                      </p>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                      <p>Phone Number</p>
+                      <p>
+                        {{ employee[0].supervisor.emp_phone_no }}
+                      </p>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                      <p>Office Email</p>
+                      <p>
+                        {{ employee[0].supervisor.emp_office_email }}
+                      </p>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                      <p>Sector Code</p>
+                      <p>
+                        {{ employee[0].supervisor.sector.d_t3_code }}
+                      </p>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                      <p>Location Code</p>
+                      <p>
+                        {{ employee[0].supervisor.location.l_t6_code }}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="card mb-4">
+                  <div class="card-body" v-if="employee[0]">
+                    <div class="p-3 bg-light mb-4">
+                      <h5 class="font-size-14 mb-0">Employee Details</h5>
+                    </div>
+                    <div class="d-flex justify-content-between text-capitalize">
+                      <p>Employee Name</p>
+                      <p>
+                        {{ employee[0].emp_first_name }}
+                        {{ employee[0].emp_last_name }}
+                      </p>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                      <p>T7 Number</p>
+                      <p>
+                        {{ employee[0].emp_unique_id }}
+                      </p>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                      <p>Phone Number</p>
+                      <p>
+                        {{ employee[0].emp_phone_no }}
+                      </p>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                      <p>Office Email</p>
+                      <p>
+                        {{ employee[0].emp_office_email }}
+                      </p>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                      <p>Sector Code</p>
+                      <p>
+                        {{ employee[0].sector.d_t3_code }}
+                      </p>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                      <p>Location Code</p>
+                      <p>
+                        {{ employee[0].location.l_t6_code }}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
               <div class="col-md-12">
                 <h5 class="mb-2">
                   End of Year: {{ selectedYear }}
@@ -387,20 +477,21 @@ export default {
                         <strong class="font-size-14 mb-0">
                           Strength (required):
                         </strong>
-                        Think about this employee’s achievements and identify an area
-                        of strength that you have observed in them. An example of a
-                        strength may be a task or process that comes easily to your
-                        employee, and something that excites/motivates them.
+                        Think about this employee’s achievements and identify an
+                        area of strength that you have observed in them. An
+                        example of a strength may be a task or process that
+                        comes easily to your employee, and something that
+                        excites/motivates them.
                       </p>
                       <div class="form-group">
-                  <textarea
-                    v-if="supervisorResponse"
-                    v-model="supervisorResponse.eysr_strength"
-                    type="text"
-                    rows="4"
-                    class="form-control"
-                    readonly
-                  />
+                        <textarea
+                          v-if="supervisorResponse"
+                          v-model="supervisorResponse.eysr_strength"
+                          type="text"
+                          rows="4"
+                          class="form-control"
+                          readonly
+                        />
                       </div>
                     </div>
                     <div class="mt-5">
@@ -408,20 +499,21 @@ export default {
                         <strong class="font-size-14 mb-0">
                           Growth Area (required):
                         </strong>
-                        Identify an area of growth you wish this employee to focus on
-                        in the next 6 months. This may be a task or process your
-                        employee finds particularly challenging, or something they
-                        need to learn more about in order to excel in their role.
+                        Identify an area of growth you wish this employee to
+                        focus on in the next 6 months. This may be a task or
+                        process your employee finds particularly challenging, or
+                        something they need to learn more about in order to
+                        excel in their role.
                       </p>
                       <div class="form-group">
-                  <textarea
-                    v-if="supervisorResponse"
-                    v-model="supervisorResponse.eysr_growth"
-                    type="text"
-                    rows="4"
-                    class="form-control"
-                    readonly
-                  />
+                        <textarea
+                          v-if="supervisorResponse"
+                          v-model="supervisorResponse.eysr_growth"
+                          type="text"
+                          rows="4"
+                          class="form-control"
+                          readonly
+                        />
                       </div>
                     </div>
                     <div class="mt-5">
@@ -451,14 +543,14 @@ export default {
                         </strong>
                       </p>
                       <div class="form-group">
-                  <textarea
-                    v-if="supervisorResponse"
-                    v-model="supervisorResponse.eysr_additional_comment"
-                    type="text"
-                    rows="4"
-                    class="form-control"
-                    readonly
-                  />
+                        <textarea
+                          v-if="supervisorResponse"
+                          v-model="supervisorResponse.eysr_additional_comment"
+                          type="text"
+                          rows="4"
+                          class="form-control"
+                          readonly
+                        />
                       </div>
                     </div>
                   </div>
@@ -473,11 +565,11 @@ export default {
                     <div>
                       <p>
                         <strong class="font-size-14 mb-0">Reflection:</strong>
-                        Consider your work and performance from this fiscal year.
-                        Comment about your accomplishments and challenges. If you
-                        wish, you may list your goals from this year and comment on
-                        each goal. If you have at least one direct report, comment on
-                        how you met or worked towards the
+                        Consider your work and performance from this fiscal
+                        year. Comment about your accomplishments and challenges.
+                        If you wish, you may list your goals from this year and
+                        comment on each goal. If you have at least one direct
+                        report, comment on how you met or worked towards the
                         <a
                           href="https://rescue.app.box.com/s/w9mny3pek9xb0b2hwtz7uqxzlneh7nha"
                           target="_blank"
@@ -513,41 +605,41 @@ export default {
                     </div>
                     <div class="mt-5">
                       <p>
-                        <strong class="font-size-14 mb-0">Strength:</strong> Think
-                        about your achievements and identify an area of strength that
-                        you have observed in yourself. An example of a strength may be
-                        a task or process that comes easily to you, and something that
-                        excites/motivates you.
+                        <strong class="font-size-14 mb-0">Strength:</strong>
+                        Think about your achievements and identify an area of
+                        strength that you have observed in yourself. An example
+                        of a strength may be a task or process that comes easily
+                        to you, and something that excites/motivates you.
                       </p>
                       <div class="form-group">
-                  <textarea
-                    type="text"
-                    rows="4"
-                    class="form-control"
-                    v-model="eyr_strength"
-                    readonly
-                  />
+                        <textarea
+                          type="text"
+                          rows="4"
+                          class="form-control"
+                          v-model="eyr_strength"
+                          readonly
+                        />
                       </div>
                     </div>
                     <div class="mt-5">
                       <p>
                         <strong class="font-size-14 mb-0">Growth Area:</strong>
-                        Identify a growth area you wish to focus on in the next 6
-                        months. This may be a task or process you find particularly
-                        challenging, or something you need to learn more about to
-                        excel in your role.
+                        Identify a growth area you wish to focus on in the next
+                        6 months. This may be a task or process you find
+                        particularly challenging, or something you need to learn
+                        more about to excel in your role.
                         <br />
-                        Suggest 1-2 steps you can take to begin working on this growth
-                        area.
+                        Suggest 1-2 steps you can take to begin working on this
+                        growth area.
                       </p>
                       <div class="form-group">
-                  <textarea
-                    type="text"
-                    rows="4"
-                    class="form-control"
-                    v-model="eyr_growth_area"
-                    readonly
-                  />
+                        <textarea
+                          type="text"
+                          rows="4"
+                          class="form-control"
+                          v-model="eyr_growth_area"
+                          readonly
+                        />
                       </div>
                     </div>
                     <div class="mt-5">
@@ -556,7 +648,7 @@ export default {
                       </strong>
                       <ul class="mt-2">
                         <li
-                          class="mb-3 w-75"
+                          class="mb-3"
                           v-for="(question, index) in endOfYearQuestions"
                           :key="index"
                         >
@@ -577,10 +669,7 @@ export default {
                 </div>
               </div>
             </div>
-            <div
-              class="row"
-              v-else-if="parseInt(activity) === 1"
-            >
+            <div class="row" v-else-if="parseInt(activity) === 1">
               <div class="col-lg-12">
                 <h5 class="mb-2">
                   Beginning of Year: {{ selectedYear }}
@@ -597,9 +686,11 @@ export default {
                         <div class="p-3 bg-light mb-4">
                           <h5 class="font-size-14 mb-0">Supervisor Details</h5>
                         </div>
-                        <div class="d-flex justify-content-between text-capitalize">
+                        <div
+                          class="d-flex justify-content-between text-capitalize"
+                        >
                           <p>Supervisor Name</p>
-                          <p >
+                          <p>
                             {{ employee[0].supervisor.emp_first_name }}
                             {{ employee[0].supervisor.emp_last_name }}
                           </p>
@@ -643,9 +734,11 @@ export default {
                         <div class="p-3 bg-light mb-4">
                           <h5 class="font-size-14 mb-0">Employee Details</h5>
                         </div>
-                        <div class="d-flex justify-content-between text-capitalize">
+                        <div
+                          class="d-flex justify-content-between text-capitalize"
+                        >
                           <p>Employee Name</p>
-                          <p >
+                          <p>
                             {{ employee[0].emp_first_name }}
                             {{ employee[0].emp_last_name }}
                           </p>
@@ -685,11 +778,15 @@ export default {
                   </div>
                 </div>
                 <div class="row">
-                  <div class="col-12" v-for="(field, index) in assessments"
-                       :key="index">
+                  <div
+                    class="col-12"
+                    v-for="(field, index) in assessments"
+                    :key="index"
+                  >
                     <div class="form-group">
                       <label for="goal" class="bg-light p-1">
-                        Goal <span class="badge-danger badge">{{ index + 1 }}</span>
+                        Goal
+                        <span class="badge-danger badge">{{ index + 1 }}</span>
                       </label>
                       <p
                         style="margin-left: 30px !important"
@@ -701,99 +798,98 @@ export default {
               </div>
             </div>
             <div class="row" v-else-if="parseInt(activity) === 2">
-
-                <div class="col-6">
-                  <div class="card mb-4">
-                    <div class="card-body">
-                      <div class="p-3 bg-light mb-4">
-                        <h5 class="font-size-14 mb-0">Supervisor Details</h5>
-                      </div>
-                      <div class="d-flex justify-content-between text-capitalize">
-                        <p>Supervisor Name</p>
-                        <p >
-                          {{ employee[0].supervisor.emp_first_name }}
-                          {{ employee[0].supervisor.emp_last_name }}
-                        </p>
-                      </div>
-                      <div class="d-flex justify-content-between">
-                        <p>T7 Number</p>
-                        <p>
-                          {{ employee[0].supervisor.emp_unique_id }}
-                        </p>
-                      </div>
-                      <div class="d-flex justify-content-between">
-                        <p>Phone Number</p>
-                        <p>
-                          {{ employee[0].supervisor.emp_phone_no }}
-                        </p>
-                      </div>
-                      <div class="d-flex justify-content-between">
-                        <p>Office Email</p>
-                        <p>
-                          {{ employee[0].supervisor.emp_office_email }}
-                        </p>
-                      </div>
-                      <div class="d-flex justify-content-between">
-                        <p>Sector Code</p>
-                        <p>
-                          {{ employee[0].supervisor.sector.d_t3_code }}
-                        </p>
-                      </div>
-                      <div class="d-flex justify-content-between">
-                        <p>Location Code</p>
-                        <p>
-                          {{ employee[0].supervisor.location.l_t6_code }}
-                        </p>
-                      </div>
+              <div class="col-6">
+                <div class="card mb-4">
+                  <div class="card-body">
+                    <div class="p-3 bg-light mb-4">
+                      <h5 class="font-size-14 mb-0">Supervisor Details</h5>
+                    </div>
+                    <div class="d-flex justify-content-between text-capitalize">
+                      <p>Supervisor Name</p>
+                      <p>
+                        {{ employee[0].supervisor.emp_first_name }}
+                        {{ employee[0].supervisor.emp_last_name }}
+                      </p>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                      <p>T7 Number</p>
+                      <p>
+                        {{ employee[0].supervisor.emp_unique_id }}
+                      </p>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                      <p>Phone Number</p>
+                      <p>
+                        {{ employee[0].supervisor.emp_phone_no }}
+                      </p>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                      <p>Office Email</p>
+                      <p>
+                        {{ employee[0].supervisor.emp_office_email }}
+                      </p>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                      <p>Sector Code</p>
+                      <p>
+                        {{ employee[0].supervisor.sector.d_t3_code }}
+                      </p>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                      <p>Location Code</p>
+                      <p>
+                        {{ employee[0].supervisor.location.l_t6_code }}
+                      </p>
                     </div>
                   </div>
                 </div>
-                <div class="col-6">
-                  <div class="card mb-4">
-                    <div class="card-body">
-                      <div class="p-3 bg-light mb-4">
-                        <h5 class="font-size-14 mb-0">Employee Details</h5>
-                      </div>
-                      <div class="d-flex justify-content-between text-capitalize">
-                        <p>Employee Name</p>
-                        <p >
-                          {{ employee[0].emp_first_name }}
-                          {{ employee[0].emp_last_name }}
-                        </p>
-                      </div>
-                      <div class="d-flex justify-content-between">
-                        <p>T7 Number</p>
-                        <p>
-                          {{ employee[0].emp_unique_id }}
-                        </p>
-                      </div>
-                      <div class="d-flex justify-content-between">
-                        <p>Phone Number</p>
-                        <p>
-                          {{ employee[0].emp_phone_no }}
-                        </p>
-                      </div>
-                      <div class="d-flex justify-content-between">
-                        <p>Office Email</p>
-                        <p>
-                          {{ employee[0].emp_office_email }}
-                        </p>
-                      </div>
-                      <div class="d-flex justify-content-between">
-                        <p>Sector Code</p>
-                        <p>
-                          {{ employee[0].sector.d_t3_code }}
-                        </p>
-                      </div>
-                      <div class="d-flex justify-content-between">
-                        <p>Location Code</p>
-                        <p>
-                          {{ employee[0].location.l_t6_code }}
-                        </p>
-                      </div>
+              </div>
+              <div class="col-6">
+                <div class="card mb-4">
+                  <div class="card-body">
+                    <div class="p-3 bg-light mb-4">
+                      <h5 class="font-size-14 mb-0">Employee Details</h5>
+                    </div>
+                    <div class="d-flex justify-content-between text-capitalize">
+                      <p>Employee Name</p>
+                      <p>
+                        {{ employee[0].emp_first_name }}
+                        {{ employee[0].emp_last_name }}
+                      </p>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                      <p>T7 Number</p>
+                      <p>
+                        {{ employee[0].emp_unique_id }}
+                      </p>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                      <p>Phone Number</p>
+                      <p>
+                        {{ employee[0].emp_phone_no }}
+                      </p>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                      <p>Office Email</p>
+                      <p>
+                        {{ employee[0].emp_office_email }}
+                      </p>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                      <p>Sector Code</p>
+                      <p>
+                        {{ employee[0].sector.d_t3_code }}
+                      </p>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                      <p>Location Code</p>
+                      <p>
+                        {{ employee[0].location.l_t6_code }}
+                      </p>
                     </div>
                   </div>
                 </div>
+              </div>
 
               <div class="col-lg-12">
                 <div class="card">
@@ -812,18 +908,21 @@ export default {
                       </h5>
                       <p class="mt-3">
                         Work with your manager to discuss and agree on at least
-                        <strong>3</strong> goals for your work over this review period.
+                        <strong>3</strong> goals for your work over this review
+                        period.
                       </p>
                       <p>
-                        Try to write at least 2-3 performance goals, focused on your key
-                        areas of responsibility. Then, write 1 goal about an area of
-                        growth/development. To create a development goal, consider a
-                        strength you would like to get even better in, or a challenging
-                        area you wish to improve in.
+                        Try to write at least 2-3 performance goals, focused on
+                        your key areas of responsibility. Then, write 1 goal
+                        about an area of growth/development. To create a
+                        development goal, consider a strength you would like to
+                        get even better in, or a challenging area you wish to
+                        improve in.
                       </p>
                       <p>
-                        Your goals should be SMART (specific, measurable, actionable,
-                        realistic, timebound). For tips on creating SMART goals,
+                        Your goals should be SMART (specific, measurable,
+                        actionable, realistic, timebound). For tips on creating
+                        SMART goals,
                         <a
                           href="https://rescue.box.com/s/v5a0wfucoe1drhrz2cepy6wzr6urr3hr"
                           target="_blank"
@@ -839,7 +938,7 @@ export default {
                         </a>
                       </p>
                     </div>
-                    <form >
+                    <form>
                       <b-table-simple hover responsive bordered outlined>
                         <b-thead head-variant="dark">
                           <b-tr>
@@ -859,13 +958,13 @@ export default {
                               {{ index + 1 }}
                             </b-td>
                             <b-td style="width: 19%">
-                      <textarea
-                        type="text"
-                        v-model="field.goal"
-                        rows="6"
-                        class="form-control"
-                        :readonly="assessStatus === 1 ? true : false"
-                      />
+                              <textarea
+                                type="text"
+                                v-model="field.goal"
+                                rows="6"
+                                class="form-control"
+                                :readonly="assessStatus === 1 ? true : false"
+                              />
                             </b-td>
                             <b-td style="width: 11%">
                               <div class="form-group">
@@ -877,9 +976,13 @@ export default {
                                     type="radio"
                                     :name="index"
                                     :checked="field.update === 'Complete'"
-                                    :disabled="assessStatus === 1 ? true : false"
+                                    :disabled="
+                                      assessStatus === 1 ? true : false
+                                    "
                                   />
-                                  <label class="form-check-label"> Complete </label>
+                                  <label class="form-check-label">
+                                    Complete
+                                  </label>
                                 </div>
                                 <div class="form-check">
                                   <input
@@ -888,11 +991,15 @@ export default {
                                     v-model="field.update"
                                     value="On track"
                                     :checked="field.update === 'On track'"
-                                    :disabled="assessStatus === 1 ? true : false"
+                                    :disabled="
+                                      assessStatus === 1 ? true : false
+                                    "
                                     type="radio"
                                     :name="index"
                                   />
-                                  <label class="form-check-label"> On track </label>
+                                  <label class="form-check-label">
+                                    On track
+                                  </label>
                                 </div>
                                 <div class="form-check">
                                   <input
@@ -903,9 +1010,13 @@ export default {
                                     type="radio"
                                     :name="index"
                                     :checked="field.update === 'Delayed'"
-                                    :disabled="assessStatus === 1 ? true : false"
+                                    :disabled="
+                                      assessStatus === 1 ? true : false
+                                    "
                                   />
-                                  <label class="form-check-label"> Delayed </label>
+                                  <label class="form-check-label">
+                                    Delayed
+                                  </label>
                                 </div>
                                 <div class="form-check">
                                   <input
@@ -915,9 +1026,13 @@ export default {
                                     type="radio"
                                     :name="index"
                                     :checked="field.update"
-                                    :disabled="assessStatus === 1 ? true : false"
+                                    :disabled="
+                                      assessStatus === 1 ? true : false
+                                    "
                                   />
-                                  <label class="form-check-label"> Not started </label>
+                                  <label class="form-check-label">
+                                    Not started
+                                  </label>
                                 </div>
                                 <div class="form-check">
                                   <input
@@ -926,8 +1041,12 @@ export default {
                                     value="No longer relevant"
                                     type="radio"
                                     :name="index"
-                                    :checked="field.update === 'No longer relevant'"
-                                    :disabled="assessStatus === 1 ? true : false"
+                                    :checked="
+                                      field.update === 'No longer relevant'
+                                    "
+                                    :disabled="
+                                      assessStatus === 1 ? true : false
+                                    "
                                   />
                                   <label class="form-check-label">
                                     No longer relevant
@@ -936,40 +1055,40 @@ export default {
                               </div>
                             </b-td>
                             <b-td style="width: 17%">
-                      <textarea
-                        type="text"
-                        v-model="field.accomplishment"
-                        rows="6"
-                        class="form-control"
-                        :readonly="assessStatus === 1 ? true : false"
-                      />
+                              <textarea
+                                type="text"
+                                v-model="field.accomplishment"
+                                rows="6"
+                                class="form-control"
+                                :readonly="assessStatus === 1 ? true : false"
+                              />
                             </b-td>
                             <b-td style="width: 17%">
-                      <textarea
-                        type="text"
-                        v-model="field.challenge"
-                        rows="6"
-                        class="form-control"
-                        :readonly="assessStatus === 1 ? true : false"
-                      />
+                              <textarea
+                                type="text"
+                                v-model="field.challenge"
+                                rows="6"
+                                class="form-control"
+                                :readonly="assessStatus === 1 ? true : false"
+                              />
                             </b-td>
                             <b-td style="width: 17%">
-                      <textarea
-                        type="text"
-                        v-model="field.support"
-                        rows="6"
-                        class="form-control"
-                        :readonly="assessStatus === 1 ? true : false"
-                      />
+                              <textarea
+                                type="text"
+                                v-model="field.support"
+                                rows="6"
+                                class="form-control"
+                                :readonly="assessStatus === 1 ? true : false"
+                              />
                             </b-td>
                             <b-td style="width: 17%; cursor: pointer">
-                      <textarea
-                        type="text"
-                        v-model="field.next_step"
-                        rows="6"
-                        class="form-control"
-                        :readonly="assessStatus === 1 ? true : false"
-                      />
+                              <textarea
+                                type="text"
+                                v-model="field.next_step"
+                                rows="6"
+                                class="form-control"
+                                :readonly="assessStatus === 1 ? true : false"
+                              />
                             </b-td>
                             <b-td style="width: 1%" v-if="assessStatus === 0">
                               <button
@@ -995,8 +1114,8 @@ export default {
                           class="ml-1"
                           @click="addField"
                         >
-                  Click here to add a new goal
-                </span>
+                          Click here to add a new goal
+                        </span>
                       </div>
                       <div class="row">
                         <div class="col-md-4">
@@ -1013,8 +1132,8 @@ export default {
                         <div class="col-12">
                           <div class="form-group">
                             <label for="op">
-                              Optional – other items to discuss (career opportunities,
-                              area of growth & development, etc.)
+                              Optional – other items to discuss (career
+                              opportunities, area of growth & development, etc.)
                             </label>
                             <b-form-textarea
                               id="option"
@@ -1025,8 +1144,8 @@ export default {
                               placeholder="Optional"
                               class="form-control"
                               :class="{
-                        'is-invalid': submitted && $v.optional.$error,
-                      }"
+                                'is-invalid': submitted && $v.optional.$error,
+                              }"
                             />
                           </div>
                         </div>
@@ -1036,12 +1155,9 @@ export default {
                 </div>
               </div>
             </div>
-
           </div>
         </div>
       </div>
-
     </div>
-
   </Layout>
 </template>

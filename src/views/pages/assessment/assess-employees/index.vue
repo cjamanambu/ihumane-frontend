@@ -98,6 +98,7 @@ export default {
     selectEmployee(employee) {
       //console.log(employee);
       const gsId = employee[0].gsId;
+      const masterId = employee[0].sam_id;
       employee = employee[0].employee;
       this.employeeId = employee.emp_id;
 
@@ -113,7 +114,8 @@ export default {
           name: "mid-year-assess-employee",
           params: {
             empid: this.employeeId,
-            gsId: 2,
+            gsId: gsId,
+            masterId: masterId,
           },
         });
       } else {

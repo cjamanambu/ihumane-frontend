@@ -64,7 +64,7 @@ export default {
       employeeRating: null,
       checkOpenGoal: 0,
       newAssessment: false,
-      assessStatus:0,
+      assessStatus: 0,
       gsID: null,
     };
   },
@@ -82,7 +82,6 @@ export default {
       const url = `${this.ROUTES.selfAssessment}/get-self-assessments/${this.getEmployee.emp_id}`;
       await this.apiGet(url).then((res) => {
         const { data } = res;
-
         if (data.questions.length) {
           this.texts = [];
           this.gsID = data.openGoal[0].gs_id;
@@ -196,7 +195,7 @@ export default {
         <div class="card">
           <div class="card-body">
             <div class="p-3 bg-light mb-4">
-              <h5 class="font-size-14 mb-0">Goal Setting Form </h5>
+              <h5 class="font-size-14 mb-0">Goal Setting Form</h5>
             </div>
             <div class="mb-3">
               <h5 class="mb-2">
@@ -249,7 +248,7 @@ export default {
                       rows="3"
                       v-model="field.goal"
                       :readonly="assessStatus === 1"
-                      class="form-control "
+                      class="form-control"
                       :class="{
                         'is-invalid': submitted && $v.goal.$error,
                       }"
@@ -274,30 +273,29 @@ export default {
                   <i class="ri-error-warning-line mr-2"></i>
                   You must submit a minimum of 3 goals.
                   <span style="cursor: pointer" class="ml-1" @click="addField">
-                  Click here to add a new goal
-                </span>
+                    Click here to add a new goal
+                  </span>
                 </div>
                 <div class="row">
                   <div class="col-12">
                     <b-button
-                        v-if="!submitting"
-                        class="btn btn-success btn-block mt-4"
-                        type="submit"
+                      v-if="!submitting"
+                      class="btn btn-success btn-block mt-4"
+                      type="submit"
                     >
                       Submit
                     </b-button>
                     <b-button
-                        v-else
-                        disabled
-                        class="btn btn-success btn-block mt-4"
-                        type="submit"
+                      v-else
+                      disabled
+                      class="btn btn-success btn-block mt-4"
+                      type="submit"
                     >
                       Submitting...
                     </b-button>
                   </div>
                 </div>
               </div>
-
             </form>
 
             <form v-else @submit.prevent="submitNewBeginning">
@@ -320,32 +318,27 @@ export default {
                     />
                   </div>
                 </div>
-                <div class="col-1" v-if="index > 2" >
+                <div class="col-1" v-if="index > 2 && assessStatus === 0">
                   <div class="form-group">
                     <label style="visibility: hidden">hidden</label><br />
                     <button
                       type="button"
                       class="btn btn-danger btn-block"
                       @click="delField(index)"
-                      v-if="assessStatus === 0"
                     >
                       DEL
                     </button>
                   </div>
                 </div>
               </div>
-              <div class="alert alert-info d-flex mt-3"  v-if="assessStatus === 0">
+              <div
+                class="alert alert-info d-flex mt-3"
+                v-if="assessStatus === 0"
+              >
                 <i class="ri-error-warning-line mr-2"></i>
                 You must submit a minimum of 3 goals.
                 <span style="cursor: pointer" class="ml-1" @click="addField">
-
-                <div class="alert alert-info d-flex mt-3">
-                  <i class="ri-error-warning-line mr-2"></i>
-                  You must submit a minimum of 3 goals.
-                    <span style="cursor: pointer" class="ml-1" @click="addField">
-                    Click here to add a new goal
-                  </span>
-                </div>
+                  Click here to add a new goal
                 </span>
               </div>
 
@@ -368,9 +361,7 @@ export default {
                     Submitting...
                   </b-button>
                 </div>
-
               </div>
-
             </form>
           </div>
         </div>
@@ -380,7 +371,6 @@ export default {
           The beginning of year review period is currently closed.
         </div>
       </div>
-
     </div>
   </Layout>
 </template>

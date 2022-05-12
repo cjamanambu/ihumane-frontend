@@ -25,7 +25,6 @@ export default {
     await this.getSelfAssessment();
     await this.getEndYearAssessment();
     await this.getRatings();
-
     this.authuser = this.getEmployee.emp_id;
   },
   validations: {
@@ -156,21 +155,24 @@ export default {
       });
     },
     async getSelfAssessment() {
-      const url = `${this.ROUTES.selfAssessment}/get-self-assessment/${this.empId}/${this.activeGoalId}`;
+      this.masterId = this.$route.params.masterId;
+
+      const url = `${this.ROUTES.selfAssessment}/get-self-assessment-by-master/${this.masterId}`;
+      //const url = `${this.ROUTES.selfAssessment}/get-self-assessment/${this.getEmployee.emp_id}/${this.gsID}`;
       await this.apiGet(url).then((res) => {
         const { data } = res;
-        if (data.questions.length > 0) {
+        console.log({ data });
+        if (data.question.length > 0) {
           this.texts = [];
-          this.gsID = data.openGoal[0].gs_id;
-          this.gsID = data.openGoal[0].gs_id;
+          this.gsID = data.master?.sam_gs_id;
           this.optional = data.master?.sam_optional;
           this.sam_discussion_held_on = new Date(
             data.master?.sam_discussion_held_on
           )
             .toISOString()
             .substr(0, 10);
-          this.assessStatus = data.questions[0].sa_status;
-          data.questions.forEach(async (datum) => {
+          this.assessStatus = data.question[0].sa_status;
+          data.question.forEach(async (datum) => {
             this.selfAssessmentStatus = true;
             this.prefillStatus = true;
             const dat = {
@@ -183,15 +185,15 @@ export default {
               support: datum.sa_support_needed,
             };
             this.texts.push(dat);
-            //console.log(this.texts);
           });
         } else {
-          const prevUrl = `${this.ROUTES.selfAssessment}/prefill-goal-setting/${this.empId}`;
+          const prevUrl = `${this.ROUTES.selfAssessment}/prefill-goal-setting/${this.getEmployee.emp_id}`;
           this.apiGet(prevUrl).then((res) => {
             const { data } = res;
+            console.log({ data });
             this.texts = [];
             this.gsID = parseInt(data[0].sa_gs_id);
-            this.assessStatus = data[0].sa_status;
+            this.assessStatus = 0; //data[0].sa_status;
             data.forEach(async (datum) => {
               this.selfAssessmentStatus = true;
               this.prefillStatus = true;
@@ -295,9 +297,22 @@ export default {
         return true;
       });
       if (validForm) {
-        this.apiPost(url, this.goals, "Add goals Error").then(() => {
-          this.apiResponseHandler("Process Complete", "Goals Added");
-          this.getSelfAssessment();
+        this.apiPost(url, this.goals, "Add goals Error").then((res) => {
+          const { data } = res;
+          if (data) {
+            this.$router
+              .push({
+                name: "mid-year-assess-employee",
+                params: {
+                  empid: data.sam_emp_id,
+                  gsId: data.sam_gs_id,
+                  masterId: data.sam_id,
+                },
+              })
+              .then(() => {
+                this.apiResponseHandler("Process Complete", "Goals Updated");
+              });
+          }
         });
       }
     },
@@ -373,12 +388,12 @@ export default {
         emp_id: employeeID,
       };
       this.apiPost(url, data, "Could not process request").then(() => {
-        this.apiResponseHandler(
-          "Process Complete",
-          "Employee self-assessment completed."
-        );
-        //this.$router.push("/assess-employees");
-        location.reload();
+        this.$router.push({ name: "assess-employees" }).then(() => {
+          this.apiResponseHandler(
+            "Process Complete",
+            "Employee self-assessment completed."
+          );
+        });
       });
     },
     async fetchEmployee() {
@@ -560,7 +575,6 @@ export default {
                             v-if="index > 2"
                             type="button"
                             class="btn btn-sm btn-danger"
-                            @click="delField(index)"
                             style="display: none"
                           >
                             DEL
@@ -578,7 +592,6 @@ export default {
                     <span
                       style="cursor: pointer; text-decoration: underline"
                       class="ml-1"
-                      @click="addField"
                     >
                       Click here to add a new goal
                     </span>
@@ -648,7 +661,7 @@ export default {
           </div>
           <div class="col-lg-4">
             <div class="card">
-              <div class="card-body">
+              <div class="card-body" v-if="currentEmployee">
                 <div class="p-3 bg-light mb-4">
                   <h5 class="font-size-14 mb-0">Employee Details</h5>
                 </div>
@@ -683,7 +696,10 @@ export default {
             </div>
             <div
               class="card"
-              v-if="authuser === currentEmployee.emp_supervisor_id"
+              v-if="
+                currentEmployee &&
+                authuser === currentEmployee.emp_supervisor_id
+              "
             >
               <div class="card-body">
                 <form @submit.prevent="processAssessment">
