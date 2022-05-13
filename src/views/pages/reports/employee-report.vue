@@ -94,6 +94,7 @@ export default {
             bvn: employee.emp_bvn,
             account_no: employee.emp_account_no,
             bank: employee.bank ? employee.bank.bank_name : null,
+            status: employee.emp_status === 1 ? "ACTIVE" : "INACTIVE",
           };
           this.employees.push(employeeObj);
         });
@@ -187,20 +188,18 @@ export default {
             this.jsonFields["ACCOUNT NUMBER"] = key;
           } else if (key === "bank") {
             this.jsonFields["BANK NAME"] = key;
+          } else if (key === "status") {
+            this.jsonFields["STATUS"] = key;
           }
         });
       });
     },
     async sortArrayOfObjects(array) {
-      console.log({ array });
       return array.sort(function (a, b) {
-        console.log({ a, b });
         let matchesA = a.emp_unique_id.match(/(\d+)/);
         matchesA = parseInt(matchesA[0]);
-
         let matchesB = b.emp_unique_id.match(/(\d+)/);
         matchesB = parseInt(matchesB[0]);
-
         return matchesA - matchesB;
       });
     },
@@ -305,6 +304,7 @@ export default {
         { key: "bvn", label: "BVN", sortable: true },
         { key: "account_no", label: "Account Number", sortable: true },
         { key: "bank", label: "Bank Name", sortable: true },
+        { key: "status", label: "Status", sortable: true },
       ],
       jsonFields: {},
       filtered: [],
