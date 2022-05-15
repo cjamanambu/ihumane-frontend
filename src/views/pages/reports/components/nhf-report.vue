@@ -30,7 +30,10 @@ export default {
     },
     fetchLocations() {
       this.apiGet(this.ROUTES.location, "Get Locations Error").then((res) => {
-        this.locations = [{ value: null, text: "Select location" }];
+        this.locations = [
+          { value: null, text: "Select location" },
+          { value: 0, text: "All locations" },
+        ];
         const { data } = res;
         data.forEach((location) => {
           this.locations.push({
@@ -42,7 +45,7 @@ export default {
     },
     async generate() {
       let data, pym_month, pym_year;
-      if ((!this.useCurrent && !this.pmyDate) || !this.location) {
+      if ((!this.useCurrent && !this.pmyDate) || this.location === null) {
         this.apiFormHandler("Nhf Report");
       } else {
         if (this.useCurrent) {

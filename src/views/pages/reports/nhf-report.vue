@@ -28,8 +28,8 @@ export default {
       };
       const url = `${this.ROUTES.salary}/nhf-report`;
       this.apiPost(url, data, "Generate nhf Report").then(async (res) => {
-        const {data} = res;
-        const newData = await this.sortArrayOfObjects(data)
+        const { data } = res;
+        const newData = await this.sortArrayOfObjects(data);
         newData.forEach((nhf, index) => {
           this.locationName = nhf.location;
           // let pensionEmployeeContribution;
@@ -42,8 +42,10 @@ export default {
             employeeName: nhf.employeeName,
             sector: nhf.sector,
             location: nhf.location,
-            employee_gross: this.apiValueHandler(nhf.adjustedGross.toFixed(2)) ?? '0.00',
-            nhf_contribution: this.apiValueHandler(nhf.nhfArray[0].Amount.toFixed(2)) ?? '0.00',
+            employee_gross:
+              this.apiValueHandler(nhf.adjustedGross.toFixed(2)) ?? "0.00",
+            nhf_contribution:
+              this.apiValueHandler(nhf.nhfArray[0].Amount.toFixed(2)) ?? "0.00",
             month: nhf.month,
             year: nhf.year,
             nhf_number: nhf.pin,
@@ -52,8 +54,9 @@ export default {
         });
         this.filtered = this.nhfs;
         this.totalRows = this.nhfs.length;
-
-
+        if (this.location === 0) {
+          this.locationName = "All Locations";
+        }
       });
 
       this.newFields.forEach((field) => {
@@ -64,9 +67,9 @@ export default {
           this.jsonFields["T7 NUMBER"] = key;
         } else if (key === "employeeName") {
           this.jsonFields["NAME"] = key;
-        }  else if (key === "sector") {
+        } else if (key === "sector") {
           this.jsonFields["SECTOR"] = key;
-        }else if (key === "location") {
+        } else if (key === "location") {
           this.jsonFields["LOCATION"] = key;
         } else if (key === "employee_gross") {
           this.jsonFields["EMPLOYEE GROSS"] = key;
@@ -74,26 +77,25 @@ export default {
           this.jsonFields["NHF CONTRIBUTION"] = key;
         } else if (key === "total") {
           this.jsonFields["TOTAL"] = key;
-        }else if (key === "month") {
+        } else if (key === "month") {
           this.jsonFields["MONTH"] = key;
-        }else if (key === "year") {
+        } else if (key === "year") {
           this.jsonFields["YEAR"] = key;
-        }else if (key === "nhf_number") {
+        } else if (key === "nhf_number") {
           this.jsonFields["nhf NUMBER"] = key;
         }
       });
     },
     async sortArrayOfObjects(array) {
       return array.sort(function (a, b) {
-
         let matchesA = a.employeeUniqueId.match(/(\d+)/);
-        matchesA = parseInt(matchesA[0])
+        matchesA = parseInt(matchesA[0]);
 
         let matchesB = b.employeeUniqueId.match(/(\d+)/);
-        matchesB = parseInt(matchesB[0])
+        matchesB = parseInt(matchesB[0]);
 
         return matchesA - matchesB;
-      })
+      });
     },
 
     onFiltered(filteredItems) {
@@ -154,13 +156,12 @@ export default {
         "employee_unique_id",
         "employeeName",
         "sector",
-         "location",
+        "location",
         "nhf_number",
         "month",
         "year",
         "employee_gross",
         "nhf_contribution",
-
       ],
       incomeFields: [],
       deductionFields: [],
@@ -304,8 +305,7 @@ export default {
 
                 <template #cell(month)="row">
                   <span class="text-nowrap">
-                     {{ (parseInt(row.value) - 1) | getMonth }}
-
+                    {{ (parseInt(row.value) - 1) | getMonth }}
                   </span>
                 </template>
                 <template #cell(year)="row">
@@ -313,7 +313,6 @@ export default {
                     {{ row.value }}
                   </span>
                 </template>
-
 
                 <template #cell(employee_gross)="row">
                   <span class="text-nowrap">
@@ -332,8 +331,6 @@ export default {
                     {{ row.value }}
                   </span>
                 </template>
-
-
               </b-table>
             </div>
             <div v-else>

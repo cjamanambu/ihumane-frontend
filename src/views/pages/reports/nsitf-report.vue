@@ -28,8 +28,8 @@ export default {
       };
       const url = `${this.ROUTES.salary}/nsitf-report`;
       this.apiPost(url, data, "Generate NSITF Report").then(async (res) => {
-        const {data} = res;
-        const newData = await this.sortArrayOfObjects(data)
+        const { data } = res;
+        const newData = await this.sortArrayOfObjects(data);
         newData.forEach((nsitf, index) => {
           this.locationName = nsitf.location;
           // let pensionEmployeeContribution;
@@ -42,8 +42,11 @@ export default {
             employeeName: nsitf.employeeName,
             sector: nsitf.sector,
             t6: nsitf.location,
-            gross: this.apiValueHandler(nsitf.adjustedGrossII.toFixed(2)) ?? '0.00',
-            nsitf_contribution: this.apiValueHandler(nsitf.nsitfArray[0].Amount.toFixed(2)) ?? '0.00',
+            gross:
+              this.apiValueHandler(nsitf.adjustedGrossII.toFixed(2)) ?? "0.00",
+            nsitf_contribution:
+              this.apiValueHandler(nsitf.nsitfArray[0].Amount.toFixed(2)) ??
+              "0.00",
             month: nsitf.month,
             year: nsitf.year,
           };
@@ -51,8 +54,9 @@ export default {
         });
         this.filtered = this.nsitfs;
         this.totalRows = this.nsitfs.length;
-
-
+        if (this.location === 0) {
+          this.locationName = "All Locations";
+        }
       });
 
       this.newFields.forEach((field) => {
@@ -63,9 +67,9 @@ export default {
           this.jsonFields["T7 NUMBER"] = key;
         } else if (key === "employeeName") {
           this.jsonFields["NAME"] = key;
-        }  else if (key === "sector") {
+        } else if (key === "sector") {
           this.jsonFields["SECTOR"] = key;
-        }else if (key === "t6") {
+        } else if (key === "t6") {
           this.jsonFields["LOCATION"] = key;
         } else if (key === "gross") {
           this.jsonFields["GROSS"] = key;
@@ -73,24 +77,23 @@ export default {
           this.jsonFields["nsitf CONTRIBUTION"] = key;
         } else if (key === "total") {
           this.jsonFields["TOTAL"] = key;
-        }else if (key === "month") {
+        } else if (key === "month") {
           this.jsonFields["MONTH"] = key;
-        }else if (key === "year") {
+        } else if (key === "year") {
           this.jsonFields["YEAR"] = key;
         }
       });
     },
     async sortArrayOfObjects(array) {
       return array.sort(function (a, b) {
-
         let matchesA = a.employeeUniqueId.match(/(\d+)/);
-        matchesA = parseInt(matchesA[0])
+        matchesA = parseInt(matchesA[0]);
 
         let matchesB = b.employeeUniqueId.match(/(\d+)/);
-        matchesB = parseInt(matchesB[0])
+        matchesB = parseInt(matchesB[0]);
 
         return matchesA - matchesB;
-      })
+      });
     },
 
     onFiltered(filteredItems) {
@@ -156,7 +159,6 @@ export default {
         "year",
         "gross",
         "nsitf_contribution",
-
       ],
       incomeFields: [],
       deductionFields: [],
@@ -300,8 +302,7 @@ export default {
 
                 <template #cell(month)="row">
                   <span class="text-nowrap">
-                     {{ (parseInt(row.value) - 1) | getMonth }}
-
+                    {{ (parseInt(row.value) - 1) | getMonth }}
                   </span>
                 </template>
                 <template #cell(year)="row">
@@ -309,7 +310,6 @@ export default {
                     {{ row.value }}
                   </span>
                 </template>
-
 
                 <template #cell(gross)="row">
                   <span class="float-right">
@@ -328,8 +328,6 @@ export default {
                     {{ row.value }}
                   </span>
                 </template>
-
-
               </b-table>
             </div>
             <div v-else>
