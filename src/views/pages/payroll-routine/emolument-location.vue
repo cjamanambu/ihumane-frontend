@@ -44,9 +44,9 @@ export default {
           } else if (newField === "totalDeduction") {
             this.jsonFields["TOTAL DEDUCTION"] = newField;
           } else if (newField.key === "jobRole") {
-            this.jsonFields["JOB TITLE"] = newField;
+            this.jsonFields["JOB TITLE"] = newField.key;
           } else if (newField.key === "salaryGrade") {
-            this.jsonFields["SALARY BAND"] = newField;
+            this.jsonFields["SALARY BAND"] = newField.key;
           } else {
             this.jsonFields[newField.toUpperCase()] = newField;
           }

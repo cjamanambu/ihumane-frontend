@@ -28,8 +28,8 @@ export default {
       };
       const url = `${this.ROUTES.salary}/tax-report`;
       this.apiPost(url, data, "Generate tax Report").then(async (res) => {
-        const {data} = res;
-        const newData = await this.sortArrayOfObjects(data)
+        const { data } = res;
+        const newData = await this.sortArrayOfObjects(data);
         newData.forEach((tax, index) => {
           this.locationName = tax.location;
           // let pensionEmployeeContribution;
@@ -42,18 +42,21 @@ export default {
             employeeName: tax.employeeName,
             sector: tax.sector,
             t6: tax.location,
-            gross: this.apiValueHandler(tax.adjustedGrossII.toFixed(2)) ?? '0.00',
-            tax: this.apiValueHandler(tax.taxArray[0].Amount.toFixed(2)) ?? '0.00',
+            gross:
+              this.apiValueHandler(tax.adjustedGrossII.toFixed(2)) ?? "0.00",
+            tax:
+              this.apiValueHandler(tax.taxArray[0].Amount.toFixed(2)) ?? "0.00",
             month: tax.month,
             year: tax.year,
-            paye_number: tax.employeePaye
+            paye_number: tax.employeePaye,
           };
           this.taxs.push(taxObj);
         });
         this.filtered = this.taxs;
         this.totalRows = this.taxs.length;
-
-
+        if (this.location === 0) {
+          this.locationName = "All Locations";
+        }
       });
 
       this.newFields.forEach((field) => {
@@ -64,9 +67,9 @@ export default {
           this.jsonFields["T7 NUMBER"] = key;
         } else if (key === "employeeName") {
           this.jsonFields["NAME"] = key;
-        }  else if (key === "sector") {
+        } else if (key === "sector") {
           this.jsonFields["SECTOR"] = key;
-        }else if (key === "t6") {
+        } else if (key === "t6") {
           this.jsonFields["T6 NUMBER"] = key;
         } else if (key === "gross") {
           this.jsonFields["GROSS"] = key;
@@ -74,26 +77,25 @@ export default {
           this.jsonFields["TAX"] = key;
         } else if (key === "total") {
           this.jsonFields["TOTAL"] = key;
-        }else if (key === "month") {
+        } else if (key === "month") {
           this.jsonFields["MONTH"] = key;
-        }else if (key === "year") {
+        } else if (key === "year") {
           this.jsonFields["YEAR"] = key;
-        }else if (key === "paye_number") {
+        } else if (key === "paye_number") {
           this.jsonFields["PAYE NUMBER"] = key;
         }
       });
     },
     async sortArrayOfObjects(array) {
       return array.sort(function (a, b) {
-
         let matchesA = a.employeeUniqueId.match(/(\d+)/);
-        matchesA = parseInt(matchesA[0])
+        matchesA = parseInt(matchesA[0]);
 
         let matchesB = b.employeeUniqueId.match(/(\d+)/);
-        matchesB = parseInt(matchesB[0])
+        matchesB = parseInt(matchesB[0]);
 
         return matchesA - matchesB;
-      })
+      });
     },
 
     onFiltered(filteredItems) {
@@ -160,7 +162,6 @@ export default {
         "year",
         "gross",
         "tax",
-
       ],
       incomeFields: [],
       deductionFields: [],
@@ -304,8 +305,7 @@ export default {
 
                 <template #cell(month)="row">
                   <span class="text-nowrap">
-                     {{ (parseInt(row.value) - 1) | getMonth }}
-
+                    {{ (parseInt(row.value) - 1) | getMonth }}
                   </span>
                 </template>
                 <template #cell(year)="row">
@@ -313,7 +313,6 @@ export default {
                     {{ row.value }}
                   </span>
                 </template>
-
 
                 <template #cell(gross)="row">
                   <span class="float-right">
@@ -332,8 +331,6 @@ export default {
                     {{ row.value }}
                   </span>
                 </template>
-
-
               </b-table>
             </div>
             <div v-else>
