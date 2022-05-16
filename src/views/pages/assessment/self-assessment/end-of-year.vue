@@ -88,6 +88,7 @@ export default {
       eysr_strength: null,
       eysr_growth_area: null,
       eysr_additional_comment: null,
+      sam_discussion_held_on: null,
     };
   },
   methods: {
@@ -311,6 +312,11 @@ export default {
       this.apiGet(url, "Get Supervisor End Year Response Error").then((res) => {
         const { data } = res;
         this.supervisorResponse = data[0];
+        this.sam_discussion_held_on = new Date(
+          this.supervisorResponse.selfAssessment.sam_discussion_held_on
+        )
+          .toISOString()
+          .substr(0, 10);
       });
     },
     respond() {
@@ -532,6 +538,22 @@ export default {
                       class="form-control"
                       readonly
                     />
+                  </div>
+                </div>
+                <div class="mt-5 mb-3">
+                  <div class="row">
+                    <div class="col-md-6">
+                      <div class="form-group">
+                        <label for="">Discussion held on:</label>
+                        <input
+                          type="date"
+                          v-model="sam_discussion_held_on"
+                          placeholder="Discussion Held On"
+                          class="form-control"
+                          readonly
+                        />
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>

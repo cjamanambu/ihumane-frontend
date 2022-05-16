@@ -43,6 +43,10 @@ export default {
             this.jsonFields["GROSS SALARY"] = newField;
           } else if (newField === "totalDeduction") {
             this.jsonFields["TOTAL DEDUCTION"] = newField;
+          } else if (newField.key === "jobRole") {
+            this.jsonFields["JOB TITLE"] = newField.key;
+          } else if (newField.key === "salaryGrade") {
+            this.jsonFields["SALARY BAND"] = newField.key;
           } else {
             this.jsonFields[newField.toUpperCase()] = newField;
           }
@@ -61,8 +65,8 @@ export default {
       // };
       const url = `${this.ROUTES.salary}/pull-emolument/${locationId}`;
       this.apiGet(url, "Generate Emolument Report").then(async (res) => {
-        const {data} = res;
-        const newData = await this.sortArrayOfObjects(data)
+        const { data } = res;
+        const newData = await this.sortArrayOfObjects(data);
 
         newData.forEach((emolument, index) => {
           let emolumentObj = {
@@ -137,15 +141,14 @@ export default {
     },
     async sortArrayOfObjects(array) {
       return array.sort(function (a, b) {
-
         let matchesA = a.employeeUniqueId.match(/(\d+)/);
-        matchesA = parseInt(matchesA[0])
+        matchesA = parseInt(matchesA[0]);
 
         let matchesB = b.employeeUniqueId.match(/(\d+)/);
-        matchesB = parseInt(matchesB[0])
+        matchesB = parseInt(matchesB[0]);
 
         return matchesA - matchesB;
-      })
+      });
     },
     selectRow(row) {
       row = row[0];
@@ -153,14 +156,17 @@ export default {
       let empID = row.employeeId;
       let year = parseInt(this.pmyYear);
       let month = parseInt(this.pmyMonth);
-      this.$router.push({ name: "view-payslip", params: { empID, month, year } });
+      this.$router.push({
+        name: "view-payslip",
+        params: { empID, month, year },
+      });
       this.$refs["emolument-table"].clearSelected();
     },
 
     async fetchPMY() {
       this.apiGet(
-          this.ROUTES.payrollMonthYear,
-          "Get Payroll Month & Year Error"
+        this.ROUTES.payrollMonthYear,
+        "Get Payroll Month & Year Error"
       ).then((res) => {
         if (res.data) {
           const { pym_year, pym_month } = res.data;
@@ -171,8 +177,6 @@ export default {
         }
       });
     },
-
-
   },
   data() {
     return {
@@ -211,7 +215,8 @@ export default {
         "employeeName",
         "sector",
         "location",
-        "jobRole",
+        { key: "jobRole", label: "Job Title", sortable: true },
+        { key: "salaryGrade", label: "Salary Band", sortable: true },
         "salaryGrade",
         "contractStartDate",
         "contractEndDate",
