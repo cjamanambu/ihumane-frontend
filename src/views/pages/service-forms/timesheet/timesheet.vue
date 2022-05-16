@@ -108,6 +108,7 @@ export default {
        * I set the initial date on the FullCalendar as the first day of the payroll
        * month and year.
        * */
+      console.log(this.getEmployee);
       this.fetching = true;
       await this.apiGet(this.ROUTES.publicHolidays).then((res) => {
         this.publicHolidays = res.data;
@@ -324,7 +325,7 @@ export default {
                   </div>
                   <div class="d-flex justify-content-between">
                     <p>Site Code (T3)</p>
-                    <p>{{ getEmployee.JobRole.Department.d_t3_code }}</p>
+                    <p>{{ getEmployee.sector.d_t3_code }}</p>
                   </div>
                   <div class="d-flex justify-content-between">
                     <p>Nationality</p>
