@@ -54,6 +54,7 @@
                 public_date:"",
                 public_date_to:"",
                 public_date_update:"",
+                public_group:null,
                 ph_id:"",
                 fields: [
                     { key: "ph_name", label:"Holiday Name", sortable: true },
@@ -68,7 +69,7 @@
                 this.apiGet(this.ROUTES.publicHolidays, "Error getting public holidays").then((res) => {
                     const { data } = res;
                     this.holidays = data;
-                    console.log(data);
+                    //console.log(this.holidays);
                     this.totalRows = this.holidays.length;
                 });
             },
@@ -84,6 +85,7 @@
                 this.public_day = ph.ph_day;
                 this.public_month = ph.ph_month;
                 this.public_year = ph.ph_year;
+                this.public_group = ph.ph_group;
                 this.public_date = new Date(parseInt(ph.ph_year), parseInt(ph.ph_month)-1,parseInt(ph.ph_day)+1).toISOString().split("T")[0];
                 this.public_date_to = ph.ph_day ? new Date() : new Date(parseInt(ph.ph_to_year), parseInt(ph.ph_to_month)-1,parseInt(ph.ph_to_day)+1).toISOString().split("T")[0];
                 this.$refs["update-ph"].show();
@@ -101,6 +103,7 @@
                     public_name: this.public_name,
                     public_date: this.public_date,
                     public_date_to: this.public_date_to,
+                    group: this.public_group,
                   };
                     this.apiPatch(url, data, "Error updating public holiday").then((res) => {
                         this.apiResponseHandler(`${res.data}`, "Update Successful");

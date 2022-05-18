@@ -144,6 +144,7 @@ export default {
       const url = `${this.ROUTES.timesheet}/get-time-sheets/${employeeID}`;
       this.apiGet(url, "Get Timesheet Error").then((res) => {
         const { data } = res;
+        console.log(data)
         if (!data.length) {
           this.populateTimesheetData();
         } else {
