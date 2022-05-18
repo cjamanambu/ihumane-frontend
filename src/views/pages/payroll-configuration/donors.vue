@@ -17,12 +17,12 @@ export default {
   },
   mounted() {
     this.refreshTable();
-    this.getLocations();
+    this.getSectors();
   },
   validations: {
     code: { required },
     description: { required },
-    locationId: { required },
+    sectorId: { required },
   },
   methods: {
     refreshTable() {
@@ -32,21 +32,21 @@ export default {
         data.forEach((donor, index) => {
           this.donors[index] = {
             sn: ++index,
-            d_location: donor.location.location_name,
+            d_sector: donor.sector.department_name,
             ...donor
           };
         });
         this.totalRows = this.donors.length;
       });
     },
-    getLocations() {
-      this.apiGet(this.ROUTES.location, "Get Locations Error").then((res) => {
+    getSectors() {
+      this.apiGet(this.ROUTES.department, "Get sectors Error").then((res) => {
         const { data } = res
-        //console.log(data)
-        data.map((location) => {
-          this.locations.push({
-            value: location.location_id,
-            text: location.location_name,
+        const { departments} = data;
+        departments.map((sector) => {
+          this.sectors.push({
+            value: sector.department_id,
+            text: sector.department_name,
           });
         });
       });
@@ -79,7 +79,7 @@ export default {
         const data = {
           donor_code: this.code,
           donor_description: this.description,
-          location: this.locationId.value,
+          sector: this.sectorId.value,
         };
         const url = `${this.ROUTES.donor}/add-donor`;
         this.apiPost(url, data, "Add Donor Error").then((res) => {
@@ -105,7 +105,7 @@ export default {
         const data = {
           donor_code: this.code,
           donor_description: this.description,
-          location: this.locationId.value,
+          sector: this.sectorId.value,
         };
         const url = `${this.ROUTES.donor}/update-donor/${this.donorID}`;
         this.apiPatch(url, data, "Update Donor Error").then(() => {
@@ -143,8 +143,8 @@ export default {
           disabled: "true",
         },
       ],
-      locations:[],
-      locationId:null,
+      sectors:[],
+      sectorId:null,
       donors: [],
       totalRows: 1,
       currentPage: 1,
@@ -157,7 +157,7 @@ export default {
       fields: [
         { key: "sn", label: "S/n", sortable: true },
         { key: "donor_code", label: "Donor Code", sortable: true },
-        { key: "d_location", label: "Location", sortable: true },
+        { key: "d_sector", label: "Sector", sortable: true },
         {
           key: "donor_description",
           label: "Description",
@@ -287,13 +287,13 @@ export default {
           />
         </div>
         <b-form-group>
-          <label for="">Location <span class="text-danger">*</span></label>
+          <label for="">Sector <span class="text-danger">*</span></label>
           <multiselect
-            v-model="locationId"
-            :options="locations"
+            v-model="sectorId"
+            :options="sectors"
             :custom-label="locationLabel"
             :class="{
-                      'is-invalid': submitted && $v.locationId.$error,
+                      'is-invalid': submitted && $v.sectorId.$error,
                     }"
           ></multiselect>
         </b-form-group>
@@ -352,13 +352,13 @@ export default {
           />
         </div>
         <b-form-group>
-          <label for="">Location <span class="text-danger">*</span></label>
+          <label for="">Sector <span class="text-danger">*</span></label>
           <multiselect
-            v-model="locationId"
-            :options="locations"
+            v-model="sectorId"
+            :options="sectors"
             :custom-label="locationLabel"
             :class="{
-                      'is-invalid': submitted && $v.locationId.$error,
+                      'is-invalid': submitted && $v.sectorId.$error,
                     }"
           ></multiselect>
         </b-form-group>
