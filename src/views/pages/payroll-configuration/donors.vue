@@ -3,6 +3,7 @@ import Layout from "@/views/layouts/main";
 import PageHeader from "@/components/page-header";
 import appConfig from "@/app.config";
 import { required } from "vuelidate/lib/validators";
+import Multiselect from "vue-multiselect";
 
 export default {
   page: {
@@ -12,22 +13,42 @@ export default {
   components: {
     Layout,
     PageHeader,
+    Multiselect
   },
   mounted() {
     this.refreshTable();
+    this.getLocations();
   },
   validations: {
     code: { required },
     description: { required },
+    locationId: { required },
   },
   methods: {
     refreshTable() {
       this.apiGet(this.ROUTES.donor, "Get Donors Error").then((res) => {
         const { data } = res;
+        //console.log(data)
         data.forEach((donor, index) => {
-          this.donors[index] = { sn: ++index, ...donor };
+          this.donors[index] = {
+            sn: ++index,
+            d_location: donor.location.location_name,
+            ...donor
+          };
         });
         this.totalRows = this.donors.length;
+      });
+    },
+    getLocations() {
+      this.apiGet(this.ROUTES.location, "Get Locations Error").then((res) => {
+        const { data } = res
+        //console.log(data)
+        data.map((location) => {
+          this.locations.push({
+            value: location.location_id,
+            text: location.location_name,
+          });
+        });
       });
     },
     onFiltered(filteredItems) {
@@ -35,8 +56,10 @@ export default {
       this.currentPage = 1;
     },
     selectRow(row) {
+      //console.log(row);
       row = row[0];
       this.donorID = row.donor_id;
+      //console.log(this.donorID);
       this.code = row.donor_code;
       this.description = row.donor_description;
       this.$refs["edit-donor"].show();
@@ -56,6 +79,7 @@ export default {
         const data = {
           donor_code: this.code,
           donor_description: this.description,
+          location: this.locationId.value,
         };
         const url = `${this.ROUTES.donor}/add-donor`;
         this.apiPost(url, data, "Add Donor Error").then((res) => {
@@ -69,6 +93,9 @@ export default {
         });
       }
     },
+    locationLabel({ text }) {
+      return `${text}`;
+    },
     submitUpdate() {
       this.submitted = true;
       this.$v.$touch();
@@ -78,6 +105,7 @@ export default {
         const data = {
           donor_code: this.code,
           donor_description: this.description,
+          location: this.locationId.value,
         };
         const url = `${this.ROUTES.donor}/update-donor/${this.donorID}`;
         this.apiPatch(url, data, "Update Donor Error").then(() => {
@@ -108,6 +136,15 @@ export default {
           active: true,
         },
       ],
+      officials: [
+        {
+          value: null,
+          text: "Please choose the next reviewer",
+          disabled: "true",
+        },
+      ],
+      locations:[],
+      locationId:null,
       donors: [],
       totalRows: 1,
       currentPage: 1,
@@ -120,6 +157,7 @@ export default {
       fields: [
         { key: "sn", label: "S/n", sortable: true },
         { key: "donor_code", label: "Donor Code", sortable: true },
+        { key: "d_location", label: "Location", sortable: true },
         {
           key: "donor_description",
           label: "Description",
@@ -248,6 +286,17 @@ export default {
             }"
           />
         </div>
+        <b-form-group>
+          <label for="">Location <span class="text-danger">*</span></label>
+          <multiselect
+            v-model="locationId"
+            :options="locations"
+            :custom-label="locationLabel"
+            :class="{
+                      'is-invalid': submitted && $v.locationId.$error,
+                    }"
+          ></multiselect>
+        </b-form-group>
         <div class="form-group">
           <label for="desc">
             Donor Description <span class="text-danger">*</span>
@@ -302,6 +351,17 @@ export default {
             }"
           />
         </div>
+        <b-form-group>
+          <label for="">Location <span class="text-danger">*</span></label>
+          <multiselect
+            v-model="locationId"
+            :options="locations"
+            :custom-label="locationLabel"
+            :class="{
+                      'is-invalid': submitted && $v.locationId.$error,
+                    }"
+          ></multiselect>
+        </b-form-group>
         <div class="form-group">
           <label for="desc">
             Donor Description <span class="text-danger">*</span>
