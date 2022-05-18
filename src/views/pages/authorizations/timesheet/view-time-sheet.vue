@@ -36,7 +36,7 @@ export default {
       const url = `${this.ROUTES.timesheet}/time-sheet/${month}/${year}/${empId}`;
 
       this.apiGet(url, "Get Time sheet authorization").then(async (res) => {
-        console.log({ res });
+        //console.log({ res });
         const { timesheet, timeAllocation, log } = res.data;
         this.timeSheet = timesheet;
         this.numAbsents = 0;
