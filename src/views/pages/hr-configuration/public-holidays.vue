@@ -57,9 +57,10 @@
                 public_group:null,
                 ph_id:"",
                 fields: [
+                    { key: "sn", label:"S/No", sortable: true },
                     { key: "ph_name", label:"Holiday Name", sortable: true },
-                    { key: "ph_day", label: "From", sortable: true },
-                    { key: "ph_day_to", label: "To", sortable: true }
+                    { key: "ph_date", label: "From", sortable: true },
+                    { key: "ph_to_date", label: "To", sortable: true }
                 ],
 
             };
@@ -68,13 +69,34 @@
             refreshTable() {
                 this.apiGet(this.ROUTES.publicHolidays, "Error getting public holidays").then((res) => {
                     const { data } = res;
-                    this.holidays = data;
-                    //console.log(this.holidays);
+                    //console.log(data);
+                    data.map((pub,index)=>{
+                      this.holidays.push({
+                        sn: index+1,
+                        ph_id:pub.ph_id,
+                        ph_group:pub.ph_group,
+                        ph_year:pub.ph_year,
+                        ph_month:pub.ph_month,
+                        ph_day:pub.ph_day,
+
+                        ph_to_month:pub.ph_to_month,
+                        ph_to_year:pub.ph_to_year,
+                        ph_to_day: pub.ph_to_day,
+
+                        ph_name: pub.ph_name,
+                        ph_date: new Date(`${parseInt(pub.ph_month)}-${parseInt(pub.ph_day)}-${parseInt(pub.ph_year)}`).toDateString(),
+                        ph_to_date: new Date(`${parseInt(pub.ph_to_month)}-${parseInt(pub.ph_to_day)}-${parseInt(pub.ph_to_year)}`).toDateString()
+                      })
+                    })
+                  //console.log(this.holidays);
                     this.totalRows = this.holidays.length;
                 });
             },
             resetForm() {
                 this.name = null;
+                this.public_date = null;
+                this.public_date = null;
+                this.public_date_to = null;
                 this.$v.$reset();
             },
             selectPublicHoliday(ph) {
@@ -87,7 +109,7 @@
                 this.public_year = ph.ph_year;
                 this.public_group = ph.ph_group;
                 this.public_date = new Date(parseInt(ph.ph_year), parseInt(ph.ph_month)-1,parseInt(ph.ph_day)+1).toISOString().split("T")[0];
-                this.public_date_to = ph.ph_day ? new Date() : new Date(parseInt(ph.ph_to_year), parseInt(ph.ph_to_month)-1,parseInt(ph.ph_to_day)+1).toISOString().split("T")[0];
+                this.public_date_to = new Date(parseInt(ph.ph_to_year), parseInt(ph.ph_to_month)-1,parseInt(ph.ph_to_day)+1).toISOString().split("T")[0];
                 this.$refs["update-ph"].show();
                 this.$refs["ph-table"].clearSelected();
 
@@ -133,7 +155,6 @@
                 }
             },
             onFiltered(filteredItems) {
-
                 this.totalRows = filteredItems.length;
                 this.currentPage = 1;
             },
@@ -212,12 +233,6 @@
                                     select-mode="single"
                                     @row-selected="selectPublicHoliday"
                             >
-                              <template #cell(ph_day)="row">
-                                <span>{{ new Date(`${parseInt(row.item.ph_month)}-${parseInt(row.item.ph_day)}-${parseInt(row.item.ph_year)}`).toDateString()    }}</span>
-                              </template>
-                              <template #cell(ph_day_to)="row">
-                                <span>{{ new Date(`${parseInt(row.item.ph_to_month)}-${parseInt(row.item.ph_to_day)}-${parseInt(row.item.ph_to_year)}`).toDateString()    }}</span>
-                              </template>
 
                             </b-table>
                         </div>
@@ -384,6 +399,21 @@
                         type="submit"
                 >
                     Submitting...
+                </b-button>
+              <b-button
+                        v-if="!submitting"
+                        class="btn btn-danger btn-block mt-4"
+                        type="submit"
+                >
+                    Delete
+                </b-button>
+                <b-button
+                        v-else
+                        disabled
+                        class="btn btn-danger btn-block mt-4"
+                        type="submit"
+                >
+                    Deleting...
                 </b-button>
             </form>
         </b-modal>
