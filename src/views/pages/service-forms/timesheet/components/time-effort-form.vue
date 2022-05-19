@@ -131,7 +131,7 @@ export default {
           ta_tcode: field.grant,
           ta_charge: field.charge,
           ta_t0_code: field.match,
-          ta_t0_percent: field.matchCharge.toString(),
+          ta_t0_percent: field.matchCharge,
           ta_ref_no,
         };
         await this.apiPost(url, data, "Time Allocation Error").then();

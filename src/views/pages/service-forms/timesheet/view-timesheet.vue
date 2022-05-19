@@ -98,6 +98,7 @@ export default {
       populating: false,
       timeAllocated: false,
       publicHolidays: [],
+      groupedPublicHolidays: [],
       showModalPH: false,
       phName: "",
       breakdown: [],
@@ -107,8 +108,14 @@ export default {
   },
   methods: {
     async fetchPayroll() {
+      let url = `${this.ROUTES.publicHolidays}/holiday`;
+      await this.apiGet(url).then((res) => {
+        this.publicHolidays = res.data;
+      });
+      await this.apiGet(this.ROUTES.publicHolidays).then((res) => {
+        this.groupedPublicHolidays = res.data;
+      });
       let payrollMY = this.$route.params.payrollMY;
-      console.log({ payrollMY });
       this.pymFullDate = `${payrollMY}-01`;
       this.pymYear = payrollMY.split("-")[0];
       this.pymMonth = payrollMY.split("-")[1];
@@ -141,7 +148,6 @@ export default {
       });
     },
     async dateClicked(info) {
-      console.log(this.calendarOptions);
       if (info) {
         this.newEventData = info;
         this.dateInfo = info;
@@ -173,6 +179,36 @@ export default {
       this.apiGet(url, "Get Timesheet Error").then(async (res) => {
         const { data } = res;
         if (data.length) {
+          let calendarApi = this.$refs.fullCalendar.getApi();
+          let entryObj = {};
+          this.groupedPublicHolidays.forEach((publicHoliday) => {
+            let month, endMonth, day, endDay;
+            publicHoliday.ph_month.length === 1
+              ? (month = `0${publicHoliday.ph_month}`)
+              : (month = publicHoliday.ph_month);
+            publicHoliday.ph_day.length === 1
+              ? (day = `0${publicHoliday.ph_day}`)
+              : (day = publicHoliday.ph_day);
+            publicHoliday.ph_to_month.toString().length === 1
+              ? (endMonth = `0${publicHoliday.ph_to_month}`)
+              : (endMonth = publicHoliday.ph_to_month);
+            publicHoliday.ph_to_day.toString().length === 1
+              ? (endDay = `0${publicHoliday.ph_to_day}`)
+              : (endDay = publicHoliday.ph_to_day);
+            let startDate = `${publicHoliday.ph_year}-${month}-${day}`;
+            let endDate = `${publicHoliday.ph_to_year}-${endMonth}-${
+              endDay + 1
+            }`;
+            entryObj = {
+              id: this.entryCount++,
+              start: startDate,
+              end: endDate,
+              display: "background",
+              backgroundColor: "red",
+              title: `${publicHoliday.ph_name} Public Holiday`,
+            };
+            calendarApi.addEvent(entryObj);
+          });
           await data.forEach((entry) => {
             let month, day;
             entry.ts_month.length === 1
@@ -182,7 +218,7 @@ export default {
               ? (day = `0${entry.ts_day}`)
               : (day = entry.ts_day);
             const date = `${entry.ts_year}-${month}-${day}`;
-            const entryObj = {
+            entryObj = {
               id: this.entryCount++,
               start: date,
               end: date,
@@ -196,7 +232,6 @@ export default {
               entryObj.title = `ABSENT`;
               entryObj.display = "block";
             }
-            let calendarApi = this.$refs.fullCalendar.getApi();
             calendarApi.addEvent(entryObj);
           });
         }
@@ -233,7 +268,16 @@ export default {
   },
 };
 </script>
-
+<style>
+/*.fc-event-title {*/
+/*  color: blue;*/
+/*}*/
+.fc .fc-bg-event .fc-event-title {
+  font-size: 1.5em;
+  color: black;
+  padding-top: 2em;
+}
+</style>
 <template>
   <Layout>
     <PageHeader :title="title" :items="items" />
@@ -255,7 +299,7 @@ export default {
     <scale-loader class="scale-loader" v-if="this.apiBusy" />
     <div v-else>
       <div class="row">
-        <div class="col-lg-7">
+        <div class="col-12">
           <div class="card">
             <div class="card-body">
               <div class="app-calendar">
@@ -268,7 +312,9 @@ export default {
             </div>
           </div>
         </div>
-        <div class="col-lg-5">
+      </div>
+      <div class="row mt-3">
+        <div class="col-lg-4">
           <div class="card mb-3">
             <div class="card-body">
               <div class="p-3 bg-light mb-4">
@@ -301,7 +347,7 @@ export default {
               </div>
               <div class="d-flex justify-content-between">
                 <p>Site Code (T3)</p>
-                <p>{{ getEmployee.JobRole.Department.d_t3_code }}</p>
+                <p>{{ getEmployee.sector.d_t3_code }}</p>
               </div>
               <div class="d-flex justify-content-between">
                 <p>Nationality</p>
@@ -309,6 +355,8 @@ export default {
               </div>
             </div>
           </div>
+        </div>
+        <div class="col-lg-8">
           <div class="card">
             <div class="card-body">
               <div class="p-3 bg-light mb-4">
