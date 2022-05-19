@@ -363,6 +363,8 @@ export default {
         emp_first_name: this.emp_first_name,
         emp_last_name: this.emp_last_name,
         emp_other_name: this.emp_other_name,
+        emp_personal_email: this.emp_personal_email,
+        emp_office_email: this.emp_office_email,
         emp_qualification: this.emp_qualification,
         emp_phone_no: this.emp_phone_no,
         emp_account_no: this.emp_account_no,
@@ -917,6 +919,24 @@ export default {
                 class="form-control"
                 v-model="emp_last_name"
                 placeholder="Last Name"
+              />
+            </div>
+            <div class="form-group">
+              <label for=""> Personal Email </label>
+              <input
+                type="text"
+                class="form-control"
+                v-model="emp_personal_email"
+                placeholder="Personal Email"
+              />
+            </div>
+            <div class="form-group">
+              <label for=""> Office Email </label>
+              <input
+                type="text"
+                class="form-control"
+                v-model="emp_office_email"
+                placeholder="Office Email"
               />
             </div>
             <div class="form-group">
