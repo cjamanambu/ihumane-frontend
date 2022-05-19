@@ -6,8 +6,12 @@ export default {
     return {
       count: 1,
       invalidCharge: false,
+      invalidMatchCharge: false,
       sum: 100,
-      fields: [{ id: 0, grant: null, charge: 100 }],
+      matchSum: 100,
+      fields: [
+        { id: 0, grant: null, charge: 100, match: null, matchCharge: 100 },
+      ],
       confirmTER: false,
       donor: null,
       donors: [{ value: null, text: "Select code", disabled: true }],
@@ -42,16 +46,27 @@ export default {
         const { data } = res;
         this.donors = [{ value: null, text: "Select code", disabled: true }];
         data.forEach((donor) => {
-          this.donors.push({
-            value: donor.donor_code,
-            text: `${donor.donor_code} (${donor.donor_description})`,
-          });
+          if (
+            donor.donor_sector === parseInt(this.getEmployee.emp_department_id)
+          ) {
+            this.donors.push({
+              value: donor.donor_code,
+              text: `${donor.donor_code} (${donor.donor_description})`,
+            });
+          }
         });
       });
     },
     addField() {
       this.fields[0].charge--;
-      this.fields.push({ id: this.count, grant: null, charge: 1 });
+      this.fields[0].matchCharge--;
+      this.fields.push({
+        id: this.count,
+        grant: null,
+        charge: 1,
+        match: null,
+        matchCharge: 1,
+      });
       this.count++;
     },
     delField(index) {
@@ -62,22 +77,40 @@ export default {
     },
     calc() {
       this.sum = 0;
+      this.matchSum = 0;
       this.fields.forEach((field) => {
-        this.sum += field.charge;
+        if (!field.charge) field.charge = 0;
+        if (!field.matchCharge) field.matchCharge = 0;
+        this.sum += parseInt(field.charge);
+        this.matchSum += parseInt(field.matchCharge);
       });
       this.invalidCharge = this.sum !== 100;
+      this.invalidMatchCharge = this.matchSum !== 100;
     },
     confirm() {
-      const valid = this.fields.every((field) => {
-        if (!field.grant) {
+      let valid = this.fields.every((field) => {
+        if (!field.grant || !field.match) {
           return false;
         }
         return true;
       });
       if (valid) {
-        this.confirmTER = true;
+        let grants = [];
+        let matches = [];
+        this.fields.forEach((field) => {
+          grants.push(field.grant);
+          matches.push(field.match);
+        });
+        if (
+          new Set(grants).size !== grants.length ||
+          new Set(matches).size !== matches.length
+        ) {
+          this.apiFormHandler("No Duplicate T1 or T0 codes");
+        } else {
+          this.confirmTER = true;
+        }
       } else {
-        this.apiFormHandler("Invalid Grant Code(s)");
+        this.apiFormHandler("All T1 & T0 codes must be filled/selected");
       }
     },
     submit() {
@@ -90,7 +123,6 @@ export default {
         ta_ref_no = Math.random().toString(36).slice(2);
         url = `${this.ROUTES.timeAllocation}/add-time-allocation`;
       }
-      console.log(this.fields);
       this.fields.forEach(async (field) => {
         const data = {
           ta_emp_id: this.getEmployee.emp_id,
@@ -98,6 +130,8 @@ export default {
           ta_year: this.pmyYear,
           ta_tcode: field.grant,
           ta_charge: field.charge,
+          ta_t0_code: field.match,
+          ta_t0_percent: field.matchCharge.toString(),
           ta_ref_no,
         };
         await this.apiPost(url, data, "Time Allocation Error").then();
@@ -114,6 +148,8 @@ export default {
             id: index,
             grant: entry.ta_tcode,
             charge: entry.ta_charge,
+            match: entry.ta_t0_code,
+            matchCharge: entry.ta_t0_percent,
           });
         });
       }
@@ -134,27 +170,45 @@ export default {
   <div>
     <form @submit.prevent="confirm">
       <div class="row" v-for="(field, index) in fields" :key="index">
-        <div class="col-lg-6">
+        <div class="col-lg-4">
+          <label> Match Code (T0) </label>
+          <input class="form-control" v-model="field.match" />
+        </div>
+        <div class="col-lg-2">
+          <label> % to Charge (T0) </label>
+          <input
+            v-model="field.matchCharge"
+            type="number"
+            class="form-control"
+            min="1"
+            max="100"
+            @input="calc()"
+          />
+        </div>
+
+        <div class="col-lg-3">
           <div class="form-group">
             <label> Grant Code (T1) </label>
             <b-form-select v-model="field.grant" :options="donors" />
           </div>
         </div>
-        <div class="col-lg-4">
+        <div class="col-lg-2">
           <div class="form-group">
             <label> % to Charge (T1) </label>
-            <b-form-spinbutton
+            <input
               v-model="field.charge"
+              type="number"
+              class="form-control"
               id="charge"
               min="1"
               max="100"
-              @change="calc(field.charge)"
+              @input="calc()"
             />
           </div>
         </div>
-        <div class="col-lg-2">
+        <div class="col-lg-1 text-right">
           <div v-if="field.id > 0" class="form-group">
-            <label style="visibility: hidden">hidden</label>
+            <label style="visibility: hidden">hidden</label><br />
             <button
               type="button"
               class="btn btn-danger"
@@ -164,25 +218,37 @@ export default {
             </button>
           </div>
           <div v-else class="form-group">
-            <label style="visibility: hidden">hidden</label>
+            <label style="visibility: hidden">hidden</label><br />
             <button type="button" class="btn btn-success" @click="addField">
               ADD
             </button>
           </div>
         </div>
       </div>
-      <div
-        class="alert d-flex justify-content-between"
-        :class="[invalidCharge ? 'alert-danger' : 'alert-success']"
-      >
-        <strong>% Charge (T1) Total</strong> <span>{{ sum }}%</span>
+      <div class="row">
+        <div class="col-lg-6">
+          <div
+            class="alert d-flex justify-content-between"
+            :class="[invalidMatchCharge ? 'alert-danger' : 'alert-success']"
+          >
+            <strong>% Charge (T0) Total</strong> <span>{{ matchSum }}%</span>
+          </div>
+        </div>
+        <div class="col-lg-5">
+          <div
+            class="alert d-flex justify-content-between"
+            :class="[invalidCharge ? 'alert-danger' : 'alert-success']"
+          >
+            <strong>% Charge (T1) Total</strong> <span>{{ sum }}%</span>
+          </div>
+        </div>
       </div>
       <div class="form-group">
         <b-button
           v-if="!submitting"
           class="btn btn-success btn-block mt-4"
           type="submit"
-          :disabled="invalidCharge"
+          :disabled="invalidCharge || invalidMatchCharge"
         >
           Submit
         </b-button>

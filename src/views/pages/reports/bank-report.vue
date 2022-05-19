@@ -27,56 +27,61 @@ export default {
         pym_location: parseFloat(this.location),
       };
       const url = `${this.ROUTES.salary}/pay-order`;
-      this.apiPost(url, data, "Generate Bank Schedule Report").then(async (res) => {
-        const {data} = res;
-        const newData = await this.sortArrayOfObjects(data)
-        newData.forEach((payOrder, index) => {
-          this.locationName = payOrder.location;
-          let payOrderObj = {
-            sn: ++index,
-            employeeUniqueId: payOrder.employeeUniqueId,
-            employeeName: payOrder.employeeName,
-            location: payOrder.locationCode,
-            sector: payOrder.sectorCode,
-            accountNumber: payOrder.accountNumber,
-            bankName: payOrder.bankName,
-            bankSortCode: payOrder.bankSortCode,
-            month: payOrder.month,
-            year: payOrder.year,
-            netSalary: this.apiValueHandler(payOrder.netSalary.toFixed(2)),
-          };
-          this.payOrders.push(payOrderObj);
-        });
-        this.filtered = this.payOrders;
-        this.totalRows = this.payOrders.length;
-        this.newFields.forEach((newField) => {
-          if (newField === "sn") {
-            this.jsonFields["S/N"] = newField;
-          } else if (newField === "t7_number") {
-            this.jsonFields["T7 NUMBER"] = "employeeUniqueId";
-          } else if (newField === "t6_code") {
-            this.jsonFields["LOCATION"] = "location";
-          } else if (newField === "t3_code") {
-            this.jsonFields["SECTOR"] = "sector";
-          } else if (newField === "employeeName") {
-            this.jsonFields["EMPLOYEE NAME"] = newField;
-          } else if (newField === "accountNumber") {
-            this.jsonFields["ACCOUNT NUMBER"] = newField;
-          } else if (newField === "bankName") {
-            this.jsonFields["BANK NAME"] = newField;
-          } else if (newField === "bankSortCode") {
-            this.jsonFields["BANK SORT CODE"] = newField;
-          } else if (newField === "netSalary") {
-            this.jsonFields["NET SALARY"] = newField;
-          } else if (newField === "month") {
-            this.jsonFields["MONTH"] = newField;
-          } else if (newField === "year") {
-            this.jsonFields["YEAR"] = newField;
-          } else {
-            this.jsonFields[newField.toUpperCase()] = newField;
+      this.apiPost(url, data, "Generate Bank Schedule Report").then(
+        async (res) => {
+          const { data } = res;
+          const newData = await this.sortArrayOfObjects(data);
+          newData.forEach((payOrder, index) => {
+            this.locationName = payOrder.location;
+            let payOrderObj = {
+              sn: ++index,
+              employeeUniqueId: payOrder.employeeUniqueId,
+              employeeName: payOrder.employeeName,
+              location: payOrder.locationCode,
+              sector: payOrder.sectorCode,
+              accountNumber: payOrder.accountNumber,
+              bankName: payOrder.bankName,
+              bankSortCode: payOrder.bankSortCode,
+              month: payOrder.month,
+              year: payOrder.year,
+              netSalary: this.apiValueHandler(payOrder.netSalary.toFixed(2)),
+            };
+            this.payOrders.push(payOrderObj);
+          });
+          this.filtered = this.payOrders;
+          this.totalRows = this.payOrders.length;
+          if (this.location === 0) {
+            this.locationName = "All Locations";
           }
-        });
-      });
+          this.newFields.forEach((newField) => {
+            if (newField === "sn") {
+              this.jsonFields["S/N"] = newField;
+            } else if (newField === "t7_number") {
+              this.jsonFields["T7 NUMBER"] = "employeeUniqueId";
+            } else if (newField === "t6_code") {
+              this.jsonFields["LOCATION"] = "location";
+            } else if (newField === "t3_code") {
+              this.jsonFields["SECTOR"] = "sector";
+            } else if (newField === "employeeName") {
+              this.jsonFields["EMPLOYEE NAME"] = newField;
+            } else if (newField === "accountNumber") {
+              this.jsonFields["ACCOUNT NUMBER"] = newField;
+            } else if (newField === "bankName") {
+              this.jsonFields["BANK NAME"] = newField;
+            } else if (newField === "bankSortCode") {
+              this.jsonFields["BANK SORT CODE"] = newField;
+            } else if (newField === "netSalary") {
+              this.jsonFields["NET SALARY"] = newField;
+            } else if (newField === "month") {
+              this.jsonFields["MONTH"] = newField;
+            } else if (newField === "year") {
+              this.jsonFields["YEAR"] = newField;
+            } else {
+              this.jsonFields[newField.toUpperCase()] = newField;
+            }
+          });
+        }
+      );
     },
     onFiltered(filteredItems) {
       // Trigger pagination to update the number of buttons/pages due to filtering
@@ -104,17 +109,15 @@ export default {
     },
     async sortArrayOfObjects(array) {
       return array.sort(function (a, b) {
-
         let matchesA = a.employeeUniqueId.match(/(\d+)/);
-        matchesA = parseInt(matchesA[0])
+        matchesA = parseInt(matchesA[0]);
 
         let matchesB = b.employeeUniqueId.match(/(\d+)/);
-        matchesB = parseInt(matchesB[0])
+        matchesB = parseInt(matchesB[0]);
 
         return matchesA - matchesB;
-      })
+      });
     },
-
   },
   data() {
     return {
@@ -154,8 +157,8 @@ export default {
         "bankName",
         "bankSortCode",
         "netSalary",
-         "month",
-         "year"
+        "month",
+        "year",
       ],
       incomeFields: [],
       deductionFields: [],
@@ -287,13 +290,13 @@ export default {
                 </template>
                 <template #cell(t6_code)="row">
                   <span class="text-nowrap">
-                     {{ row.item.location }}
+                    {{ row.item.location }}
                   </span>
                 </template>
 
                 <template #cell(t3_code)="row">
                   <span class="text-nowrap">
-                     {{ row.item.sector }}
+                    {{ row.item.sector }}
                   </span>
                 </template>
                 <template #cell(accountNumber)="row">
@@ -314,8 +317,7 @@ export default {
 
                 <template #cell(month)="row">
                   <span class="text-nowrap">
-                     {{ (parseInt(row.value) - 1) | getMonth }}
-
+                    {{ (parseInt(row.value) - 1) | getMonth }}
                   </span>
                 </template>
                 <template #cell(year)="row">
