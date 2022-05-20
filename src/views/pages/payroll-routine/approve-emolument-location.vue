@@ -28,7 +28,24 @@ export default {
       const url = `${this.ROUTES.salary}/approve-salary-routine`;
       this.apiPost(url, data, "Salary Approval").then(
           (res) => {
-            this.apiResponseHandler(`${res.data}`, "Salary Confirmed");
+            this.apiResponseHandler(`${res.data}`, "Salary Approved");
+            this.$router.push({ name: "approve-payroll" });
+
+          }
+      );
+    },
+    unconfirmRoutine(){
+      this.submitted = true;
+
+      const data = {
+        pmyl_location_id: this.$route.params.locationId
+
+      };
+      //console.log(data)
+      const url = `${this.ROUTES.salary}/unconfirm-salary-routine`;
+      this.apiPost(url, data, "Salary Return").then(
+          (res) => {
+            this.apiResponseHandler(`${res.data}`, "Salary Returned");
             this.$router.push({ name: "approve-payroll" });
 
           }
@@ -233,6 +250,16 @@ export default {
         <i class="mdi mdi-check mr-2"></i>
         Approve Routine
       </b-button>
+
+
+    </div>
+    <div class="d-flex justify-content-end mb-3">
+
+
+      <b-button class="btn btn-danger"  @click="$refs['return-routine'].show()">
+        <i class="mdi mdi-cancel mr-2"></i>
+        Return Routine
+      </b-button>
     </div>
     <scale-loader v-if="apiBusy" />
     <div v-else class="row">
@@ -382,5 +409,32 @@ export default {
         </div>
       </div>
     </div>
+
+    <b-modal
+        ref="return-routine"
+        title="Return Routine ?"
+        hide-footer
+        centered
+        title-class="font-18"
+
+    >
+      <div class="modal-body">
+
+     <div class="alert alert-danger">
+          <strong>Warning!</strong> You are about to return this payroll routine.
+        </div>
+
+        <div class="d-flex justify-content-end mb-3">
+
+
+          <b-button class="btn btn-danger"  @click="unconfirmRoutine">
+            <i class="mdi mdi-cancel mr-2"></i>
+            Return Routine
+          </b-button>
+        </div>
+      </div>
+
+    </b-modal>
+
   </Layout>
 </template>
