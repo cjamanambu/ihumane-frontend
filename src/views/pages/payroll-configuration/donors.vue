@@ -13,7 +13,7 @@ export default {
   components: {
     Layout,
     PageHeader,
-    Multiselect
+    Multiselect,
   },
   mounted() {
     this.refreshTable();
@@ -33,7 +33,7 @@ export default {
           this.donors[index] = {
             sn: ++index,
             d_sector: donor.sector.department_name,
-            ...donor
+            ...donor,
           };
         });
         this.totalRows = this.donors.length;
@@ -41,8 +41,8 @@ export default {
     },
     getSectors() {
       this.apiGet(this.ROUTES.department, "Get sectors Error").then((res) => {
-        const { data } = res
-        const { departments} = data;
+        const { data } = res;
+        const { departments } = data;
         departments.map((sector) => {
           this.sectors.push({
             value: sector.department_id,
@@ -143,8 +143,8 @@ export default {
           disabled: "true",
         },
       ],
-      sectors:[],
-      sectorId:null,
+      sectors: [],
+      sectorId: null,
       donors: [],
       totalRows: 1,
       currentPage: 1,
@@ -157,7 +157,7 @@ export default {
       fields: [
         { key: "sn", label: "S/n", sortable: true },
         { key: "donor_code", label: "Donor Code", sortable: true },
-        { key: "d_sector", label: "Sector", sortable: true },
+        { key: "d_sector", label: "Sector (T3 Code)", sortable: true },
         {
           key: "donor_description",
           label: "Description",
@@ -293,8 +293,8 @@ export default {
             :options="sectors"
             :custom-label="locationLabel"
             :class="{
-                      'is-invalid': submitted && $v.sectorId.$error,
-                    }"
+              'is-invalid': submitted && $v.sectorId.$error,
+            }"
           ></multiselect>
         </b-form-group>
         <div class="form-group">
@@ -358,8 +358,8 @@ export default {
             :options="sectors"
             :custom-label="locationLabel"
             :class="{
-                      'is-invalid': submitted && $v.sectorId.$error,
-                    }"
+              'is-invalid': submitted && $v.sectorId.$error,
+            }"
           ></multiselect>
         </b-form-group>
         <div class="form-group">
