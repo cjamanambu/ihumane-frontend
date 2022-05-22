@@ -363,10 +363,26 @@ export default {
                 <h5 class="font-size-14 mb-0">Time Allocation</h5>
               </div>
               <div v-if="status">
-                <p v-for="(charge, index) in breakdown" :key="index">
-                  <span class="mr-4">Grant Code: {{ charge.ta_tcode }}</span>
-                  <span>Percentage Charge: {{ charge.ta_charge }}%</span>
-                </p>
+                <b-row>
+                  <b-col lg="6">
+                    <p v-for="(charge, index) in breakdown" :key="index">
+                      <span class="mr-4">
+                        Grant Code: {{ charge.ta_tcode }}
+                      </span>
+                      <span>Percentage Charge: {{ charge.ta_charge }}%</span>
+                    </p>
+                  </b-col>
+                  <b-col lg="6">
+                    <p v-for="(charge, index) in breakdown" :key="index">
+                      <span class="mr-4">
+                        Grant Code: {{ charge.ta_t0_code }}
+                      </span>
+                      <span>
+                        Percentage Charge: {{ parseInt(charge.ta_t0_percent) }}%
+                      </span>
+                    </p>
+                  </b-col>
+                </b-row>
               </div>
               <div v-else>
                 <TimeEffortForm
@@ -374,6 +390,7 @@ export default {
                   :pmy-month="pymMonth"
                   :pmy-year="pymYear"
                   @added-ta="viewTimesheet"
+                  @updated-ta="fetchPayroll"
                 />
               </div>
             </div>

@@ -33,7 +33,14 @@ export default {
               ref_no: time.ta_ref_no,
               payroll_month: time.ta_month,
               payroll_year: time.ta_year,
-              breakdown: [{ t1code: time.ta_tcode, charge: time.ta_charge }],
+              breakdown: [
+                {
+                  t1code: time.ta_tcode,
+                  charge: time.ta_charge,
+                  t0code: time.ta_t0_code,
+                  charge2: parseInt(time.ta_t0_percent),
+                },
+              ],
               status: time.ta_status ? time.ta_status : 0,
             });
           } else {
@@ -42,6 +49,8 @@ export default {
                 timeAllocation.breakdown.push({
                   t1code: time.ta_tcode,
                   charge: time.ta_charge,
+                  t0code: time.ta_t0_code,
+                  charge2: parseInt(time.ta_t0_percent),
                 });
                 found = true;
                 return false;
@@ -54,7 +63,14 @@ export default {
                 ref_no: time.ta_ref_no,
                 payroll_month: time.ta_month,
                 payroll_year: time.ta_year,
-                breakdown: [{ t1code: time.ta_tcode, charge: time.ta_charge }],
+                breakdown: [
+                  {
+                    t1code: time.ta_tcode,
+                    charge: time.ta_charge,
+                    t0code: time.ta_t0_code,
+                    charge2: parseInt(time.ta_t0_percent),
+                  },
+                ],
                 status: time.ta_status ? time.ta_status : 0,
               });
             }
@@ -114,7 +130,12 @@ export default {
         {
           key: "breakdown",
           label: "Percentage to Charge (T1)",
-          sortable: true,
+          sortable: false,
+        },
+        {
+          key: "breakdown-2",
+          label: "Percentage to Charge (T0)",
+          sortable: false,
         },
         {
           key: "status",
@@ -212,6 +233,16 @@ export default {
                   >
                     <span class="mr-3">T1 Code: {{ charge.t1code }}</span>
                     <span>Charge: {{ charge.charge }}%</span>
+                  </p>
+                </template>
+                <template #cell(breakdown-2)="row">
+                  <p
+                    class="mb-0"
+                    v-for="(charge, index) in row.item.breakdown"
+                    :key="index"
+                  >
+                    <span class="mr-3">T0 Code: {{ charge.t0code }}</span>
+                    <span>Charge: {{ charge.charge2 }}%</span>
                   </p>
                 </template>
                 <template #cell(status)="row">
