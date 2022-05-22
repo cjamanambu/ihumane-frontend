@@ -115,32 +115,54 @@ export default {
     },
     submit() {
       this.confirmTER = false;
-      let ta_ref_no, url;
+      let ta_ref_no, url, data;
       if (this.refNo) {
         ta_ref_no = this.refNo;
         url = `${this.ROUTES.timeAllocation}/update-time-allocation`;
+        data = [];
+        this.fields.forEach(async (field) => {
+          data.push({
+            ta_emp_id: this.getEmployee.emp_id,
+            ta_month: this.pmyMonth,
+            ta_year: this.pmyYear,
+            ta_tcode: field.grant,
+            ta_charge: field.charge,
+            ta_t0_code: field.match,
+            ta_t0_percent: field.matchCharge,
+            ta_ref_no,
+          });
+        });
+        this.apiPost(url, data, "Time Allocation Error").then(() => {
+          this.$emit("updated-ta");
+          this.apiResponseHandler("Process Complete", "Time Allocation Added");
+        });
       } else {
         ta_ref_no = Math.random().toString(36).slice(2);
         url = `${this.ROUTES.timeAllocation}/add-time-allocation`;
+        this.fields.forEach(async (field) => {
+          const data = {
+            ta_emp_id: this.getEmployee.emp_id,
+            ta_month: this.pmyMonth,
+            ta_year: this.pmyYear,
+            ta_tcode: field.grant,
+            ta_charge: field.charge,
+            ta_t0_code: field.match,
+            ta_t0_percent: field.matchCharge,
+            ta_ref_no,
+          };
+          await this.apiPost(url, data, "Time Allocation Error").then(() => {
+            this.$emit("added-ta");
+            this.apiResponseHandler(
+              "Process Complete",
+              "Time Allocation Added"
+            );
+          });
+        });
       }
-      this.fields.forEach(async (field) => {
-        const data = {
-          ta_emp_id: this.getEmployee.emp_id,
-          ta_month: this.pmyMonth,
-          ta_year: this.pmyYear,
-          ta_tcode: field.grant,
-          ta_charge: field.charge,
-          ta_t0_code: field.match,
-          ta_t0_percent: field.matchCharge,
-          ta_ref_no,
-        };
-        await this.apiPost(url, data, "Time Allocation Error").then();
-      });
-      this.$emit("added-ta");
-      this.apiResponseHandler("Process Complete", "Time Allocation Added");
     },
     populateFields() {
       if (this.breakdown && this.breakdown.length) {
+        console.log(this.breakdown);
         this.fields = [];
         this.refNo = this.breakdown[0].ta_ref_no;
         this.breakdown.forEach((entry, index) => {
