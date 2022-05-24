@@ -36,7 +36,7 @@ export default {
       const url = `${this.ROUTES.timesheet}/time-sheet/${month}/${year}/${empId}`;
 
       this.apiGet(url, "Get Time sheet authorization").then(async (res) => {
-        //console.log({ res });
+        console.log({ res });
         const { timesheet, timeAllocation, log } = res.data;
         this.timeSheet = timesheet;
         this.numAbsents = 0;
@@ -258,7 +258,7 @@ export default {
           <div class="card-body">
             <div class="p-3 bg-light mb-4 d-flex justify-content-between">
               <div class="d-inline mb-0">
-                <h5>Time Sheet</h5>
+                <h5 class="font-size-14 mb-0">Timesheet Entries</h5>
               </div>
               <small
                 v-if="this.ta_status === 1"
@@ -339,7 +339,7 @@ export default {
           <div class="card-body">
             <div class="p-3 bg-light mb-4 d-flex justify-content-between">
               <div class="d-inline mb-0">
-                <h5>Authorization Log</h5>
+                <h5 class="font-size-14 mb-0">Authorization Log</h5>
               </div>
             </div>
             <div class="row">
@@ -419,6 +419,14 @@ export default {
               <span>Grant Code: {{ charge.ta_tcode }}</span>
               <span>Percentage Charge: {{ charge.ta_charge }}%</span>
             </div>
+            <div
+              class="d-flex justify-content-between mb-2"
+              v-for="(charge, index) in breakdown"
+              :key="index"
+            >
+              <span>Match Code: {{ charge.ta_t0_code }}</span>
+              <span>Percentage Charge: {{ charge.ta_t0_percent }}%</span>
+            </div>
             <hr />
             <div
               class="text-danger d-flex justify-content-between mt-3"
@@ -427,9 +435,9 @@ export default {
               <strong class="d-inline-block">
                 Default Charge - {{ numAbsents }} absence(s)</strong
               >
-              <strong>{{
-                parseFloat(defaultCharge.toFixed(2)).toLocaleString()
-              }}</strong>
+              <strong>
+                {{ parseFloat(defaultCharge.toFixed(2)).toLocaleString() }}
+              </strong>
             </div>
           </div>
         </div>
