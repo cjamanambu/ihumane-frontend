@@ -20,11 +20,15 @@ export default {
   },
   methods: {
     refreshTable() {
+      //let currentDate = new Date();
       const url = `${this.ROUTES.leaveApplication}/approved-applications`;
       this.apiGet(url, "Get Leave Applications Error").then((res) => {
         const { data, officers } = res.data;
+        console.log(data)
         data.forEach((leave, index) => {
-          this.applications[index] = { sn: ++index, ...leave };
+          //let setDate = new Date(leave.leapp_start_date)
+            this.applications[index] = { sn: ++index, ...leave };
+
         });
         this.applications.forEach((application) => {
           officers.forEach((officer) => {
@@ -171,20 +175,25 @@ export default {
                     {{ row.value.emp_unique_id }}
                   </small>
                 </template>
+
                 <template #cell(LeaveType)="row">
                   <p class="mb-0">
                     {{ row.value.leave_name }}
                   </p>
                 </template>
+
                 <template #cell(leapp_start_date)="row">
                   <span> {{ new Date(row.value).toDateString() }}</span>
                 </template>
+
                 <template #cell(leapp_end_date)="row">
                   <span> {{ new Date(row.value).toDateString() }}</span>
                 </template>
+
                 <template #cell(leapp_total_days)="row">
                   <span> {{ row.value }} days</span>
                 </template>
+
                 <template #cell(Officer)="row">
                   <p class="mb-0">
                     {{ row.value.emp_first_name }} {{ row.value.emp_last_name }}
@@ -193,20 +202,16 @@ export default {
                     {{ row.value.emp_unique_id }}
                   </small>
                 </template>
+
                 <template #cell(leapp_status)="row">
-                  <span v-if="row.value === 0" class="text-warning">
-                    PENDING
+                  <span v-if="new Date(row.value) < new Date().getTime()" class="text-success">
+                    INACTIVE
                   </span>
-                  <span v-else-if="row.value === 1" class="text-success">
-                    APPROVED
-                  </span>
-                  <span v-else-if="row.value === 2" class="text-danger">
-                    DECLINED
-                  </span>
-                  <span v-else-if="row.value === 3" class="text-primary">
+
+                  <span v-else-if="new Date(row.value) > new Date().getTime()" class="text-primary">
                     ACTIVE
                   </span>
-                  <span v-else-if="row.value === 4" class="text-info">
+                  <span v-if=" new Date(row.value) > new Date().getTime()" class="text-info">
                     FINISHED
                   </span>
                 </template>
