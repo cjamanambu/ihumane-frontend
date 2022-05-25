@@ -443,7 +443,7 @@ export default {
                           {{ logEntry.officers.emp_last_name }}
                         </span>
                       </b-td>
-                      <b-td style="width: 15%">
+                      <b-td style="width: 2%">
                         <span
                           v-if="logEntry.auth_status === 0"
                           class="text-warning"
@@ -473,10 +473,10 @@ export default {
                           {{ logEntry.role.ar_title }}
                         </span>
                       </b-td>
-                      <b-td style="width: 40%" v-else>
+                      <b-td style="width: 20%" v-else>
                         <span> --- </span>
                       </b-td>
-                      <b-td style="width: 20%">
+                      <b-td style="width: 40%">
                         <span>
                           {{ new Date(logEntry.updatedAt).toDateString() }}
                           {{
