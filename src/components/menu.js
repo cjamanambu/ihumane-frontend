@@ -355,7 +355,7 @@ export const menuItems = [
       {
         id: 30,
         label: "Salary Mapping",
-        link: "/approve-payroll",
+        link: "/salary-mapping",
       },
       {
         id: 30,
