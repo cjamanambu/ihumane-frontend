@@ -77,7 +77,7 @@ export default [
       import("@/views/pages/self-service/travel-application-details"),
   },
   {
-    path: "/manage-time-sheet-details/:month/:year",
+    path: "/manage-time-sheet-details/:month/:year/:empId",
     name: "manage-time-sheet-details",
     meta: {
       authRequired: true,
