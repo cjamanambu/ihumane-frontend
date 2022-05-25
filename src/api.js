@@ -2,7 +2,7 @@ import axios from "axios";
 
 export const API = axios.create({
   //baseURL: `https://irc-api.ihumane.net/`,
-  //baseURL: `http://localhost:9811/`,
+  //baseURL: `http://localhost:8000/`,
   baseURL: `https://api.ircng.org`,
 });
 
@@ -70,4 +70,5 @@ export const ROUTES = {
   leaveDoc: `leavedoc`,
   notifications: `notifications`,
   endYearResponse: `end-year-response`,
+  payrollJournal: 'payroll-journal'
 };

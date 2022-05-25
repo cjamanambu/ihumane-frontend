@@ -9,6 +9,7 @@ import selfService from "./routes/self-service";
 import variation from "@/router/routes/variation";
 import assessment from "./routes/assessment";
 import payrollRoutine from "./routes/payroll-routine";
+import payrollJournal from "./routes/payroll-journal"
 import report from "./routes/report";
 
 export default [
@@ -32,4 +33,5 @@ export default [
   ...assessment,
   ...payrollRoutine,
   ...report,
+  ...payrollJournal
 ];
