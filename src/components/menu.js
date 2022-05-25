@@ -341,6 +341,29 @@ export const menuItems = [
       },
     ],
   },
+
+  {
+    id: 27,
+    label: "Payroll Journal",
+    icon: " ri-exchange-funds-line",
+    subItems: [
+      {
+        id: 28,
+        label: "Journal Code Setup",
+        link: "/journal-code",
+      },
+      {
+        id: 30,
+        label: "Salary Mapping",
+        link: "/approve-payroll",
+      },
+      {
+        id: 30,
+        label: "Journals",
+        link: "/approve-payroll",
+      },
+    ],
+  },
   {
     id: 2,
     label: "Reports",
