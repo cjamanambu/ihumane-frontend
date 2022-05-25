@@ -261,6 +261,12 @@ export default {
         params: { date: dateInfo.dateStr },
       });
     },
+    viewTimesheets() {
+      // const payrollMY = `${this.pymYear}-${this.pymMonth}`;
+      this.$router.push({
+        name: "timesheets",
+      });
+    },
     viewTimesheet() {
       const payrollMY = `${this.pymYear}-${this.pymMonth}`;
       this.$router.push({
@@ -383,7 +389,7 @@ export default {
                   <TimeEffortForm
                     :pmy-month="pymMonth"
                     :pmy-year="pymYear"
-                    @added-ta="viewTimesheet"
+                    @added-ta="viewTimesheets"
                   />
                 </div>
               </div>
