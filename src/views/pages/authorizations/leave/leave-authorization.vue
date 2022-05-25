@@ -22,6 +22,7 @@ export default {
   mounted() {
     this.fetchRequest();
     this.getAuthorizingRoles(1); //leave app
+    this.fetchLeaveDocuments();
   },
   validations: {
     comment: { required },
@@ -34,6 +35,13 @@ export default {
       const url = `${this.ROUTES.leaveApplication}/${requestID}`;
       this.apiGet(url, "Get Leave Application").then((res) => {
         const { application, log } = res.data;
+        //console.log(log)
+        log.map(lg=>{
+          if(lg.auth_officer_id == this.getEmployee.emp_id){
+            this.reviewStatus = lg.auth_status;
+          }
+        });
+        //console.log(this.reviewStatus);
         this.application = application;
         this.getLocation(application.employee.emp_location_id);
         this.getSector(application.employee.emp_job_role_id);
@@ -94,6 +102,23 @@ export default {
         });
       });
     },
+    fetchLeaveDocuments() {
+      const leaveApplicationID = this.$route.params.leaveAppID;
+      const url = `${this.ROUTES.leaveDoc}/${leaveApplicationID}`;
+      this.apiGet(url, "Get Supporting Documents Error").then((res) => {
+        const { data } = res;
+        data.forEach((doc, index) => {
+          this.supportingDocs[index] = { sn: ++index, ...doc };
+        });
+        this.totalRows = this.supportingDocs.length;
+        //this.fetchLeaveApplication();
+      });
+    },
+    selectRow(row) {
+      row = row[0];
+      window.open(`${row.leavedoc_url}`);
+      this.$refs["employee-doc-table"].clearSelected();
+    },
     submit(type) {
       this.submitted = true;
       if (this.type === "approve") {
@@ -153,6 +178,7 @@ export default {
         },
       ],
       application: null,
+      supportingDocs: [],
       log: [],
       roles: [
         {
@@ -172,10 +198,33 @@ export default {
           disabled: true,
         },
       ],
+      totalRows: 1,
+      currentPage: 1,
+      perPage: 10,
+      pageOptions: [10, 25, 50, 100],
+      filter: null,
+      filterOn: [],
+      sortBy: "sn",
+      sortDesc: false,
+      fields: [
+        { key: "sn", label: "S/n", sortable: true, thStyle: { width: "5%" } },
+        {
+          key: "leavedoc_filename",
+          label: "File Name",
+          sortable: true,
+          thStyle: { width: "65%" },
+        },
+        {
+          key: "createdAt",
+          label: "Uploaded At",
+          sortable: true,
+        },
+      ],
       submitted: false,
       status: null,
       approving: false,
       declining: false,
+      reviewStatus:null,
     };
   },
 };
@@ -283,6 +332,94 @@ export default {
           <div class="card-body">
             <div class="p-3 bg-light mb-4 d-flex justify-content-between">
               <div class="d-inline mb-0">
+                <h5 class="font-size-14 mb-0">Supporting Documents</h5>
+              </div>
+            </div>
+            <div class="row mt-4">
+              <div class="col-sm-12 col-md-6">
+                <div id="tickets-table_length" class="dataTables_length">
+                  <label class="d-inline-flex align-items-center">
+                    Show&nbsp;
+                    <b-form-select
+                      v-model="perPage"
+                      size="sm"
+                      :options="pageOptions"
+                    ></b-form-select
+                    >&nbsp;entries
+                  </label>
+                </div>
+              </div>
+              <!-- Search -->
+              <div class="col-sm-12 col-md-6">
+                <div
+                  id="tickets-table_filter"
+                  class="dataTables_filter text-md-right"
+                >
+                  <label class="d-inline-flex align-items-center">
+                    Search:
+                    <b-form-input
+                      v-model="filter"
+                      type="search"
+                      placeholder="Search..."
+                      class="form-control form-control-sm ml-2"
+                    ></b-form-input>
+                  </label>
+                </div>
+              </div>
+              <!-- End search -->
+            </div>
+            <div v-if="supportingDocs.length > 0" class="table-responsive mb-0">
+              <b-table
+                ref="employee-doc-table"
+                bordered
+                selectable
+                hover
+                :items="supportingDocs"
+                :fields="fields"
+                responsive="sm"
+                :per-page="perPage"
+                :current-page="currentPage"
+                :sort-by.sync="sortBy"
+                :sort-desc.sync="sortDesc"
+                :filter="filter"
+                :filter-included-fields="filterOn"
+                @filtered="onFiltered"
+                show-empty
+                select-mode="single"
+                @row-selected="selectRow"
+              >
+                <template #cell(createdAt)="row">
+                  <span>
+                    {{ new Date(row.value).toDateString() }}
+                  </span>
+                  <span>
+                    {{ new Date(row.value).toLocaleTimeString("en") }}
+                  </span>
+                </template>
+              </b-table>
+            </div>
+            <div class="row">
+              <div class="col">
+                <div
+                  class="dataTables_paginate paging_simple_numbers float-right"
+                >
+                  <ul class="pagination pagination-rounded mb-0">
+                    <!-- pagination -->
+                    <b-pagination
+                      v-model="currentPage"
+                      :total-rows="totalRows"
+                      :per-page="perPage"
+                    ></b-pagination>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card mt-4">
+          <div class="card-body">
+            <div class="p-3 bg-light mb-4 d-flex justify-content-between">
+              <div class="d-inline mb-0">
                 <h5 class="font-size-14 mb-0">Authorization Log</h5>
               </div>
             </div>
@@ -292,9 +429,9 @@ export default {
                   <b-thead head-variant="light">
                     <b-tr>
                       <b-th>OFFICER</b-th>
-                      <b-th>STATUS</b-th>
+                      <b-th thStyle="width: 30px;">STATUS</b-th>
                       <b-th>COMMENT</b-th>
-                      <b-th>Authorized As</b-th>
+                      <b-th >Authorized As</b-th>
                       <b-th>DATE</b-th>
                     </b-tr>
                   </b-thead>
@@ -306,7 +443,7 @@ export default {
                           {{ logEntry.officers.emp_last_name }}
                         </span>
                       </b-td>
-                      <b-td style="width: 15%">
+                      <b-td style="width: 2%">
                         <span
                           v-if="logEntry.auth_status === 0"
                           class="text-warning"
@@ -336,10 +473,10 @@ export default {
                           {{ logEntry.role.ar_title }}
                         </span>
                       </b-td>
-                      <b-td style="width: 40%" v-else>
+                      <b-td style="width: 20%" v-else>
                         <span> --- </span>
                       </b-td>
-                      <b-td style="width: 20%">
+                      <b-td style="width: 40%">
                         <span>
                           {{ new Date(logEntry.updatedAt).toDateString() }}
                           {{
@@ -394,10 +531,10 @@ export default {
               <span>T6 Code</span>
               <span> {{ t6 }} </span>
             </div>
-            <div v-if="status" class="d-flex justify-content-between mb-3">
+            <div v-if="reviewStatus" class="d-flex justify-content-between mb-3">
               <span>Status</span>
-              <span v-if="status === 1" class="text-success">Approved</span>
-              <span v-else-if="status === 2" class="text-danger">Declined</span>
+              <span v-if="reviewStatus === 1" class="text-success">Approved</span>
+              <span v-else-if="reviewStatus === 2" class="text-danger">Declined</span>
             </div>
             <div v-else>
               <b-form-group>
