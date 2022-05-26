@@ -50,6 +50,7 @@ export default {
       start: "",
       end: "",
       duration: 0,
+      breakDuration: 0,
       submitted: false,
       isPresent: true,
       update: false,
@@ -73,10 +74,10 @@ export default {
     getTimesheetData() {
       const employeeID = this.getEmployee.emp_id;
       const date = this.$route.params.date;
+      const day = new Date(date).getDay();
       const url = `${this.ROUTES.timesheet}/get-time-sheet/${employeeID}/${date}`;
       this.apiGet(url).then((res) => {
         const { data } = res;
-        console.log({ data });
         if (data) {
           this.start = data.ts_start;
           this.end = data.ts_end;
@@ -84,12 +85,24 @@ export default {
           data.ts_is_present
             ? (this.isPresent = true)
             : (this.isPresent = false);
+          if (day !== 5) {
+            this.breakDuration = 45;
+          }
+          this.getTimeDiff();
         }
       });
     },
+    getTimeDiff() {
+      let start = new Date("01/01/2007 " + this.start);
+      let end = new Date("01/01/2007 " + this.end);
+      let hourDiff = (end - start) / 60 / 1000;
+      hourDiff = hourDiff - this.breakDuration;
+      let hour = Math.floor(hourDiff / 60);
+      let min = hourDiff % 60;
+      this.duration = parseFloat(`${hour}.${min}`);
+    },
     submit() {
       const url = `${this.ROUTES.timesheet}/add-time-sheet`;
-
       if (this.isPresent) {
         this.submitted = true;
         this.$v.$touch();
@@ -113,6 +126,7 @@ export default {
             }
             this.$v.$reset();
             this.getTimesheetData();
+            this.$router.push({ name: "timesheet" });
           });
         }
       } else {
@@ -133,6 +147,7 @@ export default {
           }
           this.$v.$reset();
           this.getTimesheetData();
+          this.$router.push({ name: "timesheet" });
         });
       }
     },
@@ -176,7 +191,7 @@ export default {
     </div>
     <scale-loader v-if="apiBusy" />
     <div v-else class="row">
-      <div class="col-lg-7">
+      <div class="col-lg-8">
         <div class="card">
           <div class="card-body">
             <div
@@ -206,6 +221,7 @@ export default {
                       type="time"
                       :disabled="!isPresent"
                       v-model="start"
+                      @input="getTimeDiff"
                       class="form-control"
                       :class="{
                         'is-invalid': submitted && $v.start.$error,
@@ -232,6 +248,7 @@ export default {
                       :disabled="!isPresent"
                       class="form-control"
                       v-model="end"
+                      @input="getTimeDiff"
                       :class="{
                         'is-invalid': submitted && $v.end.$error,
                       }"
@@ -256,7 +273,7 @@ export default {
                       type="number"
                       class="form-control"
                       :disabled="!isPresent"
-                      step=".01"
+                      step=".05"
                       v-model="duration"
                       :class="{
                         'is-invalid': submitted && $v.duration.$error,
@@ -296,7 +313,7 @@ export default {
           </div>
         </div>
       </div>
-      <div class="col-lg-5">
+      <div class="col-lg-4">
         <div class="card">
           <div class="card-body">
             <div class="p-3 bg-light mb-4">
@@ -343,7 +360,9 @@ export default {
             </div>
             <div class="d-flex justify-content-between">
               <p>Break Hours</p>
-              <p v-if="timesheetDate.getDay() === 5">-</p>
+              <p v-if="timesheetDate.getDay() === 5">
+                {{ breakDuration }} mins
+              </p>
               <p
                 v-else-if="
                   timesheetDate.getDay() === 0 || timesheetDate.getDay() === 6
@@ -351,7 +370,7 @@ export default {
               >
                 WEEKEND
               </p>
-              <p v-else>45mins</p>
+              <p v-else>{{ breakDuration }} mins</p>
             </div>
             <div class="d-flex justify-content-between">
               <p>Hours Worked</p>
@@ -362,7 +381,7 @@ export default {
               >
                 WEEKEND
               </p>
-              <p v-else>{{ duration }}</p>
+              <p v-else>{{ duration }} hrs</p>
             </div>
           </div>
         </div>

@@ -8,9 +8,9 @@ export default {
       invalidCharge: false,
       invalidMatchCharge: false,
       sum: 100,
-      matchSum: 100,
+      matchSum: 0,
       fields: [
-        { id: 0, grant: null, charge: 100, match: null, matchCharge: 100 },
+        { id: 0, grant: null, charge: 100, match: null, matchCharge: 0 },
       ],
       confirmTER: false,
       donor: null,
@@ -59,13 +59,12 @@ export default {
     },
     addField() {
       this.fields[0].charge--;
-      this.fields[0].matchCharge--;
       this.fields.push({
         id: this.count,
         grant: null,
         charge: 1,
         match: null,
-        matchCharge: 1,
+        matchCharge: 0,
       });
       this.count++;
     },
@@ -85,7 +84,9 @@ export default {
         this.matchSum += parseInt(field.matchCharge);
       });
       this.invalidCharge = this.sum !== 100;
-      this.invalidMatchCharge = this.matchSum !== 100;
+      this.matchSum > 0 && this.matchSum !== 100
+        ? (this.invalidMatchCharge = true)
+        : (this.invalidMatchCharge = false);
     },
     confirm() {
       let valid = this.fields.every((field) => {
@@ -162,7 +163,6 @@ export default {
     },
     populateFields() {
       if (this.breakdown && this.breakdown.length) {
-        console.log(this.breakdown);
         this.fields = [];
         this.refNo = this.breakdown[0].ta_ref_no;
         this.breakdown.forEach((entry, index) => {
@@ -202,7 +202,7 @@ export default {
             v-model="field.matchCharge"
             type="number"
             class="form-control"
-            min="1"
+            min="0"
             max="100"
             @input="calc()"
           />
@@ -222,7 +222,7 @@ export default {
               type="number"
               class="form-control"
               id="charge"
-              min="1"
+              min="0"
               max="100"
               @input="calc()"
             />

@@ -34,9 +34,8 @@ export default {
       let year = this.$route.params.year;
       let empId = this.$route.params.empId;
       const url = `${this.ROUTES.timesheet}/time-sheet/${month}/${year}/${empId}`;
-
       this.apiGet(url, "Get Time sheet authorization").then(async (res) => {
-        //console.log({ res });
+        console.log({ res });
         const { timesheet, timeAllocation, log } = res.data;
         this.timeSheet = timesheet;
         this.numAbsents = 0;
@@ -62,6 +61,7 @@ export default {
             this.my_status = this.log[i].auth_status;
           }
         }
+        this.fetchEmployees();
       });
     },
     authorizingAsLabel({ text }) {
@@ -84,6 +84,7 @@ export default {
     },
     getAuthorizingRoles(type) {
       //1=leave,2=time sheet,3=travel
+      this.roles = [];
       const url = `${this.ROUTES.authorizationRole}/${type}`;
       this.apiGet(url, "Couldn't get authorizing roles").then((res) => {
         const { data } = res;
@@ -163,6 +164,25 @@ export default {
         //alert("Comment: "+this.comment+" val: "+val);
       }
     },*/
+    fetchEmployees() {
+      this.apiGet(this.ROUTES.employee, "Get Employees Error").then((res) => {
+        this.officials = [];
+        const { data } = res;
+        console.log(data);
+        data.forEach((employee) => {
+          if (
+            employee.emp_id !== this.allocation.Employee.emp_id &&
+            employee.emp_id !== this.getEmployee.emp_id
+          ) {
+            this.officials.push({
+              value: employee.emp_id,
+              text: `${employee.emp_first_name} ${employee.emp_last_name} (${employee.emp_unique_id})`,
+              disabled: false,
+            });
+          }
+        });
+      });
+    },
     tConvert(time) {
       // Check correct time format and split into components
       time = time
@@ -210,26 +230,14 @@ export default {
       allocationId: null,
       ref_no: null,
       ta_status: null,
-      roles: [
-        {
-          value: null,
-          text: "Authorizing as...",
-          disabled: true,
-        },
-      ],
+      roles: [],
       type: null,
       submitted: false,
       status: null,
       approving: false,
       declining: false,
       roleId: null,
-      officials: [
-        {
-          value: null,
-          text: "Please choose the next reviewer",
-          disabled: "true",
-        },
-      ],
+      officials: [],
       breakdown: [],
       currentEmployee: null,
       numAbsents: 0,
@@ -258,7 +266,7 @@ export default {
           <div class="card-body">
             <div class="p-3 bg-light mb-4 d-flex justify-content-between">
               <div class="d-inline mb-0">
-                <h5>Time Sheet</h5>
+                <h5 class="font-size-14 mb-0">Timesheet Entries</h5>
               </div>
               <small
                 v-if="this.ta_status === 1"
@@ -339,7 +347,7 @@ export default {
           <div class="card-body">
             <div class="p-3 bg-light mb-4 d-flex justify-content-between">
               <div class="d-inline mb-0">
-                <h5>Authorization Log</h5>
+                <h5 class="font-size-14 mb-0">Authorization Log</h5>
               </div>
             </div>
             <div class="row">
@@ -419,7 +427,15 @@ export default {
               <span>Grant Code: {{ charge.ta_tcode }}</span>
               <span>Percentage Charge: {{ charge.ta_charge }}%</span>
             </div>
-            <hr />
+            <div
+              class="d-flex justify-content-between mb-2"
+              v-for="(charge, index) in breakdown"
+              :key="index"
+            >
+              <span>Match Code: {{ charge.ta_t0_code }}</span>
+              <span>Percentage Charge: {{ charge.ta_t0_percent }}%</span>
+            </div>
+            <hr v-if="defaultCharge > 0" />
             <div
               class="text-danger d-flex justify-content-between mt-3"
               v-if="defaultCharge > 0"
@@ -427,9 +443,9 @@ export default {
               <strong class="d-inline-block">
                 Default Charge - {{ numAbsents }} absence(s)</strong
               >
-              <strong>{{
-                parseFloat(defaultCharge.toFixed(2)).toLocaleString()
-              }}</strong>
+              <strong>
+                {{ parseFloat(defaultCharge.toFixed(2)).toLocaleString() }}
+              </strong>
             </div>
           </div>
         </div>
@@ -533,6 +549,7 @@ export default {
                     v-model="roleId"
                     :options="roles"
                     :custom-label="authorizingAsLabel"
+                    placeholder="Authorizing as..."
                     :class="{
                       'is-invalid': submitted && $v.roleId.$error,
                     }"
@@ -542,6 +559,7 @@ export default {
                   <multiselect
                     v-model="official"
                     :options="officials"
+                    placeholder="Please choose the next reviewer"
                     :custom-label="nextAuthorizingOfficer"
                     :class="{
                       'is-invalid': submitted && $v.official.$error,
@@ -549,8 +567,15 @@ export default {
                   ></multiselect>
                 </b-form-group>
                 <div>
-                  <button class="btn btn-success w-100 mr-3">
+                  <button
+                    v-if="!submitting"
+                    @click="submit('forward')"
+                    class="btn btn-success w-100 mr-3"
+                  >
                     Forward Request
+                  </button>
+                  <button v-else disabled class="btn btn-success w-100 mr-3">
+                    Forwarding...
                   </button>
                 </div>
               </div>

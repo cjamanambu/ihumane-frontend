@@ -89,11 +89,13 @@ export default {
     },
     selectRow(row) {
       row = row[0];
+      console.log({ row });
       const month = `${row.payroll_month}`;
       const year = `${row.payroll_year}`;
+      const empId = row.employee.emp_id;
       this.$router.push({
         name: "manage-time-sheet-details",
-        params: { month, year },
+        params: { month, year, empId },
       });
     },
   },
@@ -127,11 +129,6 @@ export default {
         {
           key: "employee",
           label: "Employee",
-          sortable: true,
-        },
-        {
-          key: "ref_no",
-          label: "Ref No",
           sortable: true,
         },
         { key: "payroll_month", label: "Payroll Month", sortable: true },
@@ -228,9 +225,6 @@ export default {
                   <small>
                     {{ row.value.emp_unique_id }}
                   </small>
-                </template>
-                <template #cell(ref_no)="row">
-                  <span class="text-uppercase">{{ row.value }}</span>
                 </template>
                 <template #cell(payroll_month)="row">
                   <span>{{ (parseFloat(row.value) - 1) | getMonth }}</span>

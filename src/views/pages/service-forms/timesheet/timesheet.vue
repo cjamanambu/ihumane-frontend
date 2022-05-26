@@ -153,29 +153,29 @@ export default {
         } else {
           let calendarApi = this.$refs.fullCalendar.getApi();
           let entryObj = {};
-          this.groupedPublicHolidays.forEach((publicHoliday) => {
-            let month, endMonth, day, endDay;
+          this.publicHolidays.forEach((publicHoliday) => {
+            let month, day;
             publicHoliday.ph_month.length === 1
               ? (month = `0${publicHoliday.ph_month}`)
               : (month = publicHoliday.ph_month);
             publicHoliday.ph_day.length === 1
               ? (day = `0${publicHoliday.ph_day}`)
               : (day = publicHoliday.ph_day);
-            publicHoliday.ph_to_month.toString().length === 1
-              ? (endMonth = `0${publicHoliday.ph_to_month}`)
-              : (endMonth = publicHoliday.ph_to_month);
-            publicHoliday.ph_to_day.toString().length === 1
-              ? (endDay = `0${publicHoliday.ph_to_day}`)
-              : (endDay = publicHoliday.ph_to_day);
+            // publicHoliday.ph_to_month.toString().length === 1
+            //   ? (endMonth = `0${publicHoliday.ph_to_month}`)
+            //   : (endMonth = publicHoliday.ph_to_month);
+            // publicHoliday.ph_to_day.toString().length === 1
+            //   ? (endDay = `0${publicHoliday.ph_to_day}`)
+            //   : (endDay = publicHoliday.ph_to_day);
             let startDate = `${publicHoliday.ph_year}-${month}-${day}`;
-            let endDate = `${publicHoliday.ph_to_year}-${endMonth}-${
-              endDay + 1
-            }`;
+            // let endDate = `${publicHoliday.ph_to_year}-${endMonth}-${
+            //   endDay + 1
+            // }`;
             entryObj = {
               id: this.entryCount++,
               start: startDate,
-              end: endDate,
-              display: "background",
+              end: startDate,
+              display: "block",
               backgroundColor: "red",
               title: `${publicHoliday.ph_name} Public Holiday`,
             };
@@ -259,6 +259,12 @@ export default {
       this.$router.push({
         name: "timesheet-entry",
         params: { date: dateInfo.dateStr },
+      });
+    },
+    viewTimesheets() {
+      // const payrollMY = `${this.pymYear}-${this.pymMonth}`;
+      this.$router.push({
+        name: "timesheets",
       });
     },
     viewTimesheet() {
@@ -383,7 +389,7 @@ export default {
                   <TimeEffortForm
                     :pmy-month="pymMonth"
                     :pmy-year="pymYear"
-                    @added-ta="viewTimesheet"
+                    @added-ta="viewTimesheets"
                   />
                 </div>
               </div>
