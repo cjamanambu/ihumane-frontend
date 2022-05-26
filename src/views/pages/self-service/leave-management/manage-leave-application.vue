@@ -292,34 +292,6 @@ export default {
           <div class="card-body" v-if="application">
             <div class="p-3 bg-light mb-4 d-flex justify-content-between">
               <div class="d-inline mb-0">
-                <h5 class="font-size-14 mb-0">Employee Details</h5>
-              </div>
-            </div>
-            <div class="d-flex justify-content-between mb-3">
-              <span>Employee Name</span>
-              <span>
-                {{ application.employee.emp_first_name }}
-                {{ application.employee.emp_last_name }}
-              </span>
-            </div>
-            <div class="d-flex justify-content-between mb-3">
-              <span>Phone No.</span>
-              <span> {{ application.employee.emp_phone_no }} </span>
-            </div>
-            <div class="d-flex justify-content-between mb-3">
-              <span>Office Email</span>
-              <span> {{ application.employee.emp_office_email }} </span>
-            </div>
-            <div class="d-flex justify-content-between mb-3">
-              <span>T7 Number</span>
-              <span> {{ application.employee.emp_unique_id }} </span>
-            </div>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-body" v-if="application">
-            <div class="p-3 bg-light mb-4 d-flex justify-content-between">
-              <div class="d-inline mb-0">
                 <h5 class="font-size-14 mb-0">Leave Details</h5>
               </div>
               <span class="d-inline mb-0">
@@ -406,6 +378,15 @@ export default {
                   <p class="text-muted">
                     {{ application.leapp_total_days }} days
                   </p>
+                </div>
+              </div>
+              <div class="col-lg-4">
+                <div class="form-group">
+                  <label for=""> Status </label> :
+                  <label v-if=" new Date().getTime() >= new Date(application.leapp_start_date).getTime() " class="badge badge-primary">ACTIVE</label>
+                  <label v-else-if="new Date().getTime() <= new Date(application.leapp_start_date).getTime()  " class="badge badge-warning">INACTIVE</label>
+                  <label v-else-if="new Date().getTime() > new Date(application.leapp_end_date).getTime()  " class="badge badge-success">FINISHED</label>
+
                 </div>
               </div>
             </div>
@@ -688,42 +669,30 @@ export default {
       </div>
       <div class="col-lg-4">
         <div class="card">
-          <div class="card-body">
+          <div class="card-body" v-if="application">
             <div class="p-3 bg-light mb-4 d-flex justify-content-between">
               <div class="d-inline mb-0">
-                <h5 class="font-size-14 mb-0">Update Status</h5>
+                <h5 class="font-size-14 mb-0">Employee Details</h5>
               </div>
             </div>
-            <div class="row">
-              <div class="col-12">
-                <form @submit.prevent="updateLeaveStatus">
-                  <div class="form-group">
-                    <label for="">
-                      Status <span class="text-danger">*</span>
-                    </label>
-                    <b-form-select
-                      v-model="selected"
-                      :options="options"
-                    ></b-form-select>
-                  </div>
-
-                  <b-button
-                    v-if="!submitting"
-                    class="btn btn-success btn-block mt-4"
-                    type="submit"
-                  >
-                    Submit
-                  </b-button>
-                  <b-button
-                    v-else
-                    disabled
-                    class="btn btn-success btn-block mt-4"
-                    type="submit"
-                  >
-                    Submitting...
-                  </b-button>
-                </form>
-              </div>
+            <div class="d-flex justify-content-between mb-3">
+              <span>Employee Name</span>
+              <span>
+                {{ application.employee.emp_first_name }}
+                {{ application.employee.emp_last_name }}
+              </span>
+            </div>
+            <div class="d-flex justify-content-between mb-3">
+              <span>Phone No.</span>
+              <span> {{ application.employee.emp_phone_no }} </span>
+            </div>
+            <div class="d-flex justify-content-between mb-3">
+              <span>Office Email</span>
+              <span> {{ application.employee.emp_office_email }} </span>
+            </div>
+            <div class="d-flex justify-content-between mb-3">
+              <span>T7 Number</span>
+              <span> {{ application.employee.emp_unique_id }} </span>
             </div>
           </div>
         </div>
