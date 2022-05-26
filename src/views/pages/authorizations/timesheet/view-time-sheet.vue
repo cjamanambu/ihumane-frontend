@@ -311,26 +311,41 @@ export default {
                           }}
                         </td>
                         <td>
-                          <span v-if="ts.ts_is_present">{{
-                            tConvert(ts.ts_start)
-                          }}</span>
+                          <span v-if="ts.ts_is_present === 1">
+                            {{ tConvert(ts.ts_start) }}
+                          </span>
                           <span v-else>-</span>
                         </td>
                         <td>
-                          <span v-if="ts.ts_is_present">{{
-                            tConvert(ts.ts_end)
-                          }}</span>
+                          <span v-if="ts.ts_is_present === 1">
+                            {{ tConvert(ts.ts_end) }}
+                          </span>
                           <span v-else>-</span>
                         </td>
                         <td>
-                          <span v-if="ts.ts_is_present">
+                          <span v-if="ts.ts_is_present === 1">
                             {{ ts.ts_duration }} hrs
                           </span>
                           <span v-else>-</span>
                         </td>
                         <td style="width: 10%">
-                          <small class="text-success" v-if="ts.ts_is_present">
+                          <small
+                            class="text-success"
+                            v-if="ts.ts_is_present === 1"
+                          >
                             PRESENT
+                          </small>
+                          <small
+                            class="text-primary"
+                            v-else-if="ts.ts_is_present === 2"
+                          >
+                            P. HOLIDAY
+                          </small>
+                          <small
+                            class="text-warning"
+                            v-else-if="ts.ts_is_present === 3"
+                          >
+                            WEEKEND
                           </small>
                           <small class="text-danger" v-else>ABSENT</small>
                         </td>
@@ -541,6 +556,7 @@ export default {
                   <b-form-textarea
                     rows="5"
                     no-resize
+                    v-model="comment"
                     placeholder="Leave your comments here.."
                   />
                 </b-form-group>

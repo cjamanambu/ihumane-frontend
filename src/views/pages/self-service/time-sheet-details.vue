@@ -205,20 +205,56 @@ export default {
                           }}
                         </td>
                         <td>
-                          <span v-if="parseInt(ts.ts_start)">
+                          <span v-if="ts.ts_is_present === 1">
                             {{ tConvert(ts.ts_start) }}
                           </span>
-                          <span v-else class="text-danger">ABSENT</span>
-                        </td>
-                        <td>
-                          <span v-if="parseInt(ts.ts_end)">
-                            {{ tConvert(ts.ts_end) }}
+                          <span
+                            class="text-primary"
+                            v-else-if="ts.ts_is_present === 2"
+                          >
+                            P. HOLIDAY
+                          </span>
+                          <span
+                            class="text-warning"
+                            v-else-if="ts.ts_is_present === 3"
+                          >
+                            WEEKEND
                           </span>
                           <span v-else class="text-danger">ABSENT</span>
                         </td>
                         <td>
-                          <span v-if="parseInt(ts.ts_duration)">
-                            {{ ts.ts_duration }} hrs
+                          <span v-if="ts.ts_is_present === 1">
+                            {{ tConvert(ts.ts_end) }}
+                          </span>
+                          <span
+                            class="text-primary"
+                            v-else-if="ts.ts_is_present === 2"
+                          >
+                            P. HOLIDAY
+                          </span>
+                          <span
+                            class="text-warning"
+                            v-else-if="ts.ts_is_present === 3"
+                          >
+                            WEEKEND
+                          </span>
+                          <span v-else class="text-danger">ABSENT</span>
+                        </td>
+                        <td>
+                          <span v-if="ts.ts_is_present === 1">
+                            {{ tConvert(ts.ts_duration) }} hrs
+                          </span>
+                          <span
+                            class="text-primary"
+                            v-else-if="ts.ts_is_present === 2"
+                          >
+                            P. HOLIDAY
+                          </span>
+                          <span
+                            class="text-warning"
+                            v-else-if="ts.ts_is_present === 3"
+                          >
+                            WEEKEND
                           </span>
                           <span v-else class="text-danger">ABSENT</span>
                         </td>
