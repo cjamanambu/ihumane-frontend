@@ -24,10 +24,12 @@ export default {
       const url = `${this.ROUTES.leaveApplication}/approved-applications`;
       this.apiGet(url, "Get Leave Applications Error").then((res) => {
         const { data, officers } = res.data;
-        console.log(data)
+        //console.log(data)
+        let status = 0;
         data.forEach((leave, index) => {
-          //let setDate = new Date(leave.leapp_start_date)
-            this.applications[index] = { sn: ++index, ...leave };
+          status = new Date(leave.leapp_start_date).getTime() > new Date().getTime() ? 0  : 1;
+          status = new Date(leave.leapp_end_date).getTime() > new Date().getTime() ? 3  : 3;
+            this.applications[index] = { sn: ++index,leave_status:status,  ...leave };
 
         });
         this.applications.forEach((application) => {
@@ -94,7 +96,7 @@ export default {
         { key: "leapp_total_days", label: "Leave Length", sortable: true },
         { key: "Officer", label: "Authorization Officer", sortable: true },
         {
-          key: "leapp_status",
+          key: "leave_status",
           label: "Application Status",
           sortable: true,
         },
@@ -203,16 +205,15 @@ export default {
                   </small>
                 </template>
 
-                <template #cell(leapp_status)="row">
-                  <span v-if="new Date(row.value) < new Date().getTime()" class="text-success">
-                    INACTIVE
+                <template #cell(leave_status)="row">
+                  <span v-if="row.value === 1" class="text-success">
+                    <label class="text-primary">ACTIVE</label>
                   </span>
-
-                  <span v-else-if="new Date(row.value) > new Date().getTime()" class="text-primary">
-                    ACTIVE
+                  <span v-else-if="row.value === 0" class="text-primary">
+                    <label  class="text-warning">INACTIVE</label>
                   </span>
-                  <span v-if=" new Date(row.value) > new Date().getTime()" class="text-info">
-                    FINISHED
+                  <span v-else-if="row.value === 3" class="text-info">
+                    <label class="text-success">FINISHED</label>
                   </span>
                 </template>
               </b-table>
