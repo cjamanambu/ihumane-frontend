@@ -196,15 +196,24 @@ export default {
               end: date,
               display: "background",
             };
-            if (entry.ts_is_present) {
-              entryObj.title = `${this.tConvert(
-                entry.ts_start
-              )} - ${this.tConvert(entry.ts_end)} for ${entry.ts_duration} hrs`;
-            } else {
-              entryObj.title = `ABSENT`;
-              entryObj.display = "block";
+            switch (entry.ts_is_present) {
+              case 0: // employee absent
+                entryObj.title = `ABSENT`;
+                entryObj.display = "block";
+                calendarApi.addEvent(entryObj);
+                break;
+              case 1: // employee present
+                entryObj.title = `${this.tConvert(
+                  entry.ts_start
+                )} - ${this.tConvert(entry.ts_end)} for ${
+                  entry.ts_duration
+                } hrs`;
+                calendarApi.addEvent(entryObj);
+                break;
+              default:
+                // do nothing on public holidays and weekends
+                break;
             }
-            calendarApi.addEvent(entryObj);
           });
         }
       });
