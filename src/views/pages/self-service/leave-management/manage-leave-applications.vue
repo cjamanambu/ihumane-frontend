@@ -24,11 +24,15 @@ export default {
       const url = `${this.ROUTES.leaveApplication}/approved-applications`;
       this.apiGet(url, "Get Leave Applications Error").then((res) => {
         const { data, officers } = res.data;
-        //console.log(data)
         let status = 0;
         data.forEach((leave, index) => {
-          status = new Date(leave.leapp_start_date).getTime() > new Date().getTime() ? 0  : 1;
-          status = new Date(leave.leapp_end_date).getTime() > new Date().getTime() ? 3  : 1;
+          if(new Date().getTime() >= new Date(leave.leapp_start_date).getTime() ){
+            status = 1;
+          }else if(new Date().getTime() <= new Date(leave.leapp_start_date).getTime()){
+            status = 0;
+          }else if(new Date().getTime() > new Date(leave.leapp_end_date).getTime() ){
+            status = 3;
+          }
             this.applications[index] = { sn: ++index,leave_status:status,  ...leave };
 
         });
@@ -206,15 +210,9 @@ export default {
                 </template>
 
                 <template #cell(leave_status)="row">
-                  <span v-if="row.value === 1" class="text-success">
-                    <label class="text-primary">ACTIVE</label>
-                  </span>
-                  <span v-else-if="row.value === 0" class="text-primary">
-                    <label  class="text-warning">INACTIVE</label>
-                  </span>
-                  <span v-else-if="row.value === 3" class="text-info">
-                    <label class="text-success">FINISHED</label>
-                  </span>
+                  <label v-if=" row.value === 1 " class="badge badge-primary">ACTIVE</label>
+                  <label v-else-if="row.value === 0 " class="badge badge-warning">INACTIVE</label>
+                  <label v-else-if="row.value === 3 " class="badge badge-success">FINISHED</label>
                 </template>
               </b-table>
             </div>
