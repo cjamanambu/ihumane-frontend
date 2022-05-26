@@ -2,18 +2,20 @@
 import Layout from "@/views/layouts/main";
 import PageHeader from "@/components/page-header";
 import appConfig from "@/app.config";
+import NewSalaryMappingForm from "./components/new-salary-mapping-form";
 export default {
   page: {
-    title: "Salary Mapping",
+    title: "Salary Mappings",
     meta: [{ name: "description", content: appConfig.description }],
   },
   components: {
     Layout,
     PageHeader,
+    NewSalaryMappingForm,
   },
   data() {
     return {
-      title: "Salary Mapping",
+      title: "Salary Mappings",
       items: [
         {
           text: "IHUMANE",
@@ -23,23 +25,19 @@ export default {
           href: "/",
         },
         {
-          text: "Salary Mapping",
+          text: "Salary Mappings",
           active: true,
         },
       ],
     };
   },
+  methods: {},
 };
 </script>
 
 <template>
   <Layout>
     <PageHeader :title="title" :items="items" />
-    <div class="d-flex justify-content-end mb-3">
-      <b-button class="btn btn-success">
-        <i class="mdi mdi-plus mr-2"></i>
-        perform action button
-      </b-button>
-    </div>
+    <NewSalaryMappingForm />
   </Layout>
 </template>

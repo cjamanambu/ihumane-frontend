@@ -354,8 +354,8 @@ export const menuItems = [
       },
       {
         id: 30,
-        label: "Salary Mapping",
-        link: "/salary-mapping",
+        label: "Salary Mappings",
+        link: "/salary-mappings",
       },
       {
         id: 30,
