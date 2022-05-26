@@ -28,7 +28,7 @@ export default {
         let status = 0;
         data.forEach((leave, index) => {
           status = new Date(leave.leapp_start_date).getTime() > new Date().getTime() ? 0  : 1;
-          status = new Date(leave.leapp_end_date).getTime() > new Date().getTime() ? 3  : 3;
+          status = new Date(leave.leapp_end_date).getTime() > new Date().getTime() ? 3  : 1;
             this.applications[index] = { sn: ++index,leave_status:status,  ...leave };
 
         });

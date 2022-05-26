@@ -687,46 +687,6 @@ export default {
         </div>
       </div>
       <div class="col-lg-4">
-        <div class="card">
-          <div class="card-body">
-            <div class="p-3 bg-light mb-4 d-flex justify-content-between">
-              <div class="d-inline mb-0">
-                <h5 class="font-size-14 mb-0">Update Status</h5>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col-12">
-                <form @submit.prevent="updateLeaveStatus">
-                  <div class="form-group">
-                    <label for="">
-                      Status <span class="text-danger">*</span>
-                    </label>
-                    <b-form-select
-                      v-model="selected"
-                      :options="options"
-                    ></b-form-select>
-                  </div>
-
-                  <b-button
-                    v-if="!submitting"
-                    class="btn btn-success btn-block mt-4"
-                    type="submit"
-                  >
-                    Submit
-                  </b-button>
-                  <b-button
-                    v-else
-                    disabled
-                    class="btn btn-success btn-block mt-4"
-                    type="submit"
-                  >
-                    Submitting...
-                  </b-button>
-                </form>
-              </div>
-            </div>
-          </div>
-        </div>
         <div
           class="card mt-4"
           v-if="
