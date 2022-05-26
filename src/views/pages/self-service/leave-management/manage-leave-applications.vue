@@ -20,11 +20,17 @@ export default {
   },
   methods: {
     refreshTable() {
+      //let currentDate = new Date();
       const url = `${this.ROUTES.leaveApplication}/approved-applications`;
       this.apiGet(url, "Get Leave Applications Error").then((res) => {
         const { data, officers } = res.data;
+        //console.log(data)
+        let status = 0;
         data.forEach((leave, index) => {
-          this.applications[index] = { sn: ++index, ...leave };
+          status = new Date(leave.leapp_start_date).getTime() > new Date().getTime() ? 0  : 1;
+          status = new Date(leave.leapp_end_date).getTime() > new Date().getTime() ? 3  : 3;
+            this.applications[index] = { sn: ++index,leave_status:status,  ...leave };
+
         });
         this.applications.forEach((application) => {
           officers.forEach((officer) => {
@@ -90,7 +96,7 @@ export default {
         { key: "leapp_total_days", label: "Leave Length", sortable: true },
         { key: "Officer", label: "Authorization Officer", sortable: true },
         {
-          key: "leapp_status",
+          key: "leave_status",
           label: "Application Status",
           sortable: true,
         },
@@ -171,20 +177,25 @@ export default {
                     {{ row.value.emp_unique_id }}
                   </small>
                 </template>
+
                 <template #cell(LeaveType)="row">
                   <p class="mb-0">
                     {{ row.value.leave_name }}
                   </p>
                 </template>
+
                 <template #cell(leapp_start_date)="row">
                   <span> {{ new Date(row.value).toDateString() }}</span>
                 </template>
+
                 <template #cell(leapp_end_date)="row">
                   <span> {{ new Date(row.value).toDateString() }}</span>
                 </template>
+
                 <template #cell(leapp_total_days)="row">
                   <span> {{ row.value }} days</span>
                 </template>
+
                 <template #cell(Officer)="row">
                   <p class="mb-0">
                     {{ row.value.emp_first_name }} {{ row.value.emp_last_name }}
@@ -193,21 +204,16 @@ export default {
                     {{ row.value.emp_unique_id }}
                   </small>
                 </template>
-                <template #cell(leapp_status)="row">
-                  <span v-if="row.value === 0" class="text-warning">
-                    PENDING
+
+                <template #cell(leave_status)="row">
+                  <span v-if="row.value === 1" class="text-success">
+                    <label class="text-primary">ACTIVE</label>
                   </span>
-                  <span v-else-if="row.value === 1" class="text-success">
-                    APPROVED
+                  <span v-else-if="row.value === 0" class="text-primary">
+                    <label  class="text-warning">INACTIVE</label>
                   </span>
-                  <span v-else-if="row.value === 2" class="text-danger">
-                    DECLINED
-                  </span>
-                  <span v-else-if="row.value === 3" class="text-primary">
-                    ACTIVE
-                  </span>
-                  <span v-else-if="row.value === 4" class="text-info">
-                    FINISHED
+                  <span v-else-if="row.value === 3" class="text-info">
+                    <label class="text-success">FINISHED</label>
                   </span>
                 </template>
               </b-table>
