@@ -18,6 +18,7 @@ export default {
   },
   validations: {
     name: { required },
+    provider_code: { required },
   },
   methods: {
     refreshTable() {
@@ -26,6 +27,7 @@ export default {
         "Get Pension Providers Error"
       ).then((res) => {
         const { data } = res;
+        console.log(data);
         data.forEach((pensionProvider, index) => {
           this.pensionProviders[index] = { sn: ++index, ...pensionProvider };
         });
@@ -40,6 +42,7 @@ export default {
       } else {
         const data = {
           provider_name: this.name,
+          provider_code: this.provider_code,
         };
         this.apiPost(
           this.ROUTES.pensionProvider,
@@ -61,6 +64,7 @@ export default {
       } else {
         const data = {
           provider_name: this.name,
+          provider_code: this.provider_code,
         };
         const url = `${this.ROUTES.pensionProvider}/${this.pensionProviderID}`;
         this.apiPatch(url, data, "Update Pension Provider Error").then(
@@ -81,6 +85,7 @@ export default {
       pensionProvider = pensionProvider[0];
       this.pensionProviderID = pensionProvider.pension_provider_id;
       this.name = pensionProvider.provider_name;
+      this.provider_code = pensionProvider.provider_code;
       this.$refs["update-pension-provider"].show();
       this.$refs["pension-provider-table"].clearSelected();
     },
@@ -119,8 +124,10 @@ export default {
       fields: [
         { key: "sn", label: "S/n", sortable: true, thStyle: { width: "5%" } },
         { key: "provider_name", label: "Pension Provider", sortable: true },
+        { key: "provider_code", label: " Provider Code", sortable: true },
       ],
       name: null,
+      provider_code: null,
       pensionProviderID: null,
     };
   },
@@ -245,6 +252,20 @@ export default {
             }"
           />
         </div>
+        <div class="form-group">
+          <label for="name">
+            Provider Code <span class="text-danger">*</span>
+          </label>
+          <input
+            id="provider_code"
+            type="text"
+            v-model="provider_code"
+            class="form-control"
+            :class="{
+              'is-invalid': submitted && $v.provider_code.$error,
+            }"
+          />
+        </div>
         <b-button
           v-if="!submitting"
           class="btn btn-success btn-block mt-4"
@@ -282,6 +303,20 @@ export default {
             class="form-control"
             :class="{
               'is-invalid': submitted && $v.name.$error,
+            }"
+          />
+        </div>
+        <div class="form-group">
+          <label for="name">
+            Provider Code <span class="text-danger">*</span>
+          </label>
+          <input
+            id="provider_code"
+            type="text"
+            v-model="provider_code"
+            class="form-control"
+            :class="{
+              'is-invalid': submitted && $v.provider_code.$error,
             }"
           />
         </div>
