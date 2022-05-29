@@ -45,16 +45,41 @@ export default {
           smm_year: parseInt(this.period.split("-")[0]),
           smm_location: this.location.value,
         };
-        const url = `${this.ROUTES.payrollJournal}/salary-mapping-master`;
-        await this.apiPost(url, data, "Upload Salary Mapping (Step 1)").then(
-          (res) => {
+        let url = `${this.ROUTES.payrollJournal}/salary-mapping-master`;
+        await this.apiPost(url, data, "Upload Salary Mapping (Step 1)")
+          .then(async (res) => {
             const { data } = res;
             if (data) {
-              console.log(data);
-              // const masterId = data.smm_id;
+              const masterId = data.smm_id;
+              url = `${this.ROUTES.payrollJournal}/upload-mapping-detail/${masterId}`;
+              let fd = new FormData();
+              fd.append("salary_map", this.file);
+              await this.apiPost(url, fd, "Upload Salary Mapping (Step 2)")
+                .then(async (res) => {
+                  const { data } = res;
+                  if (data && data === "Uploaded Successfully") {
+                    url = `${this.ROUTES.payrollJournal}/salary-mapping-detail/${masterId}`;
+                    await this.apiGet(url, "Upload Salary Mapping (Step 3)")
+                      .then((res) => {
+                        const { data } = res;
+                        if (data) {
+                          this.apiResponseHandler(data, "Process Complete");
+                          this.$emit("uploaded");
+                        }
+                      })
+                      .catch(() => {
+                        this.uploading = false;
+                      });
+                  }
+                })
+                .catch(() => {
+                  this.uploading = false;
+                });
             }
-          }
-        );
+          })
+          .catch(() => {
+            this.uploading = false;
+          });
         this.uploading = false;
         this.resetForm();
       }

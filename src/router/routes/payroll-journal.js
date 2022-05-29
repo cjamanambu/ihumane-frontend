@@ -15,4 +15,13 @@ export default [
     },
     component: () => import("@/views/pages/payroll-journal/salary-mappings"),
   },
+  {
+    path: "/salary-mapping-detail/:masterId",
+    name: "salary-mapping-detail",
+    meta: {
+      authRequired: true,
+    },
+    component: () =>
+      import("@/views/pages/payroll-journal/salary-mapping-detail"),
+  },
 ];

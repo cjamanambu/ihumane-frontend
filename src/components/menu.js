@@ -345,7 +345,7 @@ export const menuItems = [
   {
     id: 27,
     label: "Payroll Journal",
-    icon: " ri-exchange-funds-line",
+    icon: "ri-book-2-line",
     subItems: [
       {
         id: 28,
