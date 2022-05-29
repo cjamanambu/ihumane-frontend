@@ -14,28 +14,37 @@ export default {
   methods: {
     apiGet(url, errTitle) {
       this.apiBusy = true;
-      return new Promise((resolve) => {
+      return new Promise((resolve, reject) => {
         API.get(`${url}`, this.apiConfig())
           .then((res) => resolve(res))
-          .catch((err) => this.apiErrorHandler(err, errTitle))
+          .catch((err) => {
+            this.apiErrorHandler(err, errTitle);
+            reject(err);
+          })
           .finally(() => (this.apiBusy = false));
       });
     },
     apiPost(url, data, errTitle) {
       this.submitting = true;
-      return new Promise((resolve) => {
+      return new Promise((resolve, reject) => {
         API.post(`${url}`, data, this.apiConfig())
           .then((res) => resolve(res))
-          .catch((err) => this.apiErrorHandler(err, errTitle))
+          .catch((err) => {
+            this.apiErrorHandler(err, errTitle);
+            reject(err);
+          })
           .finally(() => (this.submitting = false));
       });
     },
     apiPatch(url, data, errTitle) {
       this.submitting = true;
-      return new Promise((resolve) => {
+      return new Promise((resolve, reject) => {
         API.patch(`${url}`, data, this.apiConfig())
           .then((res) => resolve(res))
-          .catch((err) => this.apiErrorHandler(err, errTitle))
+          .catch((err) => {
+            this.apiErrorHandler(err, errTitle);
+            reject(err);
+          })
           .finally(() => (this.submitting = false));
       });
     },
