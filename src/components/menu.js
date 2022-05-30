@@ -345,7 +345,7 @@ export const menuItems = [
   {
     id: 27,
     label: "Payroll Journal",
-    icon: " ri-exchange-funds-line",
+    icon: "ri-book-2-line",
     subItems: [
       {
         id: 28,
@@ -354,8 +354,8 @@ export const menuItems = [
       },
       {
         id: 30,
-        label: "Salary Mapping",
-        link: "/salary-mapping",
+        label: "Salary Mappings",
+        link: "/salary-mappings",
       },
       {
         id: 30,
