@@ -27,7 +27,7 @@ export default {
         "Get Pension Providers Error"
       ).then((res) => {
         const { data } = res;
-        console.log(data);
+        //console.log(data);
         data.forEach((pensionProvider, index) => {
           this.pensionProviders[index] = { sn: ++index, ...pensionProvider };
         });

@@ -30,6 +30,7 @@ export default {
 
       this.apiGet(url, "Get Time sheet details").then((res) => {
         const { timesheet, timeAllocation, log } = res.data;
+        console.log(timesheet)
         this.timeSheet = timesheet;
         this.allocation = timeAllocation[0];
         this.breakdown = timeAllocation;
