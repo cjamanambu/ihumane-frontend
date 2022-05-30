@@ -347,6 +347,12 @@ export default {
                           >
                             WEEKEND
                           </small>
+                          <small
+                            class="text-info"
+                            v-else-if="ts.ts_is_present === 4"
+                          >
+                            LEAVE
+                          </small>
                           <small class="text-danger" v-else>ABSENT</small>
                         </td>
                       </tr>

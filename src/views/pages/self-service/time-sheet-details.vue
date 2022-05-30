@@ -30,6 +30,7 @@ export default {
 
       this.apiGet(url, "Get Time sheet details").then((res) => {
         const { timesheet, timeAllocation, log } = res.data;
+        console.log(timesheet)
         this.timeSheet = timesheet;
         this.allocation = timeAllocation[0];
         this.breakdown = timeAllocation;
@@ -220,6 +221,12 @@ export default {
                           >
                             WEEKEND
                           </span>
+                          <span
+                            class="text-info"
+                            v-else-if="ts.ts_is_present === 4"
+                          >
+                            LEAVE
+                          </span>
                           <span v-else class="text-danger">ABSENT</span>
                         </td>
                         <td>
@@ -238,6 +245,12 @@ export default {
                           >
                             WEEKEND
                           </span>
+                          <span
+                            class="text-info"
+                            v-else-if="ts.ts_is_present === 4"
+                          >
+                            LEAVE
+                          </span>
                           <span v-else class="text-danger">ABSENT</span>
                         </td>
                         <td>
@@ -255,6 +268,12 @@ export default {
                             v-else-if="ts.ts_is_present === 3"
                           >
                             WEEKEND
+                          </span>
+                          <span
+                            class="text-info"
+                            v-else-if="ts.ts_is_present === 4"
+                          >
+                            LEAVE
                           </span>
                           <span v-else class="text-danger">ABSENT</span>
                         </td>
