@@ -359,8 +359,8 @@ export const menuItems = [
       },
       {
         id: 30,
-        label: "Journals",
-        link: "/approve-payroll",
+        label: "Journal Report",
+        link: "/journal-report",
       },
     ],
   },
