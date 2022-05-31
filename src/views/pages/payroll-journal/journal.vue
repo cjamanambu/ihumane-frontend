@@ -67,7 +67,6 @@ export default {
   methods: {
     processReport(value) {
       let { location, period, journals } = value;
-      console.log(journals);
       if (location && period) {
         location = location.value;
         this.journals = journals;
