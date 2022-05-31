@@ -24,4 +24,12 @@ export default [
     component: () =>
       import("@/views/pages/payroll-journal/salary-mapping-detail"),
   },
+  {
+    path: "/journal-report",
+    name: "journal-report",
+    meta: {
+      authRequired: true,
+    },
+    component: () => import("@/views/pages/payroll-journal/journal"),
+  },
 ];

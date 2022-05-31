@@ -17,9 +17,6 @@ export default {
     };
   },
   methods: {
-    test() {
-      console.log(this.file);
-    },
     fetchLocations() {
       this.apiGet(this.ROUTES.location, "Get Locations Error").then((res) => {
         this.locations = [];
@@ -111,7 +108,6 @@ export default {
                 type="month"
                 class="form-control"
                 v-model="period"
-                @input="test"
               />
             </div>
             <div class="form-group">
@@ -126,12 +122,7 @@ export default {
             </div>
             <div class="form-group">
               <label for="file">File Upload</label>
-              <b-form-file
-                id="file"
-                v-model="file"
-                @input="test"
-                accept=".xlsx,.xls,.csv"
-              />
+              <b-form-file id="file" v-model="file" accept=".xlsx,.xls,.csv" />
             </div>
             <div class="mt-4">
               <button
