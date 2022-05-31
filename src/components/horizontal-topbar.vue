@@ -31,6 +31,7 @@ export default {
   data() {
     return {
       notifications: [],
+      employeeId: null,
       languages: [
         {
           flag: require("@/assets/images/flags/us.jpg"),
@@ -64,6 +65,7 @@ export default {
   methods: {
     getEmployeeNotifications() {
       let employeeID = this.getEmployee.emp_id;
+      this.employeeId = this.getEmployee.emp_id;
       const url = `${this.ROUTES.notifications}/${employeeID}`;
       this.apiGet(url, "Get Notifications Error").then((res) => {
         const { data } = res;
@@ -275,7 +277,9 @@ export default {
                 </h6>
               </div>
               <div class="col-auto">
-                <a href="#!" class="small">{{
+                <a href="javascript:void(0);" class="small"
+                   @click="$router.push({ name: 'my-notifications',params: { employeeId: employeeId }, })"
+                >{{
                   $t("navbar.dropdown.notification.subtext")
                 }}</a>
               </div>
@@ -317,6 +321,7 @@ export default {
             <a
               class="btn btn-sm btn-link font-size-14 btn-block text-center"
               href="javascript:void(0)"
+              @click="$router.push({ name: 'my-notifications',params: { employeeId: employeeId }, })"
             >
               <i class="mdi mdi-arrow-right-circle mr-1"></i>
               {{ $t("navbar.dropdown.notification.button") }}
