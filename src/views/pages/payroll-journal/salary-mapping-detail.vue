@@ -54,6 +54,7 @@ export default {
         { key: "t2b", label: "T2 - Benefit", sortable: true },
       ],
       fetching: false,
+      undoing: false,
     };
   },
   methods: {
@@ -118,6 +119,24 @@ export default {
         name: "journal-report",
         query: { period, location },
       });
+    },
+    undoProcessing() {
+      this.undoing = true;
+      const { masterId } = this.$route.params;
+      const url = `${this.ROUTES.payrollJournal}/undo-salary-mapping/${masterId}`;
+      this.apiGet(url, "Undo Salary Mapping Error")
+        .then((res) => {
+          const { data } = res;
+          if (data) {
+            this.undoing = false;
+            this.$router.push({ name: "salary-mappings" }).then(() => {
+              this.apiResponseHandler(data, "Action Successful");
+            });
+          }
+        })
+        .catch(() => {
+          this.undoing = false;
+        });
     },
   },
 };
@@ -204,8 +223,15 @@ export default {
               >
                 <strong> Actions </strong>
                 <span>
-                  <span class="mr-2 cursor-pointer text-danger">
-                    Undo Processing
+                  <span
+                    @click="undoProcessing"
+                    v-if="!undoing"
+                    class="mr-2 cursor-pointer text-danger"
+                  >
+                    Undo Mapping
+                  </span>
+                  <span v-else class="mr-2 text-danger text-muted">
+                    Undoing please wait...
                   </span>
                   <strong>|</strong>
                   <span
