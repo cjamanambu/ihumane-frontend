@@ -43,7 +43,7 @@ export default {
       sortDesc: false,
       fields: [
         { key: "sn", label: "S/n", sortable: true, thStyle: { width: "5%" } },
-        { key: "smm_location", label: "Location", sortable: true },
+        { key: "location", label: "Location (T6)", sortable: true },
         { key: "smm_month", label: "Month", sortable: true },
         { key: "smm_year", label: "Year", sortable: true },
         { key: "smm_ref_code", label: "Ref Code", sortable: true },
@@ -62,6 +62,7 @@ export default {
       let url = `${this.ROUTES.payrollJournal}/salary-mappings`;
       this.apiGet(url, "Get Salary Mappings Error").then(async (res) => {
         const { data } = res;
+        console.log({ data });
         data.forEach((mapping, index) => {
           this.mappings[index] = { sn: ++index, ...mapping };
         });
@@ -159,6 +160,11 @@ export default {
                 </template>
                 <template #cell(smm_month)="row">
                   {{ (parseInt(row.value) - 1) | getMonth }}
+                </template>
+                <template #cell(location)="row">
+                  <span>
+                    {{ row.value.location_name }} - {{ row.value.l_t6_code }}
+                  </span>
                 </template>
               </b-table>
             </div>

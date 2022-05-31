@@ -54,6 +54,7 @@ export default {
         { key: "t2b", label: "T2 - Benefit", sortable: true },
       ],
       fetching: false,
+      undoing: false,
     };
   },
   methods: {
@@ -111,6 +112,32 @@ export default {
           this.processing = false;
         });
     },
+    viewJournalReport() {
+      const period = `${this.master.smm_year}-${this.master.smm_month}`;
+      const location = this.location.location_id;
+      this.$router.push({
+        name: "journal-report",
+        query: { period, location },
+      });
+    },
+    undoProcessing() {
+      this.undoing = true;
+      const { masterId } = this.$route.params;
+      const url = `${this.ROUTES.payrollJournal}/undo-salary-mapping/${masterId}`;
+      this.apiGet(url, "Undo Salary Mapping Error")
+        .then((res) => {
+          const { data } = res;
+          if (data) {
+            this.undoing = false;
+            this.$router.push({ name: "salary-mappings" }).then(() => {
+              this.apiResponseHandler(data, "Action Successful");
+            });
+          }
+        })
+        .catch(() => {
+          this.undoing = false;
+        });
+    },
   },
 };
 </script>
@@ -118,6 +145,9 @@ export default {
 <style>
 .jp:hover {
   cursor: not-allowed;
+}
+.cursor-pointer {
+  cursor: pointer;
 }
 </style>
 
@@ -166,6 +196,7 @@ export default {
                 <strong> Uploaded </strong>
                 <span> {{ new Date(master.createdAt).toDateString() }} </span>
               </div>
+
               <div class="mt-4">
                 <button
                   v-if="master.smm_posted"
@@ -184,6 +215,31 @@ export default {
                 <button v-else disabled class="btn btn-success w-100 mr-3">
                   Processing Journal...
                 </button>
+              </div>
+              <div
+                v-if="master.smm_posted"
+                class="d-flex justify-content-between mt-3"
+              >
+                <strong> Actions </strong>
+                <span>
+                  <span
+                    @click="undoProcessing"
+                    v-if="!undoing"
+                    class="mr-2 cursor-pointer text-danger"
+                  >
+                    Undo Mapping
+                  </span>
+                  <span v-else class="mr-2 text-danger text-muted">
+                    Undoing please wait...
+                  </span>
+                  <strong>|</strong>
+                  <span
+                    @click="viewJournalReport"
+                    class="ml-2 cursor-pointer text-primary"
+                  >
+                    View Journal Report
+                  </span>
+                </span>
               </div>
             </div>
           </div>

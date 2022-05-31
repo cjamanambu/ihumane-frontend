@@ -27,6 +27,7 @@ export default {
     refreshTable() {
       this.apiGet(this.ROUTES.user, "Get Users Error").then((res) => {
         const { data } = res;
+        console.log({ data });
         data.forEach((user, index) => {
           this.users[index] = { sn: ++index, ...user };
         });
