@@ -93,7 +93,7 @@ export default {
 <template>
   <div>
     <div class="row">
-      <div class="col-lg-6">
+      <div class="col-lg-4">
         <div class="card">
           <div class="card-body">
             <div class="p-3 bg-light mb-4">
