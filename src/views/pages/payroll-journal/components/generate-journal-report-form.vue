@@ -56,7 +56,21 @@ export default {
               data.forEach((journal, index) => {
                 this.journals.push({
                   sn: ++index,
-                  ...journal,
+                  j_acc_code: journal.j_acc_code,
+                  j_date: journal.j_date,
+                  j_ref_code: journal.j_ref_code,
+                  j_d_c: journal.j_d_c,
+                  j_desc: journal.j_desc,
+                  j_amount: this.apiValueHandler(journal.j_amount.toFixed(2)),
+                  j_t0: journal.j_t0,
+                  j_t1: journal.j_t1,
+                  j_t2: journal.j_t2,
+                  j_t3: journal.j_t3,
+                  j_t4: journal.j_t4,
+                  j_t5: journal.j_t5,
+                  j_t6: journal.j_t6,
+                  j_t7: journal.j_t7,
+                  j_name: journal.j_name,
                 });
               });
               const { journals } = this;

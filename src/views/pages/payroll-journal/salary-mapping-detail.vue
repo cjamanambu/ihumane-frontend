@@ -216,7 +216,6 @@ export default {
                   Processing Journal...
                 </button>
               </div>
-              <hr v-if="master.smm_posted" />
               <div
                 v-if="master.smm_posted"
                 class="d-flex justify-content-between mt-3"

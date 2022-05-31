@@ -3,6 +3,8 @@ import Layout from "@/views/layouts/main";
 import PageHeader from "@/components/page-header";
 import appConfig from "@/app.config";
 import GenerateJournalReportForm from "./components/generate-journal-report-form";
+import JsonExcel from "vue-json-excel";
+
 export default {
   page: {
     title: "Payroll Journal Report",
@@ -12,6 +14,7 @@ export default {
     Layout,
     PageHeader,
     GenerateJournalReportForm,
+    JsonExcel,
   },
   mounted() {
     this.refreshTable();
@@ -62,6 +65,8 @@ export default {
         { key: "j_name", label: "Staff Name", sortable: true },
       ],
       journalDetail: null,
+      filtered: [],
+      jsonFields: {},
     };
   },
   methods: {
@@ -70,7 +75,44 @@ export default {
       if (location && period) {
         location = location.value;
         this.journals = journals;
+        this.filtered = this.journals;
         this.totalRows = journals.length;
+        this.fields.forEach((field) => {
+          let key = field.key;
+          if (key === "sn") {
+            this.jsonFields["S/N"] = key;
+          } else if (key === "j_acc_code") {
+            this.jsonFields["ACC"] = key;
+          } else if (key === "j_date") {
+            this.jsonFields["TRANS DATE"] = key;
+          } else if (key === "j_ref_code") {
+            this.jsonFields["REFERENCE"] = key;
+          } else if (key === "j_d_c") {
+            this.jsonFields["D/C"] = key;
+          } else if (key === "j_desc") {
+            this.jsonFields["DESCRIPTION"] = key;
+          } else if (key === "j_amount") {
+            this.jsonFields["OTHER AMT"] = key;
+          } else if (key === "j_t0") {
+            this.jsonFields["T0"] = key;
+          } else if (key === "j_t1") {
+            this.jsonFields["T1"] = key;
+          } else if (key === "j_t2") {
+            this.jsonFields["T2"] = key;
+          } else if (key === "j_t3") {
+            this.jsonFields["T3"] = key;
+          } else if (key === "j_t4") {
+            this.jsonFields["T4"] = key;
+          } else if (key === "j_t5") {
+            this.jsonFields["T5"] = key;
+          } else if (key === "j_t6") {
+            this.jsonFields["T6"] = key;
+          } else if (key === "j_t7") {
+            this.jsonFields["T7"] = key;
+          } else if (key === "j_name") {
+            this.jsonFields["STAFF NAME"] = key;
+          }
+        });
         this.journalDetail = journals[0];
         this.generated = true;
         this.$router.push({
@@ -96,15 +138,68 @@ export default {
         this.apiPost(url, data, "Get Journal Error")
           .then((res) => {
             const { data } = res;
+            console.log({ data });
             this.journals = [];
             if (data) {
               data.forEach((journal, index) => {
                 this.journals.push({
                   sn: ++index,
-                  ...journal,
+                  j_acc_code: journal.j_acc_code,
+                  j_date: journal.j_date,
+                  j_ref_code: journal.j_ref_code,
+                  j_d_c: journal.j_d_c,
+                  j_desc: journal.j_desc,
+                  j_amount: this.apiValueHandler(journal.j_amount.toFixed(2)),
+                  j_t0: journal.j_t0,
+                  j_t1: journal.j_t1,
+                  j_t2: journal.j_t2,
+                  j_t3: journal.j_t3,
+                  j_t4: journal.j_t4,
+                  j_t5: journal.j_t5,
+                  j_t6: journal.j_t6,
+                  j_t7: journal.j_t7,
+                  j_name: journal.j_name,
                 });
               });
+              this.filtered = this.journals;
               this.totalRows = this.journals.length;
+              this.fields.forEach((field) => {
+                let key = field.key;
+                if (key === "sn") {
+                  this.jsonFields["S/N"] = key;
+                } else if (key === "j_acc_code") {
+                  this.jsonFields["ACC"] = key;
+                } else if (key === "j_date") {
+                  this.jsonFields["TRANS DATE"] = key;
+                } else if (key === "j_ref_code") {
+                  this.jsonFields["REFERENCE"] = key;
+                } else if (key === "j_d_c") {
+                  this.jsonFields["D/C"] = key;
+                } else if (key === "j_desc") {
+                  this.jsonFields["DESCRIPTION"] = key;
+                } else if (key === "j_amount") {
+                  this.jsonFields["OTHER AMT"] = key;
+                } else if (key === "j_t0") {
+                  this.jsonFields["T0"] = key;
+                } else if (key === "j_t1") {
+                  this.jsonFields["T1"] = key;
+                } else if (key === "j_t2") {
+                  this.jsonFields["T2"] = key;
+                } else if (key === "j_t3") {
+                  this.jsonFields["T3"] = key;
+                } else if (key === "j_t4") {
+                  this.jsonFields["T4"] = key;
+                } else if (key === "j_t5") {
+                  this.jsonFields["T5"] = key;
+                } else if (key === "j_t6") {
+                  this.jsonFields["T6"] = key;
+                } else if (key === "j_t7") {
+                  this.jsonFields["T7"] = key;
+                } else if (key === "j_name") {
+                  this.jsonFields["STAFF NAME"] = key;
+                }
+              });
+
               this.journalDetail = this.journals[0];
               this.generating = false;
               this.generated = true;
@@ -122,6 +217,7 @@ export default {
     onFiltered(filteredItems) {
       // Trigger pagination to update the number of buttons/pages due to filtering
       this.totalRows = filteredItems.length;
+      this.filtered = filteredItems;
       this.currentPage = 1;
     },
   },
@@ -199,10 +295,20 @@ export default {
       <div class="col-12">
         <div class="card">
           <div class="card-body">
-            <div class="p-3 bg-light mb-4">
+            <div class="p-3 bg-light mb-4 d-flex justify-content-between">
               <div class="d-inline mb-0">
                 <h5 class="font-size-14 mb-0">Report Breakdown</h5>
               </div>
+              <span class="font-size-12 text-success">
+                <JsonExcel
+                  style="cursor: pointer"
+                  :data="filtered"
+                  :fields="jsonFields"
+                  :name="`Journal_Report_${journalDetail.j_ref_code}.xls`"
+                >
+                  Export to Excel
+                </JsonExcel>
+              </span>
             </div>
             <div class="row mt-4">
               <div class="col-sm-12 col-md-6">
@@ -264,7 +370,7 @@ export default {
                 </template>
                 <template #cell(j_amount)="row">
                   <p class="text-nowrap text-right mb-0">
-                    {{ apiValueHandler(row.value.toFixed(2)) }}
+                    {{ row.value }}
                   </p>
                 </template>
               </b-table>
