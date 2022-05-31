@@ -66,6 +66,17 @@ export default [
       ),
   },
   {
+    path: "/my-notifications/:employeeId",
+    name: "my-notifications",
+    meta: {
+      authRequired: true,
+    },
+    component: () =>
+      import(
+        "@/views/pages/self-service/my-notifications"
+      ),
+  },
+  {
     path: "/employee-leave-accruals",
     name: "employee-leave-accruals",
     meta: {
