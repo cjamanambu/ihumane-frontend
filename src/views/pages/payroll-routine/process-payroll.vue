@@ -2,7 +2,17 @@
 import Layout from "@/views/layouts/main";
 import PageHeader from "@/components/page-header";
 import appConfig from "@/app.config";
+import store from "@/state/store";
 export default {
+  beforeRouteEnter(to, from, next) {
+    const userType = store.getters["auth/getUser"].user_type;
+    if (userType === 1 || userType === 3) {
+      next();
+    } else {
+      alert("You are not allowed to access this page. You will be redirected.");
+      next("/");
+    }
+  },
   page: {
     title: "Process Payroll Routine",
     meta: [{ name: "description", content: appConfig.description }],
@@ -35,7 +45,7 @@ export default {
       routineRun: false,
       pay: [],
       selectedLocations: [],
-      locationIds:[],
+      locationIds: [],
       totalRows: 1,
       currentPage: 1,
       perPage: 10,
@@ -45,16 +55,24 @@ export default {
       sortBy: "sn",
       sortDesc: false,
       fields: [
-        '#',
+        "#",
         { key: "sn", label: "S/n", sortable: true },
         { key: "locationName", label: "Location", sortable: true },
         { key: "locationTotalGross", label: "Total Gross", sortable: true },
-        { key: "locationTotalDeduction", label: "Total Deduction", sortable: true },
+        {
+          key: "locationTotalDeduction",
+          label: "Total Deduction",
+          sortable: true,
+        },
         { key: "locationTotalNet", label: "Total Net", sortable: true },
-        { key: "locationEmployeesCount", label: "Total Employees", sortable: true },
+        {
+          key: "locationEmployeesCount",
+          label: "Total Employees",
+          sortable: true,
+        },
         { key: "month", label: "month", sortable: true },
         { key: "year", label: "year", sortable: true },
-         "Action"
+        "Action",
       ],
       pmyMonth: null,
       pmyYear: null,
@@ -63,16 +81,15 @@ export default {
     };
   },
   methods: {
-
     selectLocations(items) {
-      this.selectedLocations = items
+      this.selectedLocations = items;
     },
     selectAllRows() {
-      this.$refs.payrollSummaryTable.selectAllRows()
+      this.$refs.payrollSummaryTable.selectAllRows();
     },
 
     clearSelected() {
-      this.$refs.payrollSummaryTable.clearSelected()
+      this.$refs.payrollSummaryTable.clearSelected();
     },
     getLocations() {
       this.apiGet(this.ROUTES.location, "Get Locations Error").then((res) => {
@@ -126,9 +143,9 @@ export default {
       });
     },
 
-    confirmSelected(){
+    confirmSelected() {
       this.submitted = true;
-      this.locationIds = [ ]
+      this.locationIds = [];
       this.selectedLocations.forEach((location) => {
         this.locationIds.push(location.locationId);
       });
@@ -136,21 +153,16 @@ export default {
 
       const data = {
         pmyl_location_id: this.locationIds,
-
       };
       //console.log(data)
       const url = `${this.ROUTES.salary}/confirm-salary-routine`;
-      this.apiPost(url, data, "Salary Confirmation").then(
-          (res) => {
-            this.apiResponseHandler(`${res.data}`, "Salary Confirmed");
-            this.selectedLocations= [ ]
-            this.locationIds = [ ]
-            this.fetchPayrollRoutine()
-
-          }
-      );
+      this.apiPost(url, data, "Salary Confirmation").then((res) => {
+        this.apiResponseHandler(`${res.data}`, "Salary Confirmed");
+        this.selectedLocations = [];
+        this.locationIds = [];
+        this.fetchPayrollRoutine();
+      });
     },
-
 
     approveRoutine() {
       let url = `${this.ROUTES.salary}/approve-salary-routine`;
@@ -233,7 +245,6 @@ export default {
             <i class="mdi mdi-plus mr-2"></i>
             Undo Routine
           </b-button>
-
         </div>
         <div class="row">
           <div class="col-12">
@@ -299,7 +310,6 @@ export default {
                     select-mode="multi"
                     @row-selected="selectLocations"
                   >
-
                     <template #cell(#)="{ rowSelected }">
                       <template v-if="rowSelected">
                         <span aria-hidden="true">&check;</span>
@@ -333,18 +343,41 @@ export default {
                     </template>
 
                     <template #cell(action)="row">
-                      <b-button style="margin: 10px" variant="primary" size="sm" @click="selectRow(row.item.locationId)">View</b-button>
+                      <b-button
+                        style="margin: 10px"
+                        variant="primary"
+                        size="sm"
+                        @click="selectRow(row.item.locationId)"
+                        >View</b-button
+                      >
                     </template>
                   </b-table>
 
                   <p>
-                    <b-button style="margin: 10px" variant="primary" size="sm" @click="selectAllRows">Select all</b-button>
+                    <b-button
+                      style="margin: 10px"
+                      variant="primary"
+                      size="sm"
+                      @click="selectAllRows"
+                      >Select all</b-button
+                    >
 
-                    <b-button style="margin: 10px" variant="warning" size="sm" @click="clearSelected">Clear Selection</b-button>
+                    <b-button
+                      style="margin: 10px"
+                      variant="warning"
+                      size="sm"
+                      @click="clearSelected"
+                      >Clear Selection</b-button
+                    >
 
-                    <b-button style="margin: 10px" variant="success" size="sm" @click="confirmSelected">Confirm Selected</b-button>
+                    <b-button
+                      style="margin: 10px"
+                      variant="success"
+                      size="sm"
+                      @click="confirmSelected"
+                      >Confirm Selected</b-button
+                    >
                   </p>
-
                 </div>
                 <div v-else>
                   <scale-loader />

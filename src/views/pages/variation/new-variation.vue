@@ -2,9 +2,19 @@
 import Layout from "@/views/layouts/main";
 import PageHeader from "@/components/page-header";
 import appConfig from "@/app.config";
-import Multiselect from 'vue-multiselect';
+import Multiselect from "vue-multiselect";
+import store from "@/state/store";
 
 export default {
+  beforeRouteEnter(to, from, next) {
+    const userType = store.getters["auth/getUser"].user_type;
+    if (userType === 1 || userType === 3) {
+      next();
+    } else {
+      alert("You are not allowed to access this page. You will be redirected.");
+      next("/");
+    }
+  },
   page: {
     title: "New Variational Payments",
     meta: [{ name: "description", content: appConfig.description }],
@@ -12,7 +22,7 @@ export default {
   components: {
     Layout,
     PageHeader,
-    Multiselect
+    Multiselect,
   },
   mounted() {
     this.getVariationalPayments();
@@ -35,8 +45,8 @@ export default {
       this.leapp_end_date = null;
       this.$v.$reset();
     },
-    selectionLabel ({ text }) {
-      return `${text}`
+    selectionLabel({ text }) {
+      return `${text}`;
     },
 
     getVariationalPaymentss() {
@@ -142,52 +152,52 @@ export default {
     },
     async submitNew() {
       // if (1) {
-        // if (this.uploadFiles.length > 0) {
-        // }
-        this.submitted = true;
+      // if (this.uploadFiles.length > 0) {
+      // }
+      this.submitted = true;
 
-        await this.paymentsFields.forEach((field) => {
-          const data = {
-            payment_definition: field.id,
-            amount: field.amount,
-          };
-          //console.log(data)
-
-          this.filledPayments.push(data);
-        });
-        // let formData = new FormData();
-        // formData.append('employee', this.selectedEmployees.value)
-        // formData.append('payments', this.filledPayments)
-        // formData.append('month', this.month)
-        // formData.append('year', this.year)
-        //
-        //
-        // await this.uploadFiles.forEach((file) => {
-        //   formData.append("documents", file);
-        // });
-        // const url = `${this.ROUTES.variationalPayment}`;
-        // this.apiPost(url, formData, "Add Variational Payment").then((res) => {
-        //   this.apiResponseHandler(`${res.data}`, "Add Variational Payment");
-        //   this.submitted = false;
-        //   this.selectedEmployees = null;
-        //   this.count = 0;
-        //   this.getVariationalPayments();
-        // });
-
+      await this.paymentsFields.forEach((field) => {
         const data = {
-          employee: this.selectedEmployees.value,
-          payments: this.filledPayments,
-          month: this.month,
-          year: this.year,
+          payment_definition: field.id,
+          amount: field.amount,
         };
-        const url = `${this.ROUTES.variationalPayment}`;
-        this.apiPost(url, data, "Add Variational Payment").then((res) => {
-          this.apiResponseHandler(`${res.data}`, "Add Variational Payment");
-          this.submitted = false;
-          this.selectedEmployees = null;
-          this.count = 0;
-          this.getVariationalPayments();
-        });
+        //console.log(data)
+
+        this.filledPayments.push(data);
+      });
+      // let formData = new FormData();
+      // formData.append('employee', this.selectedEmployees.value)
+      // formData.append('payments', this.filledPayments)
+      // formData.append('month', this.month)
+      // formData.append('year', this.year)
+      //
+      //
+      // await this.uploadFiles.forEach((file) => {
+      //   formData.append("documents", file);
+      // });
+      // const url = `${this.ROUTES.variationalPayment}`;
+      // this.apiPost(url, formData, "Add Variational Payment").then((res) => {
+      //   this.apiResponseHandler(`${res.data}`, "Add Variational Payment");
+      //   this.submitted = false;
+      //   this.selectedEmployees = null;
+      //   this.count = 0;
+      //   this.getVariationalPayments();
+      // });
+
+      const data = {
+        employee: this.selectedEmployees.value,
+        payments: this.filledPayments,
+        month: this.month,
+        year: this.year,
+      };
+      const url = `${this.ROUTES.variationalPayment}`;
+      this.apiPost(url, data, "Add Variational Payment").then((res) => {
+        this.apiResponseHandler(`${res.data}`, "Add Variational Payment");
+        this.submitted = false;
+        this.selectedEmployees = null;
+        this.count = 0;
+        this.getVariationalPayments();
+      });
       // }else{
       //   this.$bvToast.toast("Please select at least one file to upload", {
       //     title: "No Files Selected",
@@ -197,7 +207,6 @@ export default {
       //   });
       //
       // }
-
 
       // const data = {
       //   employee: this.selectedEmployees.value,
@@ -302,14 +311,13 @@ export default {
                   <div class="form-group">
                     <label>Employee</label>
                     <multiselect
-                            v-model="selectedEmployees"
-                            :options="employees"
-                            :custom-label="selectionLabel"
-                            :class="{
-                      'is-invalid': submitted && $v.selectedEmployees.$error,
-                    }"
+                      v-model="selectedEmployees"
+                      :options="employees"
+                      :custom-label="selectionLabel"
+                      :class="{
+                        'is-invalid': submitted && $v.selectedEmployees.$error,
+                      }"
                     ></multiselect>
-
                   </div>
 
                   <br />
@@ -454,31 +462,35 @@ export default {
                   <div class="card">
                     <div class="card-body">
                       <div class="p-3 bg-light mb-4">
-                        <h5 class="font-size-14 mb-0">
-                          Supporting Documents
-
-                        </h5>
+                        <h5 class="font-size-14 mb-0">Supporting Documents</h5>
                       </div>
                       <input
-                          type="file"
-                          ref="file"
-                          multiple
-                          :name="uploadFieldName"
-                          @change="onFileChange($event.target.name, $event.target.files)"
-                          style="display: none"
+                        type="file"
+                        ref="file"
+                        multiple
+                        :name="uploadFieldName"
+                        @change="
+                          onFileChange($event.target.name, $event.target.files)
+                        "
+                        style="display: none"
                       />
-                      <div class="file-uploads mb-3" @click="launchFilePicker()">
-                        <p class="mb-0 text-muted">Click here to upload files</p>
+                      <div
+                        class="file-uploads mb-3"
+                        @click="launchFilePicker()"
+                      >
+                        <p class="mb-0 text-muted">
+                          Click here to upload files
+                        </p>
                       </div>
                       <div v-if="uploadFiles.length > 0">
                         <div class="alert alert-info mb-3">
-                          You've chosen the following documents to upload. Confirm and
-                          upload your selection below.
+                          You've chosen the following documents to upload.
+                          Confirm and upload your selection below.
                         </div>
                         <div
-                            class="file-detail d-flex justify-content-between align-items-center mt-3"
-                            v-for="(file, index) in uploadFiles"
-                            :key="index"
+                          class="file-detail d-flex justify-content-between align-items-center mt-3"
+                          v-for="(file, index) in uploadFiles"
+                          :key="index"
                         >
                           <small>
                             <span>{{ file.name }}</span>
@@ -486,13 +498,12 @@ export default {
                             <span>{{ file.size | getFileSize }}</span>
                           </small>
                           <button
-                              class="btn btn-sm btn-danger"
-                              @click="deleteFile(index)"
+                            class="btn btn-sm btn-danger"
+                            @click="deleteFile(index)"
                           >
                             DEL
                           </button>
                         </div>
-
                       </div>
                     </div>
                   </div>

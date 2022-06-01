@@ -60,26 +60,50 @@ export default {
       });
     },
     apiErrorHandler(error, title) {
-      if (error.response.status !== 403) {
-        this.$bvToast.toast(`${error.response.data}`, {
-          title,
-          toaster: "b-toaster-top-right",
-          appendToast: true,
-          variant: "danger",
-        });
-      } else {
-        this.logOut().then(() => {});
-        this.$router.push({ name: "login" }).then(() => {
-          this.$bvToast.toast(
-            `Your session has expired. Please log in again.`,
-            {
-              title: `${error.response.data}`,
-              toaster: "b-toaster-top-right",
-              appendToast: true,
-              variant: "danger",
-            }
-          );
-        });
+      const statusCode = error.response.status;
+      switch (statusCode) {
+        case 403: {
+          this.logOut().then(() => {});
+          this.$router.push({ name: "login" }).then(() => {
+            this.$bvToast.toast(
+              `Your session has expired. Please log in again.`,
+              {
+                title: `${error.response.data}`,
+                toaster: "b-toaster-top-right",
+                appendToast: true,
+                variant: "danger",
+              }
+            );
+          });
+          break;
+        }
+        case 500: {
+          const errorMessage = error.response.data.message;
+          if (errorMessage && errorMessage === "jwt expired") {
+            this.logOut().then(() => {});
+            this.$router.push({ name: "login" }).then(() => {
+              this.$bvToast.toast(
+                `Your session has expired. Please log in again.`,
+                {
+                  title: `Invalid Session`,
+                  toaster: "b-toaster-top-right",
+                  appendToast: true,
+                  variant: "danger",
+                }
+              );
+            });
+          }
+          break;
+        }
+        default: {
+          this.$bvToast.toast(`${error.response.data}`, {
+            title: `${title}`,
+            toaster: "b-toaster-top-right",
+            appendToast: true,
+            variant: "danger",
+          });
+          break;
+        }
       }
     },
     apiFormHandler(title) {

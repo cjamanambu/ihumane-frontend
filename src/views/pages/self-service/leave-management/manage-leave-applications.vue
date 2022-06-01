@@ -3,7 +3,17 @@ import Layout from "@/views/layouts/main";
 import PageHeader from "@/components/page-header";
 import appConfig from "@/app.config.json";
 import { authComputed } from "@/state/helpers";
+import store from "@/state/store";
 export default {
+  beforeRouteEnter(to, from, next) {
+    const userType = store.getters["auth/getUser"].user_type;
+    if (userType === 1 || userType === 3) {
+      next();
+    } else {
+      alert("You are not allowed to access this page. You will be redirected.");
+      next("/");
+    }
+  },
   page: {
     title: "Leave Authorizations",
     meta: [{ name: "description", content: appConfig.description }],
@@ -26,15 +36,24 @@ export default {
         const { data, officers } = res.data;
         let status = 0;
         data.forEach((leave, index) => {
-          if(new Date().getTime() >= new Date(leave.leapp_start_date).getTime() ){
+          if (
+            new Date().getTime() >= new Date(leave.leapp_start_date).getTime()
+          ) {
             status = 1;
-          }else if(new Date().getTime() <= new Date(leave.leapp_start_date).getTime()){
+          } else if (
+            new Date().getTime() <= new Date(leave.leapp_start_date).getTime()
+          ) {
             status = 0;
-          }else if(new Date().getTime() > new Date(leave.leapp_end_date).getTime() ){
+          } else if (
+            new Date().getTime() > new Date(leave.leapp_end_date).getTime()
+          ) {
             status = 3;
           }
-            this.applications[index] = { sn: ++index,leave_status:status,  ...leave };
-
+          this.applications[index] = {
+            sn: ++index,
+            leave_status: status,
+            ...leave,
+          };
         });
         this.applications.forEach((application) => {
           officers.forEach((officer) => {
@@ -210,9 +229,15 @@ export default {
                 </template>
 
                 <template #cell(leave_status)="row">
-                  <label v-if=" row.value === 1 " class="badge badge-primary">ACTIVE</label>
-                  <label v-else-if="row.value === 0 " class="badge badge-warning">INACTIVE</label>
-                  <label v-else-if="row.value === 3 " class="badge badge-success">FINISHED</label>
+                  <label v-if="row.value === 1" class="badge badge-primary"
+                    >ACTIVE</label
+                  >
+                  <label v-else-if="row.value === 0" class="badge badge-warning"
+                    >INACTIVE</label
+                  >
+                  <label v-else-if="row.value === 3" class="badge badge-success"
+                    >FINISHED</label
+                  >
                 </template>
               </b-table>
             </div>

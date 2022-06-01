@@ -2,11 +2,21 @@
 import Layout from "@/views/layouts/main";
 import PageHeader from "@/components/page-header";
 import appConfig from "@/app.config";
-import {required} from "vuelidate/lib/validators";
+import { required } from "vuelidate/lib/validators";
 import { VueEditor } from "vue2-editor";
-import Multiselect from 'vue-multiselect';
+import Multiselect from "vue-multiselect";
 import { authComputed } from "@/state/helpers";
+import store from "@/state/store";
 export default {
+  beforeRouteEnter(to, from, next) {
+    const userType = store.getters["auth/getUser"].user_type;
+    if (userType === 1 || userType === 3) {
+      next();
+    } else {
+      alert("You are not allowed to access this page. You will be redirected.");
+      next("/");
+    }
+  },
   page: {
     title: "Manage Queries ",
     meta: [{ name: "description", content: appConfig.description }],
@@ -17,7 +27,7 @@ export default {
     VueEditor,
     Multiselect,
   },
-  computed:{
+  computed: {
     ...authComputed,
   },
   mounted() {
@@ -38,15 +48,21 @@ export default {
         const { data } = res;
         data.list.forEach((query, index) => {
           this.queries[index] = {
-            sn: ++index, subject:query.q_subject,
-            employee:`${query.offender.emp_first_name} ${query.offender.emp_last_name}`,
-            emp_id:query.q_queried,
-            query_id:query.q_id,
-            type:`${query.q_query_type == 1 ? 'Warning' : 'Query'}`,
-            queried_by:`${query.issuer.emp_first_name} ${query.issuer.emp_last_name}`,
-            summary:`${query.q_body.replace( /(<([^>]+)>)/ig, '').length > 50 ? query.q_body.replace( /(<([^>]+)>)/ig, '').substr(0,47) : query.q_body.replace( /(<([^>]+)>)/ig, '')}`,
-            date:`${new Date(query.createdAt).toDateString()}`,
-            ...query };
+            sn: ++index,
+            subject: query.q_subject,
+            employee: `${query.offender.emp_first_name} ${query.offender.emp_last_name}`,
+            emp_id: query.q_queried,
+            query_id: query.q_id,
+            type: `${query.q_query_type == 1 ? "Warning" : "Query"}`,
+            queried_by: `${query.issuer.emp_first_name} ${query.issuer.emp_last_name}`,
+            summary: `${
+              query.q_body.replace(/(<([^>]+)>)/gi, "").length > 50
+                ? query.q_body.replace(/(<([^>]+)>)/gi, "").substr(0, 47)
+                : query.q_body.replace(/(<([^>]+)>)/gi, "")
+            }`,
+            date: `${new Date(query.createdAt).toDateString()}`,
+            ...query,
+          };
         });
         this.totalRows = this.queries.length;
       });
@@ -64,20 +80,18 @@ export default {
         //console.log(data);
 
         data.forEach((employee) => {
-
           this.employees.push({
             value: employee.emp_id,
             text: `${employee.emp_first_name} ${employee.emp_last_name} (${employee.emp_unique_id})`,
             disabled: false,
           });
-
         });
       });
     },
-    authorizingAsLabel ({ text }) {
-      return `${text}`
+    authorizingAsLabel({ text }) {
+      return `${text}`;
     },
-    submitData(){
+    submitData() {
       this.submitted = true;
       /*this.$v.$touch();
       if (this.$v.$invalid) {
@@ -85,11 +99,11 @@ export default {
       } else {*/
 
       const data = {
-        queried_by:this.getEmployee.emp_id,
-        subject:this.subject,
-        query_type:parseInt(this.selectedTarget),
-        body:this.body,
-        employee:this.persons
+        queried_by: this.getEmployee.emp_id,
+        subject: this.subject,
+        query_type: parseInt(this.selectedTarget),
+        body: this.body,
+        employee: this.persons,
       };
       //console.log({data})
 
@@ -134,12 +148,12 @@ export default {
       employees: [],
       types: [
         {
-          value:"1",
-          text:"Warning",
+          value: "1",
+          text: "Warning",
         },
         {
-          value:"2",
-          text:"Query",
+          value: "2",
+          text: "Query",
         },
       ],
       queries: [],
@@ -151,8 +165,8 @@ export default {
       filterOn: [],
       sortBy: "sn",
       sortDesc: false,
-      posted_on:null,
-      audience:null,
+      posted_on: null,
+      audience: null,
       fields: [
         { key: "sn", label: "S/n", sortable: true },
         {
@@ -171,12 +185,11 @@ export default {
       ],
       employeeID: null,
       queryId: null,
-      subject:null,
-      selectedTarget:null,
-      attachment:null,
-      body:null,
-      persons:[],
-
+      subject: null,
+      selectedTarget: null,
+      attachment: null,
+      body: null,
+      persons: [],
     };
   },
 };
@@ -287,9 +300,7 @@ export default {
     >
       <form @submit.prevent="submitData">
         <div class="form-group">
-          <label for="role">
-            Subject <span class="text-danger">*</span>
-          </label>
+          <label for="role"> Subject <span class="text-danger">*</span> </label>
           <input
             id="subject"
             type="text"
@@ -303,7 +314,10 @@ export default {
         </div>
         <div class="form-group">
           <label for="types">Type</label>
-          <b-form-select v-model="selectedTarget" :options="types"></b-form-select>
+          <b-form-select
+            v-model="selectedTarget"
+            :options="types"
+          ></b-form-select>
         </div>
         <b-form-group>
           <label for="">Employee(s)</label>
@@ -313,8 +327,8 @@ export default {
             :custom-label="authorizingAsLabel"
             :multiple="true"
             :class="{
-                      'is-invalid': submitted && $v.person.$error,
-                    }"
+              'is-invalid': submitted && $v.person.$error,
+            }"
           ></multiselect>
         </b-form-group>
         <div class="form-group">
@@ -326,9 +340,7 @@ export default {
           ></b-form-file>
         </div>
         <div class="form-group">
-          <label for="body">
-            Content <span class="text-danger">*</span>
-          </label>
+          <label for="body"> Content <span class="text-danger">*</span> </label>
           <vue-editor v-model="body"></vue-editor>
         </div>
         <b-button
@@ -360,9 +372,7 @@ export default {
     >
       <form @submit.prevent="submitData">
         <div class="form-group">
-          <label for="role">
-            Title <span class="text-danger">*</span>
-          </label>
+          <label for="role"> Title <span class="text-danger">*</span> </label>
           <input
             id="title"
             type="text"
@@ -404,18 +414,14 @@ export default {
           />
         </div>
         <div class="form-group">
-          <label for="body">
-            Content <span class="text-danger">*</span>
-          </label>
+          <label for="body"> Content <span class="text-danger">*</span> </label>
           <div v-html="body" style="border: 1px solid #ccc; padding: 5px"></div>
-
         </div>
         <div class="form-group">
-          <label for="">Attachment</label> <br>
+          <label for="">Attachment</label> <br />
           <a href="">Download attachment || No Attachment</a>
         </div>
       </form>
     </b-modal>
-
   </Layout>
 </template>

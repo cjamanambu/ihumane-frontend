@@ -5,7 +5,17 @@ import appConfig from "@/app.config";
 //import {required} from "vuelidate/lib/validators";
 import { VueEditor } from "vue2-editor";
 import { authComputed } from "@/state/helpers";
+import store from "@/state/store";
 export default {
+  beforeRouteEnter(to, from, next) {
+    const userType = store.getters["auth/getUser"].user_type;
+    if (userType === 1 || userType === 3) {
+      next();
+    } else {
+      alert("You are not allowed to access this page. You will be redirected.");
+      next("/");
+    }
+  },
   page: {
     title: "Manage Queries ",
     meta: [{ name: "description", content: appConfig.description }],
@@ -19,8 +29,8 @@ export default {
     this.getQueryDetails();
     this.getQueryReplies();
   },
-  computed:{
-    ...authComputed
+  computed: {
+    ...authComputed,
   },
   methods: {
     getQueryDetails() {
@@ -52,20 +62,18 @@ export default {
         //console.log(data);
 
         data.forEach((employee) => {
-
           this.employees.push({
             value: employee.emp_id,
             text: `${employee.emp_first_name} ${employee.emp_last_name} (${employee.emp_unique_id})`,
             disabled: false,
           });
-
         });
       });
     },
-    authorizingAsLabel ({ text }) {
-      return `${text}`
+    authorizingAsLabel({ text }) {
+      return `${text}`;
     },
-    submitData(){
+    submitData() {
       this.submitted = true;
       /*this.$v.$touch();
       if (this.$v.$invalid) {
@@ -73,10 +81,10 @@ export default {
       } else {*/
 
       const data = {
-        employee:this.getEmployee.emp_id,
-        reply_source:2,
-        reply:this.body,
-        query_id:parseInt(this.$route.params.queryId)
+        employee: this.getEmployee.emp_id,
+        reply_source: 2,
+        reply: this.body,
+        query_id: parseInt(this.$route.params.queryId),
       };
       //console.log({data})
 
@@ -121,15 +129,15 @@ export default {
       employees: [],
       types: [
         {
-          value:"1",
-          text:"Warning",
+          value: "1",
+          text: "Warning",
         },
         {
-          value:"2",
-          text:"Query",
+          value: "2",
+          text: "Query",
         },
       ],
-      query:null,
+      query: null,
       replies: [],
       queries: [],
       totalRows: 1,
@@ -140,8 +148,8 @@ export default {
       filterOn: [],
       sortBy: "sn",
       sortDesc: false,
-      posted_on:null,
-      audience:null,
+      posted_on: null,
+      audience: null,
       fields: [
         { key: "sn", label: "S/n", sortable: true },
         {
@@ -159,12 +167,11 @@ export default {
         },
       ],
       employeeID: null,
-      subject:null,
-      selectedTarget:null,
-      attachment:null,
-      body:null,
-      persons:[],
-
+      subject: null,
+      selectedTarget: null,
+      attachment: null,
+      body: null,
+      persons: [],
     };
   },
 };
@@ -190,7 +197,6 @@ export default {
           Reply Query
         </b-button>
       </div>
-
     </div>
     <scale-loader v-if="apiBusy" />
     <div v-else class="row">
@@ -202,19 +208,33 @@ export default {
               :src="require('@/assets/images/irc-logo.png')"
               class="mr-4"
             />
-                <h6 class="text-uppercase"><small for="" class="text-info">Subject: </small> <br>{{query.q_subject}}</h6>
-                <h6 class="text-uppercase"><small class="text-info">Body:</small></h6>
-                <div v-html="query.q_body">
-                </div>
+            <h6 class="text-uppercase">
+              <small for="" class="text-info">Subject: </small> <br />{{
+                query.q_subject
+              }}
+            </h6>
+            <h6 class="text-uppercase">
+              <small class="text-info">Body:</small>
+            </h6>
+            <div v-html="query.q_body"></div>
           </div>
         </div>
         <div class="card">
           <div class="card-header bg-dark">
-            <h5 class="text-white text-uppercase"> Replies</h5>
+            <h5 class="text-white text-uppercase">Replies</h5>
           </div>
           <div class="card-body">
-            <div v-for=" reply in replies" :key="reply.qr_id">
-                <h6 class=""><small for="" class="text-info text-uppercase">Name: </small> <br>{{reply.employee.emp_first_name}} {{reply.employee.emp_last_name}} ({{reply.employee.emp_unique_id}}) <small><i>{{new Date(reply.createdAt).toDateString()}}</i></small></h6>
+            <div v-for="reply in replies" :key="reply.qr_id">
+              <h6 class="">
+                <small for="" class="text-info text-uppercase">Name: </small>
+                <br />{{ reply.employee.emp_first_name }}
+                {{ reply.employee.emp_last_name }} ({{
+                  reply.employee.emp_unique_id
+                }})
+                <small
+                  ><i>{{ new Date(reply.createdAt).toDateString() }}</i></small
+                >
+              </h6>
               <div v-html="reply.qr_reply"></div>
             </div>
           </div>
@@ -223,17 +243,44 @@ export default {
       <div class="col-4">
         <div class="card">
           <div class="card-body">
-                <h5 class="text-uppercase mb-3">Other Information</h5>
-                <h6 class=""><small for="" class="text-info text-uppercase">Queried By: </small> <br>{{query.issuer.emp_first_name}} {{query.issuer.emp_last_name}} ({{query.issuer.emp_unique_id}})</h6>
-                <h6 class=""><small for="" class="text-info text-uppercase">Employee: </small> <br>{{query.offender.emp_first_name}} {{query.offender.emp_last_name}} ({{query.offender.emp_unique_id}})</h6>
-                <h6 class=""><small for="" class="text-info text-uppercase">Date: </small> <br>{{new Date(query.createdAt).toDateString()}} </h6>
-                <h6 class=""><small for="" class="text-info text-uppercase">Type of Query: </small>
-                  <br><span>{{ query.q_query_type == 1 ? 'Warning' : 'Query'}}</span>
-                </h6>
-            <h6 class=""><small for="" class="text-info text-uppercase">Read?: </small>
-              <br>{{ query.q_is_seen == 1 ? 'Read' : 'Unread' }}
+            <h5 class="text-uppercase mb-3">Other Information</h5>
+            <h6 class="">
+              <small for="" class="text-info text-uppercase"
+                >Queried By:
+              </small>
+              <br />{{ query.issuer.emp_first_name }}
+              {{ query.issuer.emp_last_name }} ({{
+                query.issuer.emp_unique_id
+              }})
             </h6>
-            <h6 class=""><small for="" class="text-info text-uppercase">Attachment: </small></h6>
+            <h6 class="">
+              <small for="" class="text-info text-uppercase">Employee: </small>
+              <br />{{ query.offender.emp_first_name }}
+              {{ query.offender.emp_last_name }} ({{
+                query.offender.emp_unique_id
+              }})
+            </h6>
+            <h6 class="">
+              <small for="" class="text-info text-uppercase">Date: </small>
+              <br />{{ new Date(query.createdAt).toDateString() }}
+            </h6>
+            <h6 class="">
+              <small for="" class="text-info text-uppercase"
+                >Type of Query:
+              </small>
+              <br /><span>{{
+                query.q_query_type == 1 ? "Warning" : "Query"
+              }}</span>
+            </h6>
+            <h6 class="">
+              <small for="" class="text-info text-uppercase">Read?: </small>
+              <br />{{ query.q_is_seen == 1 ? "Read" : "Unread" }}
+            </h6>
+            <h6 class="">
+              <small for="" class="text-info text-uppercase"
+                >Attachment:
+              </small>
+            </h6>
             <a href="" class="btn btn-primary btn-sm">Download</a>
           </div>
         </div>
@@ -259,9 +306,7 @@ export default {
           ></b-form-file>
         </div>
         <div class="form-group">
-          <label for="body">
-            Content <span class="text-danger">*</span>
-          </label>
+          <label for="body"> Content <span class="text-danger">*</span> </label>
           <vue-editor v-model="body"></vue-editor>
         </div>
         <b-button
@@ -281,8 +326,5 @@ export default {
         </b-button>
       </form>
     </b-modal>
-
-
-
   </Layout>
 </template>

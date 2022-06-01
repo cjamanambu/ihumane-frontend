@@ -37,6 +37,7 @@ export default {
         },
       ],
       current_language: "en",
+      notifications: [],
     };
   },
   components: { simplebar },
@@ -71,13 +72,12 @@ export default {
         }
       }
     },
-    getEmployeeNotifications(){
-      let employeeID = this.getEmployee.emp_id
-
+    getEmployeeNotifications() {
+      let employeeID = this.getEmployee.emp_id;
       const url = `${this.ROUTES.notifications}/${employeeID}`;
+      this.notifications = [];
       this.apiGet(url, "Get Notifications Error").then((res) => {
         const { data } = res;
-        //console.log({ data });
         data.forEach((notification) => {
           this.notifications.push(notification);
         });
@@ -105,16 +105,18 @@ export default {
     },
   },
 
- /* getUserType(){
+  /* getUserType(){
     if(user == 2 || user == 3){
       this.getEmployeeNotifications();
     }
   }*/
   mounted() {
-    if( parseInt(this.getUser.user_type) === 2 || parseInt(this.getUser.user_type) === 3){
+    if (
+      parseInt(this.getUser.user_type) === 2 ||
+      parseInt(this.getUser.user_type) === 3
+    ) {
       this.notifications = this.getNotifications;
       this.getEmployeeNotifications();
-
     }
   },
 };
@@ -211,8 +213,12 @@ export default {
             </div>
           </div>
           <simplebar style="max-height: 230px">
-
-            <a href class="text-reset notification-item" v-for="notify in notifications" :key="notify.n_id">
+            <a
+              href
+              class="text-reset notification-item"
+              v-for="notify in notifications"
+              :key="notify.n_id"
+            >
               <div class="media">
                 <div class="avatar-xs mr-3">
                   <span
@@ -237,8 +243,6 @@ export default {
                 </div>
               </div>
             </a>
-
-
           </simplebar>
           <div class="p-2 border-top">
             <a

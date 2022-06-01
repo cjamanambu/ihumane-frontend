@@ -2,8 +2,18 @@
 import Layout from "@/views/layouts/main";
 import PageHeader from "@/components/page-header";
 import appConfig from "@/app.config";
-import {required} from "vuelidate/lib/validators";
+import { required } from "vuelidate/lib/validators";
+import store from "@/state/store";
 export default {
+  beforeRouteEnter(to, from, next) {
+    const userType = store.getters["auth/getUser"].user_type;
+    if (userType === 1 || userType === 3) {
+      next();
+    } else {
+      alert("You are not allowed to access this page. You will be redirected.");
+      next("/");
+    }
+  },
   page: {
     title: "Education ",
     meta: [{ name: "description", content: appConfig.description }],
@@ -26,7 +36,7 @@ export default {
   methods: {
     refreshTable() {
       this.employeeID = this.$route.params.employeeID;
-      const url = `${this.ROUTES.education}/${this.employeeID}`
+      const url = `${this.ROUTES.education}/${this.employeeID}`;
       this.apiGet(url, "Get Employees Error").then((res) => {
         const { data } = res;
         const list = data.list;
@@ -35,14 +45,15 @@ export default {
         list.forEach((edu, index) => {
           this.edu_backgrounds[index] = {
             sn: ++index,
-            institution:edu.e_institution,
-            program:edu.e_program,
-            qualification:edu.e_qualification,
-            start_date:edu.e_start_date,
-            end_date:edu.e_end_date,
-            emp_id:edu.e_emp_id,
-            id:edu.e_id,
-            ...edu };
+            institution: edu.e_institution,
+            program: edu.e_program,
+            qualification: edu.e_qualification,
+            start_date: edu.e_start_date,
+            end_date: edu.e_end_date,
+            emp_id: edu.e_emp_id,
+            id: edu.e_id,
+            ...edu,
+          };
         });
         this.totalRows = this.employees.length;
       });
@@ -51,28 +62,29 @@ export default {
       this.totalRows = filteredItems.length;
       this.currentPage = 1;
     },
-    submitData(){
+    submitData() {
       this.submitted = true;
       this.$v.$touch();
       if (this.$v.$invalid) {
         this.apiFormHandler("Invalid LGA");
       } else {
-
         const data = {
-          employee:this.employeeID,
-          institution:this.institution,
-          qualification:this.qualification,
-          program:this.program,
-          start_date:this.start_date,
-          end_date:this.end_date,
+          employee: this.employeeID,
+          institution: this.institution,
+          qualification: this.qualification,
+          program: this.program,
+          start_date: this.start_date,
+          end_date: this.end_date,
         };
 
-        this.apiPost(this.ROUTES.education, data, "Add Education Error").then((res) => {
-          this.apiResponseHandler(`${res.data}`, "New Education Added");
-          this.refreshTable();
-          this.$v.$reset();
-          this.$refs["handle-education"].hide();
-        });
+        this.apiPost(this.ROUTES.education, data, "Add Education Error").then(
+          (res) => {
+            this.apiResponseHandler(`${res.data}`, "New Education Added");
+            this.refreshTable();
+            this.$v.$reset();
+            this.$refs["handle-education"].hide();
+          }
+        );
       }
     },
     submitUpdate() {
@@ -81,14 +93,13 @@ export default {
       if (this.$v.$invalid) {
         this.apiFormHandler("Invalid Entry");
       } else {
-
         const data = {
-          employee:this.employeeID,
-          institution:this.institution,
-          qualification:this.qualification,
-          program:this.program,
-          start_date:this.start_date,
-          end_date:this.end_date,
+          employee: this.employeeID,
+          institution: this.institution,
+          qualification: this.qualification,
+          program: this.program,
+          start_date: this.start_date,
+          end_date: this.end_date,
         };
         //console.log({data});
         const url = `${this.ROUTES.education}/${this.eduID}`;
@@ -184,49 +195,49 @@ export default {
           Add New
         </b-button>
       </div>
-
     </div>
     <scale-loader v-if="apiBusy" />
     <div v-else class="row">
-        <div class="col-md-6">
-          <h6 class="text-uppercase">Employee Details</h6>
-          <div class="card">
-            <div class="card-body">
-              <table class="table table-bordered">
-                <tr>
-                  <td><strong>Full Name</strong></td>
-                  <td>{{employee.emp_first_name}} {{employee.emp_last_name}} {{employee.emp_other_name}}
-                  </td>
-                </tr>
-                <tr>
-                  <td><strong>Phone</strong></td>
-                  <td>{{employee.emp_phone_no}}
-                  </td>
-                </tr>
-                <tr>
-                  <td><strong>ID</strong></td>
-                  <td>{{employee.emp_unique_id}}
-                  </td>
-                </tr>
-                <tr>
-                  <td><strong>Location</strong></td>
-                  <td>{{employee.location.location_name}} ({{ employee.location.l_t6_code }})
-                  </td>
-                </tr>
-                <tr>
-                  <td><strong>Office Email</strong></td>
-                  <td>{{employee.emp_office_email}}
-                  </td>
-                </tr>
-                <tr>
-                  <td><strong>Personal Email</strong></td>
-                  <td>{{employee.emp_personal_email}}
-                  </td>
-                </tr>
-              </table>
-            </div>
+      <div class="col-md-6">
+        <h6 class="text-uppercase">Employee Details</h6>
+        <div class="card">
+          <div class="card-body">
+            <table class="table table-bordered">
+              <tr>
+                <td><strong>Full Name</strong></td>
+                <td>
+                  {{ employee.emp_first_name }} {{ employee.emp_last_name }}
+                  {{ employee.emp_other_name }}
+                </td>
+              </tr>
+              <tr>
+                <td><strong>Phone</strong></td>
+                <td>{{ employee.emp_phone_no }}</td>
+              </tr>
+              <tr>
+                <td><strong>ID</strong></td>
+                <td>{{ employee.emp_unique_id }}</td>
+              </tr>
+              <tr>
+                <td><strong>Location</strong></td>
+                <td>
+                  {{ employee.location.location_name }} ({{
+                    employee.location.l_t6_code
+                  }})
+                </td>
+              </tr>
+              <tr>
+                <td><strong>Office Email</strong></td>
+                <td>{{ employee.emp_office_email }}</td>
+              </tr>
+              <tr>
+                <td><strong>Personal Email</strong></td>
+                <td>{{ employee.emp_personal_email }}</td>
+              </tr>
+            </table>
           </div>
         </div>
+      </div>
       <div class="col-12">
         <div class="card">
           <div class="card-body">
@@ -327,7 +338,6 @@ export default {
       @hidden="resetForm"
     >
       <form @submit.prevent="submitData">
-
         <div class="form-group">
           <label for="name">
             Institution Name <span class="text-danger">*</span>
@@ -344,9 +354,7 @@ export default {
           />
         </div>
         <div class="form-group">
-          <label for="name">
-            Program <span class="text-danger">*</span>
-          </label>
+          <label for="name"> Program <span class="text-danger">*</span> </label>
           <input
             id="program"
             type="text"
@@ -429,7 +437,6 @@ export default {
       @hidden="resetForm"
     >
       <form @submit.prevent="submitUpdate">
-
         <div class="form-group">
           <label for="name">
             Institution Name <span class="text-danger">*</span>

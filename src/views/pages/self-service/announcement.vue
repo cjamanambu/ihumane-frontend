@@ -2,13 +2,23 @@
 import Layout from "@/views/layouts/main";
 import PageHeader from "@/components/page-header";
 import appConfig from "@/app.config";
-import {required} from "vuelidate/lib/validators";
+import { required } from "vuelidate/lib/validators";
 import { authComputed } from "@/state/helpers";
+import store from "@/state/store";
 //import html2pdf from 'html2pdf.js';
 
 export default {
+  beforeRouteEnter(to, from, next) {
+    const userType = store.getters["auth/getUser"].user_type;
+    if (userType === 2 || userType === 3) {
+      next();
+    } else {
+      alert("You are not allowed to access this page. You will be redirected.");
+      next("/");
+    }
+  },
   page: {
-    title: " Announcements ",
+    title: "Announcements ",
     meta: [{ name: "description", content: appConfig.description }],
   },
   components: {
@@ -36,22 +46,29 @@ export default {
         //console.log(data.announcements);
         data.announcements.forEach((announcement, index) => {
           this.announcements[index] = {
-            sn: ++index, a_title:announcement.a_title,
-            posted_by:`${announcement.author.emp_first_name} ${announcement.author.emp_last_name}`,
-            target:`${announcement.a_target == 1 ? 'Everyone' : 'Specific'}`,
-            body:announcement.a_body,
-            summary:`${announcement.a_body.replace( /(<([^>]+)>)/ig, '').length > 50 ? announcement.a_body.replace( /(<([^>]+)>)/ig, '').substr(0,47) : announcement.a_body.replace( /(<([^>]+)>)/ig, '')}`,
-            date_published:`${new Date(announcement.createdAt).toDateString()}`,
-            ...announcement };
+            sn: ++index,
+            a_title: announcement.a_title,
+            posted_by: `${announcement.author.emp_first_name} ${announcement.author.emp_last_name}`,
+            target: `${announcement.a_target == 1 ? "Everyone" : "Specific"}`,
+            body: announcement.a_body,
+            summary: `${
+              announcement.a_body.replace(/(<([^>]+)>)/gi, "").length > 50
+                ? announcement.a_body.replace(/(<([^>]+)>)/gi, "").substr(0, 47)
+                : announcement.a_body.replace(/(<([^>]+)>)/gi, "")
+            }`,
+            date_published: `${new Date(
+              announcement.createdAt
+            ).toDateString()}`,
+            ...announcement,
+          };
         });
         this.totalRows = this.employees.length;
       });
     },
-    async print () {
+    async print() {
       // Pass the element id here html2pdf
       //var element = document.getElementById('printArea');
       //html2pdf(element);
-
     },
     fetchEmployees() {
       this.apiGet(this.ROUTES.employee, "Get Employees Error").then((res) => {
@@ -66,20 +83,18 @@ export default {
         //console.log(data);
 
         data.forEach((employee) => {
-
           this.employees.push({
             value: employee.emp_id,
             text: `${employee.emp_first_name} ${employee.emp_last_name} (${employee.emp_unique_id})`,
             disabled: false,
           });
-
         });
       });
     },
-    authorizingAsLabel ({ text }) {
-      return `${text}`
+    authorizingAsLabel({ text }) {
+      return `${text}`;
     },
-    submitData(){
+    submitData() {
       this.submitted = true;
       /*this.$v.$touch();
       if (this.$v.$invalid) {
@@ -87,15 +102,19 @@ export default {
       } else {*/
 
       const data = {
-        author:4,
-        title:this.subject,
-        target:parseInt(this.selectedTarget),
-        body:this.body,
-        persons:this.persons
+        author: 4,
+        title: this.subject,
+        target: parseInt(this.selectedTarget),
+        body: this.body,
+        persons: this.persons,
       };
       //console.log({data})
 
-      this.apiPost(this.ROUTES.announcement, data, "Post announcement Error").then((res) => {
+      this.apiPost(
+        this.ROUTES.announcement,
+        data,
+        "Post announcement Error"
+      ).then((res) => {
         this.apiResponseHandler(`${res.data}`, "Publish Announcement");
         this.refreshTable();
         this.$v.$reset();
@@ -112,7 +131,7 @@ export default {
       row = row[0];
       this.subject = row.a_title;
       this.author = row.posted_by;
-      this.audience = row.target == 1 ? 'Everyone' : 'Specific';
+      this.audience = row.target == 1 ? "Everyone" : "Specific";
       this.body = row.body;
       this.posted_on = row.date_published;
       this.$refs["view-announcement"].show();
@@ -138,12 +157,12 @@ export default {
       employees: [],
       target: [
         {
-          value:"1",
-          text:"Everyone",
+          value: "1",
+          text: "Everyone",
         },
         {
-          value:"2",
-          text:"Specific",
+          value: "2",
+          text: "Specific",
         },
       ],
       announcements: [],
@@ -155,8 +174,8 @@ export default {
       filterOn: [],
       sortBy: "sn",
       sortDesc: false,
-      posted_on:null,
-      audience:null,
+      posted_on: null,
+      audience: null,
       fields: [
         { key: "sn", label: "S/n", sortable: true },
         {
@@ -174,12 +193,11 @@ export default {
         },
       ],
       employeeID: null,
-      subject:null,
-      selectedTarget:null,
-      attachment:null,
-      body:null,
-      persons:[],
-
+      subject: null,
+      selectedTarget: null,
+      attachment: null,
+      body: null,
+      persons: [],
     };
   },
 };
@@ -279,28 +297,40 @@ export default {
       @hidden="resetForm"
       class="modal-lg"
     >
-      <button class="btn btn-primary btn-sm float-right" type="button" @click="print"> <i class="mdi mdi-printer"></i> Print</button>
+      <button
+        class="btn btn-primary btn-sm float-right"
+        type="button"
+        @click="print"
+      >
+        <i class="mdi mdi-printer"></i> Print
+      </button>
       <form @submit.prevent="" id="printArea">
         <img
           style="width: 30%"
           :src="require('@/assets/images/irc-logo.png')"
           class="mr-4"
         />
-        <h6 class=""><small for="" class="text-info text-uppercase">Title: </small>
-          <br><span v-html="subject"></span></h6>
-        <h6 class=""><small for="" class="text-info text-uppercase">Date: </small>
-          <br><span v-html="posted_on"></span></h6>
-        <h6 class=""><small for="" class="text-info text-uppercase">Audience: </small>
-          <br><span v-html="audience"></span></h6>
-        <h6 class=""><small for="" class="text-info text-uppercase">Content: </small>
+        <h6 class="">
+          <small for="" class="text-info text-uppercase">Title: </small>
+          <br /><span v-html="subject"></span>
+        </h6>
+        <h6 class="">
+          <small for="" class="text-info text-uppercase">Date: </small>
+          <br /><span v-html="posted_on"></span>
+        </h6>
+        <h6 class="">
+          <small for="" class="text-info text-uppercase">Audience: </small>
+          <br /><span v-html="audience"></span>
+        </h6>
+        <h6 class="">
+          <small for="" class="text-info text-uppercase">Content: </small>
         </h6>
         <div v-html="body"></div>
-        <h6 class=""><small for="" class="text-info text-uppercase">Attachment: </small>
+        <h6 class="">
+          <small for="" class="text-info text-uppercase">Attachment: </small>
         </h6>
-        <a href="">Download attachment || No Attachment</a> <br>
-
+        <a href="">Download attachment || No Attachment</a> <br />
       </form>
     </b-modal>
-
   </Layout>
 </template>

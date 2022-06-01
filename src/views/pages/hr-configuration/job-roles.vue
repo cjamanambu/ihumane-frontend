@@ -3,9 +3,19 @@ import Layout from "@/views/layouts/main";
 import PageHeader from "@/components/page-header";
 import appConfig from "@/app.config";
 import { required } from "vuelidate/lib/validators";
+import store from "@/state/store";
 //import Multiselect from 'vue-multiselect';
 
 export default {
+  beforeRouteEnter(to, from, next) {
+    const userType = store.getters["auth/getUser"].user_type;
+    if (userType === 1 || userType === 3) {
+      next();
+    } else {
+      alert("You are not allowed to access this page. You will be redirected.");
+      next("/");
+    }
+  },
   page: {
     title: "Job Roles",
     meta: [{ name: "description", content: appConfig.description }],
@@ -24,8 +34,8 @@ export default {
     description: { required },
   },
   methods: {
-    departmentLabel ({ text }) {
-      return `${text}`
+    departmentLabel({ text }) {
+      return `${text}`;
     },
     resetForm() {
       this.role = null;
@@ -42,21 +52,16 @@ export default {
       });
     },
     fetchDepartments() {
-      this.apiGet(this.ROUTES.department, "Get Sector Error").then(
-        (res) => {
-          this.departments = [
-            { value: null, text: "Please select a sector" },
-          ];
-          const { data } = res;
-           data.departments.forEach((department) => {
-            this.departments.push({
-              value: department.department_id,
-              text: department.department_name,
-            });
+      this.apiGet(this.ROUTES.department, "Get Sector Error").then((res) => {
+        this.departments = [{ value: null, text: "Please select a sector" }];
+        const { data } = res;
+        data.departments.forEach((department) => {
+          this.departments.push({
+            value: department.department_id,
+            text: department.department_name,
           });
-
-        }
-      );
+        });
+      });
     },
     onFiltered(filteredItems) {
       // Trigger pagination to update the number of buttons/pages due to filtering
@@ -143,7 +148,6 @@ export default {
         { key: "job_role_id", label: "ID", sortable: true },
         { key: "job_role", label: "Role", sortable: true },
         { key: "description", label: "Description", sortable: true },
-
       ],
       role: null,
       // department: null,
@@ -278,25 +282,25 @@ export default {
             }"
           />
         </div>
-<!--        <div class="form-group">-->
-<!--          <label for="department">-->
-<!--            Sector <span class="text-danger">*</span>-->
-<!--          </label>-->
-<!--          <multiselect-->
-<!--                  v-model="department"-->
-<!--                  :options="departments"-->
-<!--                  :custom-label="departmentLabel"-->
-<!--                  :class="{-->
-<!--                      'is-invalid': submitted && $v.department.$error,-->
-<!--                    }"-->
-<!--          ></multiselect>-->
-<!--          <small-->
-<!--            class="form-text text-muted manage"-->
-<!--            @click="$router.push('/departments')"-->
-<!--          >-->
-<!--            Manage Sectors-->
-<!--          </small>-->
-<!--        </div>-->
+        <!--        <div class="form-group">-->
+        <!--          <label for="department">-->
+        <!--            Sector <span class="text-danger">*</span>-->
+        <!--          </label>-->
+        <!--          <multiselect-->
+        <!--                  v-model="department"-->
+        <!--                  :options="departments"-->
+        <!--                  :custom-label="departmentLabel"-->
+        <!--                  :class="{-->
+        <!--                      'is-invalid': submitted && $v.department.$error,-->
+        <!--                    }"-->
+        <!--          ></multiselect>-->
+        <!--          <small-->
+        <!--            class="form-text text-muted manage"-->
+        <!--            @click="$router.push('/departments')"-->
+        <!--          >-->
+        <!--            Manage Sectors-->
+        <!--          </small>-->
+        <!--        </div>-->
         <div class="form-group">
           <label for="description">
             Description <span class="text-danger">*</span>
@@ -350,26 +354,26 @@ export default {
             }"
           />
         </div>
-<!--        <div class="form-group">-->
-<!--          <label for="department">-->
-<!--            Sector <span class="text-danger">*</span>-->
-<!--          </label>-->
-<!--          <multiselect-->
-<!--                  v-model="department"-->
-<!--                  :options="departments"-->
-<!--                  :custom-label="departmentLabel"-->
-<!--                  :class="{-->
-<!--                      'is-invalid': submitted && $v.department.$error,-->
-<!--                    }"-->
-<!--          ></multiselect>-->
+        <!--        <div class="form-group">-->
+        <!--          <label for="department">-->
+        <!--            Sector <span class="text-danger">*</span>-->
+        <!--          </label>-->
+        <!--          <multiselect-->
+        <!--                  v-model="department"-->
+        <!--                  :options="departments"-->
+        <!--                  :custom-label="departmentLabel"-->
+        <!--                  :class="{-->
+        <!--                      'is-invalid': submitted && $v.department.$error,-->
+        <!--                    }"-->
+        <!--          ></multiselect>-->
 
-<!--          <small-->
-<!--            class="form-text text-muted manage"-->
-<!--            @click="$router.push('/departments')"-->
-<!--          >-->
-<!--            Manage Sectors-->
-<!--          </small>-->
-<!--        </div>-->
+        <!--          <small-->
+        <!--            class="form-text text-muted manage"-->
+        <!--            @click="$router.push('/departments')"-->
+        <!--          >-->
+        <!--            Manage Sectors-->
+        <!--          </small>-->
+        <!--        </div>-->
         <div class="form-group">
           <label for="description">
             Description <span class="text-danger">*</span>
