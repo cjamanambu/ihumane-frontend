@@ -6,7 +6,7 @@ import { authComputed } from "@/state/helpers";
 import { required } from "vuelidate/lib/validators";
 import DatePicker from "vue2-datepicker";
 import "vue2-datepicker/index.css";
-
+import VueHtml2pdf from "vue-html2pdf";
 export default {
   page: {
     title: "Leave Details",
@@ -19,6 +19,7 @@ export default {
     Layout,
     PageHeader,
     DatePicker,
+    VueHtml2pdf,
   },
   mounted() {
     this.fetchLeaveDocuments();
@@ -39,6 +40,9 @@ export default {
         this.totalRows = this.supportingDocs.length;
         this.fetchRequest();
       });
+    },
+    printLeaveApplication() {
+      this.$refs.html2Pdf.generatePdf();
     },
     fetchRequest() {
       let requestID = this.$route.params.leaveAppID;
@@ -277,13 +281,22 @@ export default {
   <Layout>
     <PageHeader :title="title" :items="items" />
     <div class="d-flex justify-content-end mb-3">
-      <b-button
-        class="btn btn-success"
-        @click="$router.push({ name: 'manage-leave-applications' })"
-      >
-        <i class="mdi mdi-plus mr-2"></i>
-        Manage Leave Applications
-      </b-button>
+     <div class="btn-group">
+       <b-button
+         class="btn btn-success"
+         @click="printLeaveApplication"
+       >
+         <i class="mdi mdi-printer mr-2"></i>
+         Print
+       </b-button>
+       <b-button
+         class="btn btn-secondary"
+         @click="$router.push({ name: 'manage-leave-applications' })"
+       >
+         <i class="mdi mdi-step-backward mr-2"></i>
+         Go Back
+       </b-button>
+     </div>
     </div>
     <scale-loader v-if="apiBusy" />
     <div class="row" v-else>
@@ -752,5 +765,404 @@ export default {
         </div>
       </div>
     </div>
+    <VueHtml2pdf
+      :show-layout="false"
+      :float-layout="true"
+      :enable-download="false"
+      :preview-modal="true"
+      :paginate-elements-by-height="1400"
+      filename="Employee Leave Application"
+      :pdf-quality="2"
+      :manual-pagination="false"
+      pdf-format="a4"
+      pdf-orientation="portrait"
+      pdf-content-width="100%"
+      ref="html2Pdf"
+    >
+      <section slot="pdf-content">
+      <div class="row" >
+        <div class="col-lg-8">
+          <div class="card">
+            <div class="card-body" v-if="application">
+              <div class="p-3 bg-light mb-4 d-flex justify-content-between">
+                <div class="d-inline mb-0">
+                  <h5 class="font-size-14 mb-0">Leave Details</h5>
+                </div>
+                <span class="d-inline mb-0">
+                <small
+                  v-if="application.leapp_status === 0"
+                  class="text-warning"
+                >
+                  Application Pending
+                </small>
+                <small
+                  v-else-if="application.leapp_status === 1"
+                  class="text-success"
+                >
+                  Application Approved
+                </small>
+                <small
+                  v-else-if="application.leapp_status === 2"
+                  class="text-danger"
+                >
+                  Application Declined
+                </small>
+                <small
+                  v-else-if="application.leapp_status === 3"
+                  class="text-success"
+                >
+                  Leave Active
+                </small>
+                <small
+                  v-else-if="application.leapp_status === 4"
+                  class="text-danger"
+                >
+                  Leave Finished
+                </small>
+              </span>
+              </div>
+              <div class="row">
+                <div class="col-lg-4">
+                  <div class="form-group">
+                    <label for=""> Leave Type </label>
+                    <p class="text-muted">
+                      {{ application.LeaveType.leave_name }}
+                    </p>
+                  </div>
+                </div>
+                <div class="col-lg-4">
+                  <div class="form-group">
+                    <label for=""> Emergency Email Address </label>
+                    <p class="text-muted" v-if="application.leapp_alt_email">
+                      {{ application.leapp_alt_email }}
+                    </p>
+                    <p v-else>---</p>
+                  </div>
+                </div>
+                <div class="col-lg-4">
+                  <div class="form-group">
+                    <label for=""> Emergency Phone Number </label>
+                    <p class="text-muted" v-if="application.leapp_alt_phone">
+                      {{ application.leapp_alt_phone }}
+                    </p>
+                    <p v-else>---</p>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-lg-4">
+                  <div class="form-group">
+                    <label for=""> Start Date </label>
+                    <p class="text-muted">
+                      {{ new Date(application.leapp_start_date).toDateString() }}
+                    </p>
+                  </div>
+                </div>
+                <div class="col-lg-4">
+                  <div class="form-group">
+                    <label for=""> End Date </label>
+                    <p class="text-muted">
+                      {{ new Date(application.leapp_end_date).toDateString() }}
+                    </p>
+                  </div>
+                </div>
+                <div class="col-lg-4">
+                  <div class="form-group">
+                    <label for=""> Leave Length </label>
+                    <p class="text-muted">
+                      {{ application.leapp_total_days }} days
+                    </p>
+                  </div>
+                </div>
+                <div class="col-lg-4">
+                  <div class="form-group">
+                    <label for=""> Status </label> :
+                    <label v-if=" new Date().getTime() >= new Date(application.leapp_start_date).getTime() " class="badge badge-primary">ACTIVE</label>
+                    <label v-else-if="new Date().getTime() <= new Date(application.leapp_start_date).getTime()  " class="badge badge-warning">INACTIVE</label>
+                    <label v-else-if="new Date().getTime() > new Date(application.leapp_end_date).getTime()  " class="badge badge-success">FINISHED</label>
+
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-body">
+              <div class="p-3 bg-light mb-4 d-flex justify-content-between">
+                <div class="d-inline mb-0">
+                  <h5 class="font-size-14 mb-0">Authorization Log</h5>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-12">
+                  <b-table-simple striped responsive bordered outlined>
+                    <b-thead head-variant="light">
+                      <b-tr>
+                        <b-th>OFFICER</b-th>
+                        <b-th>STATUS</b-th>
+                        <b-th>COMMENT</b-th>
+                        <b-th>DATE</b-th>
+                      </b-tr>
+                    </b-thead>
+                    <b-tbody>
+                      <b-tr v-for="(logEntry, index) in log" :key="index">
+                        <b-td style="width: 25%">
+                        <span>
+                          {{ logEntry.officers.emp_first_name }}
+                          {{ logEntry.officers.emp_last_name }}
+                        </span>
+                        </b-td>
+                        <b-td style="width: 15%">
+                        <span
+                          v-if="logEntry.auth_status === 0"
+                          class="text-warning"
+                        >
+                          Pending
+                        </span>
+                          <span
+                            v-else-if="logEntry.auth_status === 1"
+                            class="text-success"
+                          >
+                          Approved
+                        </span>
+                          <span
+                            v-else-if="logEntry.auth_status === 2"
+                            class="text-danger"
+                          >
+                          Declined
+                        </span>
+                        </b-td>
+                        <b-td style="width: 40%">
+                        <span>
+                          {{ logEntry.auth_comment }}
+                        </span>
+                        </b-td>
+                        <b-td style="width: 20%">
+                        <span>
+                          {{ new Date(logEntry.updatedAt).toDateString() }}
+                          {{
+                            new Date(logEntry.updatedAt).toLocaleTimeString()
+                          }}
+                        </span>
+                        </b-td>
+                      </b-tr>
+                    </b-tbody>
+                  </b-table-simple>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-body">
+              <div class="p-3 bg-light mb-4 d-flex justify-content-between">
+                <div class="d-inline mb-0">
+                  <h5 class="font-size-14 mb-0">Previous Applications</h5>
+                </div>
+              </div>
+              <div class="row mt-4">
+                <div class="col-sm-12 col-md-6">
+                  <div id="tickets-table_length" class="dataTables_length">
+                    <label class="d-inline-flex align-items-center">
+                      Show&nbsp;
+                      <b-form-select
+                        v-model="perPage"
+                        size="sm"
+                        :options="pageOptions"
+                      ></b-form-select
+                      >&nbsp;entries
+                    </label>
+                  </div>
+                </div>
+                <!-- Search -->
+                <div class="col-sm-12 col-md-6">
+                  <div
+                    id="tickets-table_filter"
+                    class="dataTables_filter text-md-right"
+                  >
+                    <label class="d-inline-flex align-items-center">
+                      Search:
+                      <b-form-input
+                        v-model="filter"
+                        type="search"
+                        placeholder="Search..."
+                        class="form-control form-control-sm ml-2"
+                      ></b-form-input>
+                    </label>
+                  </div>
+                </div>
+                <!-- End search -->
+              </div>
+              <!-- Table -->
+              <div class="table-responsive mb-0">
+                <b-table
+                  ref="donor-table"
+                  bordered
+                  selectable
+                  hover
+                  :items="previous_applications"
+                  :fields="fields"
+                  responsive="sm"
+                  :per-page="perPage"
+                  :current-page="currentPage"
+                  :sort-by.sync="sortBy"
+                  :sort-desc.sync="sortDesc"
+                  :filter="filter"
+                  :filter-included-fields="filterOn"
+                  @filtered="onFiltered"
+                  show-empty
+                  select-mode="single"
+                  @row-selected="selectRow"
+                >
+                  <template #cell(employee)="row">
+                    <p class="mb-0">
+                      {{ row.value.emp_first_name }} {{ row.value.emp_last_name }}
+                    </p>
+                    <small class="text-muted">
+                      {{ row.value.emp_unique_id }}
+                    </small>
+                  </template>
+
+                  <template #cell(leapp_start_date)="row">
+                    <span> {{ new Date(row.value).toDateString() }}</span>
+                  </template>
+                  <template #cell(leapp_end_date)="row">
+                    <span> {{ new Date(row.value).toDateString() }}</span>
+                  </template>
+                  <template #cell(leapp_total_days)="row">
+                    <span> {{ row.value }} days</span>
+                  </template>
+
+                  <template #cell(leapp_status)="row">
+                  <span
+                    v-if="row.value === 0"
+                    class="badge badge-pill badge-warning"
+                  >
+                    pending
+                  </span>
+                    <span
+                      v-else-if="row.value === 1"
+                      class="badge badge-pill badge-success"
+                    >
+                    approved
+                  </span>
+                    <span
+                      v-else-if="row.value === 2"
+                      class="badge badge-pill badge-danger"
+                    >
+                    declined
+                  </span>
+                  </template>
+                </b-table>
+              </div>
+              <div class="row">
+                <div class="col">
+                  <div
+                    class="dataTables_paginate paging_simple_numbers float-right"
+                  >
+                    <ul class="pagination pagination-rounded mb-0">
+                      <!-- pagination -->
+                      <b-pagination
+                        v-model="currentPage"
+                        :total-rows="totalRows"
+                        :per-page="perPage"
+                      ></b-pagination>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="card mt-4">
+            <div class="card-body">
+              <div class="p-3 bg-light mb-4 d-flex justify-content-between">
+                <div class="d-inline mb-0">
+                  <h5 class="font-size-14 mb-0">Supporting Documents</h5>
+                </div>
+              </div>
+              <div class="row mt-4">
+                <div class="col-sm-12 col-md-6">
+                  <div id="tickets-table_length" class="dataTables_length">
+                    <label class="d-inline-flex align-items-center">
+                      Show&nbsp;
+                      <b-form-select
+                        v-model="perPageAlt"
+                        size="sm"
+                        :options="pageOptionsAlt"
+                      ></b-form-select
+                      >&nbsp;entries
+                    </label>
+                  </div>
+                </div>
+                <!-- Search -->
+                <div class="col-sm-12 col-md-6">
+                  <div
+                    id="tickets-table_filter"
+                    class="dataTables_filter text-md-right"
+                  >
+                    <label class="d-inline-flex align-items-center">
+                      Search:
+                      <b-form-input
+                        v-model="filterAlt"
+                        type="search"
+                        placeholder="Search..."
+                        class="form-control form-control-sm ml-2"
+                      ></b-form-input>
+                    </label>
+                  </div>
+                </div>
+                <!-- End search -->
+              </div>
+              <div class="table-responsive mb-0">
+                <b-table
+                  ref="employee-doc-table"
+                  bordered
+                  selectable
+                  hover
+                  :items="supportingDocs"
+                  :fields="docFields"
+                  responsive="sm"
+                  :per-page="perPageAlt"
+                  :current-page="currentPageAlt"
+                  :sort-by.sync="sortByAlt"
+                  :sort-desc.sync="sortDescAlt"
+                  :filter="filterAlt"
+                  :filter-included-fields="filterOnAlt"
+                  @filtered="onFiltered"
+                  show-empty
+                  select-mode="single"
+                  @row-selected="selectRow"
+                >
+                  <template #cell(createdAt)="row">
+                  <span>
+                    {{ new Date(row.value).toDateString() }}
+                  </span>
+                    <span>
+                    {{ new Date(row.value).toLocaleTimeString("en") }}
+                  </span>
+                  </template>
+                </b-table>
+              </div>
+              <div class="row">
+                <div class="col">
+                  <div
+                    class="dataTables_paginate paging_simple_numbers float-right"
+                  >
+                    <ul class="pagination pagination-rounded mb-0">
+                      <!-- pagination -->
+                      <b-pagination
+                        v-model="currentPageAlt"
+                        :total-rows="totalRowsAlt"
+                        :per-page="perPageAlt"
+                      ></b-pagination>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      </section>
+    </VueHtml2pdf>
   </Layout>
 </template>
