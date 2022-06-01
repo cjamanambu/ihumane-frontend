@@ -3,6 +3,7 @@ import Layout from "@/views/layouts/main";
 import PageHeader from "@/components/page-header";
 import appConfig from "@/app.config";
 import { authComputed } from "@/state/helpers";
+import VueHtml2pdf from "vue-html2pdf";
 export default {
   page: {
     title: "Time Sheet Details",
@@ -14,6 +15,7 @@ export default {
   components: {
     Layout,
     PageHeader,
+    VueHtml2pdf,
   },
   mounted() {
     this.fetchRequest();
@@ -30,7 +32,7 @@ export default {
 
       this.apiGet(url, "Get Time sheet details").then((res) => {
         const { timesheet, timeAllocation, log } = res.data;
-        console.log(timesheet)
+        //console.log(timesheet)
         this.timeSheet = timesheet;
         this.allocation = timeAllocation[0];
         this.breakdown = timeAllocation;
@@ -97,6 +99,9 @@ export default {
       }
       return time.join(""); // return adjusted time or original string
     },
+    generateReport() {
+      this.$refs.html2Pdf.generatePdf();
+    },
   },
   data() {
     return {
@@ -147,13 +152,22 @@ export default {
   <Layout>
     <PageHeader :title="title" :items="items" />
     <div class="d-flex justify-content-end mb-3">
-      <b-button
-        class="btn btn-secondary"
-        @click="$router.push({ name: 'manage-time-sheets' })"
-      >
-        <i class="mdi mdi-step-backward mr-2"></i>
-        Go Back
-      </b-button>
+      <div class="btn-group">
+        <b-button
+          class="btn btn-success"
+          @click="generateReport"
+        >
+          <i class="mdi mdi-printer mr-2"></i>
+          Print
+        </b-button>
+        <b-button
+          class="btn btn-secondary"
+          @click="$router.push({ name: 'manage-time-sheets' })"
+        >
+          <i class="mdi mdi-step-backward mr-2"></i>
+          Go Back
+        </b-button>
+      </div>
     </div>
     <scale-loader v-if="apiBusy" />
     <div class="row" v-else>
@@ -432,5 +446,298 @@ export default {
         </div>
       </div>
     </div>
+    <VueHtml2pdf
+      :show-layout="false"
+      :float-layout="true"
+      :enable-download="false"
+      :preview-modal="true"
+      :paginate-elements-by-height="1400"
+      filename="Employee Timesheet"
+      :pdf-quality="2"
+      :manual-pagination="false"
+      pdf-format="a4"
+      pdf-orientation="portrait"
+      pdf-content-width="100%"
+      ref="html2Pdf"
+    >
+      <section slot="pdf-content">
+        <div class="row">
+          <div class="col-lg-8">
+            <div class="card">
+              <div class="card-body">
+                <div class="p-3 bg-light mb-4 d-flex justify-content-between">
+                  <div class="d-inline mb-0">
+                    <h5 class="font-size-14 mb-0">Timesheet Entries</h5>
+                  </div>
+                  <small
+                    v-if="this.ta_status === 1"
+                    class="text-success float-right"
+                  >
+                    Approved
+                  </small>
+                  <small
+                    v-else-if="this.ta_status === 2"
+                    class="text-danger float-right"
+                  >
+                    Discarded
+                  </small>
+                  <small v-else class="text-warning float-right"> Pending </small>
+                </div>
+                <div class="row">
+                  <div class="col-lg-12">
+                    <div class="table-responsive">
+                      <table class="table mb-0">
+                        <thead>
+                        <tr>
+                          <th>#</th>
+                          <th>Day</th>
+                          <th>Start</th>
+                          <th>End</th>
+                          <th>Duration</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr
+                          class="table-light"
+                          v-for="(ts, index) in this.timeSheet"
+                          :key="index"
+                        >
+                          <th scope="row">{{ index + 1 }}</th>
+                          <td>
+                            {{
+                              new Date(
+                                `${ts.ts_month}-${ts.ts_day}-${ts.ts_year}`
+                              ).toDateString()
+                            }}
+                          </td>
+                          <td>
+                          <span v-if="ts.ts_is_present === 1">
+                            {{ tConvert(ts.ts_start) }}
+                          </span>
+                            <span
+                              class="text-primary"
+                              v-else-if="ts.ts_is_present === 2"
+                            >
+                            P. HOLIDAY
+                          </span>
+                            <span
+                              class="text-warning"
+                              v-else-if="ts.ts_is_present === 3"
+                            >
+                            WEEKEND
+                          </span>
+                            <span
+                              class="text-info"
+                              v-else-if="ts.ts_is_present === 4"
+                            >
+                            LEAVE
+                          </span>
+                            <span v-else class="text-danger">ABSENT</span>
+                          </td>
+                          <td>
+                          <span v-if="ts.ts_is_present === 1">
+                            {{ tConvert(ts.ts_end) }}
+                          </span>
+                            <span
+                              class="text-primary"
+                              v-else-if="ts.ts_is_present === 2"
+                            >
+                            P. HOLIDAY
+                          </span>
+                            <span
+                              class="text-warning"
+                              v-else-if="ts.ts_is_present === 3"
+                            >
+                            WEEKEND
+                          </span>
+                            <span
+                              class="text-info"
+                              v-else-if="ts.ts_is_present === 4"
+                            >
+                            LEAVE
+                          </span>
+                            <span v-else class="text-danger">ABSENT</span>
+                          </td>
+                          <td>
+                          <span v-if="ts.ts_is_present === 1">
+                            {{ tConvert(ts.ts_duration) }} hrs
+                          </span>
+                            <span
+                              class="text-primary"
+                              v-else-if="ts.ts_is_present === 2"
+                            >
+                            P. HOLIDAY
+                          </span>
+                            <span
+                              class="text-warning"
+                              v-else-if="ts.ts_is_present === 3"
+                            >
+                            WEEKEND
+                          </span>
+                            <span
+                              class="text-info"
+                              v-else-if="ts.ts_is_present === 4"
+                            >
+                            LEAVE
+                          </span>
+                            <span v-else class="text-danger">ABSENT</span>
+                          </td>
+                        </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-body">
+                <div class="p-3 bg-light mb-4 d-flex justify-content-between">
+                  <div class="d-inline mb-0">
+                    <h5 class="font-size-14 mb-0">Authorization Log</h5>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-lg-12">
+                    <div class="table-responsive">
+                      <table class="table mb-0">
+                        <thead>
+                        <tr>
+                          <th>#</th>
+                          <th>Officer</th>
+                          <th>Status</th>
+                          <th>Comment</th>
+                          <th>Date</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr
+                          class="table-light"
+                          v-for="(off, ind) in this.log"
+                          :key="ind"
+                        >
+                          <th scope="row">{{ ind + 1 }}</th>
+                          <td>
+                            {{
+                              off.officers.emp_first_name
+                                ? off.officers.emp_first_name
+                                : ""
+                            }}
+                            {{
+                              off.officers.emp_last_name
+                                ? off.officers.emp_last_name
+                                : ""
+                            }}
+                          </td>
+                          <td>
+                            <small
+                              v-if="off.auth_status === 1"
+                              class="text-success"
+                            >
+                              Approved
+                            </small>
+                            <small
+                              v-else-if="off.auth_status === 2"
+                              class="text-danger"
+                            >
+                              Discarded
+                            </small>
+                            <small v-else class="text-warning"> Pending </small>
+                          </td>
+                          <td>{{ off.auth_comment }}</td>
+                          <td>{{ new Date(off.updatedAt).toDateString() }}</td>
+                        </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-4">
+            <div class="card">
+              <div class="card-body">
+                <div class="p-3 bg-light mb-4 d-flex justify-content-between">
+                  <div class="d-inline mb-0">
+                    <h5 class="font-size-14 mb-0">Employee Details</h5>
+                  </div>
+                </div>
+                <div class="d-flex justify-content-between mb-3">
+                  <span>Employee Name</span>
+                  <span>
+                {{ this.allocation.Employee.emp_first_name }}
+                {{ this.allocation.Employee.emp_last_name }}
+              </span>
+                </div>
+                <div class="d-flex justify-content-between mb-3">
+                  <span>Phone No.</span>
+                  <span>
+                {{ this.allocation.Employee.emp_phone_no }}
+              </span>
+                </div>
+                <div class="d-flex justify-content-between mb-3">
+                  <span>Office Email</span>
+                  <span>
+                {{ this.allocation.Employee.emp_office_email }}
+              </span>
+                </div>
+                <div class="d-flex justify-content-between mb-3">
+                  <span>T7 Number</span>
+                  <span>
+                {{ this.allocation.Employee.emp_unique_id }}
+              </span>
+                </div>
+                <div class="d-flex justify-content-between mb-3">
+                  <span>T3 Code</span>
+                  <span> {{ t3 }} </span>
+                </div>
+                <div class="d-flex justify-content-between mb-3">
+                  <span>T6 Code</span>
+                  <span> {{ t6 }} </span>
+                </div>
+              </div>
+            </div>
+            <div class="card mt-3">
+              <div class="card-body">
+                <div class="p-3 bg-light mb-4 d-flex justify-content-between">
+                  <div class="d-inline mb-0">
+                    <h5 class="font-size-14 mb-0">Time Allocation</h5>
+                  </div>
+                </div>
+                <div
+                  class="d-flex justify-content-between mb-2"
+                  v-for="(charge, index) in breakdown"
+                  :key="index"
+                >
+                  <span>Grant Code: {{ charge.ta_tcode }}</span>
+                  <span>Percentage Charge: {{ charge.ta_charge }}%</span>
+                </div>
+                <div
+                  class="d-flex justify-content-between mb-2"
+                  v-for="(charge, index) in breakdown"
+                  :key="index"
+                >
+                  <span>Match Code: {{ charge.ta_t0_code }}</span>
+                  <span>Percentage Charge: {{ charge.ta_t0_percent }}%</span>
+                </div>
+                <!--            <hr />-->
+                <!--            <div-->
+                <!--              class="text-danger d-flex justify-content-between mt-3"-->
+                <!--              v-if="defaultCharge > 0"-->
+                <!--            >-->
+                <!--              <strong class="d-inline-block">-->
+                <!--                Default Charge - {{ numAbsents }} absence(s)</strong-->
+                <!--              >-->
+                <!--              <strong>-->
+                <!--                {{ parseFloat(defaultCharge.toFixed(2)).toLocaleString() }}-->
+                <!--              </strong>-->
+                <!--            </div>-->
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </VueHtml2pdf>
   </Layout>
 </template>
