@@ -96,11 +96,11 @@ export default {
           break;
         }
         default: {
-          this.$bvToast.toast(`Please fill in all fields correctly`, {
+          this.$bvToast.toast(`${error.response.data}`, {
             title: `${title}`,
             toaster: "b-toaster-top-right",
             appendToast: true,
-            variant: "warning",
+            variant: "danger",
           });
           break;
         }
