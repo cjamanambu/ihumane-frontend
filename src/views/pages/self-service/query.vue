@@ -3,7 +3,17 @@ import Layout from "@/views/layouts/main";
 import PageHeader from "@/components/page-header";
 import appConfig from "@/app.config";
 import { authComputed } from "@/state/helpers";
+import store from "@/state/store";
 export default {
+  beforeRouteEnter(to, from, next) {
+    const userType = store.getters["auth/getUser"].user_type;
+    if (userType === 2 || userType === 3) {
+      next();
+    } else {
+      alert("You are not allowed to access this page. You will be redirected.");
+      next("/");
+    }
+  },
   page: {
     title: " Queries ",
     meta: [{ name: "description", content: appConfig.description }],
@@ -12,7 +22,7 @@ export default {
     Layout,
     PageHeader,
   },
-  computed:{
+  computed: {
     ...authComputed,
   },
   mounted() {
@@ -25,15 +35,21 @@ export default {
         const { data } = res;
         data.list.forEach((query, index) => {
           this.queries[index] = {
-            sn: ++index, subject:query.q_subject,
-            employee:`${query.offender.emp_first_name} ${query.offender.emp_last_name}`,
-            emp_id:query.q_queried,
-            query_id:query.q_id,
-            type:`${query.q_query_type == 1 ? 'Warning' : 'Query'}`,
-            queried_by:`${query.issuer.emp_first_name} ${query.issuer.emp_last_name}`,
-            summary:`${query.q_body.replace( /(<([^>]+)>)/ig, '').length > 50 ? query.q_body.replace( /(<([^>]+)>)/ig, '').substr(0,47) : query.q_body.replace( /(<([^>]+)>)/ig, '')}`,
-            date:`${new Date(query.createdAt).toDateString()}`,
-            ...query };
+            sn: ++index,
+            subject: query.q_subject,
+            employee: `${query.offender.emp_first_name} ${query.offender.emp_last_name}`,
+            emp_id: query.q_queried,
+            query_id: query.q_id,
+            type: `${query.q_query_type == 1 ? "Warning" : "Query"}`,
+            queried_by: `${query.issuer.emp_first_name} ${query.issuer.emp_last_name}`,
+            summary: `${
+              query.q_body.replace(/(<([^>]+)>)/gi, "").length > 50
+                ? query.q_body.replace(/(<([^>]+)>)/gi, "").substr(0, 47)
+                : query.q_body.replace(/(<([^>]+)>)/gi, "")
+            }`,
+            date: `${new Date(query.createdAt).toDateString()}`,
+            ...query,
+          };
         });
         this.totalRows = this.queries.length;
       });
@@ -72,12 +88,12 @@ export default {
       employees: [],
       types: [
         {
-          value:"1",
-          text:"Warning",
+          value: "1",
+          text: "Warning",
         },
         {
-          value:"2",
-          text:"Query",
+          value: "2",
+          text: "Query",
         },
       ],
       queries: [],
@@ -89,8 +105,8 @@ export default {
       filterOn: [],
       sortBy: "sn",
       sortDesc: false,
-      posted_on:null,
-      audience:null,
+      posted_on: null,
+      audience: null,
       fields: [
         { key: "sn", label: "S/n", sortable: true },
         {
@@ -109,12 +125,11 @@ export default {
       ],
       employeeID: null,
       queryId: null,
-      subject:null,
-      selectedTarget:null,
-      attachment:null,
-      body:null,
-      persons:[],
-
+      subject: null,
+      selectedTarget: null,
+      attachment: null,
+      body: null,
+      persons: [],
     };
   },
 };
@@ -204,7 +219,5 @@ export default {
         </div>
       </div>
     </div>
-
-
   </Layout>
 </template>

@@ -4,9 +4,19 @@ import PageHeader from "@/components/page-header";
 import appConfig from "@/app.config";
 import { authComputed } from "@/state/helpers";
 import { required } from "vuelidate/lib/validators";
-import Multiselect from 'vue-multiselect';
+import Multiselect from "vue-multiselect";
+import store from "@/state/store";
 
 export default {
+  beforeRouteEnter(to, from, next) {
+    const userType = store.getters["auth/getUser"].user_type;
+    if (userType === 2 || userType === 3) {
+      next();
+    } else {
+      alert("You are not allowed to access this page. You will be redirected.");
+      next("/");
+    }
+  },
   page: {
     title: "Travel Authorization",
     meta: [{ name: "description", content: appConfig.description }],
@@ -17,7 +27,7 @@ export default {
   components: {
     Layout,
     PageHeader,
-    Multiselect
+    Multiselect,
   },
   mounted() {
     this.fetchRequest();
@@ -27,7 +37,6 @@ export default {
     comment: { required },
     official: { required },
     roleId: { required },
-
   },
   methods: {
     fetchRequest() {
@@ -49,23 +58,23 @@ export default {
         this.getSector(application.applicant.emp_job_role_id);
       });
     },
-    authorizingAsLabel ({ text }) {
-      return `${text}`
+    authorizingAsLabel({ text }) {
+      return `${text}`;
     },
-    nextAuthorizingOfficer ({ text }) {
-      return `${text}`
+    nextAuthorizingOfficer({ text }) {
+      return `${text}`;
     },
-    getAuthorizingRoles(type){ //1=leave,2=time sheet,3=travel
+    getAuthorizingRoles(type) {
+      //1=leave,2=time sheet,3=travel
       const url = `${this.ROUTES.authorizationRole}/${type}`;
-      this.apiGet(url, "Couldn't get authorizing roles").then((res)=>{
-        const { data} = res;
+      this.apiGet(url, "Couldn't get authorizing roles").then((res) => {
+        const { data } = res;
         data.map((role) => {
           this.roles.push({
             value: role.ar_id,
             text: role.ar_title,
           });
         });
-
       });
     },
     fetchDonorInfo() {
@@ -122,21 +131,19 @@ export default {
         return true;
       });
     },
-    getLocation(locationId){
-
-      const url = `${this.ROUTES.location}/${locationId}`
-      this.apiGet(url, "Couldn't get location details").then((res)=>{
+    getLocation(locationId) {
+      const url = `${this.ROUTES.location}/${locationId}`;
+      this.apiGet(url, "Couldn't get location details").then((res) => {
         this.t6 = res.data.location_name;
       });
     },
-    getSector(sectorId){
+    getSector(sectorId) {
       const url = `${this.ROUTES.jobRole}/${sectorId}`;
-      this.apiGet(url, "Couldn't get location details").then((res)=>{
+      this.apiGet(url, "Couldn't get location details").then((res) => {
         this.t3 = res.data.job_role;
       });
     },
     submit(type) {
-
       this.submitted = true;
       if (this.type === "approve") {
         this.approving = true;
@@ -191,8 +198,8 @@ export default {
           active: true,
         },
       ],
-      t3:null,
-      t6:null,
+      t3: null,
+      t6: null,
       application: null,
       breakdowns: [],
       expenses: [],
@@ -201,12 +208,14 @@ export default {
       t2Codes: [],
       comment: null,
       final: false,
-      roles:[{
-        value:null,
-        text:"Authorizing as...",
-        disabled:true,
-      }],
-      roleId:null,
+      roles: [
+        {
+          value: null,
+          text: "Authorizing as...",
+          disabled: true,
+        },
+      ],
+      roleId: null,
       official: null,
       officials: [
         {
@@ -557,9 +566,7 @@ export default {
                         </span>
                       </b-td>
                       <b-td style="width: 40%" v-else>
-                        <span>
-                          ---
-                        </span>
+                        <span> --- </span>
                       </b-td>
                       <b-td style="width: 20%">
                         <span>
@@ -646,16 +653,16 @@ export default {
                   }"
                 />
               </b-form-group>
-                <b-form-group>
-                  <multiselect
-                          v-model="roleId"
-                          :options="roles"
-                          :custom-label="authorizingAsLabel"
-                          :class="{
-                      'is-invalid': submitted && $v.roleId.$error,
-                    }"
-                  ></multiselect>
-                </b-form-group>
+              <b-form-group>
+                <multiselect
+                  v-model="roleId"
+                  :options="roles"
+                  :custom-label="authorizingAsLabel"
+                  :class="{
+                    'is-invalid': submitted && $v.roleId.$error,
+                  }"
+                ></multiselect>
+              </b-form-group>
               <div class="d-flex" v-if="final">
                 <button
                   v-if="!approving"

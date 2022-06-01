@@ -63,8 +63,9 @@ export default {
     };
   },
   mounted() {
-    this.loadAdminDashboard();
-    this.loadSelfServiceDashboard();
+    const { user_type } = this.getUser;
+    if (user_type === 1 || user_type === 3) this.loadAdminDashboard(); // admin or moderator
+    if (user_type === 2 || user_type === 3) this.loadSelfServiceDashboard(); // employee or moderator
   },
   methods: {
     async loadAdminDashboard() {
