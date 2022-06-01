@@ -6,8 +6,18 @@ import { authComputed } from "@/state/helpers";
 import { required } from "vuelidate/lib/validators";
 import DatePicker from "vue2-datepicker";
 import "vue2-datepicker/index.css";
+import store from "@/state/store";
 
 export default {
+  beforeRouteEnter(to, from, next) {
+    const userType = store.getters["auth/getUser"].user_type;
+    if (userType === 1 || userType === 3) {
+      next();
+    } else {
+      alert("You are not allowed to access this page. You will be redirected.");
+      next("/");
+    }
+  },
   page: {
     title: "Leave Details",
     meta: [{ name: "description", content: appConfig.description }],
@@ -383,10 +393,30 @@ export default {
               <div class="col-lg-4">
                 <div class="form-group">
                   <label for=""> Status </label> :
-                  <label v-if=" new Date().getTime() >= new Date(application.leapp_start_date).getTime() " class="badge badge-primary">ACTIVE</label>
-                  <label v-else-if="new Date().getTime() <= new Date(application.leapp_start_date).getTime()  " class="badge badge-warning">INACTIVE</label>
-                  <label v-else-if="new Date().getTime() > new Date(application.leapp_end_date).getTime()  " class="badge badge-success">FINISHED</label>
-
+                  <label
+                    v-if="
+                      new Date().getTime() >=
+                      new Date(application.leapp_start_date).getTime()
+                    "
+                    class="badge badge-primary"
+                    >ACTIVE</label
+                  >
+                  <label
+                    v-else-if="
+                      new Date().getTime() <=
+                      new Date(application.leapp_start_date).getTime()
+                    "
+                    class="badge badge-warning"
+                    >INACTIVE</label
+                  >
+                  <label
+                    v-else-if="
+                      new Date().getTime() >
+                      new Date(application.leapp_end_date).getTime()
+                    "
+                    class="badge badge-success"
+                    >FINISHED</label
+                  >
                 </div>
               </div>
             </div>

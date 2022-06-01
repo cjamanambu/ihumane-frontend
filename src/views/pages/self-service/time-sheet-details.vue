@@ -3,7 +3,17 @@ import Layout from "@/views/layouts/main";
 import PageHeader from "@/components/page-header";
 import appConfig from "@/app.config";
 import { authComputed } from "@/state/helpers";
+import store from "@/state/store";
 export default {
+  beforeRouteEnter(to, from, next) {
+    const userType = store.getters["auth/getUser"].user_type;
+    if (userType === 1 || userType === 3) {
+      next();
+    } else {
+      alert("You are not allowed to access this page. You will be redirected.");
+      next("/");
+    }
+  },
   page: {
     title: "Time Sheet Details",
     meta: [{ name: "description", content: appConfig.description }],
@@ -30,7 +40,7 @@ export default {
 
       this.apiGet(url, "Get Time sheet details").then((res) => {
         const { timesheet, timeAllocation, log } = res.data;
-        console.log(timesheet)
+        console.log(timesheet);
         this.timeSheet = timesheet;
         this.allocation = timeAllocation[0];
         this.breakdown = timeAllocation;

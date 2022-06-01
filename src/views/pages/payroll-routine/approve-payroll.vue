@@ -2,7 +2,17 @@
 import Layout from "@/views/layouts/main";
 import PageHeader from "@/components/page-header";
 import appConfig from "@/app.config";
+import store from "@/state/store";
 export default {
+  beforeRouteEnter(to, from, next) {
+    const userType = store.getters["auth/getUser"].user_type;
+    if (userType === 1 || userType === 3) {
+      next();
+    } else {
+      alert("You are not allowed to access this page. You will be redirected.");
+      next("/");
+    }
+  },
   page: {
     title: "Approve Payroll Routine",
     meta: [{ name: "description", content: appConfig.description }],
@@ -35,7 +45,7 @@ export default {
       routineRun: false,
       pay: [],
       selectedLocations: [],
-      locationIds:[],
+      locationIds: [],
       totalRows: 1,
       currentPage: 1,
       perPage: 10,
@@ -48,9 +58,17 @@ export default {
         { key: "sn", label: "S/n", sortable: true },
         { key: "locationName", label: "Location", sortable: true },
         { key: "locationTotalGross", label: "Total Gross", sortable: true },
-        { key: "locationTotalDeduction", label: "Total Deduction", sortable: true },
+        {
+          key: "locationTotalDeduction",
+          label: "Total Deduction",
+          sortable: true,
+        },
         { key: "locationTotalNet", label: "Total Net", sortable: true },
-        { key: "locationEmployeesCount", label: "Total Employees", sortable: true },
+        {
+          key: "locationEmployeesCount",
+          label: "Total Employees",
+          sortable: true,
+        },
         { key: "month", label: "month", sortable: true },
         { key: "year", label: "year", sortable: true },
       ],
@@ -61,16 +79,15 @@ export default {
     };
   },
   methods: {
-
     selectLocations(items) {
-      this.selectedLocations = items
+      this.selectedLocations = items;
     },
     selectAllRows() {
-      this.$refs.payrollSummaryTable.selectAllRows()
+      this.$refs.payrollSummaryTable.selectAllRows();
     },
 
     clearSelected() {
-      this.$refs.payrollSummaryTable.clearSelected()
+      this.$refs.payrollSummaryTable.clearSelected();
     },
     getLocations() {
       this.apiGet(this.ROUTES.location, "Get Locations Error").then((res) => {
@@ -124,9 +141,9 @@ export default {
       });
     },
 
-    confirmSelected(){
+    confirmSelected() {
       this.submitted = true;
-      this.locationIds = [ ]
+      this.locationIds = [];
       this.selectedLocations.forEach((location) => {
         this.locationIds.push(location.locationId);
       });
@@ -134,21 +151,16 @@ export default {
 
       const data = {
         pmyl_location_id: this.locationIds,
-
       };
       //console.log(data)
       const url = `${this.ROUTES.salary}/confirm-salary-routine`;
-      this.apiPost(url, data, "Salary Confirmation").then(
-          (res) => {
-            this.apiResponseHandler(`${res.data}`, "Salary Confirmed");
-            this.selectedLocations= [ ]
-            this.locationIds = [ ]
-            this.fetchPayrollRoutine()
-
-          }
-      );
+      this.apiPost(url, data, "Salary Confirmation").then((res) => {
+        this.apiResponseHandler(`${res.data}`, "Salary Confirmed");
+        this.selectedLocations = [];
+        this.locationIds = [];
+        this.fetchPayrollRoutine();
+      });
     },
-
 
     async fetchPayrollRoutine() {
       let url = `${this.ROUTES.salary}/pull-confirmed-salary-routine-locations`;
@@ -187,7 +199,10 @@ export default {
     selectRow(row) {
       row = row[0];
       let locationId = row.locationId;
-      this.$router.push({ name: "approve-emolument-location", params: { locationId } });
+      this.$router.push({
+        name: "approve-emolument-location",
+        params: { locationId },
+      });
       this.$refs["payrollSummaryTable"].clearSelected();
     },
   },
@@ -200,7 +215,6 @@ export default {
     <scale-loader v-if="apiBusy" />
     <div v-else>
       <div v-if="routineRun">
-
         <div class="row">
           <div class="col-12">
             <div class="card">
@@ -265,8 +279,6 @@ export default {
                     select-mode="single"
                     @row-selected="selectRow"
                   >
-
-
                     <template #cell(locationTotalGross)="row">
                       <p class="float-right mb-0">
                         {{ parseFloat(row.value.toFixed(2)).toLocaleString() }}
@@ -288,11 +300,7 @@ export default {
                         {{ (parseInt(row.value) - 1) | getMonth }}
                       </p>
                     </template>
-
-
                   </b-table>
-
-
                 </div>
                 <div v-else>
                   <scale-loader />
@@ -323,7 +331,6 @@ export default {
         The payroll routine for this payroll period
         <b> ({{ (parseInt(pmyMonth) - 1) | getMonth }} {{ pmyYear }})</b> hasn't
         been run for any location.
-
       </div>
     </div>
 

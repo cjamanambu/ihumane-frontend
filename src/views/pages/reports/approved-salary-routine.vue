@@ -2,8 +2,18 @@
 import Layout from "@/views/layouts/main";
 import PageHeader from "@/components/page-header";
 import appConfig from "@/app.config";
+import store from "@/state/store";
 //import JsonExcel from "vue-json-excel";
 export default {
+  beforeRouteEnter(to, from, next) {
+    const userType = store.getters["auth/getUser"].user_type;
+    if (userType === 1 || userType === 3) {
+      next();
+    } else {
+      alert("You are not allowed to access this page. You will be redirected.");
+      next("/");
+    }
+  },
   page: {
     title: "Approved Salary Report",
     meta: [{ name: "description", content: appConfig.description }],
@@ -11,22 +21,23 @@ export default {
   components: {
     Layout,
     PageHeader,
-
   },
   async mounted() {
     await this.fetchPayrollRoutine();
   },
   methods: {
-
     selectRow(row) {
       row = row[0];
       let locationId = row.locationId;
       this.period = this.$route.params.period;
       this.period = this.period.split("-");
-      let month = this.period[0]
-      let year = this.period[1]
+      let month = this.period[0];
+      let year = this.period[1];
 
-      this.$router.push({ name: "view-approved-salary-routine", params: { locationId, month, year } });
+      this.$router.push({
+        name: "view-approved-salary-routine",
+        params: { locationId, month, year },
+      });
       this.$refs["payrollSummaryTable"].clearSelected();
     },
 
@@ -39,15 +50,17 @@ export default {
         pym_year: parseFloat(this.period[1]),
       };
       let url = `${this.ROUTES.salary}/pull-approved-salary-routine-locations`;
-      await this.apiPost(url, data, "Fetch Payroll Routine Error").then((res) => {
-        console.log({ res });
-        this.routineRun = true;
-        const { data } = res;
-        data.forEach((pay, index) => {
-          this.pay[index] = { sn: ++index, ...pay };
-        });
-        this.totalRows = this.pay.length;
-      });
+      await this.apiPost(url, data, "Fetch Payroll Routine Error").then(
+        (res) => {
+          console.log({ res });
+          this.routineRun = true;
+          const { data } = res;
+          data.forEach((pay, index) => {
+            this.pay[index] = { sn: ++index, ...pay };
+          });
+          this.totalRows = this.pay.length;
+        }
+      );
     },
     fetchPaymentDefinitions() {
       this.paymentDefinitions = [];
@@ -168,7 +181,7 @@ export default {
       routineRun: false,
       pay: [],
       selectedLocations: [],
-      locationIds:[],
+      locationIds: [],
       totalRows: 1,
       currentPage: 1,
       perPage: 10,
@@ -181,9 +194,17 @@ export default {
         { key: "sn", label: "S/n", sortable: true },
         { key: "locationName", label: "Location", sortable: true },
         { key: "locationTotalGross", label: "Total Gross", sortable: true },
-        { key: "locationTotalDeduction", label: "Total Deduction", sortable: true },
+        {
+          key: "locationTotalDeduction",
+          label: "Total Deduction",
+          sortable: true,
+        },
         { key: "locationTotalNet", label: "Total Net", sortable: true },
-        { key: "locationEmployeesCount", label: "Total Employees", sortable: true },
+        {
+          key: "locationEmployeesCount",
+          label: "Total Employees",
+          sortable: true,
+        },
         { key: "month", label: "month", sortable: true },
         { key: "year", label: "year", sortable: true },
       ],
@@ -202,7 +223,6 @@ export default {
     <scale-loader v-if="apiBusy" />
     <div v-else>
       <div v-if="routineRun">
-
         <div class="row">
           <div class="col-12">
             <div class="card">
@@ -219,9 +239,9 @@ export default {
                       <label class="d-inline-flex align-items-center">
                         Show&nbsp;
                         <b-form-select
-                            v-model="perPage"
-                            size="sm"
-                            :options="pageOptions"
+                          v-model="perPage"
+                          size="sm"
+                          :options="pageOptions"
                         ></b-form-select
                         >&nbsp;entries
                       </label>
@@ -230,16 +250,16 @@ export default {
                   <!-- Search -->
                   <div class="col-sm-12 col-md-6">
                     <div
-                        id="tickets-table_filter"
-                        class="dataTables_filter text-md-right"
+                      id="tickets-table_filter"
+                      class="dataTables_filter text-md-right"
                     >
                       <label class="d-inline-flex align-items-center">
                         Search:
                         <b-form-input
-                            v-model="filter"
-                            type="search"
-                            placeholder="Search..."
-                            class="form-control form-control-sm ml-2"
+                          v-model="filter"
+                          type="search"
+                          placeholder="Search..."
+                          class="form-control form-control-sm ml-2"
                         ></b-form-input>
                       </label>
                     </div>
@@ -249,26 +269,24 @@ export default {
                 <!-- Table -->
                 <div class="table-responsive mb-0" v-if="pay.length">
                   <b-table
-                      ref="payrollSummaryTable"
-                      bordered
-                      selectable
-                      hover
-                      :items="pay"
-                      :fields="fields"
-                      responsive="sm"
-                      :per-page="perPage"
-                      :current-page="currentPage"
-                      :sort-by.sync="sortBy"
-                      :sort-desc.sync="sortDesc"
-                      :filter="filter"
-                      :filter-included-fields="filterOn"
-                      @filtered="onFiltered"
-                      show-empty
-                      select-mode="single"
-                      @row-selected="selectRow"
+                    ref="payrollSummaryTable"
+                    bordered
+                    selectable
+                    hover
+                    :items="pay"
+                    :fields="fields"
+                    responsive="sm"
+                    :per-page="perPage"
+                    :current-page="currentPage"
+                    :sort-by.sync="sortBy"
+                    :sort-desc.sync="sortDesc"
+                    :filter="filter"
+                    :filter-included-fields="filterOn"
+                    @filtered="onFiltered"
+                    show-empty
+                    select-mode="single"
+                    @row-selected="selectRow"
                   >
-
-
                     <template #cell(locationTotalGross)="row">
                       <p class="float-right mb-0">
                         {{ parseFloat(row.value.toFixed(2)).toLocaleString() }}
@@ -290,11 +308,7 @@ export default {
                         {{ (parseInt(row.value) - 1) | getMonth }}
                       </p>
                     </template>
-
-
                   </b-table>
-
-
                 </div>
                 <div v-else>
                   <scale-loader />
@@ -302,14 +316,14 @@ export default {
                 <div class="row">
                   <div class="col">
                     <div
-                        class="dataTables_paginate paging_simple_numbers float-right"
+                      class="dataTables_paginate paging_simple_numbers float-right"
                     >
                       <ul class="pagination pagination-rounded mb-0">
                         <!-- pagination -->
                         <b-pagination
-                            v-model="currentPage"
-                            :total-rows="totalRows"
-                            :per-page="perPage"
+                          v-model="currentPage"
+                          :total-rows="totalRows"
+                          :per-page="perPage"
                         ></b-pagination>
                       </ul>
                     </div>
@@ -325,39 +339,38 @@ export default {
         The payroll routine for this payroll period
         <b> ({{ (parseInt(pmyMonth) - 1) | getMonth }} {{ pmyYear }})</b> hasn't
         been run for any location.
-
       </div>
     </div>
 
     <b-modal
-        ref="run-routine"
-        title="Run Payroll Routine"
-        hide-footer
-        centered
-        title-class="font-18"
-        @hidden="resetForm"
+      ref="run-routine"
+      title="Run Payroll Routine"
+      hide-footer
+      centered
+      title-class="font-18"
+      @hidden="resetForm"
     >
       <form @submit.prevent="runRoutine">
         <div class="form-group">
           <label> Location <span class="text-danger">*</span> </label>
           <b-select
-              v-model="payrollLocation"
-              :options="payrollLocations"
+            v-model="payrollLocation"
+            :options="payrollLocations"
           ></b-select>
         </div>
 
         <b-button
-            v-if="!submitting"
-            class="btn btn-success btn-block mt-4"
-            type="submit"
+          v-if="!submitting"
+          class="btn btn-success btn-block mt-4"
+          type="submit"
         >
           Submit
         </b-button>
         <b-button
-            v-else
-            disabled
-            class="btn btn-success btn-block mt-4"
-            type="submit"
+          v-else
+          disabled
+          class="btn btn-success btn-block mt-4"
+          type="submit"
         >
           Submitting...
         </b-button>
@@ -365,34 +378,34 @@ export default {
     </b-modal>
 
     <b-modal
-        ref="undo-routine"
-        title="Undo Payroll Routine"
-        hide-footer
-        centered
-        title-class="font-18"
-        @hidden="resetForm"
+      ref="undo-routine"
+      title="Undo Payroll Routine"
+      hide-footer
+      centered
+      title-class="font-18"
+      @hidden="resetForm"
     >
       <form @submit.prevent="undoRoutine">
         <div class="form-group">
           <label> Location <span class="text-danger">*</span> </label>
           <b-select
-              v-model="payrollLocation"
-              :options="payrollLocations"
+            v-model="payrollLocation"
+            :options="payrollLocations"
           ></b-select>
         </div>
 
         <b-button
-            v-if="!submitting"
-            class="btn btn-success btn-block mt-4"
-            type="submit"
+          v-if="!submitting"
+          class="btn btn-success btn-block mt-4"
+          type="submit"
         >
           Submit
         </b-button>
         <b-button
-            v-else
-            disabled
-            class="btn btn-success btn-block mt-4"
-            type="submit"
+          v-else
+          disabled
+          class="btn btn-success btn-block mt-4"
+          type="submit"
         >
           Submitting...
         </b-button>

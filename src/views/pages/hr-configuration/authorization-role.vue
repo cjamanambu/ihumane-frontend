@@ -3,8 +3,18 @@ import Layout from "@/views/layouts/main";
 import PageHeader from "@/components/page-header";
 import appConfig from "@/app.config";
 import { required } from "vuelidate/lib/validators";
+import store from "@/state/store";
 
 export default {
+  beforeRouteEnter(to, from, next) {
+    const userType = store.getters["auth/getUser"].user_type;
+    if (userType === 1 || userType === 3) {
+      next();
+    } else {
+      alert("You are not allowed to access this page. You will be redirected.");
+      next("/");
+    }
+  },
   page: {
     title: "Authorization Roles",
     meta: [{ name: "description", content: appConfig.description }],
@@ -22,13 +32,14 @@ export default {
   },
   methods: {
     refreshTable() {
-      this.apiGet(this.ROUTES.authorizationRole, "Get Authorization role Error").then(
-        (res) => {
-          const { data } = res;
-          this.roles = data;
-          this.totalRows = this.roles.length;
-        }
-      );
+      this.apiGet(
+        this.ROUTES.authorizationRole,
+        "Get Authorization role Error"
+      ).then((res) => {
+        const { data } = res;
+        this.roles = data;
+        this.totalRows = this.roles.length;
+      });
     },
     // onFiltered(filteredItems) {
     // Trigger pagination to update the number of buttons/pages due to filtering
@@ -58,14 +69,19 @@ export default {
           title: this.auth_title,
           type: this.type,
         };
-        this.apiPost(this.ROUTES.authorizationRole, data, "Add Authorization role Error").then(
-          (res) => {
-            this.apiResponseHandler(`${res.data}`, "New Authorization role Added");
-            this.refreshTable();
-            this.$v.$reset();
-            this.$refs["add-dept"].hide();
-          }
-        );
+        this.apiPost(
+          this.ROUTES.authorizationRole,
+          data,
+          "Add Authorization role Error"
+        ).then((res) => {
+          this.apiResponseHandler(
+            `${res.data}`,
+            "New Authorization role Added"
+          );
+          this.refreshTable();
+          this.$v.$reset();
+          this.$refs["add-dept"].hide();
+        });
       }
     },
     submitUpdate() {
@@ -79,12 +95,14 @@ export default {
           type: this.type,
         };
         const url = `${this.ROUTES.authorizationRole}/${this.roleId}`;
-        this.apiPatch(url, data, "Update Authorization role Error").then((res) => {
-          this.apiResponseHandler(`${res.data}`, "Update Successful");
-          this.refreshTable();
-          this.$v.$reset();
-          this.$refs["update-dept"].hide();
-        });
+        this.apiPatch(url, data, "Update Authorization role Error").then(
+          (res) => {
+            this.apiResponseHandler(`${res.data}`, "Update Successful");
+            this.refreshTable();
+            this.$v.$reset();
+            this.$refs["update-dept"].hide();
+          }
+        );
       }
     },
   },
@@ -115,14 +133,18 @@ export default {
       sortBy: "department_id",
       sortDesc: false,
       fields: [
-        { key: "ar_id", label:"S/No.", sortable: true },
-        { key: "ar_title", label:"Title", sortable: true },
+        { key: "ar_id", label: "S/No.", sortable: true },
+        { key: "ar_title", label: "Title", sortable: true },
         { key: "ar_type", label: "Type", sortable: true },
       ],
       auth_title: null,
       type: null,
       roleId: null,
-      type_list: [{ value: 1, text: "Leave Application" }, {value:2, text:"Time Sheet"}, {value:3, text:"Travel Application"}],
+      type_list: [
+        { value: 1, text: "Leave Application" },
+        { value: 2, text: "Time Sheet" },
+        { value: 3, text: "Travel Application" },
+      ],
       submitted: false,
     };
   },
@@ -135,7 +157,7 @@ export default {
     <div class="d-flex justify-content-end mb-3">
       <b-button class="btn btn-success" @click="$refs['add-dept'].show()">
         <i class="mdi mdi-plus mr-2"></i>
-        Add  Role
+        Add Role
       </b-button>
     </div>
     <b-spinner type="grow" v-if="apiBusy" class="m-2" variant="success" />
@@ -202,7 +224,6 @@ export default {
                   <span v-else-if="row.value === 2">Time sheet</span>
                   <span v-else-if="row.value === 3">Travel Application</span>
                 </template>
-
               </b-table>
             </div>
             <div class="row">
@@ -235,9 +256,7 @@ export default {
     >
       <form @submit.prevent="submitNew">
         <div class="form-group">
-          <label for="name">
-            Title <span class="text-danger">*</span>
-          </label>
+          <label for="name"> Title <span class="text-danger">*</span> </label>
           <input
             id="name"
             type="text"
@@ -249,9 +268,7 @@ export default {
           />
         </div>
         <div class="form-group">
-          <label for="type">
-            Type <span class="text-danger">*</span>
-          </label>
+          <label for="type"> Type <span class="text-danger">*</span> </label>
           <b-form-select
             id="department"
             v-model="type"
@@ -288,9 +305,7 @@ export default {
     >
       <form @submit.prevent="submitUpdate">
         <div class="form-group">
-          <label for="name">
-            Title <span class="text-danger">*</span>
-          </label>
+          <label for="name"> Title <span class="text-danger">*</span> </label>
           <input
             id="name"
             type="text"
@@ -302,9 +317,7 @@ export default {
           />
         </div>
         <div class="form-group">
-          <label for="type">
-            Type <span class="text-danger">*</span>
-          </label>
+          <label for="type"> Type <span class="text-danger">*</span> </label>
           <b-form-select
             id="department"
             v-model="type"

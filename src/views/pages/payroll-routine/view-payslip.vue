@@ -3,8 +3,18 @@ import Layout from "@/views/layouts/main";
 import PageHeader from "@/components/page-header";
 import appConfig from "@/app.config";
 import VueHtml2pdf from "vue-html2pdf";
+import store from "@/state/store";
 
 export default {
+  beforeRouteEnter(to, from, next) {
+    const userType = store.getters["auth/getUser"].user_type;
+    if (userType === 1 || userType === 3) {
+      next();
+    } else {
+      alert("You are not allowed to access this page. You will be redirected.");
+      next("/");
+    }
+  },
   page: {
     title: "View Payslip",
     meta: [{ name: "description", content: appConfig.description }],
@@ -42,8 +52,8 @@ export default {
     async fetchPayslip() {
       const data = {
         pym_month: parseInt(this.$route.params.month),
-        pym_year: parseInt(this.$route.params.year)
-      }
+        pym_year: parseInt(this.$route.params.year),
+      };
       const url = `${this.ROUTES.salary}/pull-salary-routine/${this.$route.params.empID}`;
       await this.apiPost(url, data, "Get Payslip Error").then((res) => {
         const { data } = res;
@@ -223,9 +233,9 @@ export default {
                 <div class="col-lg-6">
                   <div v-if="payslipData">
                     <div
-                        class="d-flex justify-content-between"
-                        v-for="(income, index) in payslipData.employersIncomes"
-                        :key="index"
+                      class="d-flex justify-content-between"
+                      v-for="(income, index) in payslipData.employersIncomes"
+                      :key="index"
                     >
                       <p class="mb-1">{{ income.paymentName }}</p>
                       <p class="mb-1">
@@ -395,23 +405,20 @@ export default {
 
                 <div class="row">
                   <div class="col-lg-6">
-
                     <div v-if="payslipData">
-<!--                      <div-->
-<!--                          class="d-flex justify-content-between"-->
-<!--                          v-for="(income, index) in payslipData.employersIncomes"-->
-<!--                          :key="index"-->
-<!--                      >-->
-<!--                        <p class="mb-1">{{ income.paymentName }}</p>-->
-<!--                        <p class="mb-1">-->
-<!--                          =N= {{ income.amount.toLocaleString() }}-->
-<!--                        </p>-->
-<!--                      </div>-->
+                      <!--                      <div-->
+                      <!--                          class="d-flex justify-content-between"-->
+                      <!--                          v-for="(income, index) in payslipData.employersIncomes"-->
+                      <!--                          :key="index"-->
+                      <!--                      >-->
+                      <!--                        <p class="mb-1">{{ income.paymentName }}</p>-->
+                      <!--                        <p class="mb-1">-->
+                      <!--                          =N= {{ income.amount.toLocaleString() }}-->
+                      <!--                        </p>-->
+                      <!--                      </div>-->
                     </div>
 
-
                     <div class="d-flex justify-content-between">
-
                       <h6>PENSION (EMPLOYER CONTRIBUTION)</h6>
                       <p class="text-capitalize">
                         =N= {{ payslipData.pension.toLocaleString() }}

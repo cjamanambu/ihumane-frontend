@@ -4,9 +4,19 @@ import Layout from "@/views/layouts/main";
 import PageHeader from "@/components/page-header";
 import appConfig from "@/app.config";
 import { required } from "vuelidate/lib/validators";
-import Multiselect from 'vue-multiselect';
+import Multiselect from "vue-multiselect";
+import store from "@/state/store";
 
 export default {
+  beforeRouteEnter(to, from, next) {
+    const userType = store.getters["auth/getUser"].user_type;
+    if (userType === 1 || userType === 3) {
+      next();
+    } else {
+      alert("You are not allowed to access this page. You will be redirected.");
+      next("/");
+    }
+  },
   page: {
     title: "New Employee",
     meta: [{ name: "description", content: appConfig.description }],
@@ -25,20 +35,20 @@ export default {
     first_name: { required },
     last_name: { required },
 
-   // personal_email: { required },
+    // personal_email: { required },
     //official_email: { required },
     telephone: { required },
     account_number: { required },
   },
   methods: {
-    positionLabel ({ text }) {
-      return `${text}`
+    positionLabel({ text }) {
+      return `${text}`;
     },
-    bankLabel ({ text }) {
-      return `${text}`
+    bankLabel({ text }) {
+      return `${text}`;
     },
-    locationLabel ({ text }) {
-      return `${text}`
+    locationLabel({ text }) {
+      return `${text}`;
     },
     resetForm() {
       this.first_name = null;
@@ -228,16 +238,16 @@ export default {
                     </div>
                     <div class="form-group row mb-3">
                       <label class="col-md-3 col-form-label" for="otherName"
-                      >Other Name</label
+                        >Other Name</label
                       >
                       <div class="col-md-9">
                         <input
-                                id="otherName"
-                                type="text"
-                                class="form-control"
-                                v-model="other_name"
-                                name="other_name"
-                                placeholder="Other Name"
+                          id="otherName"
+                          type="text"
+                          class="form-control"
+                          v-model="other_name"
+                          name="other_name"
+                          placeholder="Other Name"
                         />
                       </div>
                     </div>
@@ -304,12 +314,12 @@ export default {
                       >
                       <div class="col-md-9">
                         <multiselect
-                                v-model="position"
-                                :options="positions"
-                                :custom-label="positionLabel"
-                                :class="{
-                      'is-invalid': submitted && $v.position.$error,
-                    }"
+                          v-model="position"
+                          :options="positions"
+                          :custom-label="positionLabel"
+                          :class="{
+                            'is-invalid': submitted && $v.position.$error,
+                          }"
                         ></multiselect>
                       </div>
                     </div>
@@ -320,12 +330,12 @@ export default {
                       >
                       <div class="col-md-9">
                         <multiselect
-                                v-model="bank"
-                                :options="banks"
-                                :custom-label="bankLabel"
-                                :class="{
-                      'is-invalid': submitted && $v.bank.$error,
-                    }"
+                          v-model="bank"
+                          :options="banks"
+                          :custom-label="bankLabel"
+                          :class="{
+                            'is-invalid': submitted && $v.bank.$error,
+                          }"
                         ></multiselect>
                       </div>
                     </div>
@@ -338,12 +348,12 @@ export default {
                       >
                       <div class="col-md-9">
                         <multiselect
-                                v-model="location"
-                                :options="locations"
-                                :custom-label="locationLabel"
-                                :class="{
-                      'is-invalid': submitted && $v.location.$error,
-                    }"
+                          v-model="location"
+                          :options="locations"
+                          :custom-label="locationLabel"
+                          :class="{
+                            'is-invalid': submitted && $v.location.$error,
+                          }"
                         ></multiselect>
                       </div>
                     </div>

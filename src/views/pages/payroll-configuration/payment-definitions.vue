@@ -3,8 +3,18 @@ import Layout from "@/views/layouts/main";
 import PageHeader from "@/components/page-header";
 import appConfig from "@/app.config";
 import { required } from "vuelidate/lib/validators";
+import store from "@/state/store";
 
 export default {
+  beforeRouteEnter(to, from, next) {
+    const userType = store.getters["auth/getUser"].user_type;
+    if (userType === 1 || userType === 3) {
+      next();
+    } else {
+      alert("You are not allowed to access this page. You will be redirected.");
+      next("/");
+    }
+  },
   page: {
     title: "Payment Definitions",
     meta: [{ name: "description", content: appConfig.description }],
@@ -131,7 +141,7 @@ export default {
           pd_percentage: this.pdPercentage,
           pd_total_gross: this.sum,
           pd_total_gross_ii: this.sumII,
-          pd_employee: this.pd_employee
+          pd_employee: this.pd_employee,
         };
         this.type === 1
           ? (data.pd_payment_taxable = this.taxable)
@@ -159,21 +169,20 @@ export default {
     async submitDelete() {
       this.submitted = true;
       const data = {
-          pd_id: this.pdID,
-        };
-        const url = `${this.ROUTES.paymentDefinition}/delete-payment-definition`;
-        await this.apiPost(url, data, "Delete Payment Definition Error").then(
-          (res) => {
-            this.apiResponseHandler(`${res.data}`, "Delete Successful");
-            this.$v.$reset();
-            this.$refs["delete-payment-definition"].hide();
-            this.refreshTable();
-          }
-        );
-
+        pd_id: this.pdID,
+      };
+      const url = `${this.ROUTES.paymentDefinition}/delete-payment-definition`;
+      await this.apiPost(url, data, "Delete Payment Definition Error").then(
+        (res) => {
+          this.apiResponseHandler(`${res.data}`, "Delete Successful");
+          this.$v.$reset();
+          this.$refs["delete-payment-definition"].hide();
+          this.refreshTable();
+        }
+      );
     },
 
-    deletePD(pd){
+    deletePD(pd) {
       this.pdID = pd.pd_id;
       this.code = pd.pd_payment_code;
       this.name = pd.pd_payment_name;
@@ -254,8 +263,7 @@ export default {
           sortable: true,
           thClass: "text-nowrap",
         },
-          "action"
-
+        "action",
       ],
       submitted: false,
       code: null,
@@ -325,23 +333,20 @@ export default {
       ],
 
       pd_employee: 1,
-      pd_employees:[
-        {text: "EMPLOYEE", value: 1},
-        {text: "EMPLOYER", value: 2}
+      pd_employees: [
+        { text: "EMPLOYEE", value: 1 },
+        { text: "EMPLOYER", value: 2 },
       ],
 
       tie_number: 0,
-      tie_numbers:[
-        {text: "NONE", value: 0},
-        {text: "TAX", value: 1},
-        {text: "PENSION", value: 2},
-        {text: "NHF", value: 3},
-
+      tie_numbers: [
+        { text: "NONE", value: 0 },
+        { text: "TAX", value: 1 },
+        { text: "PENSION", value: 2 },
+        { text: "NHF", value: 3 },
       ],
       sumIIDisabled: false,
       pdPercentage: 0,
-
-
     };
   },
 };
@@ -434,7 +439,6 @@ export default {
                 :filter-included-fields="filterOn"
                 @filtered="onFiltered"
                 show-empty
-
               >
                 <template #cell(pd_payment_name)="row">
                   <p class="text-nowrap">{{ row.value }}</p>
@@ -499,16 +503,24 @@ export default {
                 </template>
 
                 <template #cell(action)="row">
-
-
-                      <div class="btn-group">
-                       <b-button style="margin: 10px" variant="primary" size="sm" @click="selectPD(row.item)"> <i class="dripicons-document-edit"></i></b-button>
-                        <b-button style="margin: 10px" variant="danger" size="sm" @click="deletePD(row.item)"> <i class="dripicons-trash"></i></b-button>
-
-                      </div>
-
-
-
+                  <div class="btn-group">
+                    <b-button
+                      style="margin: 10px"
+                      variant="primary"
+                      size="sm"
+                      @click="selectPD(row.item)"
+                    >
+                      <i class="dripicons-document-edit"></i
+                    ></b-button>
+                    <b-button
+                      style="margin: 10px"
+                      variant="danger"
+                      size="sm"
+                      @click="deletePD(row.item)"
+                    >
+                      <i class="dripicons-trash"></i
+                    ></b-button>
+                  </div>
                 </template>
               </b-table>
             </div>
@@ -589,16 +601,14 @@ export default {
                 <b-form-group>
                   <label for="user_type">Category</label><br />
                   <b-form-radio-group
-                      id="user_type"
-                      v-model="pd_employee"
-                      :options="pd_employees"
-                      button-variant="outline-success"
-                      buttons
+                    id="user_type"
+                    v-model="pd_employee"
+                    :options="pd_employees"
+                    button-variant="outline-success"
+                    buttons
                   />
                 </b-form-group>
               </div>
-
-
             </div>
           </div>
         </div>
@@ -868,16 +878,14 @@ export default {
                 <b-form-group>
                   <label for="user_type">Category</label><br />
                   <b-form-radio-group
-                      id="user_type"
-                      v-model="pd_employee"
-                      :options="pd_employees"
-                      button-variant="outline-success"
-                      buttons
+                    id="user_type"
+                    v-model="pd_employee"
+                    :options="pd_employees"
+                    button-variant="outline-success"
+                    buttons
                   />
                 </b-form-group>
               </div>
-
-
             </div>
           </div>
         </div>
@@ -961,11 +969,11 @@ export default {
                 <b-form-group>
                   <label>Tie Number?</label><br />
                   <b-form-radio-group
-                      id="user_type"
-                      v-model="tie_number"
-                      :options="tie_numbers"
-                      button-variant="outline-success"
-                      buttons
+                    id="user_type"
+                    v-model="tie_number"
+                    :options="tie_numbers"
+                    button-variant="outline-success"
+                    buttons
                   />
                 </b-form-group>
               </div>
@@ -1100,7 +1108,9 @@ export default {
     >
       <form @submit.prevent="submitDelete">
         <div class="ff-wrapper mt-3">
-          <h5 class="ff-header" style="bottom: 86%">Are you Sure You want to Delete {{ name }} ? </h5>
+          <h5 class="ff-header" style="bottom: 86%">
+            Are you Sure You want to Delete {{ name }} ?
+          </h5>
           <div class="ff-content">
             <div class="row">
               <div class="col-lg-6">
@@ -1140,8 +1150,6 @@ export default {
             </div>
           </div>
         </div>
-
-
 
         <b-button
           v-if="!submitting"

@@ -2,8 +2,18 @@
 import Layout from "@/views/layouts/main";
 import PageHeader from "@/components/page-header";
 import appConfig from "@/app.config";
-import {required} from "vuelidate/lib/validators";
+import { required } from "vuelidate/lib/validators";
+import store from "@/state/store";
 export default {
+  beforeRouteEnter(to, from, next) {
+    const userType = store.getters["auth/getUser"].user_type;
+    if (userType === 1 || userType === 3) {
+      next();
+    } else {
+      alert("You are not allowed to access this page. You will be redirected.");
+      next("/");
+    }
+  },
   page: {
     title: "Work Experience ",
     meta: [{ name: "description", content: appConfig.description }],
@@ -25,7 +35,7 @@ export default {
   methods: {
     refreshTable() {
       this.employeeID = this.$route.params.employeeID;
-      const url = `${this.ROUTES.workExperience}/${this.employeeID}`
+      const url = `${this.ROUTES.workExperience}/${this.employeeID}`;
       this.apiGet(url, "Get Employees Error").then((res) => {
         const { data } = res;
         const list = data.list;
@@ -34,13 +44,14 @@ export default {
         list.forEach((ls, index) => {
           this.edu_backgrounds[index] = {
             sn: ++index,
-            organization:ls.we_organization,
-            role:ls.we_job_role,
-            start_date:ls.we_start_date,
-            end_date:ls.we_end_date,
-            emp_id:ls.we_emp_id,
-            id:ls.we_id,
-            ...ls };
+            organization: ls.we_organization,
+            role: ls.we_job_role,
+            start_date: ls.we_start_date,
+            end_date: ls.we_end_date,
+            emp_id: ls.we_emp_id,
+            id: ls.we_id,
+            ...ls,
+          };
         });
         this.totalRows = this.employees.length;
       });
@@ -49,22 +60,25 @@ export default {
       this.totalRows = filteredItems.length;
       this.currentPage = 1;
     },
-    submitData(){
+    submitData() {
       this.submitted = true;
       this.$v.$touch();
       if (this.$v.$invalid) {
         this.apiFormHandler("Invalid LGA");
       } else {
-
         const data = {
-          employee:this.employeeID,
-          organization:this.organization,
-          role:this.role,
-          start_date:this.start_date,
-          end_date:this.end_date,
+          employee: this.employeeID,
+          organization: this.organization,
+          role: this.role,
+          start_date: this.start_date,
+          end_date: this.end_date,
         };
 
-        this.apiPost(this.ROUTES.workExperience, data, "Add Work Experience Error").then((res) => {
+        this.apiPost(
+          this.ROUTES.workExperience,
+          data,
+          "Add Work Experience Error"
+        ).then((res) => {
           this.apiResponseHandler(`${res.data}`, "New Work Experience Added");
           this.refreshTable();
           this.$v.$reset();
@@ -78,13 +92,12 @@ export default {
       if (this.$v.$invalid) {
         this.apiFormHandler("Invalid Entry");
       } else {
-
         const data = {
-          employee:this.employeeID,
-          organization:this.organization,
-          role:this.role,
-          start_date:this.start_date,
-          end_date:this.end_date,
+          employee: this.employeeID,
+          organization: this.organization,
+          role: this.role,
+          start_date: this.start_date,
+          end_date: this.end_date,
         };
         const url = `${this.ROUTES.workExperience}/${this.workID}`;
         this.apiPatch(url, data, "Update Experience Error").then((res) => {
@@ -177,7 +190,6 @@ export default {
           Add New
         </b-button>
       </div>
-
     </div>
     <scale-loader v-if="apiBusy" />
     <div v-else class="row">
@@ -188,33 +200,34 @@ export default {
             <table class="table table-bordered">
               <tr>
                 <td><strong>Full Name</strong></td>
-                <td>{{employee.emp_first_name}} {{employee.emp_last_name}} {{employee.emp_other_name}}
+                <td>
+                  {{ employee.emp_first_name }} {{ employee.emp_last_name }}
+                  {{ employee.emp_other_name }}
                 </td>
               </tr>
               <tr>
                 <td><strong>Phone</strong></td>
-                <td>{{employee.emp_phone_no}}
-                </td>
+                <td>{{ employee.emp_phone_no }}</td>
               </tr>
               <tr>
                 <td><strong>ID</strong></td>
-                <td>{{employee.emp_unique_id}}
-                </td>
+                <td>{{ employee.emp_unique_id }}</td>
               </tr>
               <tr>
                 <td><strong>Location</strong></td>
-                <td>{{employee.location.location_name}} ({{ employee.location.l_t6_code }})
+                <td>
+                  {{ employee.location.location_name }} ({{
+                    employee.location.l_t6_code
+                  }})
                 </td>
               </tr>
               <tr>
                 <td><strong>Office Email</strong></td>
-                <td>{{employee.emp_office_email}}
-                </td>
+                <td>{{ employee.emp_office_email }}</td>
               </tr>
               <tr>
                 <td><strong>Personal Email</strong></td>
-                <td>{{employee.emp_personal_email}}
-                </td>
+                <td>{{ employee.emp_personal_email }}</td>
               </tr>
             </table>
           </div>
@@ -320,7 +333,6 @@ export default {
       @hidden="resetForm"
     >
       <form @submit.prevent="submitData">
-
         <div class="form-group">
           <label for="name">
             Organization Name <span class="text-danger">*</span>
@@ -407,7 +419,6 @@ export default {
       @hidden="resetForm"
     >
       <form @submit.prevent="submitUpdate">
-
         <div class="form-group">
           <label for="name">
             Organization Name <span class="text-danger">*</span>

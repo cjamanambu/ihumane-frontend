@@ -2,9 +2,19 @@
 import Layout from "@/views/layouts/main";
 import PageHeader from "@/components/page-header";
 import appConfig from "@/app.config";
+import store from "@/state/store";
 //import { required } from "vuelidate/lib/validators";
 
 export default {
+  beforeRouteEnter(to, from, next) {
+    const userType = store.getters["auth/getUser"].user_type;
+    if (userType === 1 || userType === 3) {
+      next();
+    } else {
+      alert("You are not allowed to access this page. You will be redirected.");
+      next("/");
+    }
+  },
   page: {
     title: "Goal Settings",
     meta: [{ name: "description", content: appConfig.description }],
@@ -68,8 +78,8 @@ export default {
       this.gs_id = goalSetting.gs_id;
       this.gs_year = goalSetting.gs_year;
       this.gs_activity = goalSetting.gs_activity;
-      this.gs_from = this.currentFrom;//goalSetting.gs_from;
-      this.gs_to = this.currentTo;//goalSetting.gs_to;
+      this.gs_from = this.currentFrom; //goalSetting.gs_from;
+      this.gs_to = this.currentTo; //goalSetting.gs_to;
       this.gs_status = parseInt(goalSetting.gs_status);
       this.$refs["update-goal-setting"].show();
       this.$refs["goal-setting-table"].clearSelected();
@@ -87,7 +97,6 @@ export default {
       this.$refs["add-goal-setting"].hide();
 
       //this.$v.$reset();
-
     },
     submitUpdate() {
       this.submitted = true;
@@ -119,12 +128,10 @@ export default {
       this.apiPost(url, data, "Add Goal Setting Year Error").then((res) => {
         if (res.data) {
           this.apiResponseHandler(
-              `Goal Setting Year has been set successfully`,
-              "New Goal Setting Year Set"
+            `Goal Setting Year has been set successfully`,
+            "New Goal Setting Year Set"
           );
-
         }
-
       });
       await this.refreshGSY();
       this.setGSY = false;
@@ -353,7 +360,6 @@ export default {
         <div class="form-group">
           <label> From <span class="text-danger">*</span> </label>
           <input
-
             type="date"
             v-model="currentFrom"
             class="form-control"
@@ -361,9 +367,8 @@ export default {
           />
         </div>
         <div class="form-group">
-          <label > To  <span class="text-danger">*</span> </label>
+          <label> To <span class="text-danger">*</span> </label>
           <input
-
             type="date"
             v-model="currentTo"
             class="form-control"
@@ -390,7 +395,6 @@ export default {
             id="gs_activity"
             v-model="gs_activity"
             :options="gs_activities"
-
           />
         </div>
 
@@ -430,7 +434,6 @@ export default {
             v-model="currentFrom"
             class="form-control"
             disabled
-
           />
         </div>
         <div class="form-group">
@@ -441,7 +444,6 @@ export default {
             v-model="currentTo"
             class="form-control"
             disabled
-
           />
         </div>
         <div class="form-group">
@@ -465,7 +467,6 @@ export default {
             v-model="gs_activity"
             :options="gs_activities"
             disabled
-
           />
         </div>
 
@@ -517,15 +518,32 @@ export default {
       <form @submit.prevent="submitGSY">
         <div class="form-group">
           <label> Period From <span class="text-danger">*</span> </label>
-          <input id="from" v-model="period_from" class="form-control" placeholder="From" type="date"  />
+          <input
+            id="from"
+            v-model="period_from"
+            class="form-control"
+            placeholder="From"
+            type="date"
+          />
         </div>
         <div class="form-group">
           <label> Period To <span class="text-danger">*</span> </label>
-          <input id="to" v-model="period_to" class="form-control" placeholder="To" type="date"  />
+          <input
+            id="to"
+            v-model="period_to"
+            class="form-control"
+            placeholder="To"
+            type="date"
+          />
         </div>
         <div class="form-group">
           <label> Goal Setting Year <span class="text-danger">*</span> </label>
-          <input id="pmy" v-model="gsy" class="form-control" placeholder="Year"/>
+          <input
+            id="pmy"
+            v-model="gsy"
+            class="form-control"
+            placeholder="Year"
+          />
         </div>
         <b-button
           v-if="!submitting"

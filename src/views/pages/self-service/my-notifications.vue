@@ -27,12 +27,12 @@ export default {
       this.apiGet(url, "Get Notifications Error").then((res) => {
         const { data } = res;
         data.forEach((notification, index) => {
-          const  notify = {
-            sn:index+1,
-            nDate:new Date(notification.createdAt).toDateString(),
-            nSubject:notification.n_subject,
-            nContent:notification.n_body
-          }
+          const notify = {
+            sn: index + 1,
+            nDate: new Date(notification.createdAt).toDateString(),
+            nSubject: notification.n_subject,
+            nContent: notification.n_body,
+          };
           this.notifications.push(notify);
         });
       });
@@ -152,7 +152,6 @@ export default {
                 :filter-included-fields="filterOn"
                 show-empty
                 select-mode="single"
-
               >
                 <template #cell(applicant)="row">
                   <p class="mb-0">

@@ -2,10 +2,20 @@
 import Layout from "@/views/layouts/main";
 import PageHeader from "@/components/page-header";
 import appConfig from "@/app.config";
-import Multiselect from 'vue-multiselect';
+import Multiselect from "vue-multiselect";
 import { required } from "vuelidate/lib/validators";
+import store from "@/state/store";
 
 export default {
+  beforeRouteEnter(to, from, next) {
+    const userType = store.getters["auth/getUser"].user_type;
+    if (userType === 1 || userType === 3) {
+      next();
+    } else {
+      alert("You are not allowed to access this page. You will be redirected.");
+      next("/");
+    }
+  },
   page: {
     title: "Sector",
     meta: [{ name: "description", content: appConfig.description }],
@@ -25,8 +35,8 @@ export default {
     t3_code: { required },
   },
   methods: {
-    employeeLabel ({ text }) {
-      return `${text}`
+    employeeLabel({ text }) {
+      return `${text}`;
     },
     refreshTable() {
       this.apiGet(this.ROUTES.department, "Get Departments Error").then(
@@ -43,7 +53,9 @@ export default {
               if (depart.d_sector_lead_id === parseFloat(lead.emp_id)) {
                 depart["leader"] = `${lead.emp_first_name} ${
                   lead.emp_last_name !== null ? lead.emp_last_name : ""
-                } ${lead.emp_other_name !== null ? lead.emp_other_name : ""} (${lead.emp_unique_id})`;
+                } ${lead.emp_other_name !== null ? lead.emp_other_name : ""} (${
+                  lead.emp_unique_id
+                })`;
               }
             });
           });
@@ -305,12 +317,12 @@ export default {
             Sector Lead <span class="text-danger">*</span>
           </label>
           <multiselect
-                  v-model="sector_lead"
-                  :options="employee_list"
-                  :custom-label="employeeLabel"
-                  :class="{
-                      'is-invalid': submitted && $v.employee_list.$error,
-                    }"
+            v-model="sector_lead"
+            :options="employee_list"
+            :custom-label="employeeLabel"
+            :class="{
+              'is-invalid': submitted && $v.employee_list.$error,
+            }"
           ></multiselect>
         </div>
         <b-button
@@ -372,12 +384,12 @@ export default {
             Sector Lead <span class="text-danger">*</span>
           </label>
           <multiselect
-                  v-model="sector_lead"
-                  :options="employee_list"
-                  :custom-label="employeeLabel"
-                  :class="{
-                      'is-invalid': submitted && $v.employee_list.$error,
-                    }"
+            v-model="sector_lead"
+            :options="employee_list"
+            :custom-label="employeeLabel"
+            :class="{
+              'is-invalid': submitted && $v.employee_list.$error,
+            }"
           ></multiselect>
         </div>
         <b-button
