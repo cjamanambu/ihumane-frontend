@@ -4,8 +4,18 @@ import PageHeader from "@/components/page-header";
 import appConfig from "@/app.config";
 import { authComputed } from "@/state/helpers";
 import { required } from "vuelidate/lib/validators";
+import store from "@/state/store";
 
 export default {
+  beforeRouteEnter(to, from, next) {
+    const userType = store.getters["auth/getUser"].user_type;
+    if (userType === 2 || userType === 3) {
+      next();
+    } else {
+      alert("You are not allowed to access this page. You will be redirected.");
+      next("/");
+    }
+  },
   page: {
     title: "Self Assessment",
     meta: [{ name: "description", content: appConfig.description }],
@@ -158,7 +168,7 @@ export default {
           params: {
             empid: this.employeeId,
             gsId: gsId,
-            masterId:masterId
+            masterId: masterId,
           },
         });
       } else {

@@ -3,7 +3,17 @@ import Layout from "@/views/layouts/main";
 import PageHeader from "@/components/page-header";
 import appConfig from "@/app.config.json";
 import { authComputed } from "@/state/helpers";
+import store from "@/state/store";
 export default {
+  beforeRouteEnter(to, from, next) {
+    const userType = store.getters["auth/getUser"].user_type;
+    if (userType === 1 || userType === 3) {
+      next();
+    } else {
+      alert("You are not allowed to access this page. You will be redirected.");
+      next("/");
+    }
+  },
   page: {
     title: "Employee Leave Accrual",
     meta: [{ name: "description", content: appConfig.description }],
@@ -24,33 +34,32 @@ export default {
       this.apiGet(url, "Get Leave Accrual Error").then((res) => {
         const { data } = res;
         //console.log(data)
-        data.leave_types.forEach((l_type)=>{
+        data.leave_types.forEach((l_type) => {
           let field = {
-            key:`key_${l_type.leave_type_id}`,
-            label:l_type.leave_name,
-            sortable:true
+            key: `key_${l_type.leave_type_id}`,
+            label: l_type.leave_name,
+            sortable: true,
           };
           this.fields.push(field);
-           this.newFields.push(field);
-        })
+          this.newFields.push(field);
+        });
         this.accruals = data.accruals;
 
         const data_holder = [];
-        this.accruals.forEach((leave,index)=>{
+        this.accruals.forEach((leave, index) => {
           let keyV = `key_${leave.leave_type.leave_type_id}`;
           let val = leave.total;
           data_holder.push({
-            sn:++index,
-            [keyV]:val,
-            t7:leave.employee.emp_unique_id,
-            t6:leave.employee.location.location_name,
-            employee_details:`${leave.employee.emp_first_name} ${leave.employee.emp_last_name}`,
-            t3:leave.employee.sector.department_name,
-            ...leave
+            sn: ++index,
+            [keyV]: val,
+            t7: leave.employee.emp_unique_id,
+            t6: leave.employee.location.location_name,
+            employee_details: `${leave.employee.emp_first_name} ${leave.employee.emp_last_name}`,
+            t3: leave.employee.sector.department_name,
+            ...leave,
           });
         });
         this.accruals = data_holder;
-
       });
     },
     onFiltered(filteredItems) {
@@ -94,7 +103,7 @@ export default {
       filterOn: [],
       sortBy: "sn",
       sortDesc: false,
-      newFields:[],
+      newFields: [],
       fields: [
         { key: "sn", label: "S/n", sortable: true },
         { key: "t7", label: "T7", sortable: true },

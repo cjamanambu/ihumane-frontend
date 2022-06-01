@@ -5,8 +5,18 @@ import appConfig from "@/app.config";
 import { authComputed } from "@/state/helpers";
 import { required } from "vuelidate/lib/validators";
 import Multiselect from "vue-multiselect";
+import store from "@/state/store";
 
 export default {
+  beforeRouteEnter(to, from, next) {
+    const userType = store.getters["auth/getUser"].user_type;
+    if (userType === 2 || userType === 3) {
+      next();
+    } else {
+      alert("You are not allowed to access this page. You will be redirected.");
+      next("/");
+    }
+  },
   page: {
     title: "Leave Authorization",
     meta: [{ name: "description", content: appConfig.description }],
@@ -36,8 +46,8 @@ export default {
       this.apiGet(url, "Get Leave Application").then((res) => {
         const { application, log } = res.data;
         //console.log(log)
-        log.map(lg=>{
-          if(lg.auth_officer_id == this.getEmployee.emp_id){
+        log.map((lg) => {
+          if (lg.auth_officer_id == this.getEmployee.emp_id) {
             this.reviewStatus = lg.auth_status;
           }
         });
@@ -224,7 +234,7 @@ export default {
       status: null,
       approving: false,
       declining: false,
-      reviewStatus:null,
+      reviewStatus: null,
     };
   },
 };
@@ -431,7 +441,7 @@ export default {
                       <b-th>OFFICER</b-th>
                       <b-th thStyle="width: 30px;">STATUS</b-th>
                       <b-th>COMMENT</b-th>
-                      <b-th >Authorized As</b-th>
+                      <b-th>Authorized As</b-th>
                       <b-th>DATE</b-th>
                     </b-tr>
                   </b-thead>
@@ -531,10 +541,17 @@ export default {
               <span>T6 Code</span>
               <span> {{ t6 }} </span>
             </div>
-            <div v-if="reviewStatus" class="d-flex justify-content-between mb-3">
+            <div
+              v-if="reviewStatus"
+              class="d-flex justify-content-between mb-3"
+            >
               <span>Status</span>
-              <span v-if="reviewStatus === 1" class="text-success">Approved</span>
-              <span v-else-if="reviewStatus === 2" class="text-danger">Declined</span>
+              <span v-if="reviewStatus === 1" class="text-success"
+                >Approved</span
+              >
+              <span v-else-if="reviewStatus === 2" class="text-danger"
+                >Declined</span
+              >
             </div>
             <div v-else>
               <b-form-group>

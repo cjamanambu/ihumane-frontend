@@ -3,9 +3,19 @@ import Layout from "@/views/layouts/main";
 import PageHeader from "@/components/page-header";
 import appConfig from "@/app.config";
 import { required } from "vuelidate/lib/validators";
-import Multiselect from 'vue-multiselect';
+import Multiselect from "vue-multiselect";
+import store from "@/state/store";
 
 export default {
+  beforeRouteEnter(to, from, next) {
+    const userType = store.getters["auth/getUser"].user_type;
+    if (userType === 1 || userType === 3) {
+      next();
+    } else {
+      alert("You are not allowed to access this page. You will be redirected.");
+      next("/");
+    }
+  },
   page: {
     title: "LGAs",
     meta: [{ name: "description", content: appConfig.description }],
@@ -24,12 +34,12 @@ export default {
     state: { required },
   },
   methods: {
-    selectLabel ({ text }) {
-      return `${text}`
+    selectLabel({ text }) {
+      return `${text}`;
     },
     getStates() {
       this.apiGet(this.ROUTES.state, "Get States Error").then((res) => {
-        const { data} = res;
+        const { data } = res;
         data.map((state) => {
           this.states.push({
             value: state.s_id,
@@ -47,28 +57,30 @@ export default {
       } else {
         const data = {
           lg_name: this.lg_name,
-          state:this.state.value
+          state: this.state.value,
         };
-        this.apiPost(this.ROUTES.localGovernment, data, "Add LGA Error").then((res) => {
-          this.apiResponseHandler(`${res.data}`, "New LGA Added");
-          this.refreshTable();
-          this.$v.$reset();
-          this.$refs["add-state"].hide();
-        });
+        this.apiPost(this.ROUTES.localGovernment, data, "Add LGA Error").then(
+          (res) => {
+            this.apiResponseHandler(`${res.data}`, "New LGA Added");
+            this.refreshTable();
+            this.$v.$reset();
+            this.$refs["add-state"].hide();
+          }
+        );
       }
     },
     refreshTable() {
       this.apiGet(this.ROUTES.localGovernment, "Get LGAs Error").then((res) => {
-        const { data} = res;
+        const { data } = res;
         console.log(data);
-        data.map((lg)=>{
+        data.map((lg) => {
           this.lgas.push({
-            lg_name:lg.lg_name,
-            state:lg.lga.s_name,
-            lg_id:lg.lg_id,
-            state_id:lg.lg_state_id
+            lg_name: lg.lg_name,
+            state: lg.lga.s_name,
+            lg_id: lg.lg_id,
+            state_id: lg.lg_state_id,
           });
-        })
+        });
         this.totalRows = this.lgas.length;
       });
     },
@@ -78,10 +90,9 @@ export default {
       if (this.$v.$invalid) {
         this.apiFormHandler("Invalid State");
       } else {
-
         const data = {
           state: this.state.value,
-          lg_name:this.lg_name
+          lg_name: this.lg_name,
         };
         const url = `${this.ROUTES.localGovernment}/${this.lgaId}`;
         this.apiPatch(url, data, "Update LGA Error").then((res) => {
@@ -107,7 +118,6 @@ export default {
       this.lgaId = lga.lg_id;
       this.state = lga.state_id;
       this.states.forEach(async (state) => {
-
         if (state.s_id === lga.state_id) {
           const val = {
             value: state.s_id,
@@ -155,9 +165,9 @@ export default {
       ],
       name: null,
       stateID: null,
-      lga_name:null,
-      state:[], //id
-      lgaId:null, //id
+      lga_name: null,
+      state: [], //id
+      lgaId: null, //id
     };
   },
 };
@@ -264,18 +274,15 @@ export default {
       @hidden="resetForm"
     >
       <form @submit.prevent="submitNew">
-
         <div class="form-group">
-          <label for="name">
-            State <span class="text-danger">*</span>
-          </label>
+          <label for="name"> State <span class="text-danger">*</span> </label>
           <multiselect
             v-model="state"
             :options="states"
             :custom-label="selectLabel"
             :class="{
-                      'is-invalid': submitted && $v.state.$error,
-                    }"
+              'is-invalid': submitted && $v.state.$error,
+            }"
           ></multiselect>
         </div>
         <div class="form-group">
@@ -328,14 +335,12 @@ export default {
             :options="states"
             :custom-label="selectLabel"
             :class="{
-                      'is-invalid': submitted && $v.state.$error,
-                    }"
+              'is-invalid': submitted && $v.state.$error,
+            }"
           ></multiselect>
         </div>
         <div class="form-group">
-          <label for="lga">
-            LGA <span class="text-danger">*</span>
-          </label>
+          <label for="lga"> LGA <span class="text-danger">*</span> </label>
           <input
             id="lg_namea"
             type="text"

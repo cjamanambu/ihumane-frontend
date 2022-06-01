@@ -3,9 +3,19 @@ import Layout from "@/views/layouts/main";
 import PageHeader from "@/components/page-header";
 import appConfig from "@/app.config";
 import { required } from "vuelidate/lib/validators";
-import Multiselect from 'vue-multiselect';
+import Multiselect from "vue-multiselect";
+import store from "@/state/store";
 
 export default {
+  beforeRouteEnter(to, from, next) {
+    const userType = store.getters["auth/getUser"].user_type;
+    if (userType === 1 || userType === 3) {
+      next();
+    } else {
+      alert("You are not allowed to access this page. You will be redirected.");
+      next("/");
+    }
+  },
   page: {
     title: "Supervisors",
     meta: [{ name: "description", content: appConfig.description }],
@@ -17,30 +27,24 @@ export default {
   },
   mounted() {
     this.refreshTable();
-
   },
   validations: {
     supervisor: { required },
   },
   methods: {
-    selectionLabel ({ text }) {
-      return `${text}`
+    selectionLabel({ text }) {
+      return `${text}`;
     },
     refreshTable() {
       const url = `${this.ROUTES.employee}`;
-      this.apiGet(url, "Get Employees Error").then(
-          (res) => {
-            const { data } = res;
-            this.employees = data;
-            this.totalRows = this.employees.length;
-          }
-      );
+      this.apiGet(url, "Get Employees Error").then((res) => {
+        const { data } = res;
+        this.employees = data;
+        this.totalRows = this.employees.length;
+      });
     },
 
-
-
     onFiltered(filteredItems) {
-
       this.totalRows = filteredItems.length;
       this.currentPage = 1;
     },
@@ -55,20 +59,16 @@ export default {
       this.emp_name = `${employee.emp_first_name} ${employee.emp_last_name}`;
 
       const url = `${this.ROUTES.employee}/get-supervisor`;
-      this.supervisors =   [
-        { value: null, text: "Please select an employee" },
-      ];
-      this.apiGet(url, "Get Supervisors Error").then(
-          (res) => {
-            const { data } = res;
-            data.forEach((supervisor) => {
-              this.supervisors.push({
-                value: supervisor.emp_id,
-                text:`${supervisor.emp_first_name} ${supervisor.emp_last_name} (${supervisor.emp_unique_id})`,
-              });
-            });
-          }
-      );
+      this.supervisors = [{ value: null, text: "Please select an employee" }];
+      this.apiGet(url, "Get Supervisors Error").then((res) => {
+        const { data } = res;
+        data.forEach((supervisor) => {
+          this.supervisors.push({
+            value: supervisor.emp_id,
+            text: `${supervisor.emp_first_name} ${supervisor.emp_last_name} (${supervisor.emp_unique_id})`,
+          });
+        });
+      });
       this.$refs["update-supervisor"].show();
       this.$refs["supervisor-table"].clearSelected();
     },
@@ -80,25 +80,18 @@ export default {
         this.apiFormHandler("Invalid Supervisor Application");
       } else {
         const data = {
-
           sa_emp_id: this.emp_id,
           sa_supervisor_id: this.supervisor.value,
-
-
         };
         const url = `${this.ROUTES.supervisorAssignment}/add-assignment`;
-        this.apiPost(url, data, "Assign Supervisor Error").then(
-            (res) => {
-              this.apiResponseHandler(`${res.data}`, "Supervisor Assignment");
-              this.refreshTable();
-              this.$v.$reset();
-              this.$refs["update-supervisor"].hide();
-            }
-        );
+        this.apiPost(url, data, "Assign Supervisor Error").then((res) => {
+          this.apiResponseHandler(`${res.data}`, "Supervisor Assignment");
+          this.refreshTable();
+          this.$v.$reset();
+          this.$refs["update-supervisor"].hide();
+        });
       }
     },
-
-
   },
   data() {
     return {
@@ -126,12 +119,11 @@ export default {
       sortBy: "emp_id",
       sortDesc: false,
       fields: [
-        { key: "emp_id", label:"SN", sortable: true },
+        { key: "emp_id", label: "SN", sortable: true },
         { key: "emp_unique_id", label: "Employee ID", sortable: true },
         { key: "emp_first_name", label: "Employee Name", sortable: true },
         { key: "supervisor", label: "Supervisor", sortable: true },
       ],
-
 
       employees: [],
       supervisors: [],
@@ -139,7 +131,7 @@ export default {
       employee: null,
       emp_name: null,
       emp_id: null,
-     submitted: false,
+      submitted: false,
     };
   },
 };
@@ -160,9 +152,9 @@ export default {
                   <label class="d-inline-flex align-items-center">
                     Show&nbsp;
                     <b-form-select
-                        v-model="perPage"
-                        size="sm"
-                        :options="pageOptions"
+                      v-model="perPage"
+                      size="sm"
+                      :options="pageOptions"
                     ></b-form-select
                     >&nbsp;entries
                   </label>
@@ -171,16 +163,16 @@ export default {
               <!-- Search -->
               <div class="col-sm-12 col-md-6">
                 <div
-                    id="tickets-table_filter"
-                    class="dataTables_filter text-md-right"
+                  id="tickets-table_filter"
+                  class="dataTables_filter text-md-right"
                 >
                   <label class="d-inline-flex align-items-center">
                     Search:
                     <b-form-input
-                        v-model="filter"
-                        type="search"
-                        placeholder="Search..."
-                        class="form-control form-control-sm ml-2"
+                      v-model="filter"
+                      type="search"
+                      placeholder="Search..."
+                      class="form-control form-control-sm ml-2"
                     ></b-form-input>
                   </label>
                 </div>
@@ -190,52 +182,53 @@ export default {
             <!-- Table -->
             <div class="table-responsive mb-0">
               <b-table
-                  ref="employee-table"
-                  bordered
-                  selectable
-                  hover
-                  :items="employees"
-                  :fields="fields"
-                  responsive="sm"
-                  :per-page="perPage"
-                  :current-page="currentPage"
-                  :sort-by.sync="sortBy"
-                  :sort-desc.sync="sortDesc"
-                  :filter="filter"
-                  :filter-included-fields="filterOn"
-                  @filtered="onFiltered"
-                  show-empty
-                  select-mode="single"
-                  @row-selected="selectEmployee"
+                ref="employee-table"
+                bordered
+                selectable
+                hover
+                :items="employees"
+                :fields="fields"
+                responsive="sm"
+                :per-page="perPage"
+                :current-page="currentPage"
+                :sort-by.sync="sortBy"
+                :sort-desc.sync="sortDesc"
+                :filter="filter"
+                :filter-included-fields="filterOn"
+                @filtered="onFiltered"
+                show-empty
+                select-mode="single"
+                @row-selected="selectEmployee"
               >
-
                 <template #cell(emp_first_name)="data">
-                  <b> {{ data.item.emp_first_name }} </b>,  {{ data.item.emp_last_name.toUpperCase() }} ({{ data.item.emp_unique_id}})
+                  <b> {{ data.item.emp_first_name }} </b>,
+                  {{ data.item.emp_last_name.toUpperCase() }} ({{
+                    data.item.emp_unique_id
+                  }})
                 </template>
 
                 <template #cell(supervisor)="data">
-              <div v-if="data.item.supervisor !== null">
-                <b > {{ data.item.supervisor.emp_first_name }} </b>,  {{ data.item.supervisor.emp_last_name.toUpperCase() }} ({{ data.item.supervisor.emp_unique_id}})
-
-              </div>
-                  <div v-if="data.item.supervisor == null">
-                    N/A
+                  <div v-if="data.item.supervisor !== null">
+                    <b> {{ data.item.supervisor.emp_first_name }} </b>,
+                    {{ data.item.supervisor.emp_last_name.toUpperCase() }} ({{
+                      data.item.supervisor.emp_unique_id
+                    }})
                   </div>
-                      </template>
-
+                  <div v-if="data.item.supervisor == null">N/A</div>
+                </template>
               </b-table>
             </div>
             <div class="row">
               <div class="col">
                 <div
-                    class="dataTables_paginate paging_simple_numbers float-right"
+                  class="dataTables_paginate paging_simple_numbers float-right"
                 >
                   <ul class="pagination pagination-rounded mb-0">
                     <!-- pagination -->
                     <b-pagination
-                        v-model="currentPage"
-                        :total-rows="totalRows"
-                        :per-page="perPage"
+                      v-model="currentPage"
+                      :total-rows="totalRows"
+                      :per-page="perPage"
                     ></b-pagination>
                   </ul>
                 </div>
@@ -247,12 +240,12 @@ export default {
     </div>
 
     <b-modal
-        ref="update-supervisor"
-        title="Assign Supervisor"
-        hide-footer
-        centered
-        title-class="font-18"
-        @hidden="resetForm"
+      ref="update-supervisor"
+      title="Assign Supervisor"
+      hide-footer
+      centered
+      title-class="font-18"
+      @hidden="resetForm"
     >
       <form @submit.prevent="submitNew">
         <div class="form-group">
@@ -260,47 +253,41 @@ export default {
             Employee Name <span class="text-danger">*</span>
           </label>
           <input
-              id="emp-names"
-              type="text"
-              v-model="emp_name"
-              class="form-control"
-              readonly
+            id="emp-names"
+            type="text"
+            v-model="emp_name"
+            class="form-control"
+            readonly
           />
         </div>
 
-
         <div class="form-group">
-          <label for="">
-           Supervisors <span class="text-danger">*</span>
-          </label>
+          <label for=""> Supervisors <span class="text-danger">*</span> </label>
           <multiselect
-                  v-model="supervisor"
-                  :options="supervisors"
-                  :custom-label="selectionLabel"
-                  :class="{
-                      'is-invalid': submitted && $v.supervisor.$error,
-                    }"
+            v-model="supervisor"
+            :options="supervisors"
+            :custom-label="selectionLabel"
+            :class="{
+              'is-invalid': submitted && $v.supervisor.$error,
+            }"
           ></multiselect>
-
         </div>
 
-
         <b-button
-            v-if="!submitting"
-            class="btn btn-success btn-block mt-4"
-            type="submit"
+          v-if="!submitting"
+          class="btn btn-success btn-block mt-4"
+          type="submit"
         >
           Submit
         </b-button>
         <b-button
-            v-else
-            disabled
-            class="btn btn-success btn-block mt-4"
-            type="submit"
+          v-else
+          disabled
+          class="btn btn-success btn-block mt-4"
+          type="submit"
         >
           Submitting...
         </b-button>
-
       </form>
     </b-modal>
   </Layout>

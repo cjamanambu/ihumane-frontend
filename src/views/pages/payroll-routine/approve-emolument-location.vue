@@ -3,7 +3,17 @@ import Layout from "@/views/layouts/main";
 import PageHeader from "@/components/page-header";
 import appConfig from "@/app.config";
 import JsonExcel from "vue-json-excel";
+import store from "@/state/store";
 export default {
+  beforeRouteEnter(to, from, next) {
+    const userType = store.getters["auth/getUser"].user_type;
+    if (userType === 1 || userType === 3) {
+      next();
+    } else {
+      alert("You are not allowed to access this page. You will be redirected.");
+      next("/");
+    }
+  },
   page: {
     title: "Emolument Report",
     meta: [{ name: "description", content: appConfig.description }],
@@ -17,39 +27,31 @@ export default {
     await this.fetchPaymentDefinitions();
   },
   methods: {
-    approveRoutine(){
+    approveRoutine() {
       this.submitted = true;
 
       const data = {
-        pmyl_location_id: this.$route.params.locationId
-
+        pmyl_location_id: this.$route.params.locationId,
       };
       //console.log(data)
       const url = `${this.ROUTES.salary}/approve-salary-routine`;
-      this.apiPost(url, data, "Salary Approval").then(
-          (res) => {
-            this.apiResponseHandler(`${res.data}`, "Salary Approved");
-            this.$router.push({ name: "approve-payroll" });
-
-          }
-      );
+      this.apiPost(url, data, "Salary Approval").then((res) => {
+        this.apiResponseHandler(`${res.data}`, "Salary Approved");
+        this.$router.push({ name: "approve-payroll" });
+      });
     },
-    unconfirmRoutine(){
+    unconfirmRoutine() {
       this.submitted = true;
 
       const data = {
-        pmyl_location_id: this.$route.params.locationId
-
+        pmyl_location_id: this.$route.params.locationId,
       };
       //console.log(data)
       const url = `${this.ROUTES.salary}/unconfirm-salary-routine`;
-      this.apiPost(url, data, "Salary Return").then(
-          (res) => {
-            this.apiResponseHandler(`${res.data}`, "Salary Returned");
-            this.$router.push({ name: "approve-payroll" });
-
-          }
-      );
+      this.apiPost(url, data, "Salary Return").then((res) => {
+        this.apiResponseHandler(`${res.data}`, "Salary Returned");
+        this.$router.push({ name: "approve-payroll" });
+      });
     },
     fetchPaymentDefinitions() {
       this.paymentDefinitions = [];
@@ -94,8 +96,8 @@ export default {
       // };
       const url = `${this.ROUTES.salary}/pull-emolument/${locationId}`;
       this.apiGet(url, "Generate Emolument Report").then(async (res) => {
-        const {data} = res;
-        const newData = await this.sortArrayOfObjects(data)
+        const { data } = res;
+        const newData = await this.sortArrayOfObjects(data);
         newData.forEach((emolument, index) => {
           let emolumentObj = {
             sn: ++index,
@@ -107,27 +109,26 @@ export default {
             jobRole: emolument.jobRole,
             salaryGrade: emolument.salaryGrade,
             contractStartDate: emolument.employeeStartDate,
-            contractEndDate: emolument.empEndDate
-
+            contractEndDate: emolument.empEndDate,
           };
           emolument.incomes.forEach((income) => {
             emolumentObj[income.paymentName] = this.apiValueHandler(
-                income.amount.toFixed(2)
+              income.amount.toFixed(2)
             );
           });
           emolument.deductions.forEach((deduction) => {
             emolumentObj[deduction.paymentName] = this.apiValueHandler(
-                deduction.amount.toFixed(2)
+              deduction.amount.toFixed(2)
             );
           });
           emolumentObj["grossSalary"] = this.apiValueHandler(
-              emolument.grossSalary.toFixed(2)
+            emolument.grossSalary.toFixed(2)
           );
           emolumentObj["totalDeduction"] = this.apiValueHandler(
-              emolument.totalDeduction.toFixed(2)
+            emolument.totalDeduction.toFixed(2)
           );
           emolumentObj["netSalary"] = this.apiValueHandler(
-              emolument.netSalary.toFixed(2)
+            emolument.netSalary.toFixed(2)
           );
           this.newEmoluments.push(emolumentObj);
         });
@@ -162,15 +163,14 @@ export default {
 
     async sortArrayOfObjects(array) {
       return array.sort(function (a, b) {
-
         let matchesA = a.employeeUniqueId.match(/(\d+)/);
-        matchesA = parseInt(matchesA[0])
+        matchesA = parseInt(matchesA[0]);
 
         let matchesB = b.employeeUniqueId.match(/(\d+)/);
-        matchesB = parseInt(matchesB[0])
+        matchesB = parseInt(matchesB[0]);
 
         return matchesA - matchesB;
-      })
+      });
     },
 
     async processFields(data) {
@@ -183,11 +183,9 @@ export default {
       });
     },
 
-
-
     selectRow(row) {
       row = row[0];
-      console.log(row)
+      console.log(row);
       let empID = row.employeeId;
       this.$router.push({ name: "view-payslip", params: { empID } });
       this.$refs["emolument-table"].clearSelected();
@@ -229,9 +227,9 @@ export default {
         "sector",
         "location",
         "jobRole",
-         "salaryGrade",
+        "salaryGrade",
         "contractStartDate",
-        "contractEndDate"
+        "contractEndDate",
       ],
       incomeFields: [],
       deductionFields: [],
@@ -250,13 +248,9 @@ export default {
         <i class="mdi mdi-check mr-2"></i>
         Approve Routine
       </b-button>
-
-
     </div>
     <div class="d-flex justify-content-end mb-3">
-
-
-      <b-button class="btn btn-danger"  @click="$refs['return-routine'].show()">
+      <b-button class="btn btn-danger" @click="$refs['return-routine'].show()">
         <i class="mdi mdi-cancel mr-2"></i>
         Return Routine
       </b-button>
@@ -274,10 +268,10 @@ export default {
               </h5>
               <span class="font-size-12 text-success">
                 <JsonExcel
-                    style="cursor: pointer"
-                    :data="filtered"
-                    :fields="jsonFields"
-                    :name="`Emolument_Report(${period[0]}-${period[1]}).xls`"
+                  style="cursor: pointer"
+                  :data="filtered"
+                  :fields="jsonFields"
+                  :name="`Emolument_Report(${period[0]}-${period[1]}).xls`"
                 >
                   Export to Excel
                 </JsonExcel>
@@ -289,9 +283,9 @@ export default {
                   <label class="d-inline-flex align-items-center">
                     Show&nbsp;
                     <b-form-select
-                        v-model="perPage"
-                        size="sm"
-                        :options="pageOptions"
+                      v-model="perPage"
+                      size="sm"
+                      :options="pageOptions"
                     ></b-form-select
                     >&nbsp;entries
                   </label>
@@ -301,16 +295,16 @@ export default {
               <!-- Search -->
               <div class="col-sm-12 col-md-3">
                 <div
-                    id="tickets-table_filter"
-                    class="dataTables_filter text-md-right"
+                  id="tickets-table_filter"
+                  class="dataTables_filter text-md-right"
                 >
                   <label class="d-inline-flex align-items-center">
                     Search:
                     <b-form-input
-                        v-model="filter"
-                        type="search"
-                        placeholder="Search..."
-                        class="form-control form-control-sm ml-2"
+                      v-model="filter"
+                      type="search"
+                      placeholder="Search..."
+                      class="form-control form-control-sm ml-2"
                     ></b-form-input>
                   </label>
                 </div>
@@ -320,25 +314,25 @@ export default {
             <!-- Table -->
             <div class="table-responsive mb-0" v-if="newEmoluments.length">
               <b-table
-                  selectable
-                  ref="emolument-table"
-                  bordered
-                  hover
-                  small
-                  :items="newEmoluments"
-                  :fields="newFields"
-                  striped
-                  responsive="lg"
-                  :per-page="perPage"
-                  :current-page="currentPage"
-                  :sort-by.sync="sortBy"
-                  :sort-desc.sync="sortDesc"
-                  :filter="filter"
-                  :filter-included-fields="filterOn"
-                  @filtered="onFiltered"
-                  select-mode="single"
-                  @row-selected="selectRow"
-                  show-empty
+                selectable
+                ref="emolument-table"
+                bordered
+                hover
+                small
+                :items="newEmoluments"
+                :fields="newFields"
+                striped
+                responsive="lg"
+                :per-page="perPage"
+                :current-page="currentPage"
+                :sort-by.sync="sortBy"
+                :sort-desc.sync="sortDesc"
+                :filter="filter"
+                :filter-included-fields="filterOn"
+                @filtered="onFiltered"
+                select-mode="single"
+                @row-selected="selectRow"
+                show-empty
               >
                 <template #cell(sn)="row">
                   <span>
@@ -376,8 +370,8 @@ export default {
                 <template #cell(grossSalary)="row">
                   <span class="float-right">
                     {{ row.value }}
-                  </span>
-                </template><template #cell(netSalary)="row">
+                  </span> </template
+                ><template #cell(netSalary)="row">
                   <span class="float-right">
                     {{ row.value }}
                   </span>
@@ -392,14 +386,14 @@ export default {
             <div class="row">
               <div class="col">
                 <div
-                    class="dataTables_paginate paging_simple_numbers float-right"
+                  class="dataTables_paginate paging_simple_numbers float-right"
                 >
                   <ul class="pagination pagination-rounded mb-0">
                     <!-- pagination -->
                     <b-pagination
-                        v-model="currentPage"
-                        :total-rows="totalRows"
-                        :per-page="perPage"
+                      v-model="currentPage"
+                      :total-rows="totalRows"
+                      :per-page="perPage"
                     ></b-pagination>
                   </ul>
                 </div>
@@ -411,30 +405,25 @@ export default {
     </div>
 
     <b-modal
-        ref="return-routine"
-        title="Return Routine ?"
-        hide-footer
-        centered
-        title-class="font-18"
-
+      ref="return-routine"
+      title="Return Routine ?"
+      hide-footer
+      centered
+      title-class="font-18"
     >
       <div class="modal-body">
-
-     <div class="alert alert-danger">
-          <strong>Warning!</strong> You are about to return this payroll routine.
+        <div class="alert alert-danger">
+          <strong>Warning!</strong> You are about to return this payroll
+          routine.
         </div>
 
         <div class="d-flex justify-content-end mb-3">
-
-
-          <b-button class="btn btn-danger"  @click="unconfirmRoutine">
+          <b-button class="btn btn-danger" @click="unconfirmRoutine">
             <i class="mdi mdi-cancel mr-2"></i>
             Return Routine
           </b-button>
         </div>
       </div>
-
     </b-modal>
-
   </Layout>
 </template>

@@ -5,8 +5,18 @@ import appConfig from "@/app.config";
 import { required, sameAs } from "vuelidate/lib/validators";
 import { authComputed } from "@/state/helpers";
 import authService from "@/services/auth.service";
+import store from "@/state/store";
 
 export default {
+  beforeRouteEnter(to, from, next) {
+    const userType = store.getters["auth/getUser"].user_type;
+    if (userType === 2 || userType === 3) {
+      next();
+    } else {
+      alert("You are not allowed to access this page. You will be redirected.");
+      next("/");
+    }
+  },
   mixins: [authService],
   page: {
     title: "Change Password",

@@ -13,8 +13,18 @@ import NhfReport from "./components/nhf-report";
 import TaxReport from "./components/tax-report";
 import NsitfReport from "./components/nsitf-report";
 import ApprovedRoutine from "./components/approved-routine";
+import store from "@/state/store";
 
 export default {
+  beforeRouteEnter(to, from, next) {
+    const userType = store.getters["auth/getUser"].user_type;
+    if (userType === 1 || userType === 3) {
+      next();
+    } else {
+      alert("You are not allowed to access this page. You will be redirected.");
+      next("/");
+    }
+  },
   page: {
     title: "Reports",
     meta: [{ name: "description", content: appConfig.description }],
@@ -32,8 +42,7 @@ export default {
     BankOrder,
     EmployeeReport,
     PensionReport,
-    NhfReport
-
+    NhfReport,
   },
   mounted() {
     this.fetchPMY();

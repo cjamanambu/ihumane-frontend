@@ -3,9 +3,19 @@ import Layout from "@/views/layouts/main";
 import PageHeader from "@/components/page-header";
 import appConfig from "@/app.config";
 import { required } from "vuelidate/lib/validators";
-import Multiselect from 'vue-multiselect';
+import Multiselect from "vue-multiselect";
+import store from "@/state/store";
 
 export default {
+  beforeRouteEnter(to, from, next) {
+    const userType = store.getters["auth/getUser"].user_type;
+    if (userType === 1 || userType === 3) {
+      next();
+    } else {
+      alert("You are not allowed to access this page. You will be redirected.");
+      next("/");
+    }
+  },
   page: {
     title: "Location Allowances",
     meta: [{ name: "description", content: appConfig.description }],
@@ -13,7 +23,7 @@ export default {
   components: {
     Layout,
     PageHeader,
-    Multiselect
+    Multiselect,
   },
   watch: {
     amount: function (newValue) {
@@ -40,11 +50,11 @@ export default {
       this.paymentDef = null;
       this.$v.$reset();
     },
-    locationLabel ({ text }) {
-      return `${text}`
+    locationLabel({ text }) {
+      return `${text}`;
     },
-    paymentDefsLabel ({ text }) {
-      return `${text}`
+    paymentDefsLabel({ text }) {
+      return `${text}`;
     },
     refreshTable() {
       this.apiGet(
@@ -331,12 +341,12 @@ export default {
         <div class="form-group">
           <label> Location <span class="text-danger">*</span> </label>
           <multiselect
-                  v-model="location"
-                  :options="locations"
-                  :custom-label="locationLabel"
-                  :class="{
-                      'is-invalid': submitted && $v.location.$error,
-                    }"
+            v-model="location"
+            :options="locations"
+            :custom-label="locationLabel"
+            :class="{
+              'is-invalid': submitted && $v.location.$error,
+            }"
           ></multiselect>
           <small
             class="form-text text-muted manage"
@@ -348,12 +358,12 @@ export default {
         <div class="form-group">
           <label> Payment Definition <span class="text-danger">*</span> </label>
           <multiselect
-                  v-model="paymentDef"
-                  :options="paymentDefs"
-                  :custom-label="paymentDefsLabel"
-                  :class="{
-                      'is-invalid': submitted && $v.paymentDef.$error,
-                    }"
+            v-model="paymentDef"
+            :options="paymentDefs"
+            :custom-label="paymentDefsLabel"
+            :class="{
+              'is-invalid': submitted && $v.paymentDef.$error,
+            }"
           ></multiselect>
 
           <small

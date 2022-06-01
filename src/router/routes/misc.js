@@ -5,6 +5,6 @@ export default [
     meta: {
       authRequired: true,
     },
-    component: () => import("@/views/pages/users"),
+    component: () => import("@/views/pages/users/index"),
   },
-]
+];

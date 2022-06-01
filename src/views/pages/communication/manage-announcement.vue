@@ -2,11 +2,21 @@
 import Layout from "@/views/layouts/main";
 import PageHeader from "@/components/page-header";
 import appConfig from "@/app.config";
-import {required} from "vuelidate/lib/validators";
+import { required } from "vuelidate/lib/validators";
 import { VueEditor } from "vue2-editor";
-import Multiselect from 'vue-multiselect';
+import Multiselect from "vue-multiselect";
 import { authComputed } from "@/state/helpers";
+import store from "@/state/store";
 export default {
+  beforeRouteEnter(to, from, next) {
+    const userType = store.getters["auth/getUser"].user_type;
+    if (userType === 1 || userType === 3) {
+      next();
+    } else {
+      alert("You are not allowed to access this page. You will be redirected.");
+      next("/");
+    }
+  },
   page: {
     title: "Manage Announcement ",
     meta: [{ name: "description", content: appConfig.description }],
@@ -17,8 +27,8 @@ export default {
     VueEditor,
     Multiselect,
   },
-  computed:{
-    ...authComputed
+  computed: {
+    ...authComputed,
   },
   mounted() {
     this.refreshTable();
@@ -39,13 +49,21 @@ export default {
         //console.log(data.announcements);
         data.announcements.forEach((announcement, index) => {
           this.announcements[index] = {
-            sn: ++index, a_title:announcement.a_title,
-            posted_by:`${announcement.author.emp_first_name} ${announcement.author.emp_last_name}`,
-            target:`${announcement.a_target == 1 ? 'Everyone' : 'Specific'}`,
-            body:announcement.a_body,
-            summary:`${announcement.a_body.replace( /(<([^>]+)>)/ig, '').length > 50 ? announcement.a_body.replace( /(<([^>]+)>)/ig, '').substr(0,47) : announcement.a_body.replace( /(<([^>]+)>)/ig, '')}`,
-            date_published:`${new Date(announcement.createdAt).toDateString()}`,
-            ...announcement };
+            sn: ++index,
+            a_title: announcement.a_title,
+            posted_by: `${announcement.author.emp_first_name} ${announcement.author.emp_last_name}`,
+            target: `${announcement.a_target == 1 ? "Everyone" : "Specific"}`,
+            body: announcement.a_body,
+            summary: `${
+              announcement.a_body.replace(/(<([^>]+)>)/gi, "").length > 50
+                ? announcement.a_body.replace(/(<([^>]+)>)/gi, "").substr(0, 47)
+                : announcement.a_body.replace(/(<([^>]+)>)/gi, "")
+            }`,
+            date_published: `${new Date(
+              announcement.createdAt
+            ).toDateString()}`,
+            ...announcement,
+          };
         });
         this.totalRows = this.employees.length;
       });
@@ -62,41 +80,43 @@ export default {
         const { data } = res;
 
         data.forEach((employee) => {
-
-            this.employees.push({
-              value: employee.emp_id,
-              text: `${employee.emp_first_name} ${employee.emp_last_name} (${employee.emp_unique_id})`,
-              disabled: false,
-            });
-
+          this.employees.push({
+            value: employee.emp_id,
+            text: `${employee.emp_first_name} ${employee.emp_last_name} (${employee.emp_unique_id})`,
+            disabled: false,
+          });
         });
       });
     },
-    authorizingAsLabel ({ text }) {
-      return `${text}`
+    authorizingAsLabel({ text }) {
+      return `${text}`;
     },
-    submitData(){
+    submitData() {
       this.submitted = true;
       /*this.$v.$touch();
       if (this.$v.$invalid) {
         this.apiFormHandler("Invalid Entry");
       } else {*/
 
-        const data = {
-          author:this.getEmployee.emp_id,
-          title:this.subject,
-          target:parseInt(this.selectedTarget),
-          body:this.body,
-          persons:this.persons
-        };
-        //console.log(this.getEmployee);
-        this.apiPost(this.ROUTES.announcement, data, "Post announcement Error").then((res) => {
-          this.apiResponseHandler(`${res.data}`, "Publish Announcement");
-          this.refreshTable();
-          this.$v.$reset();
-          this.$refs["post-announcement"].hide();
-        });
-     // }
+      const data = {
+        author: this.getEmployee.emp_id,
+        title: this.subject,
+        target: parseInt(this.selectedTarget),
+        body: this.body,
+        persons: this.persons,
+      };
+      //console.log(this.getEmployee);
+      this.apiPost(
+        this.ROUTES.announcement,
+        data,
+        "Post announcement Error"
+      ).then((res) => {
+        this.apiResponseHandler(`${res.data}`, "Publish Announcement");
+        this.refreshTable();
+        this.$v.$reset();
+        this.$refs["post-announcement"].hide();
+      });
+      // }
     },
     onFiltered(filteredItems) {
       // Trigger pagination to update the number of buttons/pages due to filtering
@@ -107,7 +127,7 @@ export default {
       row = row[0];
       this.subject = row.a_title;
       this.author = row.posted_by;
-      this.audience = row.target == 1 ? 'Everyone' : 'Specific';
+      this.audience = row.target == 1 ? "Everyone" : "Specific";
       this.body = row.body;
       this.posted_on = row.date_published;
       this.$refs["view-announcement"].show();
@@ -133,12 +153,12 @@ export default {
       employees: [],
       target: [
         {
-          value:"1",
-          text:"Everyone",
+          value: "1",
+          text: "Everyone",
         },
         {
-          value:"2",
-          text:"Specific",
+          value: "2",
+          text: "Specific",
         },
       ],
       announcements: [],
@@ -150,8 +170,8 @@ export default {
       filterOn: [],
       sortBy: "sn",
       sortDesc: false,
-      posted_on:null,
-      audience:null,
+      posted_on: null,
+      audience: null,
       fields: [
         { key: "sn", label: "S/n", sortable: true },
         {
@@ -169,12 +189,11 @@ export default {
         },
       ],
       employeeID: null,
-      subject:null,
-      selectedTarget:null,
-      attachment:null,
-      body:null,
-      persons:[],
-
+      subject: null,
+      selectedTarget: null,
+      attachment: null,
+      body: null,
+      persons: [],
     };
   },
 };
@@ -285,9 +304,7 @@ export default {
     >
       <form @submit.prevent="submitData">
         <div class="form-group">
-          <label for="role">
-            Title <span class="text-danger">*</span>
-          </label>
+          <label for="role"> Title <span class="text-danger">*</span> </label>
           <input
             id="title"
             type="text"
@@ -298,7 +315,10 @@ export default {
         </div>
         <div class="form-group">
           <label for="target">To</label>
-          <b-form-select v-model="selectedTarget" :options="target"></b-form-select>
+          <b-form-select
+            v-model="selectedTarget"
+            :options="target"
+          ></b-form-select>
         </div>
         <b-form-group v-if="selectedTarget == 2">
           <label for="">Persons</label>
@@ -318,9 +338,7 @@ export default {
           ></b-form-file>
         </div>
         <div class="form-group">
-          <label for="body">
-            Content <span class="text-danger">*</span>
-          </label>
+          <label for="body"> Content <span class="text-danger">*</span> </label>
           <vue-editor v-model="body"></vue-editor>
         </div>
         <b-button
@@ -352,9 +370,7 @@ export default {
     >
       <form @submit.prevent="submitData">
         <div class="form-group">
-          <label for="role">
-            Title <span class="text-danger">*</span>
-          </label>
+          <label for="role"> Title <span class="text-danger">*</span> </label>
           <input
             id="title"
             type="text"
@@ -396,18 +412,14 @@ export default {
           />
         </div>
         <div class="form-group">
-          <label for="body">
-            Content <span class="text-danger">*</span>
-          </label>
+          <label for="body"> Content <span class="text-danger">*</span> </label>
           <div v-html="body" style="border: 1px solid #ccc; padding: 5px"></div>
-
         </div>
         <div class="form-group">
-          <label for="">Attachment</label> <br>
+          <label for="">Attachment</label> <br />
           <a href="">Download attachment || No Attachment</a>
         </div>
       </form>
     </b-modal>
-
   </Layout>
 </template>
