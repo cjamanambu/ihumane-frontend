@@ -1,14 +1,23 @@
 <script>
-import { layoutMethods } from "@/state/helpers";
-import { menuItems } from "./horizontal-menu";
+import { layoutMethods, authComputed } from "@/state/helpers";
+import {
+  menuItemsSupervisors,
+  menuItemsHrFocalPoints,
+  menuItemsAllEmployees,
+} from "./horizontal-menu";
 
 export default {
   data() {
     return {
-      menuItems: menuItems,
+      menuItems: [],
+      focalPoints: [],
     };
   },
+  computed: {
+    ...authComputed,
+  },
   mounted() {
+    this.getMenuItems();
     var links = document.getElementsByClassName("side-nav-link-ref");
     var matchingMenuItem = null;
     for (var i = 0; i < links.length; i++) {
@@ -47,6 +56,35 @@ export default {
   },
   methods: {
     ...layoutMethods,
+    async getMenuItems() {
+      const employee = this.getEmployee;
+      const { emp_location_id, emp_id } = employee;
+      const isFocalPoint = await this.checkEmployeeFocalPoint(
+        emp_id,
+        emp_location_id
+      );
+      if (employee.emp_supervisor_status) {
+        this.menuItems = menuItemsSupervisors;
+      } else if (isFocalPoint) {
+        this.menuItems = menuItemsHrFocalPoints;
+      } else {
+        this.menuItems = menuItemsAllEmployees;
+      }
+      console.log(employee);
+    },
+    async checkEmployeeFocalPoint(employeeId, locationId) {
+      const url = `${this.ROUTES.hrFocalPoint}/${locationId}`;
+      this.focalPoints = [];
+      await this.apiGet(url, "Get Focal Points Error").then((res) => {
+        const { data } = res;
+        if (data) {
+          data.forEach((focalPoint) => {
+            this.focalPoints.push(focalPoint.focal_person.emp_id);
+          });
+        }
+      });
+      return this.focalPoints.includes(employeeId);
+    },
 
     /**
      * Menu clicked show the submenu
