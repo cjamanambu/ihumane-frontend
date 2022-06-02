@@ -131,7 +131,7 @@ export default {
           this.emp_pension = data.emp_pension;
           this.emp_pension_no = data.emp_pension_no;
           this.pension_provider_id = data.emp_pension_id;
-          this.emp_paye = data.emp_paye;
+          this.emp_paye = data.emp_paye_no;
           this.emp_passport = data.emp_passport;
           this.emp_sector = data.sector?.department_id;
           this.emp_sector_text = data.sector?.department_name;
@@ -413,6 +413,7 @@ export default {
         emp_nin: this.emp_nin,
         emp_department_id: this.sector.value,
       };
+      //console.log(data)
       this.apiPatch(url, data, "Update Employee Error").then();
       this.apiResponseHandler("Process Complete", "Employee Update");
       this.fetchEmployee();
