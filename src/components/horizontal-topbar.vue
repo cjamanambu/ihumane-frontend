@@ -25,7 +25,7 @@ export default {
     this.text = this.value.title;
     this.flag = this.value.flag;
 
-    this.notifications = this.getNotifications;
+    // this.notifications = this.getNotifications;
     this.getEmployeeNotifications();
   },
   data() {
@@ -277,11 +277,17 @@ export default {
                 </h6>
               </div>
               <div class="col-auto">
-                <a href="javascript:void(0);" class="small"
-                   @click="$router.push({ name: 'my-notifications',params: { employeeId: employeeId }, })"
-                >{{
-                  $t("navbar.dropdown.notification.subtext")
-                }}</a>
+                <a
+                  href="javascript:void(0);"
+                  class="small"
+                  @click="
+                    $router.push({
+                      name: 'my-notifications',
+                      params: { employeeId: employeeId },
+                    })
+                  "
+                  >{{ $t("navbar.dropdown.notification.subtext") }}</a
+                >
               </div>
             </div>
           </div>
@@ -321,7 +327,12 @@ export default {
             <a
               class="btn btn-sm btn-link font-size-14 btn-block text-center"
               href="javascript:void(0)"
-              @click="$router.push({ name: 'my-notifications',params: { employeeId: employeeId }, })"
+              @click="
+                $router.push({
+                  name: 'my-notifications',
+                  params: { employeeId: employeeId },
+                })
+              "
             >
               <i class="mdi mdi-arrow-right-circle mr-1"></i>
               {{ $t("navbar.dropdown.notification.button") }}
