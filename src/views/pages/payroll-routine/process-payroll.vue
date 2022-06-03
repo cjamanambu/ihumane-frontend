@@ -3,6 +3,7 @@ import Layout from "@/views/layouts/main";
 import PageHeader from "@/components/page-header";
 import appConfig from "@/app.config";
 import store from "@/state/store";
+import { authComputed } from "@/state/helpers";
 export default {
   beforeRouteEnter(to, from, next) {
     const userType = store.getters["auth/getUser"].user_type;
@@ -20,6 +21,9 @@ export default {
   components: {
     Layout,
     PageHeader,
+  },
+  computed: {
+    ...authComputed,
   },
   async mounted() {
     await this.getLocations();
@@ -233,12 +237,14 @@ export default {
               text-decoration: underline;
               margin-left: 0.1em;
             "
+            v-if="permissions.includes('RUN_PAYROLL')"
           >
             Click here to run it.
           </span>
         </div>
         <div class="d-flex justify-content-end mb-3">
           <b-button
+            v-if="permissions.includes('UNDO_PAYROLL')"
             class="btn btn-warning"
             @click="$refs['undo-routine'].show()"
           >
@@ -375,6 +381,7 @@ export default {
                       variant="success"
                       size="sm"
                       @click="confirmSelected"
+                      v-if="permissions.includes('CONFIRM_PAYROLL')"
                       >Confirm Selected</b-button
                     >
                   </p>

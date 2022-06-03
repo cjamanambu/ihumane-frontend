@@ -1,6 +1,6 @@
 <script>
 import simplebar from "simplebar-vue";
-import { layoutComputed } from "@/state/helpers";
+import { authComputed, layoutComputed } from "@/state/helpers";
 
 import MetisMenu from "metismenujs/dist/metismenujs";
 
@@ -31,8 +31,10 @@ export default {
   },
   computed: {
     ...layoutComputed,
+    ...authComputed,
   },
   mounted: function () {
+    // console.log(this.permissions);
     // eslint-disable-next-line no-unused-vars
     var menuRef = new MetisMenu("#side-menu");
     var links = document.getElementsByClassName("side-nav-link-ref");
@@ -84,6 +86,7 @@ export default {
     }
   },
   methods: {
+    getMenuItems() {},
     /**
      * Returns true or false if given menu item has child or not
      * @param item menuItem

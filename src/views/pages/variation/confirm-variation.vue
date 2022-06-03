@@ -3,11 +3,16 @@ import Layout from "@/views/layouts/main";
 import PageHeader from "@/components/page-header";
 import appConfig from "@/app.config";
 import store from "@/state/store";
+import { authComputed } from "@/state/helpers";
 
 export default {
   beforeRouteEnter(to, from, next) {
     const userType = store.getters["auth/getUser"].user_type;
-    if (userType === 1 || userType === 3) {
+    const permissions = store.getters["auth/permissions"];
+    if (
+      (userType === 1 || userType === 3) &&
+      permissions.includes("CONFIRM_VARIATIONS")
+    ) {
       next();
     } else {
       alert("You are not allowed to access this page. You will be redirected.");
@@ -21,6 +26,9 @@ export default {
   components: {
     Layout,
     PageHeader,
+  },
+  computed: {
+    ...authComputed,
   },
   mounted() {
     this.refreshPMY();
@@ -353,6 +361,7 @@ export default {
                   variant="success"
                   size="sm"
                   @click="approveSelected"
+                  :disabled="!permissions.includes('APPROVE_VARIATIONS')"
                   >Approve Variation</b-button
                 >
 
@@ -361,6 +370,7 @@ export default {
                   variant="danger"
                   size="sm"
                   @click="unApproveSelected"
+                  :disabled="!permissions.includes('DECLINE_VARIATIONS')"
                   >Decline Variation</b-button
                 >
 

@@ -10,6 +10,9 @@ export const state = {
   notifications: [],
   locked: false,
   panel: "admin",
+  isSupervisor: false,
+  isHRFocalPoint: false,
+  permissions: [],
 };
 
 export const mutations = {
@@ -42,6 +45,15 @@ export const mutations = {
   SET_NOTIFICATION(state, notification) {
     state.notifications = notification;
   },
+  SET_IS_SUPERVISOR(state, isSupervisor) {
+    state.isSupervisor = isSupervisor;
+  },
+  SET_IS_FOCAL_POINT(state, isFocalPoint) {
+    state.isHRFocalPoint = isFocalPoint;
+  },
+  SET_PERMISSIONS(state, permissions) {
+    state.permissions = permissions;
+  },
 };
 
 export const getters = {
@@ -58,7 +70,7 @@ export const getters = {
   getEmployee(state) {
     return state.employee;
   },
-  getNotifications(state){
+  getNotifications(state) {
     return state.notifications;
   },
   locked(state) {
@@ -66,6 +78,15 @@ export const getters = {
   },
   panel(state) {
     return state.panel;
+  },
+  isSupervisor(state) {
+    return state.isSupervisor;
+  },
+  isFocalPoint(state) {
+    return state.isHRFocalPoint;
+  },
+  permissions(state) {
+    return state.permissions;
   },
 };
 
@@ -141,6 +162,15 @@ export const actions = {
   },
   setEmployee({ commit }, { employee }) {
     commit("SET_EMPLOYEE", employee);
+  },
+  setIsSupervisor({ commit }, { isSupervisor }) {
+    commit("SET_IS_SUPERVISOR", isSupervisor);
+  },
+  setIsFocalPoint({ commit }, { isFocalPoint }) {
+    commit("SET_IS_FOCAL_POINT", isFocalPoint);
+  },
+  setPermissions({ commit }, { permissions }) {
+    commit("SET_PERMISSIONS", permissions);
   },
 
   // Logs out the current user.
