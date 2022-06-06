@@ -23,7 +23,7 @@ export default {
       const url = `${this.ROUTES.selfAssessment}/get-all-self-assessments`;
       this.apiGet(url, "Could not retrieve self assessments Error").then((res) => {
         const { data } = res;
-        console.log(data)
+        //console.log(data)
         data.forEach((assess, index) => {
           this.assessments[index] = { sn: ++index,
             emp: `${assess.employee?.emp_first_name} ${assess.employee?.emp_last_name}  - ${assess.employee?.emp_unique_id}`,

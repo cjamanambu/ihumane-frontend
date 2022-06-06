@@ -286,12 +286,12 @@ export const menuItems = [
     icon: "ri-team-line",
     link: "/self-assessment/backoffice",
   },
-  // {
-  //   id: 29,
-  //   label: "Self Assessment",
-  //   icon: "ri-file-edit-line",
-  //   link: "/manage-self-assessment",
-  // },
+   {
+     id: 29,
+     label: "Application Tracking",
+     icon: "ri-file-edit-line",
+     link: "/application-tracking",
+   },
   {
     id: 26,
     label: "Payroll Routine",

@@ -209,7 +209,7 @@ export default {
           <div class="card mb-4">
             <div class="card-body">
               <div class="p-3 bg-light mb-4">
-                <h5 class="font-size-14 mb-0">Employee Details</h5>
+                <h5 class="font-size-14 mb-0">Employee Details </h5>
               </div>
               <div class="d-flex justify-content-between text-capitalize">
                 <p>Employee Name</p>
