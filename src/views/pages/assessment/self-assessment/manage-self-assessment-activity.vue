@@ -338,7 +338,7 @@ export default {
                 <div class="card mb-4">
                   <div class="card-body" v-if="employee[0]">
                     <div class="p-3 bg-light mb-4">
-                      <h5 class="font-size-14 mb-0">Employee Details </h5>
+                      <h5 class="font-size-14 mb-0">Employee Details</h5>
                     </div>
                     <div class="d-flex justify-content-between text-capitalize">
                       <p>Employee Name</p>
@@ -713,7 +713,7 @@ export default {
                   {{ new Date(selectedEnd).toDateString() }}
                 </h5>
                 <div class="row">
-                  <div class="col-6">
+                  <div class="col-4">
                     <div class="card mb-4">
                       <div class="card-body">
                         <div class="p-3 bg-light mb-4">
@@ -761,7 +761,7 @@ export default {
                       </div>
                     </div>
                   </div>
-                  <div class="col-6">
+                  <div class="col-4">
                     <div class="card mb-4">
                       <div class="card-body">
                         <div class="p-3 bg-light mb-4">
@@ -805,6 +805,58 @@ export default {
                           <p>
                             {{ employee[0].location.l_t6_code }}
                           </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="card">
+                      <div class="card-body">
+                        <div class="p-3 bg-light mb-4 d-flex justify-content-between">
+                          <div class="d-inline mb-0">
+                            <h5 class="font-size-14 mb-0">Application Re-assignment</h5>
+                          </div>
+                        </div>
+                        <div class="mb-3">
+                          <form >
+                            <div class="form-group">
+                              <label for="">Initially Assigned to</label>
+                              <multiselect
+                                id="assignedTo"
+                                v-model="assignedTo"
+                                :options="assignedOfficials"
+                                :custom-label="employeeLabel"
+                                :class="{
+                          'is-invalid': submitted && $v.assignedTo.$error,
+                        }"
+                              ></multiselect>
+                            </div>
+                            <div class="form-group">
+                              <label for="">Re-assign to</label>
+                              <multiselect
+                                id="reAssignedTo"
+                                v-model="reAssignedTo"
+                                :options="officials"
+                                :custom-label="reAssignLabel"
+                                :class="{
+                          'is-invalid': submitted && $v.reAssignedTo.$error,
+                        }"
+                              ></multiselect>
+                              <input type="hidden" v-model="leaveID" >
+                            </div>
+                            <div class="form-group d-flex justify-content-center">
+                              <b-button
+                                v-if="!submitted"
+                                type="submit"
+                                class="btn btn-success btn-lg mt-4 d-flex justify-content-center"
+                              >
+                                Save Changes
+                              </b-button>
+                              <b-button v-else disabled class="btn btn-success btn-block mt-4">
+                                Saving changes...
+                              </b-button>
+                            </div>
+                          </form>
                         </div>
                       </div>
                     </div>

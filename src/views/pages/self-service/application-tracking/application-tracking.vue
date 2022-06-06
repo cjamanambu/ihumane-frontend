@@ -34,6 +34,7 @@ export default {
       this.getSelfAssessmentSubmissions();
       //this.getTimesheet();
       //this.getPendingLeaveApplications();
+      //this.getTravelApplications();
     },
     getPendingLeaveApplications() {
       const url = `${this.ROUTES.leaveApplication}/get-leave-applications/0`;
@@ -43,7 +44,7 @@ export default {
           this.leaves[index] = {
             sn: ++index,
             leave_employee: `${leave.employee.emp_first_name} ${leave.employee?.emp_last_name} `,
-            //current_desk: `${leave.leave_authorizer[index].officers.emp_first_name}  `,
+            current_desk: `${leave.leave_authorizer[index]?.officers.emp_first_name}  ${leave.leave_authorizer[index]?.officers.emp_last_name} (${leave.leave_authorizer[index]?.officers.emp_unique_id} ) `,
             lea_type: `${leave.leave_type?.leave_name}(${leave.leapp_total_days})`,
             leave_t6:leave.employee.location?.location_name,
             leave_t3:leave.employee.sector?.department_name,
@@ -144,6 +145,32 @@ export default {
         this.selftotalRows = this.selfAssessements.length;
       });
     },
+    getTravelApplications() {
+      const url = `${this.ROUTES.travelApplication}/get-travel-application-status/0`;
+      this.apiGet(url, "Get Travel Application Error").then((res) => {
+        const { data } = res;
+        console.log(data)
+        data.forEach((application, serial) => {
+          this.travelApplications[serial] = {
+            application_no: ++serial,
+            application_employee: `${application.applicant.emp_first_name} ${application.applicant?.emp_last_name} `,
+            application_current_desk: `${application.authorizers.officers.emp_first_name} ${application.authorizers.officers.emp_last_name} (${application.authorizers.officers.emp_unique_id}) `,
+            application_purpose: `${application.travelapp_purpose}`,//`${timesheet.leave_type?.leave_name}(${leave.leapp_total_days})`,
+            application_t6:application.applicant.location?.location_name,
+            application_t3:application.applicant.sector?.department_name,
+            application_t7:application.applicant?.emp_unique_id,
+            //ta_id:application.sam_id,
+            //year:application.sam_year,
+            //payroll_month: self.ta_month,
+            //payroll_year: self.ta_year,
+            empId: self.sam_emp_id,
+            application_date:new Date(application.travelapp_start_date).toDateString(),
+            ...self,
+          };
+        });
+        this.application_totalRows = this.travelApplications.length;
+      });
+    },
 
   },
   data() {
@@ -193,6 +220,16 @@ export default {
       self_sortBy: "sn",
       self_sortDesc: false,
 
+      //travel application
+      application_totalRows: 1,
+      application_currentPage: 1,
+      application_perPage: 10,
+      application_pageOptions: [10, 25, 50, 100],
+      application_filter: null,
+      application_filterOn: [],
+      application_sortBy: "sn",
+      application_sortDesc: false,
+
       leave_fields: [
         { key: "sn", label: "S/n", sortable: true },
         {
@@ -208,6 +245,8 @@ export default {
         { key: "current_desk", label: "Current Desk", sortable: true },
         { key: "leave_date", label: "Date", sortable: true },
       ],
+
+      //timesheet fields
       timesheet_fields: [
         { key: "serial_no", label: "S/n", sortable: true },
         {
@@ -223,6 +262,8 @@ export default {
         { key: "current_desk", label: "Current Desk", sortable: true },
         { key: "timesheet_date", label: "Date", sortable: true },
       ],
+
+      //self-assessment fields
       self_fields: [
         { key: "self_no", label: "S/n", sortable: true },
         {
@@ -238,11 +279,30 @@ export default {
         { key: "self_current_desk", label: "Current Desk", sortable: true },
         { key: "self_date", label: "Date", sortable: true },
       ],
+
+      //travel application fields
+      travel_fields: [
+        { key: "application_no", label: "S/n", sortable: true },
+        {
+          key: "application_t7",
+          label: "T7",
+          sortable: true,
+        },
+        { key: "application_employee", label: "Employee", sortable: true },
+
+        { key: "application_t6", label: "T6", sortable: true },
+        { key: "application_t3", label: "T3", sortable: true },
+        { key: "application_purpose", label: "Purpose", sortable: true },
+        { key: "application_current_desk", label: "Current Desk", sortable: true },
+        { key: "application_date", label: "Start Date", sortable: true },
+      ],
       leaves:[],
       timesheets:[],
       selfAssessements:[],
+      travelApplications:[],
       selfId:null,
       timesheetId:null,
+      travelId:null,
       leaveAppID: null,
       text: "Text here",
       content:"Content goes here"
@@ -523,7 +583,84 @@ export default {
                   </span>
                   <span class="d-none d-sm-inline-block">Travels</span>
                 </template>
-                {{ content }}
+                <div class="col-12">
+                  <div class="card">
+                    <div class="card-body">
+                      <div class="row mt-4">
+                        <div class="col-sm-12 col-md-6">
+                          <div id="tickets-table_length111" class="dataTables_length">
+                            <label class="d-inline-flex align-items-center">
+                              Show&nbsp;
+                              <b-form-select
+                                v-model="application_perPage"
+                                size="sm"
+                                :options="application_pageOptions"
+                              ></b-form-select
+                              >&nbsp;entries
+                            </label>
+                          </div>
+                        </div>
+                        <!-- Search -->
+                        <div class="col-sm-12 col-md-6">
+                          <div
+                            id="tickets-table_filter211"
+                            class="dataTables_filter text-md-right"
+                          >
+                            <label class="d-inline-flex align-items-center">
+                              Search:
+                              <b-form-input
+                                v-model="application_filter"
+                                type="search"
+                                placeholder="Search..."
+                                class="form-control form-control-sm ml-2"
+                              ></b-form-input>
+                            </label>
+                          </div>
+                        </div>
+                        <!-- End search -->
+                      </div>
+                      <!-- Table -->
+                      <div class="table-responsive mb-0">
+                        <b-table
+                          ref="donor-table"
+                          bordered
+                          selectable
+                          hover
+                          :items="travelApplications"
+                          :fields="travel_fields"
+                          responsive="sm"
+                          :per-page="application_perPage"
+                          :current-page="application_currentPage"
+                          :sort-by.sync="application_sortBy"
+                          :sort-desc.sync="application_sortDesc"
+                          :filter="application_filter"
+                          :filter-included-fields="application_filterOn"
+                          show-empty
+                          select-mode="single"
+                          @row-selected="selectSelfAssessmentRow"
+                        >
+
+                        </b-table>
+                      </div>
+                      <div class="row">
+                        <div class="col">
+                          <div
+                            class="dataTables_paginate paging_simple_numbers float-right"
+                          >
+                            <ul class="pagination pagination-rounded mb-0">
+                              <!-- pagination -->
+                              <b-pagination
+                                v-model="application_currentPage"
+                                :total-rows="application_totalRows"
+                                :per-page="application_perPage"
+                              ></b-pagination>
+                            </ul>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </b-tab>
             </b-tabs>
           </div>

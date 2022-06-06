@@ -148,7 +148,6 @@ export default {
                 employee: period.employeeId,
                 activityId: period.activityId,
                 masterId: period.masterId,
-
                  },
               })"
             >
