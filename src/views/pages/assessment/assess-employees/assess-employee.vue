@@ -244,7 +244,6 @@ export default {
       const data = {
         gs_id: gsId,
         emp_id: employeeID,
-        //supervisor:this.getEmployee.emp_id
       };
       this.apiPost(url, data, "Could not process request").then(() => {
         this.apiResponseHandler(

@@ -309,6 +309,87 @@ const menuItems = [
         link: "/self-assessment/backoffice",
       }
     : {},
+  // {
+  //   id: 26,
+  //   label: "Leave Management",
+  //   isTitle: true,
+  // },
+  // {
+  //   id: 29,
+  //   label: "Employee Leaves",
+  //   icon: "ri-user-settings-line",
+  //   link: "/employee-leave",
+  // },
+  {
+    id: 26,
+    label: "Communication",
+    isTitle: true,
+  },
+  {
+    id: 299,
+    label: "Announcement",
+    icon: "ri-error-warning-line",
+    link: "/manage-announcements",
+  },
+  {
+    id: 209,
+    label: "Query",
+    icon: "ri-file-list-2-line",
+    link: "/manage-queries",
+  },
+  {
+    id: 26,
+    label: "Self-Service",
+    isTitle: true,
+  },
+  {
+    id: 27,
+    label: "Leave Management",
+    icon: "ri-walk-line",
+    subItems: [
+      {
+        id: 28,
+        label: "All Leave Applications",
+        link: "/leave-applications",
+      },
+
+      {
+        id: 30,
+        label: "Manage Leave",
+        link: "/manage-leave-applications",
+      },
+
+      {
+        id: 31,
+        label: "Employee Leave Accruals",
+        link: "/employee-leave-accruals",
+      },
+    ],
+  },
+  {
+    id: 29,
+    label: "Travel Application",
+    icon: "ri-flight-takeoff-line",
+    link: "/manage-travel-applications",
+  },
+  {
+    id: 29,
+    label: "Time Sheet",
+    icon: "ri-calendar-event-line",
+    link: "/manage-time-sheets",
+  },
+  {
+    id: 31,
+    label: "Self Assessment",
+    icon: "ri-team-line",
+    link: "/self-assessment/backoffice",
+  },
+   {
+     id: 29,
+     label: "Application Tracking",
+     icon: "ri-file-edit-line",
+     link: "/application-tracking",
+   },
   {
     id: 26,
     label: "Payroll Routine",

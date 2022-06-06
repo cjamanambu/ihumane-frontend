@@ -35,30 +35,24 @@ export default {
   methods: {
     refreshTable() {
       const url = `${this.ROUTES.selfAssessment}/get-all-self-assessments`;
-      this.apiGet(url, "Could not retrieve self assessments Error").then(
-        (res) => {
-          const { data } = res;
-          console.log(data);
-          data.forEach((assess, index) => {
-            this.assessments[index] = {
-              sn: ++index,
-              emp: `${assess.employee?.emp_first_name} ${assess.employee?.emp_last_name}  - ${assess.employee?.emp_unique_id}`,
-              year: `${assess.goal?.gs_year} `,
-              //start_date: `${ new Date(assess.goal?.gs_from).toDateString() } `,
-              gs_period: `${new Date(
-                assess.goal?.gs_from
-              ).toDateString()} - ${new Date(
-                assess.goal?.gs_to
-              ).toDateString()} `,
-              //end_date: `${ new Date(assess.goal?.gs_to).toDateString() } `,
-              empId: assess.employee.emp_id,
-              emp_sector: `${assess.employee.sector?.d_t3_code}`,
-              emp_location: `${assess.employee.location?.l_t6_code}`,
-              gsId: assess.goal.gs_id,
-              masterId: assess.sam_id,
-              supervisor: `${assess.supervisor?.emp_first_name} ${assess.supervisor?.emp_last_name} - ${assess.supervisor?.emp_unique_id}`,
-            };
-          });
+      this.apiGet(url, "Could not retrieve self assessments Error").then((res) => {
+        const { data } = res;
+        //console.log(data)
+        data.forEach((assess, index) => {
+          this.assessments[index] = { sn: ++index,
+            emp: `${assess.employee?.emp_first_name} ${assess.employee?.emp_last_name}  - ${assess.employee?.emp_unique_id}`,
+            year: `${ assess.goal?.gs_year } `,
+            //start_date: `${ new Date(assess.goal?.gs_from).toDateString() } `,
+            gs_period: `${ new Date(assess.goal?.gs_from).toDateString() } - ${ new Date(assess.goal?.gs_to).toDateString() } `,
+            //end_date: `${ new Date(assess.goal?.gs_to).toDateString() } `,
+            empId: assess.employee.emp_id,
+            emp_sector: `${assess.employee.sector?.d_t3_code}`,
+            emp_location: `${assess.employee.location?.l_t6_code}`,
+            gsId: assess.goal.gs_id,
+            masterId: assess.sam_id,
+            supervisor: `${assess.supervisor?.emp_first_name} ${assess.supervisor?.emp_last_name} - ${assess.supervisor?.emp_unique_id}`,
+          };
+        });
 
           this.totalRows = this.assessments.length;
         }
