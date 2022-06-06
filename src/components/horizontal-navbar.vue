@@ -1,14 +1,23 @@
 <script>
-import { layoutMethods } from "@/state/helpers";
-import { menuItems } from "./horizontal-menu";
+import { layoutMethods, authComputed } from "@/state/helpers";
+import {
+  menuItemsSupervisors,
+  menuItemsHrFocalPoints,
+  menuItemsAllEmployees,
+} from "./horizontal-menu";
 
 export default {
   data() {
     return {
-      menuItems: menuItems,
+      menuItems: [],
+      focalPoints: [],
     };
   },
+  computed: {
+    ...authComputed,
+  },
   mounted() {
+    this.getMenuItems();
     var links = document.getElementsByClassName("side-nav-link-ref");
     var matchingMenuItem = null;
     for (var i = 0; i < links.length; i++) {
@@ -47,7 +56,16 @@ export default {
   },
   methods: {
     ...layoutMethods,
-
+    async getMenuItems() {
+      const { isSupervisor, isFocalPoint } = this;
+      if (isSupervisor) {
+        this.menuItems = menuItemsSupervisors;
+      } else if (isFocalPoint) {
+        this.menuItems = menuItemsHrFocalPoints;
+      } else {
+        this.menuItems = menuItemsAllEmployees;
+      }
+    },
     /**
      * Menu clicked show the submenu
      */

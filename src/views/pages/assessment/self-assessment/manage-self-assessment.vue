@@ -3,7 +3,21 @@ import Layout from "@/views/layouts/main";
 import PageHeader from "@/components/page-header";
 import appConfig from "@/app.config.json";
 import { authComputed } from "@/state/helpers";
+import store from "@/state/store";
 export default {
+  beforeRouteEnter(to, from, next) {
+    const userType = store.getters["auth/getUser"].user_type;
+    const permissions = store.getters["auth/permissions"];
+    if (
+      (userType === 1 || userType === 3) &&
+      permissions.includes("SELF_ASSESSMENT")
+    ) {
+      next();
+    } else {
+      alert("You are not allowed to access this page. You will be redirected.");
+      next("/");
+    }
+  },
   page: {
     title: "Manage Self Assessment",
     meta: [{ name: "description", content: appConfig.description }],
@@ -40,8 +54,9 @@ export default {
           };
         });
 
-        this.totalRows = this.assessments.length;
-      });
+          this.totalRows = this.assessments.length;
+        }
+      );
     },
     onFiltered(filteredItems) {
       // Trigger pagination to update the number of buttons/pages due to filtering
@@ -113,11 +128,8 @@ export default {
     <PageHeader :title="title" :items="items" />
     <scale-loader v-if="apiBusy" />
     <div v-else class="row d-flex justify-content-end">
-      <div class=" mb-3">
-        <b-button
-          class="btn btn-secondary"
-          @click="$router.go(-1)"
-        >
+      <div class="mb-3">
+        <b-button class="btn btn-secondary" @click="$router.go(-1)">
           <i class="mdi mdi-step-backward mr-2"></i>
           Go Back
         </b-button>
@@ -127,7 +139,9 @@ export default {
           <div class="card-body">
             <div class="row mt-4">
               <div class="col-sm-12 col-md-6">
-                <p><strong>Note: </strong> List of all approved self-assessments.</p>
+                <p>
+                  <strong>Note: </strong> List of all approved self-assessments.
+                </p>
                 <div id="tickets-table_length" class="dataTables_length">
                   <label class="d-inline-flex align-items-center">
                     Show&nbsp;

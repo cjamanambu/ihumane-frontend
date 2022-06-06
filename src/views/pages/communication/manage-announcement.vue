@@ -10,7 +10,11 @@ import store from "@/state/store";
 export default {
   beforeRouteEnter(to, from, next) {
     const userType = store.getters["auth/getUser"].user_type;
-    if (userType === 1 || userType === 3) {
+    const permissions = store.getters["auth/permissions"];
+    if (
+      (userType === 1 || userType === 3) &&
+      permissions.includes("ANNOUNCEMENT")
+    ) {
       next();
     } else {
       alert("You are not allowed to access this page. You will be redirected.");

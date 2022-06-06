@@ -96,10 +96,15 @@ export default {
       <div class="col-lg-4">
         <div class="card">
           <div class="card-body">
-            <div class="p-3 bg-light mb-4">
+            <div class="p-3 bg-light mb-4 d-flex justify-content-between">
               <div class="d-inline mb-0">
                 <h5 class="font-size-14 mb-0">Upload New Salary Mapping</h5>
               </div>
+              <small>
+                <a href="/files/irc-salary-mapping-template.xlsx" download>
+                  Download Mapping Template
+                </a>
+              </small>
             </div>
             <div class="form-group">
               <label for="period">Period</label>

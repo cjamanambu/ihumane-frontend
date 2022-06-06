@@ -13,6 +13,9 @@ export const authComputed = {
     "getNotifications",
     "locked",
     "panel",
+    "isSupervisor",
+    "isFocalPoint",
+    "permissions",
   ]),
 };
 
@@ -34,6 +37,9 @@ export const authMethods = mapActions("auth", [
   "unlockScreen",
   "setPanel",
   "setEmployee",
+  "setIsSupervisor",
+  "setIsFocalPoint",
+  "setPermissions",
 ]);
 
 export const layoutMethods = mapActions("layout", [

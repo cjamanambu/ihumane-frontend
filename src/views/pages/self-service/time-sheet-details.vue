@@ -11,7 +11,11 @@ import { required } from "vuelidate/lib/validators";
 export default {
   beforeRouteEnter(to, from, next) {
     const userType = store.getters["auth/getUser"].user_type;
-    if (userType === 1 || userType === 3) {
+    const permissions = store.getters["auth/permissions"];
+    if (
+      (userType === 1 || userType === 3) &&
+      permissions.includes("TIMESHEET")
+    ) {
       next();
     } else {
       alert("You are not allowed to access this page. You will be redirected.");
@@ -248,10 +252,7 @@ export default {
     <PageHeader :title="title" :items="items" />
     <div class="d-flex justify-content-end mb-3">
       <div class="btn-group">
-        <b-button
-          class="btn btn-success"
-          @click="generateReport"
-        >
+        <b-button class="btn btn-success" @click="generateReport">
           <i class="mdi mdi-printer mr-2"></i>
           Print
         </b-button>
@@ -622,108 +623,110 @@ export default {
                   >
                     Discarded
                   </small>
-                  <small v-else class="text-warning float-right"> Pending </small>
+                  <small v-else class="text-warning float-right">
+                    Pending
+                  </small>
                 </div>
                 <div class="row">
                   <div class="col-lg-12">
                     <div class="table-responsive">
                       <table class="table mb-0">
                         <thead>
-                        <tr>
-                          <th>#</th>
-                          <th>Day</th>
-                          <th>Start</th>
-                          <th>End</th>
-                          <th>Duration</th>
-                        </tr>
+                          <tr>
+                            <th>#</th>
+                            <th>Day</th>
+                            <th>Start</th>
+                            <th>End</th>
+                            <th>Duration</th>
+                          </tr>
                         </thead>
                         <tbody>
-                        <tr
-                          class="table-light"
-                          v-for="(ts, index) in this.timeSheet"
-                          :key="index"
-                        >
-                          <th scope="row">{{ index + 1 }}</th>
-                          <td>
-                            {{
-                              new Date(
-                                `${ts.ts_month}-${ts.ts_day}-${ts.ts_year}`
-                              ).toDateString()
-                            }}
-                          </td>
-                          <td>
-                          <span v-if="ts.ts_is_present === 1">
-                            {{ tConvert(ts.ts_start) }}
-                          </span>
-                            <span
-                              class="text-primary"
-                              v-else-if="ts.ts_is_present === 2"
-                            >
-                            P. HOLIDAY
-                          </span>
-                            <span
-                              class="text-warning"
-                              v-else-if="ts.ts_is_present === 3"
-                            >
-                            WEEKEND
-                          </span>
-                            <span
-                              class="text-info"
-                              v-else-if="ts.ts_is_present === 4"
-                            >
-                            LEAVE
-                          </span>
-                            <span v-else class="text-danger">ABSENT</span>
-                          </td>
-                          <td>
-                          <span v-if="ts.ts_is_present === 1">
-                            {{ tConvert(ts.ts_end) }}
-                          </span>
-                            <span
-                              class="text-primary"
-                              v-else-if="ts.ts_is_present === 2"
-                            >
-                            P. HOLIDAY
-                          </span>
-                            <span
-                              class="text-warning"
-                              v-else-if="ts.ts_is_present === 3"
-                            >
-                            WEEKEND
-                          </span>
-                            <span
-                              class="text-info"
-                              v-else-if="ts.ts_is_present === 4"
-                            >
-                            LEAVE
-                          </span>
-                            <span v-else class="text-danger">ABSENT</span>
-                          </td>
-                          <td>
-                          <span v-if="ts.ts_is_present === 1">
-                            {{ tConvert(ts.ts_duration) }} hrs
-                          </span>
-                            <span
-                              class="text-primary"
-                              v-else-if="ts.ts_is_present === 2"
-                            >
-                            P. HOLIDAY
-                          </span>
-                            <span
-                              class="text-warning"
-                              v-else-if="ts.ts_is_present === 3"
-                            >
-                            WEEKEND
-                          </span>
-                            <span
-                              class="text-info"
-                              v-else-if="ts.ts_is_present === 4"
-                            >
-                            LEAVE
-                          </span>
-                            <span v-else class="text-danger">ABSENT</span>
-                          </td>
-                        </tr>
+                          <tr
+                            class="table-light"
+                            v-for="(ts, index) in this.timeSheet"
+                            :key="index"
+                          >
+                            <th scope="row">{{ index + 1 }}</th>
+                            <td>
+                              {{
+                                new Date(
+                                  `${ts.ts_month}-${ts.ts_day}-${ts.ts_year}`
+                                ).toDateString()
+                              }}
+                            </td>
+                            <td>
+                              <span v-if="ts.ts_is_present === 1">
+                                {{ tConvert(ts.ts_start) }}
+                              </span>
+                              <span
+                                class="text-primary"
+                                v-else-if="ts.ts_is_present === 2"
+                              >
+                                P. HOLIDAY
+                              </span>
+                              <span
+                                class="text-warning"
+                                v-else-if="ts.ts_is_present === 3"
+                              >
+                                WEEKEND
+                              </span>
+                              <span
+                                class="text-info"
+                                v-else-if="ts.ts_is_present === 4"
+                              >
+                                LEAVE
+                              </span>
+                              <span v-else class="text-danger">ABSENT</span>
+                            </td>
+                            <td>
+                              <span v-if="ts.ts_is_present === 1">
+                                {{ tConvert(ts.ts_end) }}
+                              </span>
+                              <span
+                                class="text-primary"
+                                v-else-if="ts.ts_is_present === 2"
+                              >
+                                P. HOLIDAY
+                              </span>
+                              <span
+                                class="text-warning"
+                                v-else-if="ts.ts_is_present === 3"
+                              >
+                                WEEKEND
+                              </span>
+                              <span
+                                class="text-info"
+                                v-else-if="ts.ts_is_present === 4"
+                              >
+                                LEAVE
+                              </span>
+                              <span v-else class="text-danger">ABSENT</span>
+                            </td>
+                            <td>
+                              <span v-if="ts.ts_is_present === 1">
+                                {{ tConvert(ts.ts_duration) }} hrs
+                              </span>
+                              <span
+                                class="text-primary"
+                                v-else-if="ts.ts_is_present === 2"
+                              >
+                                P. HOLIDAY
+                              </span>
+                              <span
+                                class="text-warning"
+                                v-else-if="ts.ts_is_present === 3"
+                              >
+                                WEEKEND
+                              </span>
+                              <span
+                                class="text-info"
+                                v-else-if="ts.ts_is_present === 4"
+                              >
+                                LEAVE
+                              </span>
+                              <span v-else class="text-danger">ABSENT</span>
+                            </td>
+                          </tr>
                         </tbody>
                       </table>
                     </div>
