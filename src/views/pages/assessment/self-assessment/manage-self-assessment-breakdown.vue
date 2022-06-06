@@ -167,18 +167,16 @@ export default {
             <div
               class="d-flex align-items-center text-success d-inline-flex"
               style="cursor: pointer"
-              @click="
-                $router.push({
-                  name: 'self-assessment-backoffice-by-activity',
-                  params: {
-                    activity: parseInt(period.activity),
-                    year: period.activity_year,
-                    employee: period.employeeId,
-                    activityId: period.activityId,
-                    masterId: period.masterId,
-                  },
-                })
-              "
+              @click="$router.push({
+              name: 'self-assessment-backoffice-by-activity',
+              params: {
+                activity: parseInt(period.activity),
+                year: period.activity_year,
+                employee: period.employeeId,
+                activityId: period.activityId,
+                masterId: period.masterId,
+                 },
+              })"
             >
               <span class="mr-2">View more</span>
               <i class="ri-arrow-right-s-line"></i>
@@ -237,7 +235,7 @@ export default {
           <div class="card mb-4">
             <div class="card-body">
               <div class="p-3 bg-light mb-4">
-                <h5 class="font-size-14 mb-0">Employee Details</h5>
+                <h5 class="font-size-14 mb-0">Employee Details </h5>
               </div>
               <div class="d-flex justify-content-between text-capitalize">
                 <p>Employee Name</p>
@@ -279,7 +277,10 @@ export default {
             </div>
           </div>
         </div>
+
       </div>
+
     </div>
+
   </Layout>
 </template>

@@ -39,7 +39,7 @@ export default {
       this.apiGet(url, "Get Time Allocation Error").then((res) => {
         let count = 0;
         const { data } = res;
-        console.log({ data });
+        //console.log({ data });
         data.forEach((time) => {
           let found = false;
           if (this.timeAllocations.length === 0) {
@@ -57,7 +57,7 @@ export default {
                 },
               ],
               status: time.ta_status ? time.ta_status : 0,
-              employee: time.Employee,
+              employee: time.employee,
             });
           } else {
             this.timeAllocations.every((timeAllocation) => {
@@ -88,7 +88,7 @@ export default {
                   },
                 ],
                 status: time.ta_status ? time.ta_status : 0,
-                employee: time.Employee,
+                employee: time.employee,
               });
             }
           }
@@ -103,7 +103,7 @@ export default {
     },
     selectRow(row) {
       row = row[0];
-      console.log({ row });
+      //console.log({ row });
       const month = `${row.payroll_month}`;
       const year = `${row.payroll_year}`;
       const empId = row.employee.emp_id;

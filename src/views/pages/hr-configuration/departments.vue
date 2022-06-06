@@ -78,7 +78,7 @@ export default {
     },
     selectDept(dept) {
       dept = dept[0];
-      console.log({ dept });
+      //console.log({ dept });
       this.deptID = dept.department_id;
       this.name = dept.department_name;
       this.t3_code = dept.d_t3_code;

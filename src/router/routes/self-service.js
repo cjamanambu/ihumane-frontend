@@ -66,6 +66,28 @@ export default [
       ),
   },
   {
+    path: "/application-tracking",
+    name: "application-tracking",
+    meta: {
+      authRequired: true,
+    },
+    component: () =>
+      import(
+        "@/views/pages/self-service/application-tracking/application-tracking"
+      ),
+  },
+  {
+    path: "/application-tracking/leave/:leaveAppID",
+    name: "leave-application-tracking",
+    meta: {
+      authRequired: true,
+    },
+    component: () =>
+      import(
+        "@/views/pages/self-service/application-tracking/leave"
+      ),
+  },
+  {
     path: "/my-notifications/:employeeId",
     name: "my-notifications",
     meta: {
