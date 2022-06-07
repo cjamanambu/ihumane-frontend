@@ -93,7 +93,7 @@ export default {
       donors: [
         { value: null, text: "Please select grant code", disabled: true },
       ],
-      expense: [],
+      expense: [{ code: null }],
       expenses: [
         { value: null, text: "Please select expenses", disabled: true },
       ],
@@ -167,6 +167,12 @@ export default {
         this.trips.splice(index, 1);
       }
     },
+    addExp() {
+      this.expense.push({ code: null });
+    },
+    delExp(index) {
+      if (index > 0) this.expense.splice(index, 1);
+    },
     getTotal() {
       let total = 0;
       if (this.perDiem && this.perDiemDays) {
@@ -192,11 +198,9 @@ export default {
           destination: trip.destination,
         });
       });
-      this.expense.forEach((code) => {
+      this.expense.forEach((exp) => {
         // code = code.toString();
-        t2_code.push({
-          code,
-        });
+        if (exp.code) t2_code.push({ code: exp.code });
       });
       if (this.perDiem) {
         per_diem = parseInt(this.perDiem.replace(/,/g, ""));
@@ -205,7 +209,8 @@ export default {
         total = parseInt(this.total.replace(/,/g, ""));
       }
       if (this.donor) {
-        t1_code = this.donor.toString();
+        t1_code = this.donor;
+        // t1_code = this.donor.toString();
       }
       data.employee = this.getEmployee.emp_id;
       data.travel_category = this.category;
@@ -266,7 +271,7 @@ export default {
     },
   },
   mounted() {
-    this.fetchDonors();
+    // this.fetchDonors();
   },
 };
 </script>
@@ -357,10 +362,10 @@ export default {
                         </div>
                         <div class="col-lg-9">
                           <div class="form-group">
-                            <b-form-select
-                              @change="getExpenses"
+                            <input
+                              type="text"
                               v-model="donor"
-                              :options="donors"
+                              class="form-control"
                             />
                           </div>
                         </div>
@@ -371,17 +376,41 @@ export default {
                             <label class="pt-2" for="">
                               T2 <small class="text-muted">(Expense)</small>
                             </label>
-                            <scale-loader v-if="fetchingExpenses" />
                           </div>
                         </div>
                         <div class="col-lg-9">
-                          <div class="form-group">
-                            <b-form-select
-                              v-model="expense"
-                              :options="expenses"
-                              multiple
-                              :select-size="3"
-                            />
+                          <div
+                            v-for="(exp, index) in expense"
+                            :key="index"
+                            class="row"
+                          >
+                            <div class="col-lg-9">
+                              <div class="form-group">
+                                <input
+                                  type="text"
+                                  v-model="exp.code"
+                                  class="form-control"
+                                />
+                              </div>
+                            </div>
+                            <div class="col-lg-3">
+                              <b-button
+                                @click="addExp"
+                                variant="success"
+                                size="sm"
+                                v-if="index === 0"
+                              >
+                                ADD
+                              </b-button>
+                              <b-button
+                                @click="delExp(index)"
+                                variant="danger"
+                                size="sm"
+                                v-else
+                              >
+                                DEL
+                              </b-button>
+                            </div>
                           </div>
                         </div>
                       </div>

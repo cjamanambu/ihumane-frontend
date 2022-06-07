@@ -61,7 +61,7 @@ export default {
       this.travelAppID = row.travelapp_id;
       this.$router.push({
         name: "travel-application-details",
-        params: { travelAppID: this.travelAppID },
+        params: { id: this.travelAppID },
       });
     },
   },
