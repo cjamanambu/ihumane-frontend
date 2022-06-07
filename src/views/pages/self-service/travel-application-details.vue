@@ -527,7 +527,7 @@ export default {
         </div>
       </div>
       <div class="col-lg-4">
-        <div class="card">
+        <div class="card" v-if="application.travelapp_status === 0">
           <div class="card-body">
             <div class="p-3 bg-light mb-4 d-flex justify-content-between" style="background: #58181F !important; color:#fff !important;">
               <div class="d-inline mb-0">
