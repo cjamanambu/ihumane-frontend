@@ -5,6 +5,7 @@ import appConfig from "@/app.config";
 import { authComputed } from "@/state/helpers";
 import { required } from "vuelidate/lib/validators";
 import store from "@/state/store";
+import Multiselect from "vue-multiselect";
 
 export default {
   beforeRouteEnter(to, from, next) {
@@ -27,6 +28,7 @@ export default {
   components: {
     Layout,
     PageHeader,
+    Multiselect
   },
   mounted() {
     this.fetchRequest();
@@ -51,6 +53,12 @@ export default {
         this.fetchExpenses();
         this.fetchEmployees();
       });
+    },
+    employeeLabel({ text }) {
+      return `${text}`;
+    },
+    reAssignLabel({ text }) {
+      return `${text}`;
     },
     fetchDonorInfo() {
       const url = `${this.ROUTES.donor}/${this.application.travelapp_t1_code}`;
@@ -160,6 +168,8 @@ export default {
           active: true,
         },
       ],
+      reAssignedTo: null,
+      assignedTo: null,
       application: null,
       breakdowns: [],
       expenses: [],
@@ -170,6 +180,13 @@ export default {
       final: true,
       official: null,
       officials: [
+        {
+          value: null,
+          text: "Please choose the next reviewer",
+          disabled: true,
+        },
+      ],
+      assignedOfficials: [
         {
           value: null,
           text: "Please choose the next reviewer",
@@ -510,6 +527,56 @@ export default {
         </div>
       </div>
       <div class="col-lg-4">
+        <div class="card" v-if="application.travelapp_status === 0">
+          <div class="card-body">
+            <div class="p-3 bg-light mb-4 d-flex justify-content-between" style="background: #58181F !important; color:#fff !important;">
+              <div class="d-inline mb-0">
+                <h5 class="font-size-14 mb-0 text-white">Application Re-assignment</h5>
+              </div>
+            </div>
+            <div class="mb-3">
+              <form @submit.prevent="reAssignLeaveApplication">
+                <div class="form-group">
+                  <label for="">From</label>
+                  <multiselect
+                    id="assignedTo"
+                    v-model="assignedTo"
+                    :options="assignedOfficials"
+                    :custom-label="employeeLabel"
+                    :class="{
+                          'is-invalid': submitted && $v.assignedTo.$error,
+                        }"
+                  ></multiselect>
+                </div>
+                <div class="form-group">
+                  <label for="">Re-assign to</label>
+                  <multiselect
+                    id="reAssignedTo"
+                    v-model="reAssignedTo"
+                    :options="officials"
+                    :custom-label="reAssignLabel"
+                    :class="{
+                          'is-invalid': submitted && $v.reAssignedTo.$error,
+                        }"
+                  ></multiselect>
+                  <input type="hidden" v-model="leaveID" >
+                </div>
+                <div class="form-group d-flex justify-content-center">
+                  <b-button
+                    v-if="!submitted"
+                    type="submit"
+                    class="btn btn-success btn-lg mt-4 d-flex justify-content-center"
+                  >
+                    Save Changes
+                  </b-button>
+                  <b-button v-else disabled class="btn btn-success btn-block mt-4">
+                    Saving changes...
+                  </b-button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
         <div class="card">
           <div class="card-body">
             <div class="p-3 bg-light mb-4 d-flex justify-content-between">

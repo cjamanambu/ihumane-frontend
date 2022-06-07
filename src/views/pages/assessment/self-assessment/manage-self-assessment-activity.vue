@@ -5,7 +5,7 @@ import appConfig from "@/app.config";
 import { authComputed } from "@/state/helpers";
 import { required } from "vuelidate/lib/validators";
 import store from "@/state/store";
-
+import Multiselect from "vue-multiselect";
 export default {
   beforeRouteEnter(to, from, next) {
     const userType = store.getters["auth/getUser"].user_type;
@@ -27,11 +27,15 @@ export default {
   components: {
     Layout,
     PageHeader,
+    Multiselect
   },
   computed: {
     ...authComputed,
   },
   async mounted() {
+    this.fetchAuthorizingOfficers();
+    this.fetchEmployees();
+
     this.activity = this.$route.params.activity;
     if (parseInt(this.activity) === 1) {
       await this.getSelfAssessment();
@@ -46,7 +50,10 @@ export default {
     start: { required },
     end: { required },
     duration: { required },
+    assignedTo: { required },
+    reAssignedTo: { required },
   },
+
   data() {
     return {
       title: "Self Assessment Details",
@@ -117,6 +124,22 @@ export default {
       activity: null,
       activityId: null,
       sam_discussion_held_on: null,
+      officials: [
+        {
+          value: null,
+          text: "Please choose the next reviewer",
+          disabled: true,
+        },
+      ],
+      assignedOfficials: [
+        {
+          value: null,
+          text: "Please choose the next reviewer",
+          disabled: true,
+        },
+      ],
+      reAssignedTo: null,
+      assignedTo: null,
     };
   },
   methods: {
@@ -130,6 +153,51 @@ export default {
         }
       });
     },
+    fetchEmployees() {
+      this.apiGet(this.ROUTES.employee, "Get Employees Error").then((res) => {
+        this.officials = [
+          {
+            value: null,
+            text: "Please choose an officer",
+            disabled: true,
+          },
+        ];
+        const { data } = res;
+        data.forEach((employee) => {
+          this.officials.push({
+            value: employee.emp_id,
+            text: `${employee.emp_first_name} ${employee.emp_last_name} (${employee.emp_unique_id})`,
+          });
+        });
+      });
+    },
+    fetchAuthorizingOfficers() {
+      let leaveId = this.$route.params.leaveAppID;
+      const url = `${this.ROUTES.authorization}/4/${leaveId}`; //1 = for self-assessment
+      this.apiGet(url, "Get Employees Error").then((res) => {
+        this.assignedOfficials = [
+          {
+            value: null,
+            text: "Please choose an officer",
+            disabled: true,
+          },
+        ];
+        const { data } = res;
+        data.forEach((officer) => {
+          this.assignedOfficials.push({
+            value: officer.officers.emp_id,
+            text: `${officer.officers.emp_first_name} ${officer.officers.emp_last_name} (${officer.officers.emp_unique_id})`,
+          });
+        });
+      });
+    },
+    employeeLabel({ text }) {
+      return `${text}`;
+    },
+    reAssignLabel({ text }) {
+      return `${text}`;
+    },
+
     async prefillAssessment() {
       this.selectedYear = this.$route.params.year;
       this.employeeId = this.$route.params.employee;
@@ -823,23 +891,23 @@ export default {
                   <div class="col-md-4">
                     <div class="card">
                       <div class="card-body">
-                        <div class="p-3 bg-light mb-4 d-flex justify-content-between">
+                        <div class="p-3 bg-light mb-4 d-flex justify-content-between" style="background: #58181F !important; color:#fff !important;">
                           <div class="d-inline mb-0">
-                            <h5 class="font-size-14 mb-0">Application Re-assignment</h5>
+                            <h5 class="font-size-14 mb-0 text-white">Application Re-assignment</h5>
                           </div>
                         </div>
                         <div class="mb-3">
                           <form >
                             <div class="form-group">
-                              <label for="">Initially Assigned to</label>
+                              <label for="">From:</label>
                               <multiselect
                                 id="assignedTo"
                                 v-model="assignedTo"
                                 :options="assignedOfficials"
                                 :custom-label="employeeLabel"
                                 :class="{
-                          'is-invalid': submitted && $v.assignedTo.$error,
-                        }"
+                                  'is-invalid': submitted && $v.assignedTo.$error,
+                                }"
                               ></multiselect>
                             </div>
                             <div class="form-group">

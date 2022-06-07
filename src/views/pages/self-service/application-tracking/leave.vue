@@ -311,15 +311,15 @@ export default {
           <div class="col-md-4">
             <div class="card">
               <div class="card-body">
-                <div class="p-3 bg-light mb-4 d-flex justify-content-between">
+                <div class="p-3 bg-light mb-4 d-flex justify-content-between" style="background: #58181F !important; color:#fff !important;">
                   <div class="d-inline mb-0">
-                    <h5 class="font-size-14 mb-0">Application Re-assignment</h5>
+                    <h5 class="font-size-14 mb-0 text-white">Application Re-assignment</h5>
                   </div>
                 </div>
                 <div class="mb-3">
                   <form @submit.prevent="reAssignLeaveApplication">
                     <div class="form-group">
-                      <label for="">Initially Assigned to</label>
+                      <label for="">From</label>
                       <multiselect
                         id="assignedTo"
                         v-model="assignedTo"

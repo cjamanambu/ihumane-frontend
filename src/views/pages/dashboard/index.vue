@@ -71,11 +71,13 @@ export default {
     async loadAdminDashboard() {
       await this.apiGet(this.ROUTES.user, "Get Users Error").then((res) => {
         const { data } = res;
+        //console.log(data)
         this.users = data.length;
       });
       await this.apiGet(this.ROUTES.employee, "Get Employees Error").then(
         (res) => {
           const { data } = res;
+          //console.log(data)
           this.employees = data.length;
         }
       );
@@ -84,6 +86,7 @@ export default {
         "Get Leave Applications Error"
       ).then((res) => {
         const { data } = res.data;
+        //console.log(data)
         this.leaves = data.length;
       });
       await this.apiGet(
@@ -91,12 +94,14 @@ export default {
         "Get Travel Applications Error"
       ).then((res) => {
         const { data } = res.data;
+        //console.log(data)
         this.travels = data.length;
       });
       this.apiGet(this.ROUTES.timeAllocation, "Get Time Allocation Error").then(
         (res) => {
           let count = 0;
           const { data } = res;
+          //console.log(data)
           data.forEach((time) => {
             let found = false;
             if (this.timeAllocations1.length === 0) {
@@ -145,6 +150,7 @@ export default {
       let url = `${this.ROUTES.leaveApplication}/get-employee-leave/${employeeID}`;
       await this.apiGet(url, "Get Employee Leaves Error").then((res) => {
         const { data } = res.data;
+
         data.forEach((leave) => {
           if (leave.leapp_status === 0) {
             this.leaveApps++;
@@ -154,6 +160,7 @@ export default {
       url = `${this.ROUTES.travelApplication}/get-travel-application/${employeeID}`;
       await this.apiGet(url, "Get Travel Applications Error").then((res) => {
         const { data } = res.data;
+
         data.forEach((travel) => {
           if (travel.travelapp_status === 0) {
             this.travelReqs++;
@@ -164,6 +171,7 @@ export default {
       this.apiGet(url, "Get Time Allocation Error").then((res) => {
         let count = 0;
         const { data } = res;
+        console.log(data)
         data.forEach((time) => {
           let found = false;
           if (this.timeAllocations.length === 0) {
@@ -230,7 +238,7 @@ export default {
               payroll_year: time.ta_year,
               breakdown: [{ t1code: time.ta_tcode, charge: time.ta_charge }],
               status: time.ta_status ? time.ta_status : 0,
-              employee: time.Employee,
+              employee: time.employee,
             });
           } else {
             this.applications.every((application) => {
@@ -252,7 +260,7 @@ export default {
                 payroll_year: time.ta_year,
                 breakdown: [{ t1code: time.ta_tcode, charge: time.ta_charge }],
                 status: time.ta_status ? time.ta_status : 0,
-                employee: time.Employee,
+                employee: time.employee,
               });
             }
           }
