@@ -25,18 +25,21 @@ export default {
     Layout,
     PageHeader,
   },
-  mounted() {
+  async mounted() {
 
-    this.test();
+    //await this.getPendingLeaveApplications();
+    //await this.getTimesheet();
+    //await this.getSelfAssessmentSubmissions();
+    this.getTravelApplications()
   },
   methods: {
-    test(){
-      this.getSelfAssessmentSubmissions();
+
+      //this.getSelfAssessmentSubmissions();
       //this.getTimesheet();
       //this.getPendingLeaveApplications();
       //this.getTravelApplications();
-    },
-    getPendingLeaveApplications() {
+
+    async getPendingLeaveApplications() {
       const url = `${this.ROUTES.leaveApplication}/get-leave-applications/0`;
       this.apiGet(url, "Get Leave Applications Error").then((res) => {
         res.data.forEach((leave, index) => {
@@ -65,9 +68,9 @@ export default {
         params: { leaveAppID: this.leaveAppID },
       });
     },
-    timesheetSelectRow(row) {
+    async timesheetSelectRow(row) {
       row = row[0];
-      console.log({ row });
+      //console.log({ row });
       const month = `${row.payroll_month}`;
       const year = `${row.payroll_year}`;
       const empId = row.employee.emp_id;
@@ -83,6 +86,14 @@ export default {
       this.$router.push({
         name: "self-assessment-backoffice-breakdown",
         params: { year: this.selectedYear, employee: this.employeeId },
+      });
+    },
+    selectTravelRow(row) {
+      row = row[0];
+      this.travelAppID = row.travelapp_id;
+      this.$router.push({
+        name: "travel-application-details",
+        params: { travelAppID: this.travelAppID },
       });
     },
     timesheetOnFiltered(filteredItems) {
@@ -119,7 +130,7 @@ export default {
         this.timesheet_totalRows = this.timesheets.length;
       });
     },
-    getSelfAssessmentSubmissions() {
+    async getSelfAssessmentSubmissions() {
       const url = `${this.ROUTES.selfAssessment}/get-self-assessments-status/0`;
       this.apiGet(url, "Get Self-assessment Error").then((res) => {
         const { data } = res;
@@ -128,8 +139,8 @@ export default {
           this.selfAssessements[serial] = {
             self_no: ++serial,
             self_employee: `${self.employee.emp_first_name} ${self.employee?.emp_last_name} `,
-            self_current_desk: 'Current',//`${leave.leave_authorizer[index].officers.emp_first_name}  `,
-            self_goal: `${self.sam_year}`,//`${timesheet.leave_type?.leave_name}(${leave.leapp_total_days})`,
+            self_current_desk: `${self.supervisor.emp_first_name} ${self.supervisor.emp_last_name} (${self.supervisor.emp_unique_id} ) `,
+            self_goal: `${self.sam_year}`,
             self_t6:self.employee.location?.location_name,
             self_t3:self.employee.sector?.department_name,
             self_t7:self.employee?.emp_unique_id,
@@ -155,15 +166,12 @@ export default {
             application_no: ++serial,
             application_employee: `${application.applicant.emp_first_name} ${application.applicant?.emp_last_name} `,
             application_current_desk: `${application.authorizers.officers.emp_first_name} ${application.authorizers.officers.emp_last_name} (${application.authorizers.officers.emp_unique_id}) `,
-            application_purpose: `${application.travelapp_purpose}`,//`${timesheet.leave_type?.leave_name}(${leave.leapp_total_days})`,
+            application_purpose: `${application.travelapp_purpose}`,
             application_t6:application.applicant.location?.location_name,
             application_t3:application.applicant.sector?.department_name,
             application_t7:application.applicant?.emp_unique_id,
-            //ta_id:application.sam_id,
-            //year:application.sam_year,
-            //payroll_month: self.ta_month,
-            //payroll_year: self.ta_year,
             empId: self.sam_emp_id,
+            travelapp_id:application.travelapp_id,
             application_date:new Date(application.travelapp_start_date).toDateString(),
             ...self,
           };
@@ -243,7 +251,7 @@ export default {
         { key: "leave_t3", label: "T3", sortable: true },
         { key: "lea_type", label: "Leave Type(No. of Days)", sortable: true },
         { key: "current_desk", label: "Current Desk", sortable: true },
-        { key: "leave_date", label: "Date", sortable: true },
+        { key: "leave_date", label: "Date Applied", sortable: true },
       ],
 
       //timesheet fields
@@ -260,7 +268,7 @@ export default {
         { key: "timesheet_t3", label: "T3", sortable: true },
         { key: "timesheet_period", label: "Period", sortable: true },
         { key: "current_desk", label: "Current Desk", sortable: true },
-        { key: "timesheet_date", label: "Date", sortable: true },
+        { key: "timesheet_date", label: "Date Submitted", sortable: true },
       ],
 
       //self-assessment fields
@@ -402,7 +410,7 @@ export default {
                 </div>
               </b-tab>
               <b-tab>
-                <template v-slot:title>
+                <template v-slot:title >
                   <span class="d-inline-block d-sm-none">
                     <i class="far fa-user"></i>
                   </span>
@@ -637,7 +645,7 @@ export default {
                           :filter-included-fields="application_filterOn"
                           show-empty
                           select-mode="single"
-                          @row-selected="selectSelfAssessmentRow"
+                          @row-selected="selectTravelRow"
                         >
 
                         </b-table>
