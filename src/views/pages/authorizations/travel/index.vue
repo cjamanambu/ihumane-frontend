@@ -33,9 +33,8 @@ export default {
     refreshTable() {
       const url = `${this.ROUTES.travelApplication}/authorization/supervisor/${this.getEmployee.emp_id}`;
       this.apiGet(url, "Get Travel Applications Error").then((res) => {
-        const { data, officers } = res.data;
-        console.log({ res });
-        data.forEach((application, index) => {
+        const { travelApplicationsForAuth, officers } = res.data;
+        travelApplicationsForAuth.forEach((application, index) => {
           this.applications[index] = { sn: ++index, ...application };
         });
         this.applications.forEach((application) => {

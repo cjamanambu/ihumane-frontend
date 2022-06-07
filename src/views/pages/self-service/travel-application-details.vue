@@ -28,7 +28,7 @@ export default {
   components: {
     Layout,
     PageHeader,
-    Multiselect
+    Multiselect,
   },
   mounted() {
     this.fetchRequest();
@@ -42,16 +42,17 @@ export default {
       let requestID = this.$route.params.travelAppID;
       const url = `${this.ROUTES.travelApplication}/${requestID}`;
       this.apiGet(url, "Get Travel Application").then((res) => {
-        console.log({ res });
         const { application, breakdown, expenses, log } = res.data;
         this.application = application;
         this.breakdowns = breakdown;
         this.expenses = expenses;
         this.log = log;
         this.checkCurrentStatus();
-        this.fetchDonorInfo();
-        this.fetchExpenses();
+        // this.fetchDonorInfo();
+        // this.fetchExpenses();
         this.fetchEmployees();
+        this.getLocation(application.applicant.emp_location_id);
+        this.getSector(application.applicant.emp_department_id);
       });
     },
     employeeLabel({ text }) {
@@ -112,6 +113,18 @@ export default {
           }
         }
         return true;
+      });
+    },
+    getLocation(locationId) {
+      const url = `${this.ROUTES.location}/${locationId}`;
+      this.apiGet(url, "Couldn't get location details").then((res) => {
+        this.t6 = res.data.location_name;
+      });
+    },
+    getSector(sectorId) {
+      const url = `${this.ROUTES.department}/${sectorId}`;
+      this.apiGet(url, "Couldn't get location details").then((res) => {
+        this.t3 = res.data.d_t3_code;
       });
     },
     submit(type) {
@@ -197,6 +210,8 @@ export default {
       status: null,
       approving: false,
       declining: false,
+      t6: null,
+      t3: null,
     };
   },
 };
@@ -216,7 +231,7 @@ export default {
     </div>
     <scale-loader v-if="apiBusy" />
     <div class="row" v-else>
-      <div class="col-lg-8">
+      <div class="col-lg-8" v-if="application">
         <div class="card">
           <div class="card-body">
             <div class="p-3 bg-light mb-4 d-flex justify-content-between">
@@ -252,16 +267,17 @@ export default {
             </div>
             <div class="d-flex justify-content-between mb-3">
               <span>T3 Code</span>
-              <span> - </span>
+              <span> {{ t3 }} </span>
             </div>
             <div class="d-flex justify-content-between mb-3">
               <span>T6 Code</span>
-              <span> - </span>
+              <span> {{ t6 }} </span>
             </div>
             <div class="d-flex justify-content-between mb-3">
               <span>Status</span>
               <span v-if="status === 1" class="text-success">Approved</span>
               <span v-else-if="status === 2" class="text-danger">Declined</span>
+              <span v-else class="text-warning">Pending</span>
             </div>
           </div>
         </div>
@@ -345,7 +361,10 @@ export default {
                 </div>
               </div>
               <div class="col-lg-4">
-                <div class="form-group">
+                <div
+                  class="form-group"
+                  v-if="application && application.travelapp_travel_cat === 1"
+                >
                   <label for="">Program / Charge Codes</label>
                   <div class="row">
                     <div class="col-lg-4">
@@ -357,8 +376,9 @@ export default {
                     </div>
                     <div class="col-lg-8">
                       <div class="form-group">
-                        <span v-if="donor">
-                          {{ donor.donor_code }} ({{ donor.donor_description }})
+                        <span>
+                          <!--                          {{ donor.donor_code }} ({{ donor.donor_description }})-->
+                          {{ application.travelapp_t1_code }}
                         </span>
                       </div>
                     </div>
@@ -376,10 +396,10 @@ export default {
                         <div class="form-group">
                           <p
                             class="mb-0"
-                            v-for="(t2code, index) in t2Codes"
+                            v-for="(t2code, index) in expenses"
                             :key="index"
                           >
-                            {{ t2code.expense }}: {{ t2code.code }}
+                            {{ t2code.travelapp_t2_id }}
                           </p>
                         </div>
                       </div>
@@ -529,9 +549,14 @@ export default {
       <div class="col-lg-4">
         <div class="card" v-if="application.travelapp_status === 0">
           <div class="card-body">
-            <div class="p-3 bg-light mb-4 d-flex justify-content-between" style="background: #58181F !important; color:#fff !important;">
+            <div
+              class="p-3 bg-light mb-4 d-flex justify-content-between"
+              style="background: #58181f !important; color: #fff !important"
+            >
               <div class="d-inline mb-0">
-                <h5 class="font-size-14 mb-0 text-white">Application Re-assignment</h5>
+                <h5 class="font-size-14 mb-0 text-white">
+                  Application Re-assignment
+                </h5>
               </div>
             </div>
             <div class="mb-3">
@@ -544,8 +569,8 @@ export default {
                     :options="assignedOfficials"
                     :custom-label="employeeLabel"
                     :class="{
-                          'is-invalid': submitted && $v.assignedTo.$error,
-                        }"
+                      'is-invalid': submitted && $v.assignedTo.$error,
+                    }"
                   ></multiselect>
                 </div>
                 <div class="form-group">
@@ -556,10 +581,10 @@ export default {
                     :options="officials"
                     :custom-label="reAssignLabel"
                     :class="{
-                          'is-invalid': submitted && $v.reAssignedTo.$error,
-                        }"
+                      'is-invalid': submitted && $v.reAssignedTo.$error,
+                    }"
                   ></multiselect>
-                  <input type="hidden" v-model="leaveID" >
+                  <input type="hidden" v-model="leaveID" />
                 </div>
                 <div class="form-group d-flex justify-content-center">
                   <b-button
@@ -569,7 +594,11 @@ export default {
                   >
                     Save Changes
                   </b-button>
-                  <b-button v-else disabled class="btn btn-success btn-block mt-4">
+                  <b-button
+                    v-else
+                    disabled
+                    class="btn btn-success btn-block mt-4"
+                  >
                     Saving changes...
                   </b-button>
                 </div>

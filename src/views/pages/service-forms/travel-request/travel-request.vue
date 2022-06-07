@@ -104,14 +104,14 @@ export default {
     </div>
     <scale-loader v-if="apiBusy" />
     <div class="row" v-else>
-      <div class="col-12">
+      <div class="col-12" v-if="application">
         <div class="card">
           <div class="card-body">
             <div class="p-3 bg-light mb-4 d-flex justify-content-between">
               <div class="d-inline mb-0">
                 <h5
                   class="font-size-14 mb-0"
-                  v-if="application.travelapp_travel_cat === 1"
+                  v-if="application && application.travelapp_travel_cat === 1"
                 >
                   Official Travel Authorization / Per Diem Form
                 </h5>
@@ -121,19 +121,19 @@ export default {
               </div>
               <span class="d-inline mb-0">
                 <small
-                  v-if="application.travelapp_status === 0"
+                  v-if="application && application.travelapp_status === 0"
                   class="text-warning"
                 >
                   Application Pending
                 </small>
                 <small
-                  v-else-if="application.travelapp_status === 1"
+                  v-else-if="application && application.travelapp_status === 1"
                   class="text-success"
                 >
                   Application Approved
                 </small>
                 <small
-                  v-else-if="application.travelapp_status === 2"
+                  v-else-if="application && application.travelapp_status === 2"
                   class="text-danger"
                 >
                   Application Declined
@@ -185,9 +185,12 @@ export default {
                 </div>
               </div>
               <div class="col-lg-4">
-                <div class="form-group">
+                <div
+                  class="form-group"
+                  v-if="application && application.travelapp_travel_cat === 1"
+                >
                   <label for="">Program / Charge Codes</label>
-                  <div class="row" v-if="donor">
+                  <div class="row">
                     <div class="col-lg-4">
                       <div class="form-group">
                         <label class="" for="">
@@ -198,7 +201,8 @@ export default {
                     <div class="col-lg-8">
                       <div class="form-group">
                         <span>
-                          {{ donor.donor_code }} ({{ donor.donor_description }})
+                          <!--                          {{ donor.donor_code }} ({{ donor.donor_description }})-->
+                          {{ application.travelapp_t1_code }}
                         </span>
                       </div>
                     </div>
@@ -216,10 +220,11 @@ export default {
                         <div class="form-group">
                           <p
                             class="mb-0"
-                            v-for="(t2code, index) in t2Codes"
+                            v-for="(t2code, index) in expenses"
                             :key="index"
                           >
-                            {{ t2code.expense }}: {{ t2code.code }}
+                            <!--                            {{ t2code.expense }}: {{ t2code.code }}-->
+                            {{ t2code.travelapp_t2_id }}
                           </p>
                         </div>
                       </div>
