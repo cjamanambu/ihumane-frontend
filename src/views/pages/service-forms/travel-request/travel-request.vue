@@ -39,8 +39,8 @@ export default {
         this.breakdowns = breakdown;
         this.expenses = expenses;
         this.log = log;
-        this.fetchDonorInfo();
-        this.fetchExpenses();
+        // this.fetchDonorInfo();
+        // this.fetchExpenses();
       });
     },
     fetchDonorInfo() {

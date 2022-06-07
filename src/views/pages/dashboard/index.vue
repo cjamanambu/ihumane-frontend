@@ -171,7 +171,6 @@ export default {
       this.apiGet(url, "Get Time Allocation Error").then((res) => {
         let count = 0;
         const { data } = res;
-        console.log(data)
         data.forEach((time) => {
           let found = false;
           if (this.timeAllocations.length === 0) {
@@ -217,7 +216,7 @@ export default {
       url = `${this.ROUTES.travelApplication}/authorization/supervisor/${employeeID}`;
       this.apiGet(url, "Get Travel Applications Error").then((res) => {
         const { data } = res.data;
-        this.travelAuth = data.length;
+        if (data) this.travelAuth = data.length;
       });
       url = `${this.ROUTES.leaveApplication}/authorization/supervisor/${this.getEmployee.emp_id}`;
       this.apiGet(url, "Get Leave Applications Error").then((res) => {
