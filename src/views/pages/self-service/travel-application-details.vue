@@ -104,6 +104,20 @@ export default {
         });
       });
     },
+    reAssignLeaveApplication(){
+      this.submitted = true;
+      let requestID = this.$route.params.travelAppID;
+      const url = `${this.ROUTES.leaveApplication}/re-assign-travel-application/${requestID}`;
+      const data = {
+        appId: requestID,
+        reassignTo: this.reAssignedTo.value,
+        assignedTo:this.assignedTo.value,
+      };
+      this.apiPatch(url, data, "Re-assign travel  Error").then();
+      this.apiResponseHandler("Change effected", "Travel application updated");
+      this.submitted = false;
+      this.fetchRequest();
+    },
     checkCurrentStatus() {
       this.log.every((entry) => {
         if (entry.auth_officer_id === this.getEmployee.emp_id) {
