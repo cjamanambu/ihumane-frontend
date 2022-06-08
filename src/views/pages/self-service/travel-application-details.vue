@@ -32,6 +32,7 @@ export default {
   },
   mounted() {
     this.fetchRequest();
+    this.fetchAuthorizingOfficers();
   },
   validations: {
     comment: { required },
@@ -40,6 +41,7 @@ export default {
   methods: {
     fetchRequest() {
       let requestID = this.$route.params.travelAppID;
+      localStorage.setItem("travelId", requestID);
       const url = `${this.ROUTES.travelApplication}/${requestID}`;
       this.apiGet(url, "Get Travel Application").then((res) => {
         const { application, breakdown, expenses, log } = res.data;
@@ -106,8 +108,8 @@ export default {
     },
     reAssignLeaveApplication(){
       this.submitted = true;
-      let requestID = this.$route.params.travelAppID;
-      const url = `${this.ROUTES.leaveApplication}/re-assign-travel-application/${requestID}`;
+      let requestID = localStorage.getItem("travelId");
+      const url = `${this.ROUTES.travelApplication}/re-assign-travel-application/${requestID}`;
       const data = {
         appId: requestID,
         reassignTo: this.reAssignedTo.value,
@@ -140,6 +142,27 @@ export default {
       this.apiGet(url, "Couldn't get location details").then((res) => {
         this.t3 = res.data.d_t3_code;
       });
+    },
+    fetchAuthorizingOfficers() {
+      let travelId = localStorage.getItem("travelId"); //this.$route.params.travelId;
+      const url = `${this.ROUTES.authorization}/3/${travelId}`; //1 = for travel application
+      this.apiGet(url, "Get Employees Error").then((res) => {
+        this.assignedOfficials = [
+          {
+            value: null,
+            text: "Please choose an officer",
+            disabled: true,
+          },
+        ];
+        const { data } = res;
+        data.forEach((officer) => {
+          this.assignedOfficials.push({
+            value: officer.officers.emp_id,
+            text: `${officer.officers.emp_first_name} ${officer.officers.emp_last_name} (${officer.officers.emp_unique_id})`,
+          });
+        });
+      });
+      this.fetchRequest();
     },
     submit(type) {
       this.submitted = true;
@@ -206,6 +229,7 @@ export default {
       comment: null,
       final: true,
       official: null,
+      travelId: null,
       officials: [
         {
           value: null,
@@ -598,7 +622,7 @@ export default {
                       'is-invalid': submitted && $v.reAssignedTo.$error,
                     }"
                   ></multiselect>
-                  <input type="hidden" v-model="leaveID" />
+                  <input type="hidden" v-model="travelId" />
                 </div>
                 <div class="form-group d-flex justify-content-center">
                   <b-button
@@ -664,6 +688,12 @@ export default {
                           class="text-success"
                         >
                           Declined
+                        </span>
+                        <span
+                          v-else-if="logEntry.auth_status === 3"
+                          class="text-info"
+                        >
+                          Re-assigned
                         </span>
                       </b-td>
                       <b-td style="width: 40%">
