@@ -68,7 +68,7 @@ export default [
     component: () => import("@/views/pages/self-service/travel-applications"),
   },
   {
-    path: "/travel-application-details/:id",
+    path: "/travel-application-details/:travelAppID",
     name: "travel-application-details",
     meta: {
       authRequired: true,

@@ -29,8 +29,8 @@ export default {
 
     //await this.getPendingLeaveApplications();
     //await this.getTimesheet();
-    //await this.getSelfAssessmentSubmissions();
-    this.getTravelApplications()
+    await this.getSelfAssessmentSubmissions();
+    //this.getTravelApplications()
   },
   methods: {
 
