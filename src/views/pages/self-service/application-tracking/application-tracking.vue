@@ -165,7 +165,7 @@ export default {
           this.travelApplications[serial] = {
             application_no: ++serial,
             application_employee: `${application.applicant.emp_first_name} ${application.applicant?.emp_last_name} `,
-            application_current_desk: `${application.authorizers.officers.emp_first_name} ${application.authorizers.officers.emp_last_name} (${application.authorizers.officers.emp_unique_id}) `,
+            application_current_desk: `${application.authorizers?.officers.emp_first_name} ${application.authorizers?.officers.emp_last_name} (${application.authorizers?.officers.emp_unique_id}) `,
             application_purpose: `${application.travelapp_purpose}`,
             application_t6:application.applicant.location?.location_name,
             application_t3:application.applicant.sector?.department_name,
