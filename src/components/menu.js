@@ -212,11 +212,13 @@ const menuItems = [
             link: "/manage-employees",
           }
         : {},
-      {
-        id: 31,
-        label: "Supervisors",
-        link: "/supervisors",
-      },
+      permissions.includes("ASSIGN_SUPERVISORS")
+        ? {
+            id: 31,
+            label: "Supervisors",
+            link: "/supervisors",
+          }
+        : {},
       permissions.includes("ASSIGN_SUPERVISORS")
         ? {
             id: 32,
@@ -384,12 +386,12 @@ const menuItems = [
     icon: "ri-team-line",
     link: "/self-assessment/backoffice",
   },
-   {
-     id: 29,
-     label: "Application Tracking",
-     icon: "ri-file-edit-line",
-     link: "/application-tracking",
-   },
+  {
+    id: 29,
+    label: "Application Tracking",
+    icon: "ri-file-edit-line",
+    link: "/application-tracking",
+  },
   {
     id: 26,
     label: "Payroll Routine",
