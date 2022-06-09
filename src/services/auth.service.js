@@ -8,7 +8,7 @@ export default {
     ...authMethods,
     ...layoutMethods,
     login(username, password) {
-      return new Promise((resolve) => {
+      return new Promise((resolve, reject) => {
         this.logIn({ username, password })
           .then(async () => {
             const { user_type, permission } = this.getUser;
@@ -19,6 +19,7 @@ export default {
           })
           .catch((err) => {
             this.apiErrorHandler(err, "Login Error");
+            reject(err);
           });
       });
     },
