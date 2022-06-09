@@ -173,7 +173,7 @@ export default {
     },
     fetchAuthorizingOfficers() {
       let leaveId = this.$route.params.leaveAppID;
-      const url = `${this.ROUTES.authorization}/4/${leaveId}`; //1 = for self-assessment
+      const url = `${this.ROUTES.authorization}/4/${leaveId}`; //4 = for self-assessment
       this.apiGet(url, "Get Employees Error").then((res) => {
         this.assignedOfficials = [
           {

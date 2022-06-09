@@ -34,6 +34,14 @@ export default [
     component: () => import("@/views/pages/employees/manage-employee"),
   },
   {
+    path: "/manage-employees/edit-employee/:employeeID",
+    name: "edit-employee-details",
+    meta: {
+      authRequired: true,
+    },
+    component: () => import("@/views/pages/employees/edit-employee-details"),
+  },
+  {
     path: "/manage-announcements",
     name: "manage-announcements",
     meta: {

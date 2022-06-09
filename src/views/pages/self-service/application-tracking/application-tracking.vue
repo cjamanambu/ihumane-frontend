@@ -30,6 +30,7 @@ export default {
     PageHeader,
   },
   async mounted() {
+
     //await this.getPendingLeaveApplications();
     //await this.getTimesheet();
     await this.getSelfAssessmentSubmissions();
@@ -183,6 +184,7 @@ export default {
         this.application_totalRows = this.travelApplications.length;
       });
     },
+
   },
   data() {
     return {
@@ -420,7 +422,7 @@ export default {
                 </div>
               </b-tab>
               <b-tab>
-                <template v-slot:title>
+                <template v-slot:title >
                   <span class="d-inline-block d-sm-none">
                     <i class="far fa-user"></i>
                   </span>
@@ -487,6 +489,7 @@ export default {
                             select-mode="single"
                             @row-selected="timesheetSelectRow"
                           >
+
                           </b-table>
                         </div>
                         <div class="row">
@@ -664,6 +667,7 @@ export default {
                           select-mode="single"
                           @row-selected="selectTravelRow"
                         >
+
                         </b-table>
                       </div>
                       <div class="row">
