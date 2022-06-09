@@ -5,10 +5,15 @@ import appConfig from "@/app.config";
 import { authComputed } from "@/state/helpers";
 import store from "@/state/store";
 import VueHtml2pdf from "vue-html2pdf";
+
 export default {
   beforeRouteEnter(to, from, next) {
     const userType = store.getters["auth/getUser"].user_type;
-    if (userType === 1 || userType === 3) {
+    const permissions = store.getters["auth/permissions"];
+    if (
+      (userType === 1 || userType === 3) &&
+      permissions.includes("APPLICATION_TRACKING")
+    ) {
       next();
     } else {
       alert("You are not allowed to access this page. You will be redirected.");
@@ -163,10 +168,7 @@ export default {
     <PageHeader :title="title" :items="items" />
     <div class="d-flex justify-content-end mb-3">
       <div class="btn-group">
-        <b-button
-          class="btn btn-success"
-          @click="generateReport"
-        >
+        <b-button class="btn btn-success" @click="generateReport">
           <i class="mdi mdi-printer mr-2"></i>
           Print
         </b-button>
@@ -207,101 +209,101 @@ export default {
                 <div class="table-responsive">
                   <table class="table mb-0">
                     <thead>
-                    <tr>
-                      <th>#</th>
-                      <th>Day</th>
-                      <th>Start</th>
-                      <th>End</th>
-                      <th>Duration</th>
-                    </tr>
+                      <tr>
+                        <th>#</th>
+                        <th>Day</th>
+                        <th>Start</th>
+                        <th>End</th>
+                        <th>Duration</th>
+                      </tr>
                     </thead>
                     <tbody>
-                    <tr
-                      class="table-light"
-                      v-for="(ts, index) in this.timeSheet"
-                      :key="index"
-                    >
-                      <th scope="row">{{ index + 1 }}</th>
-                      <td>
-                        {{
-                          new Date(
-                            `${ts.ts_month}-${ts.ts_day}-${ts.ts_year}`
-                          ).toDateString()
-                        }}
-                      </td>
-                      <td>
+                      <tr
+                        class="table-light"
+                        v-for="(ts, index) in this.timeSheet"
+                        :key="index"
+                      >
+                        <th scope="row">{{ index + 1 }}</th>
+                        <td>
+                          {{
+                            new Date(
+                              `${ts.ts_month}-${ts.ts_day}-${ts.ts_year}`
+                            ).toDateString()
+                          }}
+                        </td>
+                        <td>
                           <span v-if="ts.ts_is_present === 1">
                             {{ tConvert(ts.ts_start) }}
                           </span>
-                        <span
-                          class="text-primary"
-                          v-else-if="ts.ts_is_present === 2"
-                        >
+                          <span
+                            class="text-primary"
+                            v-else-if="ts.ts_is_present === 2"
+                          >
                             P. HOLIDAY
                           </span>
-                        <span
-                          class="text-warning"
-                          v-else-if="ts.ts_is_present === 3"
-                        >
+                          <span
+                            class="text-warning"
+                            v-else-if="ts.ts_is_present === 3"
+                          >
                             WEEKEND
                           </span>
-                        <span
-                          class="text-info"
-                          v-else-if="ts.ts_is_present === 4"
-                        >
+                          <span
+                            class="text-info"
+                            v-else-if="ts.ts_is_present === 4"
+                          >
                             LEAVE
                           </span>
-                        <span v-else class="text-danger">ABSENT</span>
-                      </td>
-                      <td>
+                          <span v-else class="text-danger">ABSENT</span>
+                        </td>
+                        <td>
                           <span v-if="ts.ts_is_present === 1">
                             {{ tConvert(ts.ts_end) }}
                           </span>
-                        <span
-                          class="text-primary"
-                          v-else-if="ts.ts_is_present === 2"
-                        >
+                          <span
+                            class="text-primary"
+                            v-else-if="ts.ts_is_present === 2"
+                          >
                             P. HOLIDAY
                           </span>
-                        <span
-                          class="text-warning"
-                          v-else-if="ts.ts_is_present === 3"
-                        >
+                          <span
+                            class="text-warning"
+                            v-else-if="ts.ts_is_present === 3"
+                          >
                             WEEKEND
                           </span>
-                        <span
-                          class="text-info"
-                          v-else-if="ts.ts_is_present === 4"
-                        >
+                          <span
+                            class="text-info"
+                            v-else-if="ts.ts_is_present === 4"
+                          >
                             LEAVE
                           </span>
-                        <span v-else class="text-danger">ABSENT</span>
-                      </td>
-                      <td>
+                          <span v-else class="text-danger">ABSENT</span>
+                        </td>
+                        <td>
                           <span v-if="ts.ts_is_present === 1">
                             {{ tConvert(ts.ts_duration) }} hrs
                           </span>
-                        <span
-                          class="text-primary"
-                          v-else-if="ts.ts_is_present === 2"
-                        >
+                          <span
+                            class="text-primary"
+                            v-else-if="ts.ts_is_present === 2"
+                          >
                             P. HOLIDAY
                           </span>
-                        <span
-                          class="text-warning"
-                          v-else-if="ts.ts_is_present === 3"
-                        >
+                          <span
+                            class="text-warning"
+                            v-else-if="ts.ts_is_present === 3"
+                          >
                             WEEKEND
                           </span>
-                        <span
-                          class="text-info"
-                          v-else-if="ts.ts_is_present === 4"
-                        >
+                          <span
+                            class="text-info"
+                            v-else-if="ts.ts_is_present === 4"
+                          >
                             LEAVE
                           </span>
-                        <span v-else class="text-danger">ABSENT</span>
-                      </td>
-                    </tr>
+                          <span v-else class="text-danger">ABSENT</span>
+                        </td>
+                      </tr>
                     </tbody>
                   </table>
                 </div>
@@ -321,51 +323,51 @@ export default {
                 <div class="table-responsive">
                   <table class="table mb-0">
                     <thead>
-                    <tr>
-                      <th>#</th>
-                      <th>Officer</th>
-                      <th>Status</th>
-                      <th>Comment</th>
-                      <th>Date</th>
-                    </tr>
+                      <tr>
+                        <th>#</th>
+                        <th>Officer</th>
+                        <th>Status</th>
+                        <th>Comment</th>
+                        <th>Date</th>
+                      </tr>
                     </thead>
                     <tbody>
-                    <tr
-                      class="table-light"
-                      v-for="(off, ind) in this.log"
-                      :key="ind"
-                    >
-                      <th scope="row">{{ ind + 1 }}</th>
-                      <td>
-                        {{
-                          off.officers.emp_first_name
-                            ? off.officers.emp_first_name
-                            : ""
-                        }}
-                        {{
-                          off.officers.emp_last_name
-                            ? off.officers.emp_last_name
-                            : ""
-                        }}
-                      </td>
-                      <td>
-                        <small
-                          v-if="off.auth_status === 1"
-                          class="text-success"
-                        >
-                          Approved
-                        </small>
-                        <small
-                          v-else-if="off.auth_status === 2"
-                          class="text-danger"
-                        >
-                          Discarded
-                        </small>
-                        <small v-else class="text-warning"> Pending </small>
-                      </td>
-                      <td>{{ off.auth_comment }}</td>
-                      <td>{{ new Date(off.updatedAt).toDateString() }}</td>
-                    </tr>
+                      <tr
+                        class="table-light"
+                        v-for="(off, ind) in this.log"
+                        :key="ind"
+                      >
+                        <th scope="row">{{ ind + 1 }}</th>
+                        <td>
+                          {{
+                            off.officers.emp_first_name
+                              ? off.officers.emp_first_name
+                              : ""
+                          }}
+                          {{
+                            off.officers.emp_last_name
+                              ? off.officers.emp_last_name
+                              : ""
+                          }}
+                        </td>
+                        <td>
+                          <small
+                            v-if="off.auth_status === 1"
+                            class="text-success"
+                          >
+                            Approved
+                          </small>
+                          <small
+                            v-else-if="off.auth_status === 2"
+                            class="text-danger"
+                          >
+                            Discarded
+                          </small>
+                          <small v-else class="text-warning"> Pending </small>
+                        </td>
+                        <td>{{ off.auth_comment }}</td>
+                        <td>{{ new Date(off.updatedAt).toDateString() }}</td>
+                      </tr>
                     </tbody>
                   </table>
                 </div>
@@ -491,108 +493,110 @@ export default {
                   >
                     Discarded
                   </small>
-                  <small v-else class="text-warning float-right"> Pending </small>
+                  <small v-else class="text-warning float-right">
+                    Pending
+                  </small>
                 </div>
                 <div class="row">
                   <div class="col-lg-12">
                     <div class="table-responsive">
                       <table class="table mb-0">
                         <thead>
-                        <tr>
-                          <th>#</th>
-                          <th>Day</th>
-                          <th>Start</th>
-                          <th>End</th>
-                          <th>Duration</th>
-                        </tr>
+                          <tr>
+                            <th>#</th>
+                            <th>Day</th>
+                            <th>Start</th>
+                            <th>End</th>
+                            <th>Duration</th>
+                          </tr>
                         </thead>
                         <tbody>
-                        <tr
-                          class="table-light"
-                          v-for="(ts, index) in this.timeSheet"
-                          :key="index"
-                        >
-                          <th scope="row">{{ index + 1 }}</th>
-                          <td>
-                            {{
-                              new Date(
-                                `${ts.ts_month}-${ts.ts_day}-${ts.ts_year}`
-                              ).toDateString()
-                            }}
-                          </td>
-                          <td>
-                          <span v-if="ts.ts_is_present === 1">
-                            {{ tConvert(ts.ts_start) }}
-                          </span>
-                            <span
-                              class="text-primary"
-                              v-else-if="ts.ts_is_present === 2"
-                            >
-                            P. HOLIDAY
-                          </span>
-                            <span
-                              class="text-warning"
-                              v-else-if="ts.ts_is_present === 3"
-                            >
-                            WEEKEND
-                          </span>
-                            <span
-                              class="text-info"
-                              v-else-if="ts.ts_is_present === 4"
-                            >
-                            LEAVE
-                          </span>
-                            <span v-else class="text-danger">ABSENT</span>
-                          </td>
-                          <td>
-                          <span v-if="ts.ts_is_present === 1">
-                            {{ tConvert(ts.ts_end) }}
-                          </span>
-                            <span
-                              class="text-primary"
-                              v-else-if="ts.ts_is_present === 2"
-                            >
-                            P. HOLIDAY
-                          </span>
-                            <span
-                              class="text-warning"
-                              v-else-if="ts.ts_is_present === 3"
-                            >
-                            WEEKEND
-                          </span>
-                            <span
-                              class="text-info"
-                              v-else-if="ts.ts_is_present === 4"
-                            >
-                            LEAVE
-                          </span>
-                            <span v-else class="text-danger">ABSENT</span>
-                          </td>
-                          <td>
-                          <span v-if="ts.ts_is_present === 1">
-                            {{ tConvert(ts.ts_duration) }} hrs
-                          </span>
-                            <span
-                              class="text-primary"
-                              v-else-if="ts.ts_is_present === 2"
-                            >
-                            P. HOLIDAY
-                          </span>
-                            <span
-                              class="text-warning"
-                              v-else-if="ts.ts_is_present === 3"
-                            >
-                            WEEKEND
-                          </span>
-                            <span
-                              class="text-info"
-                              v-else-if="ts.ts_is_present === 4"
-                            >
-                            LEAVE
-                          </span>
-                            <span v-else class="text-danger">ABSENT</span>
-                          </td>
-                        </tr>
+                          <tr
+                            class="table-light"
+                            v-for="(ts, index) in this.timeSheet"
+                            :key="index"
+                          >
+                            <th scope="row">{{ index + 1 }}</th>
+                            <td>
+                              {{
+                                new Date(
+                                  `${ts.ts_month}-${ts.ts_day}-${ts.ts_year}`
+                                ).toDateString()
+                              }}
+                            </td>
+                            <td>
+                              <span v-if="ts.ts_is_present === 1">
+                                {{ tConvert(ts.ts_start) }}
+                              </span>
+                              <span
+                                class="text-primary"
+                                v-else-if="ts.ts_is_present === 2"
+                              >
+                                P. HOLIDAY
+                              </span>
+                              <span
+                                class="text-warning"
+                                v-else-if="ts.ts_is_present === 3"
+                              >
+                                WEEKEND
+                              </span>
+                              <span
+                                class="text-info"
+                                v-else-if="ts.ts_is_present === 4"
+                              >
+                                LEAVE
+                              </span>
+                              <span v-else class="text-danger">ABSENT</span>
+                            </td>
+                            <td>
+                              <span v-if="ts.ts_is_present === 1">
+                                {{ tConvert(ts.ts_end) }}
+                              </span>
+                              <span
+                                class="text-primary"
+                                v-else-if="ts.ts_is_present === 2"
+                              >
+                                P. HOLIDAY
+                              </span>
+                              <span
+                                class="text-warning"
+                                v-else-if="ts.ts_is_present === 3"
+                              >
+                                WEEKEND
+                              </span>
+                              <span
+                                class="text-info"
+                                v-else-if="ts.ts_is_present === 4"
+                              >
+                                LEAVE
+                              </span>
+                              <span v-else class="text-danger">ABSENT</span>
+                            </td>
+                            <td>
+                              <span v-if="ts.ts_is_present === 1">
+                                {{ tConvert(ts.ts_duration) }} hrs
+                              </span>
+                              <span
+                                class="text-primary"
+                                v-else-if="ts.ts_is_present === 2"
+                              >
+                                P. HOLIDAY
+                              </span>
+                              <span
+                                class="text-warning"
+                                v-else-if="ts.ts_is_present === 3"
+                              >
+                                WEEKEND
+                              </span>
+                              <span
+                                class="text-info"
+                                v-else-if="ts.ts_is_present === 4"
+                              >
+                                LEAVE
+                              </span>
+                              <span v-else class="text-danger">ABSENT</span>
+                            </td>
+                          </tr>
                         </tbody>
                       </table>
                     </div>
@@ -612,51 +616,55 @@ export default {
                     <div class="table-responsive">
                       <table class="table mb-0">
                         <thead>
-                        <tr>
-                          <th>#</th>
-                          <th>Officer</th>
-                          <th>Status</th>
-                          <th>Comment</th>
-                          <th>Date</th>
-                        </tr>
+                          <tr>
+                            <th>#</th>
+                            <th>Officer</th>
+                            <th>Status</th>
+                            <th>Comment</th>
+                            <th>Date</th>
+                          </tr>
                         </thead>
                         <tbody>
-                        <tr
-                          class="table-light"
-                          v-for="(off, ind) in this.log"
-                          :key="ind"
-                        >
-                          <th scope="row">{{ ind + 1 }}</th>
-                          <td>
-                            {{
-                              off.officers.emp_first_name
-                                ? off.officers.emp_first_name
-                                : ""
-                            }}
-                            {{
-                              off.officers.emp_last_name
-                                ? off.officers.emp_last_name
-                                : ""
-                            }}
-                          </td>
-                          <td>
-                            <small
-                              v-if="off.auth_status === 1"
-                              class="text-success"
-                            >
-                              Approved
-                            </small>
-                            <small
-                              v-else-if="off.auth_status === 2"
-                              class="text-danger"
-                            >
-                              Discarded
-                            </small>
-                            <small v-else class="text-warning"> Pending </small>
-                          </td>
-                          <td>{{ off.auth_comment }}</td>
-                          <td>{{ new Date(off.updatedAt).toDateString() }}</td>
-                        </tr>
+                          <tr
+                            class="table-light"
+                            v-for="(off, ind) in this.log"
+                            :key="ind"
+                          >
+                            <th scope="row">{{ ind + 1 }}</th>
+                            <td>
+                              {{
+                                off.officers.emp_first_name
+                                  ? off.officers.emp_first_name
+                                  : ""
+                              }}
+                              {{
+                                off.officers.emp_last_name
+                                  ? off.officers.emp_last_name
+                                  : ""
+                              }}
+                            </td>
+                            <td>
+                              <small
+                                v-if="off.auth_status === 1"
+                                class="text-success"
+                              >
+                                Approved
+                              </small>
+                              <small
+                                v-else-if="off.auth_status === 2"
+                                class="text-danger"
+                              >
+                                Discarded
+                              </small>
+                              <small v-else class="text-warning">
+                                Pending
+                              </small>
+                            </td>
+                            <td>{{ off.auth_comment }}</td>
+                            <td>
+                              {{ new Date(off.updatedAt).toDateString() }}
+                            </td>
+                          </tr>
                         </tbody>
                       </table>
                     </div>
@@ -676,27 +684,27 @@ export default {
                 <div class="d-flex justify-content-between mb-3">
                   <span>Employee Name</span>
                   <span>
-                {{ this.allocation.Employee.emp_first_name }}
-                {{ this.allocation.Employee.emp_last_name }}
-              </span>
+                    {{ this.allocation.Employee.emp_first_name }}
+                    {{ this.allocation.Employee.emp_last_name }}
+                  </span>
                 </div>
                 <div class="d-flex justify-content-between mb-3">
                   <span>Phone No.</span>
                   <span>
-                {{ this.allocation.Employee.emp_phone_no }}
-              </span>
+                    {{ this.allocation.Employee.emp_phone_no }}
+                  </span>
                 </div>
                 <div class="d-flex justify-content-between mb-3">
                   <span>Office Email</span>
                   <span>
-                {{ this.allocation.Employee.emp_office_email }}
-              </span>
+                    {{ this.allocation.Employee.emp_office_email }}
+                  </span>
                 </div>
                 <div class="d-flex justify-content-between mb-3">
                   <span>T7 Number</span>
                   <span>
-                {{ this.allocation.Employee.emp_unique_id }}
-              </span>
+                    {{ this.allocation.Employee.emp_unique_id }}
+                  </span>
                 </div>
                 <div class="d-flex justify-content-between mb-3">
                   <span>T3 Code</span>
