@@ -82,6 +82,7 @@ export default {
       pmyYear: null,
       payrollLocations: null,
       payrollLocation: null,
+      loadingPayroll: false,
     };
   },
   methods: {
@@ -177,16 +178,20 @@ export default {
       });
     },
     async fetchPayrollRoutine() {
+      this.loadingPayroll = true;
       let url = `${this.ROUTES.salary}/pull-salary-routine-locations`;
-      await this.apiGet(url, "Fetch Payroll Routine Error").then((res) => {
-        console.log({ res });
-        this.routineRun = true;
-        const { data } = res;
-        data.forEach((pay, index) => {
-          this.pay[index] = { sn: ++index, ...pay };
+      await this.apiGet(url, "Fetch Payroll Routine Error")
+        .then((res) => {
+          this.routineRun = true;
+          const { data } = res;
+          data.forEach((pay, index) => {
+            this.pay[index] = { sn: ++index, ...pay };
+          });
+          this.totalRows = this.pay.length;
+        })
+        .finally(() => {
+          this.loadingPayroll = false;
         });
-        this.totalRows = this.pay.length;
-      });
     },
 
     resetForm() {
@@ -225,7 +230,7 @@ export default {
     <PageHeader :title="title" :items="items" />
     <scale-loader v-if="apiBusy" />
     <div v-else>
-      <div v-if="routineRun">
+      <div v-if="!loadingPayroll">
         <div class="alert alert-info">
           The payroll routine for this payroll period
           <b> ({{ (parseInt(pmyMonth) - 1) | getMonth }} {{ pmyYear }})</b> has
@@ -242,166 +247,174 @@ export default {
             Click here to run it.
           </span>
         </div>
-        <div class="d-flex justify-content-end mb-3">
-          <b-button
-            v-if="permissions.includes('UNDO_PAYROLL')"
-            class="btn btn-warning"
-            @click="$refs['undo-routine'].show()"
-          >
-            <i class="mdi mdi-plus mr-2"></i>
-            Undo Routine
-          </b-button>
-        </div>
-        <div class="row">
-          <div class="col-12">
-            <div class="card">
-              <div class="card-body">
-                <div class="p-3 bg-light mb-4 d-flex justify-content-between">
-                  <h5 class="font-size-14 mb-0">
-                    Payroll Summary For Payroll Period:
-                    {{ (parseInt(pmyMonth) - 1) | getMonth }} {{ pmyYear }}
-                  </h5>
-                </div>
-                <div class="row mt-4">
-                  <div class="col-sm-12 col-md-6">
-                    <div id="tickets-table_length" class="dataTables_length">
-                      <label class="d-inline-flex align-items-center">
-                        Show&nbsp;
-                        <b-form-select
-                          v-model="perPage"
-                          size="sm"
-                          :options="pageOptions"
-                        ></b-form-select
-                        >&nbsp;entries
-                      </label>
-                    </div>
+        <div>
+          <div class="d-flex justify-content-end mb-3">
+            <b-button
+              v-if="permissions.includes('UNDO_PAYROLL')"
+              class="btn btn-warning"
+              @click="$refs['undo-routine'].show()"
+            >
+              <i class="mdi mdi-plus mr-2"></i>
+              Undo Routine
+            </b-button>
+          </div>
+          <div class="row">
+            <div class="col-12">
+              <div class="card">
+                <div class="card-body">
+                  <div class="p-3 bg-light mb-4 d-flex justify-content-between">
+                    <h5 class="font-size-14 mb-0">
+                      Payroll Summary For Payroll Period:
+                      {{ (parseInt(pmyMonth) - 1) | getMonth }} {{ pmyYear }}
+                    </h5>
                   </div>
-                  <!-- Search -->
-                  <div class="col-sm-12 col-md-6">
-                    <div
-                      id="tickets-table_filter"
-                      class="dataTables_filter text-md-right"
+                  <div class="row mt-4">
+                    <div class="col-sm-12 col-md-6">
+                      <div id="tickets-table_length" class="dataTables_length">
+                        <label class="d-inline-flex align-items-center">
+                          Show&nbsp;
+                          <b-form-select
+                            v-model="perPage"
+                            size="sm"
+                            :options="pageOptions"
+                          ></b-form-select
+                          >&nbsp;entries
+                        </label>
+                      </div>
+                    </div>
+                    <!-- Search -->
+                    <div class="col-sm-12 col-md-6">
+                      <div
+                        id="tickets-table_filter"
+                        class="dataTables_filter text-md-right"
+                      >
+                        <label class="d-inline-flex align-items-center">
+                          Search:
+                          <b-form-input
+                            v-model="filter"
+                            type="search"
+                            placeholder="Search..."
+                            class="form-control form-control-sm ml-2"
+                          ></b-form-input>
+                        </label>
+                      </div>
+                    </div>
+                    <!-- End search -->
+                  </div>
+                  <!-- Table -->
+                  <div class="table-responsive mb-0" v-if="pay.length">
+                    <b-table
+                      ref="payrollSummaryTable"
+                      bordered
+                      selectable
+                      hover
+                      :items="pay"
+                      :fields="fields"
+                      responsive="sm"
+                      :per-page="perPage"
+                      :current-page="currentPage"
+                      :sort-by.sync="sortBy"
+                      :sort-desc.sync="sortDesc"
+                      :filter="filter"
+                      :filter-included-fields="filterOn"
+                      @filtered="onFiltered"
+                      show-empty
+                      select-mode="multi"
+                      @row-selected="selectLocations"
                     >
-                      <label class="d-inline-flex align-items-center">
-                        Search:
-                        <b-form-input
-                          v-model="filter"
-                          type="search"
-                          placeholder="Search..."
-                          class="form-control form-control-sm ml-2"
-                        ></b-form-input>
-                      </label>
-                    </div>
-                  </div>
-                  <!-- End search -->
-                </div>
-                <!-- Table -->
-                <div class="table-responsive mb-0" v-if="pay.length">
-                  <b-table
-                    ref="payrollSummaryTable"
-                    bordered
-                    selectable
-                    hover
-                    :items="pay"
-                    :fields="fields"
-                    responsive="sm"
-                    :per-page="perPage"
-                    :current-page="currentPage"
-                    :sort-by.sync="sortBy"
-                    :sort-desc.sync="sortDesc"
-                    :filter="filter"
-                    :filter-included-fields="filterOn"
-                    @filtered="onFiltered"
-                    show-empty
-                    select-mode="multi"
-                    @row-selected="selectLocations"
-                  >
-                    <template #cell(#)="{ rowSelected }">
-                      <template v-if="rowSelected">
-                        <span aria-hidden="true">&check;</span>
-                        <span class="sr-only">Selected</span>
+                      <template #cell(#)="{ rowSelected }">
+                        <template v-if="rowSelected">
+                          <span aria-hidden="true">&check;</span>
+                          <span class="sr-only">Selected</span>
+                        </template>
+                        <template v-else>
+                          <span aria-hidden="true">&nbsp;</span>
+                          <span class="sr-only">Not selected</span>
+                        </template>
                       </template>
-                      <template v-else>
-                        <span aria-hidden="true">&nbsp;</span>
-                        <span class="sr-only">Not selected</span>
+                      <template #cell(locationTotalGross)="row">
+                        <p class="float-right mb-0">
+                          {{
+                            parseFloat(row.value.toFixed(2)).toLocaleString()
+                          }}
+                        </p>
                       </template>
-                    </template>
-                    <template #cell(locationTotalGross)="row">
-                      <p class="float-right mb-0">
-                        {{ parseFloat(row.value.toFixed(2)).toLocaleString() }}
-                      </p>
-                    </template>
-                    <template #cell(locationTotalDeduction)="row">
-                      <p class="float-right mb-0">
-                        {{ parseFloat(row.value.toFixed(2)).toLocaleString() }}
-                      </p>
-                    </template>
-                    <template #cell(locationTotalNet)="row">
-                      <p class="float-right mb-0">
-                        {{ parseFloat(row.value.toFixed(2)).toLocaleString() }}
-                      </p>
-                    </template>
+                      <template #cell(locationTotalDeduction)="row">
+                        <p class="float-right mb-0">
+                          {{
+                            parseFloat(row.value.toFixed(2)).toLocaleString()
+                          }}
+                        </p>
+                      </template>
+                      <template #cell(locationTotalNet)="row">
+                        <p class="float-right mb-0">
+                          {{
+                            parseFloat(row.value.toFixed(2)).toLocaleString()
+                          }}
+                        </p>
+                      </template>
 
-                    <template #cell(month)="row">
-                      <p class="mb-0">
-                        {{ (parseInt(row.value) - 1) | getMonth }}
-                      </p>
-                    </template>
+                      <template #cell(month)="row">
+                        <p class="mb-0">
+                          {{ (parseInt(row.value) - 1) | getMonth }}
+                        </p>
+                      </template>
 
-                    <template #cell(action)="row">
+                      <template #cell(action)="row">
+                        <b-button
+                          style="margin: 10px"
+                          variant="primary"
+                          size="sm"
+                          @click="selectRow(row.item.locationId)"
+                          >View</b-button
+                        >
+                      </template>
+                    </b-table>
+
+                    <p>
                       <b-button
                         style="margin: 10px"
                         variant="primary"
                         size="sm"
-                        @click="selectRow(row.item.locationId)"
-                        >View</b-button
+                        @click="selectAllRows"
+                        >Select all</b-button
                       >
-                    </template>
-                  </b-table>
 
-                  <p>
-                    <b-button
-                      style="margin: 10px"
-                      variant="primary"
-                      size="sm"
-                      @click="selectAllRows"
-                      >Select all</b-button
-                    >
+                      <b-button
+                        style="margin: 10px"
+                        variant="warning"
+                        size="sm"
+                        @click="clearSelected"
+                        >Clear Selection</b-button
+                      >
 
-                    <b-button
-                      style="margin: 10px"
-                      variant="warning"
-                      size="sm"
-                      @click="clearSelected"
-                      >Clear Selection</b-button
-                    >
-
-                    <b-button
-                      style="margin: 10px"
-                      variant="success"
-                      size="sm"
-                      @click="confirmSelected"
-                      v-if="permissions.includes('CONFIRM_PAYROLL')"
-                      >Confirm Selected</b-button
-                    >
-                  </p>
-                </div>
-                <div v-else>
-                  <scale-loader />
-                </div>
-                <div class="row">
-                  <div class="col">
-                    <div
-                      class="dataTables_paginate paging_simple_numbers float-right"
-                    >
-                      <ul class="pagination pagination-rounded mb-0">
-                        <!-- pagination -->
-                        <b-pagination
-                          v-model="currentPage"
-                          :total-rows="totalRows"
-                          :per-page="perPage"
-                        ></b-pagination>
-                      </ul>
+                      <b-button
+                        style="margin: 10px"
+                        variant="success"
+                        size="sm"
+                        @click="confirmSelected"
+                        v-if="permissions.includes('CONFIRM_PAYROLL')"
+                        >Confirm Selected</b-button
+                      >
+                    </p>
+                  </div>
+                  <div v-else>
+                    <scale-loader />
+                  </div>
+                  <div class="row">
+                    <div class="col">
+                      <div
+                        class="dataTables_paginate paging_simple_numbers float-right"
+                      >
+                        <ul class="pagination pagination-rounded mb-0">
+                          <!-- pagination -->
+                          <b-pagination
+                            v-model="currentPage"
+                            :total-rows="totalRows"
+                            :per-page="perPage"
+                          ></b-pagination>
+                        </ul>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -410,21 +423,26 @@ export default {
           </div>
         </div>
       </div>
-
-      <div v-else class="alert alert-info">
-        The payroll routine for this payroll period
-        <b> ({{ (parseInt(pmyMonth) - 1) | getMonth }} {{ pmyYear }})</b> hasn't
-        been run for any location.
-        <span
-          @click="$refs['run-routine'].show()"
-          style="
-            cursor: pointer;
-            text-decoration: underline;
-            margin-left: 0.1em;
-          "
-        >
-          Click here to run it.
-        </span>
+      <div v-else>
+        <div class="alert alert-info">
+          The payroll routine for this payroll period
+          <b> ({{ (parseInt(pmyMonth) - 1) | getMonth }} {{ pmyYear }})</b>
+          hasn't been run for any location.
+          <span
+            @click="$refs['run-routine'].show()"
+            style="
+              cursor: pointer;
+              text-decoration: underline;
+              margin-left: 0.1em;
+            "
+          >
+            Click here to run it.
+          </span>
+        </div>
+        <div class="d-flex mt-3">
+          <b-spinner variant="success" type="grow" />
+          <div class="ml-3 mt-1">Loading payroll summary, please wait...</div>
+        </div>
       </div>
     </div>
 
