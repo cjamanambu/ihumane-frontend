@@ -130,6 +130,12 @@ export default {
           perm_undo_payroll: 0,
           perm_confirm_payroll: 0,
           perm_approve_payroll: 0,
+          perm_journal_code_setup: 0,
+          perm_payroll_journal: 0,
+          perm_application_tracking: 0,
+          perm_salary_mapping: 0,
+          perm_undo_salary_mapping: 0,
+          perm_supervisor_reassignment: 0,
         };
         const url = `${this.ROUTES.user}/add-user`;
         this.apiPost(url, data, "Add User Error").then((res) => {
@@ -214,6 +220,32 @@ export default {
             ? 1
             : 0,
           perm_approve_payroll: this.sPerms.includes("perm_approve_payroll")
+            ? 1
+            : 0,
+          perm_journal_code_setup: this.sPerms.includes(
+            "perm_journal_code_setup"
+          )
+            ? 1
+            : 0,
+          perm_payroll_journal: this.sPerms.includes("perm_payroll_journal")
+            ? 1
+            : 0,
+          perm_application_tracking: this.sPerms.includes(
+            "perm_application_tracking"
+          )
+            ? 1
+            : 0,
+          perm_salary_mapping: this.sPerms.includes("perm_salary_mapping")
+            ? 1
+            : 0,
+          perm_undo_salary_mapping: this.sPerms.includes(
+            "perm_undo_salary_mapping"
+          )
+            ? 1
+            : 0,
+          perm_supervisor_reassignment: this.sPerms.includes(
+            "perm_supervisor_reassignment"
+          )
             ? 1
             : 0,
         };
@@ -302,6 +334,9 @@ export default {
         { text: "Query", value: "perm_query" },
         { text: "Leave", value: "perm_leave" },
         { text: "Travel", value: "perm_travel" },
+        { text: "Journal Code Setup", value: "perm_journal_code_setup" },
+        { text: "Payroll Journal", value: "perm_payroll_journal" },
+        { text: "Application Tracking", value: "perm_application_tracking" },
       ],
       permissionOptionsB: [
         { text: "Timesheet", value: "perm_timesheet" },
@@ -315,6 +350,12 @@ export default {
         { text: "Undo Payroll", value: "perm_undo_payroll" },
         { text: "Confirm Payroll", value: "perm_confirm_payroll" },
         { text: "Approve Payroll", value: "perm_approve_payroll" },
+        { text: "Salary Mapping", value: "perm_salary_mapping" },
+        { text: "Undo Mapping", value: "perm_undo_salary_mapping" },
+        {
+          text: "Supervisor Reassignment",
+          value: "perm_supervisor_reassignment",
+        },
       ],
     };
   },

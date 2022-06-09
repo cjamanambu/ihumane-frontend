@@ -32,20 +32,24 @@ export default {
         this.submitting = false;
       } else {
         const { username, password } = this;
-        this.login(username, password).then((userType) => {
-          switch (userType) {
-            case 2:
-              this.employeeLogin(username);
-              break;
-            case 3:
-              this.$refs["account-selector"].show();
-              break;
-            default:
-              this.adminLogin(username);
-              break;
-          }
-          this.submitting = false;
-        });
+        this.login(username, password)
+          .then((userType) => {
+            switch (userType) {
+              case 2:
+                this.employeeLogin(username);
+                break;
+              case 3:
+                this.$refs["account-selector"].show();
+                break;
+              default:
+                this.adminLogin(username);
+                break;
+            }
+            this.submitting = false;
+          })
+          .catch(() => {
+            this.submitting = false;
+          });
       }
     },
     adminLogin(username) {

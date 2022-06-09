@@ -10,7 +10,11 @@ import Multiselect from "vue-multiselect";
 export default {
   beforeRouteEnter(to, from, next) {
     const userType = store.getters["auth/getUser"].user_type;
-    if (userType === 1 || userType === 3) {
+    const permissions = store.getters["auth/permissions"];
+    if (
+      (userType === 1 || userType === 3) &&
+      permissions.includes("APPLICATION_TRACKING")
+    ) {
       next();
     } else {
       alert("You are not allowed to access this page. You will be redirected.");
@@ -53,7 +57,7 @@ export default {
     },
     fetchRequest() {
       let requestID = this.$route.params.leaveAppID;
-      this.leaveID  = this.$route.params.leaveAppID;
+      this.leaveID = this.$route.params.leaveAppID;
       const url = `${this.ROUTES.leaveApplication}/${requestID}`;
       this.apiGet(url, "Get Leave Application").then((res) => {
         const { application, log, previousApplications } = res.data;
@@ -86,10 +90,10 @@ export default {
         ];
         const { data } = res;
         data.forEach((employee) => {
-            this.officials.push({
-              value: employee.emp_id,
-              text: `${employee.emp_first_name} ${employee.emp_last_name} (${employee.emp_unique_id})`,
-            });
+          this.officials.push({
+            value: employee.emp_id,
+            text: `${employee.emp_first_name} ${employee.emp_last_name} (${employee.emp_unique_id})`,
+          });
         });
       });
     },
@@ -106,10 +110,10 @@ export default {
         ];
         const { data } = res;
         data.forEach((officer) => {
-            this.assignedOfficials.push({
-              value: officer.officers.emp_id,
-              text: `${officer.officers.emp_first_name} ${officer.officers.emp_last_name} (${officer.officers.emp_unique_id})`,
-            });
+          this.assignedOfficials.push({
+            value: officer.officers.emp_id,
+            text: `${officer.officers.emp_first_name} ${officer.officers.emp_last_name} (${officer.officers.emp_unique_id})`,
+          });
         });
       });
     },
@@ -127,14 +131,14 @@ export default {
         params: { leaveAppID: this.leaveAppID },
       });
     },
-    reAssignLeaveApplication(){
+    reAssignLeaveApplication() {
       this.submitted = true;
       let leaveId = this.$route.params.leaveAppID;
       const url = `${this.ROUTES.leaveApplication}/re-assign-leave/${leaveId}`;
       const data = {
         leaveId: leaveId,
         reassignTo: this.reAssignedTo.value,
-        assignedTo:this.assignedTo.value,
+        assignedTo: this.assignedTo.value,
       };
       this.apiPatch(url, data, "Re-assign leave Error").then();
       this.apiResponseHandler("Change effected", "Leave application updated");
@@ -289,9 +293,9 @@ export default {
                 <div class="d-flex justify-content-between mb-3">
                   <span>Employee Name</span>
                   <span>
-                {{ application.employee.emp_first_name }}
-                {{ application.employee.emp_last_name }}
-              </span>
+                    {{ application.employee.emp_first_name }}
+                    {{ application.employee.emp_last_name }}
+                  </span>
                 </div>
                 <div class="d-flex justify-content-between mb-3">
                   <span>Phone No.</span>
@@ -309,11 +313,19 @@ export default {
             </div>
           </div>
           <div class="col-md-4">
-            <div class="card">
+            <div
+              class="card"
+              v-if="permissions.includes('SUPERVISOR_REASSIGNMENT')"
+            >
               <div class="card-body">
-                <div class="p-3 bg-light mb-4 d-flex justify-content-between" style="background: #58181F !important; color:#fff !important;">
+                <div
+                  class="p-3 bg-light mb-4 d-flex justify-content-between"
+                  style="background: #58181f !important; color: #fff !important"
+                >
                   <div class="d-inline mb-0">
-                    <h5 class="font-size-14 mb-0 text-white">Application Re-assignment</h5>
+                    <h5 class="font-size-14 mb-0 text-white">
+                      Application Re-assignment
+                    </h5>
                   </div>
                 </div>
                 <div class="mb-3">
@@ -341,7 +353,7 @@ export default {
                           'is-invalid': submitted && $v.reAssignedTo.$error,
                         }"
                       ></multiselect>
-                      <input type="hidden" v-model="leaveID" >
+                      <input type="hidden" v-model="leaveID" />
                     </div>
                     <div class="form-group d-flex justify-content-center">
                       <b-button
@@ -351,7 +363,11 @@ export default {
                       >
                         Save Changes
                       </b-button>
-                      <b-button v-else disabled class="btn btn-success btn-block mt-4">
+                      <b-button
+                        v-else
+                        disabled
+                        class="btn btn-success btn-block mt-4"
+                      >
                         Saving changes...
                       </b-button>
                     </div>

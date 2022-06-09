@@ -3,10 +3,16 @@ import Layout from "@/views/layouts/main";
 import PageHeader from "@/components/page-header";
 import appConfig from "@/app.config";
 import store from "@/state/store";
+import { authComputed } from "@/state/helpers";
+
 export default {
   beforeRouteEnter(to, from, next) {
     const userType = store.getters["auth/getUser"].user_type;
-    if (userType === 1 || userType === 3) {
+    const permissions = store.getters["auth/permissions"];
+    if (
+      (userType === 1 || userType === 3) &&
+      permissions.includes("SALARY_MAPPING")
+    ) {
       next();
     } else {
       alert("You are not allowed to access this page. You will be redirected.");
@@ -16,6 +22,9 @@ export default {
   page: {
     title: "Salary Mapping Details",
     meta: [{ name: "description", content: appConfig.description }],
+  },
+  computed: {
+    ...authComputed,
   },
   components: {
     Layout,
@@ -234,7 +243,9 @@ export default {
                 <span>
                   <span
                     @click="undoProcessing"
-                    v-if="!undoing"
+                    v-if="
+                      !undoing && permissions.includes('UNDO_SALARY_MAPPING')
+                    "
                     class="mr-2 cursor-pointer text-danger"
                   >
                     Undo Mapping
