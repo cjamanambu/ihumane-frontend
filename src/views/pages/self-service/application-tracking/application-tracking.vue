@@ -179,6 +179,9 @@ export default {
         this.application_totalRows = this.travelApplications.length;
       });
     },
+    yes(){
+      alert('Ok');
+    }
 
   },
   data() {
@@ -410,7 +413,7 @@ export default {
                 </div>
               </b-tab>
               <b-tab>
-                <template v-slot:title >
+                <template v-slot:title @click="yes()">
                   <span class="d-inline-block d-sm-none">
                     <i class="far fa-user"></i>
                   </span>
