@@ -31,10 +31,7 @@ export default {
   },
   async mounted() {
 
-    //await this.getPendingLeaveApplications();
-    //await this.getTimesheet();
-    await this.getSelfAssessmentSubmissions();
-    //this.getTravelApplications()
+    this.switchTab()
   },
   methods: {
     //this.getSelfAssessmentSubmissions();
@@ -133,6 +130,45 @@ export default {
         this.timesheet_totalRows = this.timesheets.length;
       });
     },
+    switchTab(tabName){
+      switch (tabName){
+        case "leave":
+          this.getPendingLeaveApplications();
+          this.leaveTab = true;
+          this.selfTab = false;
+          this.timesheetTab = false;
+          this.travelTab = false;
+          break;
+        case "timesheet":
+          this.getTimesheet();
+          this.timesheetTab = true;
+          this.selfTab = false;
+          this.leaveTab = false;
+          this.travelTab = false;
+          break;
+        case "self":
+          this.getSelfAssessmentSubmissions();
+          this.selfTab = true;
+          this.leaveTab = false;
+          this.timesheetTab = false;
+          this.travelTab = false;
+          break;
+        case "travels":
+          this.getTravelApplications();
+          this.travelTab = true;
+          this.selfTab = false;
+          this.timesheetTab = false;
+          this.leaveTab = false;
+          break;
+        default:
+          this.getPendingLeaveApplications();
+          this.leaveTab = true;
+          this.selfTab = false;
+          this.timesheetTab = false;
+          this.travelTab = false;
+          break;
+      }
+    },
     async getSelfAssessmentSubmissions() {
       const url = `${this.ROUTES.selfAssessment}/get-self-assessments-status/0`;
       this.apiGet(url, "Get Self-assessment Error").then((res) => {
@@ -163,7 +199,7 @@ export default {
       const url = `${this.ROUTES.travelApplication}/get-travel-application-status/0`;
       this.apiGet(url, "Get Travel Application Error").then((res) => {
         const { data } = res;
-        console.log(data);
+        //console.log(data);
         data.forEach((application, serial) => {
           this.travelApplications[serial] = {
             application_no: ++serial,
@@ -203,6 +239,10 @@ export default {
         },
       ],
       applications: [],
+      leaveTab: false,
+      timesheetTab: false,
+      selfTab: false,
+      travelTab: false,
 
       totalRows: 1,
       currentPage: 1,
@@ -338,20 +378,26 @@ export default {
           <div class="card-body">
             <h4 class="card-title">Application Tracking</h4>
             <p class="card-title-desc">Various pending applications</p>
-            <b-tabs
-              justified
-              nav-class="nav-tabs-custom"
-              content-class="p-3 text-muted"
+            <div class="row">
+              <div class="col-md-3">
+                <button class="btn  btn-block btn-light"  @click="switchTab('leave')" >Leave</button>
+              </div>
+              <div class="col-md-3">
+                <button class="btn btn-light btn-block" @click="switchTab('timesheet')" >Timesheet</button>
+              </div>
+              <div class="col-md-3">
+                <button class="btn btn-light btn-block" @click="switchTab('self')" >Self Assessment</button>
+              </div>
+              <div class="col-md-3">
+                <button class="btn btn-light btn-block" @click="switchTab('travels')" >Travels</button>
+              </div>
+            </div>
+            <div id="contentWrapper"
             >
-              <b-tab active>
-                <template v-slot:title>
-                  <span class="d-inline-block d-sm-none">
-                    <i class="fas fa-home"></i>
-                  </span>
-                  <span class="d-none d-sm-inline-block">Leave</span>
-                </template>
+              <div id="leaveWrapper" v-if="leaveTab">
                 <div class="row mt-4">
                   <div class="col-sm-12 col-md-6">
+                    <h5>Leave Applications</h5>
                     <div id="tickets-table_length" class="dataTables_length">
                       <label class="d-inline-flex align-items-center">
                         Show&nbsp;
@@ -420,16 +466,13 @@ export default {
                     </div>
                   </div>
                 </div>
-              </b-tab>
-              <b-tab>
-                <template v-slot:title >
-                  <span class="d-inline-block d-sm-none">
-                    <i class="far fa-user"></i>
-                  </span>
-                  <span class="d-none d-sm-inline-block">Timesheet</span>
-                </template>
-                <div class="row mt-4">
+              </div>
+
+
+              <div v-if="timesheetTab" id="timesheetWrapper">
+                <div class="row mt-4" >
                   <div class="col-12">
+                    <h5>Timesheet Submissions</h5>
                     <div class="card">
                       <div class="card-body">
                         <div class="row mt-4">
@@ -512,19 +555,16 @@ export default {
                     </div>
                   </div>
                 </div>
-              </b-tab>
-              <b-tab>
-                <template v-slot:title>
-                  <span class="d-inline-block d-sm-none">
-                    <i class="far fa-envelope"></i>
-                  </span>
-                  <span class="d-none d-sm-inline-block">Self Assessment</span>
-                </template>
+              </div>
+
+              <div v-if="selfTab" id="selfWrapper">
                 <div class="col-12">
+
                   <div class="card">
                     <div class="card-body">
                       <div class="row mt-4">
                         <div class="col-sm-12 col-md-6">
+                          <h5>Self Assessments</h5>
                           <div
                             id="tickets-table_length11"
                             class="dataTables_length"
@@ -600,19 +640,17 @@ export default {
                     </div>
                   </div>
                 </div>
-              </b-tab>
-              <b-tab>
-                <template v-slot:title>
-                  <span class="d-inline-block d-sm-none">
-                    <i class="fas fa-cog"></i>
-                  </span>
-                  <span class="d-none d-sm-inline-block">Travels</span>
-                </template>
+              </div>
+
+
+              <div v-if="travelTab" id="travelWrapper">
                 <div class="col-12">
+
                   <div class="card">
                     <div class="card-body">
                       <div class="row mt-4">
                         <div class="col-sm-12 col-md-6">
+                          <h5>Travel Applications</h5>
                           <div
                             id="tickets-table_length111"
                             class="dataTables_length"
@@ -689,8 +727,11 @@ export default {
                     </div>
                   </div>
                 </div>
-              </b-tab>
-            </b-tabs>
+              </div>
+
+            </div>
+
+
           </div>
         </div>
       </div>
