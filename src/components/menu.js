@@ -1,7 +1,7 @@
 import store from "@/state/store";
 
 const permissions = store.getters["auth/permissions"];
-// console.log(permissions);
+console.log(permissions);
 
 const menuItems = [
   {
@@ -386,12 +386,14 @@ const menuItems = [
     icon: "ri-team-line",
     link: "/self-assessment/backoffice",
   },
-  {
-    id: 29,
-    label: "Application Tracking",
-    icon: "ri-file-edit-line",
-    link: "/application-tracking",
-  },
+  permissions.includes("APPLICATION_TRACKING")
+    ? {
+        id: 29,
+        label: "Application Tracking",
+        icon: "ri-file-edit-line",
+        link: "/application-tracking",
+      }
+    : {},
   {
     id: 26,
     label: "Payroll Routine",
@@ -458,28 +460,38 @@ const menuItems = [
         ],
       }
     : {},
-  {
-    id: 27,
-    label: "Payroll Journal",
-    icon: "ri-book-2-line",
-    subItems: [
-      {
-        id: 28,
-        label: "Journal Code Setup",
-        link: "/journal-code",
-      },
-      {
-        id: 30,
-        label: "Salary Mappings",
-        link: "/salary-mappings",
-      },
-      {
-        id: 30,
-        label: "Journal Report",
-        link: "/journal-report",
-      },
-    ],
-  },
+  permissions.includes("JOURNAL_CODE_SETUP") ||
+  permissions.includes("SALARY_MAPPING") ||
+  permissions.includes("PAYROLL_JOURNAL")
+    ? {
+        id: 27,
+        label: "Payroll Journal",
+        icon: "ri-book-2-line",
+        subItems: [
+          permissions.includes("JOURNAL_CODE_SETUP")
+            ? {
+                id: 28,
+                label: "Journal Code Setup",
+                link: "/journal-code",
+              }
+            : {},
+          permissions.includes("SALARY_MAPPING")
+            ? {
+                id: 30,
+                label: "Salary Mappings",
+                link: "/salary-mappings",
+              }
+            : {},
+          permissions.includes("PAYROLL_JOURNAL")
+            ? {
+                id: 30,
+                label: "Journal Report",
+                link: "/journal-report",
+              }
+            : {},
+        ],
+      }
+    : {},
   {
     id: 2,
     label: "Reports",

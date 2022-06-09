@@ -7,7 +7,11 @@ import store from "@/state/store";
 export default {
   beforeRouteEnter(to, from, next) {
     const userType = store.getters["auth/getUser"].user_type;
-    if (userType === 1 || userType === 3) {
+    const permissions = store.getters["auth/permissions"];
+    if (
+      (userType === 1 || userType === 3) &&
+      permissions.includes("APPLICATION_TRACKING")
+    ) {
       next();
     } else {
       alert("You are not allowed to access this page. You will be redirected.");
@@ -26,18 +30,16 @@ export default {
     PageHeader,
   },
   async mounted() {
-
     //await this.getPendingLeaveApplications();
     //await this.getTimesheet();
     await this.getSelfAssessmentSubmissions();
     //this.getTravelApplications()
   },
   methods: {
-
-      //this.getSelfAssessmentSubmissions();
-      //this.getTimesheet();
-      //this.getPendingLeaveApplications();
-      //this.getTravelApplications();
+    //this.getSelfAssessmentSubmissions();
+    //this.getTimesheet();
+    //this.getPendingLeaveApplications();
+    //this.getTravelApplications();
 
     async getPendingLeaveApplications() {
       const url = `${this.ROUTES.leaveApplication}/get-leave-applications/0`;
@@ -49,11 +51,11 @@ export default {
             leave_employee: `${leave.employee.emp_first_name} ${leave.employee?.emp_last_name} `,
             current_desk: `${leave.leave_authorizer[index]?.officers.emp_first_name}  ${leave.leave_authorizer[index]?.officers.emp_last_name} (${leave.leave_authorizer[index]?.officers.emp_unique_id} ) `,
             lea_type: `${leave.leave_type?.leave_name}(${leave.leapp_total_days})`,
-            leave_t6:leave.employee.location?.location_name,
-            leave_t3:leave.employee.sector?.department_name,
-            leave_t7:leave.employee?.emp_unique_id,
-            leapp_id:leave.leapp_id,
-            leave_date:new Date(leave.leapp_start_date).toDateString(),
+            leave_t6: leave.employee.location?.location_name,
+            leave_t3: leave.employee.sector?.department_name,
+            leave_t7: leave.employee?.emp_unique_id,
+            leapp_id: leave.leapp_id,
+            leave_date: new Date(leave.leapp_start_date).toDateString(),
             ...leave,
           };
         });
@@ -114,16 +116,16 @@ export default {
           this.timesheets[serial] = {
             serial_no: ++serial,
             timesheet_employee: `${timesheet.employee.emp_first_name} ${timesheet.employee?.emp_last_name} `,
-            timesheet_current_desk: 'Current',//`${leave.leave_authorizer[index].officers.emp_first_name}  `,
-            timesheet_period: `${timesheet.ta_month}-${timesheet.ta_year}`,//`${timesheet.leave_type?.leave_name}(${leave.leapp_total_days})`,
-            timesheet_t6:timesheet.employee.location?.location_name,
-            timesheet_t3:timesheet.employee.sector?.department_name,
-            timesheet_t7:timesheet.employee?.emp_unique_id,
-            ta_id:timesheet.ta_id,
+            timesheet_current_desk: "Current", //`${leave.leave_authorizer[index].officers.emp_first_name}  `,
+            timesheet_period: `${timesheet.ta_month}-${timesheet.ta_year}`, //`${timesheet.leave_type?.leave_name}(${leave.leapp_total_days})`,
+            timesheet_t6: timesheet.employee.location?.location_name,
+            timesheet_t3: timesheet.employee.sector?.department_name,
+            timesheet_t7: timesheet.employee?.emp_unique_id,
+            ta_id: timesheet.ta_id,
             payroll_month: timesheet.ta_month,
             payroll_year: timesheet.ta_year,
             employee: timesheet.ta_emp_id,
-            timesheet_date:new Date(timesheet.createdAt).toDateString(),
+            timesheet_date: new Date(timesheet.createdAt).toDateString(),
             ...timesheet,
           };
         });
@@ -141,15 +143,15 @@ export default {
             self_employee: `${self.employee.emp_first_name} ${self.employee?.emp_last_name} `,
             self_current_desk: `${self.supervisor.emp_first_name} ${self.supervisor.emp_last_name} (${self.supervisor.emp_unique_id} ) `,
             self_goal: `${self.sam_year}`,
-            self_t6:self.employee.location?.location_name,
-            self_t3:self.employee.sector?.department_name,
-            self_t7:self.employee?.emp_unique_id,
-            ta_id:self.sam_id,
-            year:self.sam_year,
+            self_t6: self.employee.location?.location_name,
+            self_t3: self.employee.sector?.department_name,
+            self_t7: self.employee?.emp_unique_id,
+            ta_id: self.sam_id,
+            year: self.sam_year,
             //payroll_month: self.ta_month,
             //payroll_year: self.ta_year,
             empId: self.sam_emp_id,
-            self_date:new Date(self.createdAt).toDateString(),
+            self_date: new Date(self.createdAt).toDateString(),
             ...self,
           };
         });
@@ -160,26 +162,27 @@ export default {
       const url = `${this.ROUTES.travelApplication}/get-travel-application-status/0`;
       this.apiGet(url, "Get Travel Application Error").then((res) => {
         const { data } = res;
-        console.log(data)
+        console.log(data);
         data.forEach((application, serial) => {
           this.travelApplications[serial] = {
             application_no: ++serial,
             application_employee: `${application.applicant.emp_first_name} ${application.applicant?.emp_last_name} `,
             application_current_desk: `${application.authorizers?.officers.emp_first_name} ${application.authorizers?.officers.emp_last_name} (${application.authorizers?.officers.emp_unique_id}) `,
             application_purpose: `${application.travelapp_purpose}`,
-            application_t6:application.applicant.location?.location_name,
-            application_t3:application.applicant.sector?.department_name,
-            application_t7:application.applicant?.emp_unique_id,
+            application_t6: application.applicant.location?.location_name,
+            application_t3: application.applicant.sector?.department_name,
+            application_t7: application.applicant?.emp_unique_id,
             empId: self.sam_emp_id,
-            travelapp_id:application.travelapp_id,
-            application_date:new Date(application.travelapp_start_date).toDateString(),
+            travelapp_id: application.travelapp_id,
+            application_date: new Date(
+              application.travelapp_start_date
+            ).toDateString(),
             ...self,
           };
         });
         this.application_totalRows = this.travelApplications.length;
       });
     },
-
   },
   data() {
     return {
@@ -301,19 +304,23 @@ export default {
         { key: "application_t6", label: "T6", sortable: true },
         { key: "application_t3", label: "T3", sortable: true },
         { key: "application_purpose", label: "Purpose", sortable: true },
-        { key: "application_current_desk", label: "Current Desk", sortable: true },
+        {
+          key: "application_current_desk",
+          label: "Current Desk",
+          sortable: true,
+        },
         { key: "application_date", label: "Start Date", sortable: true },
       ],
-      leaves:[],
-      timesheets:[],
-      selfAssessements:[],
-      travelApplications:[],
-      selfId:null,
-      timesheetId:null,
-      travelId:null,
+      leaves: [],
+      timesheets: [],
+      selfAssessements: [],
+      travelApplications: [],
+      selfId: null,
+      timesheetId: null,
+      travelId: null,
       leaveAppID: null,
       text: "Text here",
-      content:"Content goes here"
+      content: "Content goes here",
     };
   },
 };
@@ -329,7 +336,11 @@ export default {
           <div class="card-body">
             <h4 class="card-title">Application Tracking</h4>
             <p class="card-title-desc">Various pending applications</p>
-            <b-tabs justified nav-class="nav-tabs-custom" content-class="p-3 text-muted">
+            <b-tabs
+              justified
+              nav-class="nav-tabs-custom"
+              content-class="p-3 text-muted"
+            >
               <b-tab active>
                 <template v-slot:title>
                   <span class="d-inline-block d-sm-none">
@@ -389,7 +400,6 @@ export default {
                     select-mode="single"
                     @row-selected="selectRow"
                   >
-
                   </b-table>
                 </div>
                 <div class="row">
@@ -410,7 +420,7 @@ export default {
                 </div>
               </b-tab>
               <b-tab>
-                <template v-slot:title >
+                <template v-slot:title>
                   <span class="d-inline-block d-sm-none">
                     <i class="far fa-user"></i>
                   </span>
@@ -422,7 +432,10 @@ export default {
                       <div class="card-body">
                         <div class="row mt-4">
                           <div class="col-sm-12 col-md-6">
-                            <div id="tickets-table_length1" class="dataTables_length">
+                            <div
+                              id="tickets-table_length1"
+                              class="dataTables_length"
+                            >
                               <label class="d-inline-flex align-items-center">
                                 Show&nbsp;
                                 <b-form-select
@@ -474,7 +487,6 @@ export default {
                             select-mode="single"
                             @row-selected="timesheetSelectRow"
                           >
-
                           </b-table>
                         </div>
                         <div class="row">
@@ -510,7 +522,10 @@ export default {
                     <div class="card-body">
                       <div class="row mt-4">
                         <div class="col-sm-12 col-md-6">
-                          <div id="tickets-table_length11" class="dataTables_length">
+                          <div
+                            id="tickets-table_length11"
+                            class="dataTables_length"
+                          >
                             <label class="d-inline-flex align-items-center">
                               Show&nbsp;
                               <b-form-select
@@ -561,7 +576,6 @@ export default {
                           select-mode="single"
                           @row-selected="selectSelfAssessmentRow"
                         >
-
                         </b-table>
                       </div>
                       <div class="row">
@@ -596,7 +610,10 @@ export default {
                     <div class="card-body">
                       <div class="row mt-4">
                         <div class="col-sm-12 col-md-6">
-                          <div id="tickets-table_length111" class="dataTables_length">
+                          <div
+                            id="tickets-table_length111"
+                            class="dataTables_length"
+                          >
                             <label class="d-inline-flex align-items-center">
                               Show&nbsp;
                               <b-form-select
@@ -647,7 +664,6 @@ export default {
                           select-mode="single"
                           @row-selected="selectTravelRow"
                         >
-
                         </b-table>
                       </div>
                       <div class="row">
@@ -674,7 +690,6 @@ export default {
           </div>
         </div>
       </div>
-
     </div>
   </Layout>
 </template>

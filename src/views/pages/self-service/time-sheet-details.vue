@@ -37,7 +37,7 @@ export default {
     Layout,
     PageHeader,
     VueHtml2pdf,
-    Multiselect
+    Multiselect,
   },
   async mounted() {
     await this.fetchRequest();
@@ -60,7 +60,7 @@ export default {
         this.breakdown = timeAllocation;
         this.log = log;
         this.ref_no = this.allocation.ta_ref_no;
-        localStorage.setItem("ref_no", this.ref_no)
+        localStorage.setItem("ref_no", this.ref_no);
         this.getLocation(this.allocation.employee.emp_location_id);
         this.getSector(this.allocation.employee.emp_department_id);
         this.ta_status = this.allocation.ta_status;
@@ -170,14 +170,14 @@ export default {
     reAssignLabel({ text }) {
       return `${text}`;
     },
-    reAssignLeaveApplication(){
+    reAssignLeaveApplication() {
       this.submitted = true;
       let ref_no = localStorage.getItem("ref_no");
       const url = `${this.ROUTES.timeAllocation}/re-assign-timesheet/${ref_no}`;
       const data = {
         ref_no: ref_no,
         reassignTo: this.reAssignedTo.value,
-        assignedTo:this.assignedTo.value,
+        assignedTo: this.assignedTo.value,
       };
       this.apiPatch(url, data, "Re-assign timesheet Error").then();
       this.apiResponseHandler("Change effected", "Timesheet re-assigned");
@@ -535,11 +535,22 @@ export default {
             </div>
           </div>
         </div>
-        <div class="card" v-if="this.ta_status === 0">
+        <div
+          class="card"
+          v-if="
+            this.ta_status === 0 &&
+            permissions.includes('SUPERVISOR_REASSIGNMENT')
+          "
+        >
           <div class="card-body">
-            <div class="p-3 bg-light mb-4 d-flex justify-content-between" style="background: #58181F !important; color:#fff !important;">
+            <div
+              class="p-3 bg-light mb-4 d-flex justify-content-between"
+              style="background: #58181f !important; color: #fff !important"
+            >
               <div class="d-inline mb-0">
-                <h5 class="font-size-14 mb-0 text-white">Application Re-assignment</h5>
+                <h5 class="font-size-14 mb-0 text-white">
+                  Application Re-assignment
+                </h5>
               </div>
             </div>
             <div class="mb-3">
@@ -552,8 +563,8 @@ export default {
                     :options="assignedOfficials"
                     :custom-label="employeeLabel"
                     :class="{
-                          'is-invalid': submitted && $v.assignedTo.$error,
-                        }"
+                      'is-invalid': submitted && $v.assignedTo.$error,
+                    }"
                   ></multiselect>
                 </div>
                 <div class="form-group">
@@ -564,10 +575,10 @@ export default {
                     :options="employeeList"
                     :custom-label="reAssignLabel"
                     :class="{
-                          'is-invalid': submitted && $v.reAssignedTo.$error,
-                        }"
+                      'is-invalid': submitted && $v.reAssignedTo.$error,
+                    }"
                   ></multiselect>
-                  <input type="hidden" v-model="timesheetId" >
+                  <input type="hidden" v-model="timesheetId" />
                 </div>
                 <div class="form-group d-flex justify-content-center">
                   <b-button
@@ -577,7 +588,11 @@ export default {
                   >
                     Save Changes
                   </b-button>
-                  <b-button v-else disabled class="btn btn-success btn-block mt-4">
+                  <b-button
+                    v-else
+                    disabled
+                    class="btn btn-success btn-block mt-4"
+                  >
                     Saving changes...
                   </b-button>
                 </div>
@@ -585,7 +600,6 @@ export default {
             </div>
           </div>
         </div>
-
       </div>
     </div>
     <VueHtml2pdf
@@ -746,51 +760,55 @@ export default {
                     <div class="table-responsive">
                       <table class="table mb-0">
                         <thead>
-                        <tr>
-                          <th>#</th>
-                          <th>Officer</th>
-                          <th>Status</th>
-                          <th>Comment</th>
-                          <th>Date</th>
-                        </tr>
+                          <tr>
+                            <th>#</th>
+                            <th>Officer</th>
+                            <th>Status</th>
+                            <th>Comment</th>
+                            <th>Date</th>
+                          </tr>
                         </thead>
                         <tbody>
-                        <tr
-                          class="table-light"
-                          v-for="(off, ind) in this.log"
-                          :key="ind"
-                        >
-                          <th scope="row">{{ ind + 1 }}</th>
-                          <td>
-                            {{
-                              off.officers.emp_first_name
-                                ? off.officers.emp_first_name
-                                : ""
-                            }}
-                            {{
-                              off.officers.emp_last_name
-                                ? off.officers.emp_last_name
-                                : ""
-                            }}
-                          </td>
-                          <td>
-                            <small
-                              v-if="off.auth_status === 1"
-                              class="text-success"
-                            >
-                              Approved
-                            </small>
-                            <small
-                              v-else-if="off.auth_status === 2"
-                              class="text-danger"
-                            >
-                              Discarded
-                            </small>
-                            <small v-else class="text-warning"> Pending </small>
-                          </td>
-                          <td>{{ off.auth_comment }}</td>
-                          <td>{{ new Date(off.updatedAt).toDateString() }}</td>
-                        </tr>
+                          <tr
+                            class="table-light"
+                            v-for="(off, ind) in this.log"
+                            :key="ind"
+                          >
+                            <th scope="row">{{ ind + 1 }}</th>
+                            <td>
+                              {{
+                                off.officers.emp_first_name
+                                  ? off.officers.emp_first_name
+                                  : ""
+                              }}
+                              {{
+                                off.officers.emp_last_name
+                                  ? off.officers.emp_last_name
+                                  : ""
+                              }}
+                            </td>
+                            <td>
+                              <small
+                                v-if="off.auth_status === 1"
+                                class="text-success"
+                              >
+                                Approved
+                              </small>
+                              <small
+                                v-else-if="off.auth_status === 2"
+                                class="text-danger"
+                              >
+                                Discarded
+                              </small>
+                              <small v-else class="text-warning">
+                                Pending
+                              </small>
+                            </td>
+                            <td>{{ off.auth_comment }}</td>
+                            <td>
+                              {{ new Date(off.updatedAt).toDateString() }}
+                            </td>
+                          </tr>
                         </tbody>
                       </table>
                     </div>
@@ -810,27 +828,27 @@ export default {
                 <div class="d-flex justify-content-between mb-3">
                   <span>Employee Name</span>
                   <span>
-                {{ this.allocation.employee.emp_first_name }}
-                {{ this.allocation.employee.emp_last_name }}
-              </span>
+                    {{ this.allocation.employee.emp_first_name }}
+                    {{ this.allocation.employee.emp_last_name }}
+                  </span>
                 </div>
                 <div class="d-flex justify-content-between mb-3">
                   <span>Phone No.</span>
                   <span>
-                {{ this.allocation.employee.emp_phone_no }}
-              </span>
+                    {{ this.allocation.employee.emp_phone_no }}
+                  </span>
                 </div>
                 <div class="d-flex justify-content-between mb-3">
                   <span>Office Email</span>
                   <span>
-                {{ this.allocation.employee.emp_office_email }}
-              </span>
+                    {{ this.allocation.employee.emp_office_email }}
+                  </span>
                 </div>
                 <div class="d-flex justify-content-between mb-3">
                   <span>T7 Number</span>
                   <span>
-                {{ this.allocation.employee.emp_unique_id }}
-              </span>
+                    {{ this.allocation.employee.emp_unique_id }}
+                  </span>
                 </div>
                 <div class="d-flex justify-content-between mb-3">
                   <span>T3 Code</span>
