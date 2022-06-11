@@ -332,12 +332,13 @@ export default {
                   </div>
                   <div class="form-group">
                     <label>Bank</label>
-                    <b-form-select v-model="emp_bank_id" :options="banks" />
+                    <b-form-select disabled v-model="emp_bank_id" :options="banks" />
                   </div>
 
                   <div class="form-group">
-                    <label for=""> Account Number </label>
+                    <label for=""> Account Number</label>
                     <input
+                      readonly
                       type="text"
                       class="form-control"
                       v-model="emp_account_no"
