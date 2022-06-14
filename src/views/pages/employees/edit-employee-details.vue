@@ -36,6 +36,9 @@ export default {
     this.getLocalGovernmentAreas();
     this.getSectors();
     this.getEmployees();
+    this.getOperationUnits();
+    this.getReportingEntities();
+    this.getFunctionalArea();
   },
   validations: {
     location: { required },
@@ -85,6 +88,69 @@ export default {
         });
       });
     },
+    getOperationUnits() {
+      const url = `${this.ROUTES.employee}/get-d-codes/d4`;
+      this.apiGet(url).then((res) => {
+        const { data } = res;
+        this.d4_list = [{ value: null, text: "Please select D4" }];
+        data.forEach(async (datum) => {
+          const dat = {
+            value: datum.ou_id,
+            text: datum.ou_name,
+          };
+          if (parseInt(datum.ou_id) === parseInt(this.d4_id)) {
+            const val = {
+              value: datum.ou_id,
+              text: datum.ou_name,
+            };
+            this.selected_d4.push(val);
+          }
+          this.d4_list.push(dat);
+        });
+      });
+    },
+    getReportingEntities() {
+      const url = `${this.ROUTES.employee}/get-d-codes/d5`;
+      this.apiGet(url).then((res) => {
+        const { data } = res;
+        this.d5_list = [{ value: null, text: "Please select D5" }];
+        data.forEach(async (datum) => {
+          const dat = {
+            value: datum.re_id,
+            text: datum.ou_name,
+          };
+          if (parseInt(datum.re_id) === parseInt(this.d5_id)) {
+            const val = {
+              value: datum.re_id,
+              text: datum.re_name,
+            };
+            this.selected_d5.push(val);
+          }
+          this.d5_list.push(dat);
+        });
+      });
+    },
+    getFunctionalArea() {
+      const url = `${this.ROUTES.employee}/get-d-codes/d6`;
+      this.apiGet(url).then((res) => {
+        const { data } = res;
+        this.d6_list = [{ value: null, text: "Please select D6" }];
+        data.forEach(async (datum) => {
+          const dat = {
+            value: datum.fa_id,
+            text: datum.fa_name,
+          };
+          if (parseInt(datum.fa_id) === parseInt(this.d6_id)) {
+            const val = {
+              value: datum.fa_id,
+              text: datum.fa_name,
+            };
+            this.selected_d6.push(val);
+          }
+          this.d6_list.push(dat);
+        });
+      });
+    },
     async updateEmployee() {
       this.submitted = true;
       let employeeID = this.$route.params.employeeID;
@@ -130,6 +196,11 @@ export default {
         emp_paye_no: this.emp_paye,
         emp_nin: this.emp_nin,
         emp_department_id: this.sector.value,
+
+        emp_d4: this.selected_d4.value,
+        emp_d5: this.selected_d5.value,
+        emp_d6: this.selected_d6.value,
+        emp_d7: this.d7,
       };
       //console.log(data)
       this.apiPatch(url, data, "Update Employee Error").then();
@@ -234,6 +305,11 @@ export default {
           this.emp_passport = data.emp_passport;
           this.emp_sector = data.sector?.department_id;
           this.emp_sector_text = data.sector?.department_name;
+          this.d4_id = data.emp_d4;
+          this.d5_id = data.emp_d5;
+          this.d6_id = data.emp_d6;
+          this.d7 = data.emp_d7;
+          //console.log("D4 Selected: "+this.selected_d4)
           switch (parseInt(data.emp_religion)) {
             case 1:
               this.religion_text = "Christianity";
@@ -436,6 +512,20 @@ export default {
 
       state: [],
       states: [],
+
+      d7: null,
+      d4_list: [],
+      d4_id: null,
+      selected_d4: [],
+
+      d5_list: [],
+      d5_id: null,
+      selected_d5: [],
+
+      d6_list: [],
+      d6_id: null,
+      selected_d6: [],
+
       state_id: null,
 
       job_role: [],
@@ -891,6 +981,50 @@ export default {
                         v-model="emp_bvn"
                         placeholder="BVN"
                       />
+                    </div>
+                    <div class="p-3 bg-light mb-4">
+                      <h5 class="font-size-14 mb-0">
+                        D Codes
+                      </h5>
+                    </div>
+                    <div class="form-group">
+                      <label for=""> D7 </label>
+                      <input
+                        type="text"
+                        class="form-control"
+                        v-model="d7"
+                        placeholder="D7"
+                      />
+                    </div>
+
+                    <div class="form-group">
+                      <label for=""> D4 </label>
+                      <multiselect
+                        v-model="selected_d4"
+                        :options="d4_list"
+                        :custom-label="bankLabel"
+                      >
+                      </multiselect>
+                    </div>
+                    <div class="form-group">
+                      <label for=""> D5 </label>
+                      <multiselect
+                        v-model="selected_d5"
+                        :options="d5_list"
+                        :custom-label="bankLabel"
+                      >
+                      </multiselect>
+
+                    </div>
+
+                    <div class="form-group">
+                      <label>D6</label>
+                      <multiselect
+                        v-model="selected_d6"
+                        :options="d6_list"
+                        :custom-label="bankLabel"
+                      >
+                      </multiselect>
                     </div>
                   </div>
                 </div>

@@ -140,6 +140,10 @@ export default {
           this.emp_passport = data.emp_passport;
           this.emp_sector = data.sector?.department_id;
           this.emp_sector_text = data.sector?.department_name;
+          this.emp_d4 = data.operationUnit?.ou_name;
+          this.emp_d5 = data.reportingEntity?.re_name;
+          this.emp_d6 = data.functionalArea?.fa_name;
+          this.emp_d7 = data.emp_d7;
           switch (parseInt(data.emp_religion)) {
             case 1:
               this.religion_text = "Christianity";
@@ -437,6 +441,11 @@ export default {
 
       job_role: [],
       job_roles: [],
+
+      emp_d4:null,
+      emp_d5:null,
+      emp_d6:null,
+      emp_d7:null,
 
       job_role_id: null,
       bank_text: null,
@@ -959,6 +968,33 @@ export default {
                     </div>
 
                     <div class="col-md-6">
+                      <h5 class="font-size-14 text-uppercase mt-3">
+                        D Codes:
+                      </h5>
+                      <h5 class="mt-2">
+                        <span class="text-success font-size-12 ms-2">
+                          <span class="text-muted">D7: </span
+                          >{{ emp_d7 }}</span
+                        >
+                      </h5>
+                      <h5 class="mt-2">
+                        <span class="text-success font-size-12 ms-2">
+                          <span class="text-muted">D4: </span
+                          >{{ emp_d4 }}</span
+                        >
+                      </h5>
+                      <h5 class="mt-2">
+                        <span class="text-success font-size-12 ms-2">
+                          <span class="text-muted">D5: </span
+                          >{{ emp_d5 }}</span
+                        >
+                      </h5>
+                      <h5 class="mt-2">
+                        <span class="text-success font-size-12 ms-2">
+                          <span class="text-muted">D6: </span
+                          >{{ emp_d6 }}</span
+                        >
+                      </h5>
                       <h5 class="font-size-14 text-uppercase mt-3">
                         Next of Kin:
                       </h5>
