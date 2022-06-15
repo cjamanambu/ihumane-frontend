@@ -117,7 +117,7 @@ export default {
         data.forEach(async (datum) => {
           const dat = {
             value: datum.re_id,
-            text: datum.ou_name,
+            text: datum.re_name,
           };
           if (parseInt(datum.re_id) === parseInt(this.d5_id)) {
             const val = {
