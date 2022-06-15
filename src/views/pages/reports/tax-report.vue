@@ -49,6 +49,7 @@ export default {
           let taxObj = {
             sn: ++index,
             t7: tax.employeeUniqueId,
+            d7: tax.employeeD7,
             employeeName: tax.employeeName,
             sector: tax.sector,
             t6: tax.location,
@@ -74,7 +75,9 @@ export default {
         if (key === "sn") {
           this.jsonFields["S/N"] = key;
         } else if (key === "t7") {
-          this.jsonFields["T7 NUMBER"] = key;
+          this.jsonFields["T7"] = key;
+        } else if (key === "d7") {
+          this.jsonFields["D7"] = key;
         } else if (key === "employeeName") {
           this.jsonFields["NAME"] = key;
         } else if (key === "sector") {
@@ -164,6 +167,7 @@ export default {
       newFields: [
         "sn",
         "t7",
+        "d7",
         "employeeName",
         "sector",
         "t6",
