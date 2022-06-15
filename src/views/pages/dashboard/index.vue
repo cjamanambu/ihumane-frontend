@@ -316,13 +316,19 @@ export default {
                       </small>
                     </span>
                   </p>
-                  <p v-if="this.getEmployee" class="d-flex">
+                  <p v-if="this.getEmployee" class="d-flex mb-0">
                     <span class="mr-2">Sector (T3):</span>
                     <span>
                       {{ this.getEmployee.sector.d_t3_code }}
                       <small class="text-muted">
                         ({{ this.getEmployee.sector.department_name }})
                       </small>
+                    </span>
+                  </p>
+                  <p class="d-flex">
+                    <span class="mr-2">Global ID (D7):</span>
+                    <span>
+                      {{ this.getEmployee.emp_d7 }}
                     </span>
                   </p>
                 </div>
@@ -481,13 +487,19 @@ export default {
                     </small>
                   </span>
                 </p>
-                <p class="d-flex">
+                <p class="d-flex mb-0">
                   <span class="mr-2">Sector (T3):</span>
                   <span>
                     {{ this.getEmployee.sector.d_t3_code }}
                     <small class="text-muted">
                       ({{ this.getEmployee.sector.department_name }})
                     </small>
+                  </span>
+                </p>
+                <p class="d-flex">
+                  <span class="mr-2">Global ID (D7):</span>
+                  <span>
+                    {{ this.getEmployee.emp_d7 }}
                   </span>
                 </p>
                 <p class="text-muted mb-0">
