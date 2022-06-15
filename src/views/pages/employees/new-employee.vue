@@ -30,6 +30,9 @@ export default {
     this.fetchLocations();
     this.fetchPositions();
     this.fetchBanks();
+    this.getOperationUnits();
+    this.getReportingEntities();
+    this.getFunctionalArea();
   },
   validations: {
     location: { required },
@@ -103,6 +106,49 @@ export default {
         });
       });
     },
+    getOperationUnits() {
+      const url = `${this.ROUTES.employee}/get-d-codes/d4`;
+      this.apiGet(url).then((res) => {
+        const { data } = res;
+        this.d4_list = [{ value: null, text: "Please select D4" }];
+        data.forEach(async (datum) => {
+          const dat = {
+            value: datum.ou_id,
+            text: datum.ou_name,
+          };
+          this.d4_list.push(dat);
+        });
+      });
+    },
+    getReportingEntities() {
+      const url = `${this.ROUTES.employee}/get-d-codes/d5`;
+      this.apiGet(url).then((res) => {
+        const { data } = res;
+        this.d5_list = [{ value: null, text: "Please select D5" }];
+        data.forEach(async (datum) => {
+          const dat = {
+            value: datum.re_id,
+            text: datum.re_name,
+          };
+
+          this.d5_list.push(dat);
+        });
+      });
+    },
+    getFunctionalArea() {
+      const url = `${this.ROUTES.employee}/get-d-codes/d6`;
+      this.apiGet(url).then((res) => {
+        const { data } = res;
+        this.d6_list = [{ value: null, text: "Please select D6" }];
+        data.forEach(async (datum) => {
+          const dat = {
+            value: datum.fa_id,
+            text: datum.fa_name,
+          };
+          this.d6_list.push(dat);
+        });
+      });
+    },
     submitNew() {
       this.submitted = true;
       this.$v.$touch();
@@ -121,6 +167,11 @@ export default {
           bank: this.bank.value,
           phone_no: this.telephone,
           other_name: this.other_name,
+
+          emp_d4: this.selected_d4.value,
+          emp_d5: this.selected_d5.value,
+          emp_d6: this.selected_d6.value,
+          emp_d7: this.d7,
         };
         const url = `${this.ROUTES.employee}/employee-enrollment`;
         this.apiPost(url, data, "Employee Enrollment Error").then((res) => {
@@ -151,6 +202,19 @@ export default {
           active: true,
         },
       ],
+      d7: null,
+      d4_list: [],
+      d4_id: null,
+      selected_d4: [],
+
+      d5_list: [],
+      d5_id: null,
+      selected_d5: [],
+
+      d6_list: [],
+      d6_id: null,
+      selected_d6: [],
+
       location: null,
       position: null,
       bank: null,
@@ -374,6 +438,75 @@ export default {
                           name="nuban"
                           placeholder="Account Number"
                         />
+                      </div>
+                    </div>
+                  </div>
+                  <!-- end col -->
+                </div>
+                <div class="row">
+                  <div class="col-6">
+                    <div class="form-group row mb-3">
+                      <label class="col-md-3 col-form-label" for="firstName"
+                        >D7</label
+                      >
+                      <div class="col-md-9">
+                        <input
+                          id="d7"
+                          type="text"
+                          v-model="d7"
+                          class="form-control"
+                          name="d7"
+                          placeholder="Enter D7"
+                        />
+                      </div>
+                    </div>
+
+                    <div class="form-group row mb-3">
+                      <label class="col-md-3 col-form-label" for="otherName"
+                        >D4 <small>(Operating Unit)</small></label
+                      >
+                      <div class="col-md-9">
+                        <multiselect
+                          v-model="selected_d4"
+                          :options="d4_list"
+                          :custom-label="bankLabel"
+                          :class="{
+                            'is-invalid': submitted && $v.bank.$error,
+                          }"
+                        ></multiselect>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="col-6">
+                    <div class="form-group row mb-3">
+                      <label class="col-md-3 col-form-label" for="firstName"
+                        >D5 <small>(Reporting Entity)</small></label
+                      >
+                      <div class="col-md-9">
+                        <multiselect
+                          v-model="selected_d5"
+                          :options="d5_list"
+                          :custom-label="locationLabel"
+                          :class="{
+                            'is-invalid': submitted && $v.location.$error,
+                          }"
+                        ></multiselect>
+                      </div>
+                    </div>
+                    <div class="form-group row mb-3">
+                      <label class="col-md-3 col-form-label" for="lastName"
+                        >D6 <small>(Functional Area)</small></label
+                      >
+                      <div class="col-md-9">
+                        <multiselect
+                          v-model="selected_d6"
+                          :options="d6_list"
+                          :custom-label="locationLabel"
+                          :class="{
+                            'is-invalid': submitted && $v.location.$error,
+                          }"
+                        ></multiselect>
                       </div>
                     </div>
                   </div>
