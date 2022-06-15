@@ -46,8 +46,10 @@ export default {
         this.newFields.forEach((newField) => {
           if (newField === "sn") {
             this.jsonFields["S/N"] = newField;
-          } else if (newField === "t7_number") {
-            this.jsonFields["T7 NUMBER"] = "employeeUniqueId";
+          } else if (newField === "t7") {
+            this.jsonFields["T7"] = "employeeUniqueId";
+          } else if (newField === "d7") {
+            this.jsonFields["D7"] = "employeeD7";
           } else if (newField === "employeeName") {
             this.jsonFields["EMPLOYEE NAME"] = newField;
           } else if (newField === "netSalary") {
@@ -79,6 +81,7 @@ export default {
           let emolumentObj = {
             sn: ++index,
             employeeUniqueId: emolument.employeeUniqueId,
+            employeeD7: emolument.employeeD7,
             employeeName: emolument.employeeName,
             location: emolument.location,
             sector: emolument.sector,
@@ -188,7 +191,7 @@ export default {
       sortDesc: false,
       newFields: [
         "sn",
-        "t7_number",
+        "t7",
         "d7",
         "employeeName",
         "sector",
@@ -314,13 +317,15 @@ export default {
                     {{ row.value }}
                   </span>
                 </template>
-                <template #cell(t7_number)="row">
+                <template #cell(t7)="row">
                   <span>
                     {{ row.item.employeeUniqueId }}
                   </span>
                 </template>
-                <template #cell(d7)="">
-                  <span> </span>
+                <template #cell(d7)="row">
+                  <span>
+                    {{ row.item.employeeD7 }}
+                  </span>
                 </template>
                 <template #cell(employeeName)="row">
                   <span class="text-nowrap">

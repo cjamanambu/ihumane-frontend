@@ -49,7 +49,8 @@ export default {
           //   if(typeof pensionArray[0])
           let pensionObj = {
             sn: ++index,
-            employee_unique_id: pension.employeeUniqueId,
+            t7: pension.employeeUniqueId,
+            d7: pension.employeeD7,
             employeeName: pension.employeeName,
             sector: pension.sector,
             location: pension.location,
@@ -85,8 +86,10 @@ export default {
         let key = field;
         if (key === "sn") {
           this.jsonFields["S/N"] = key;
-        } else if (key === "employee_unique_id") {
-          this.jsonFields["T7 NUMBER"] = key;
+        } else if (key === "t7") {
+          this.jsonFields["T7"] = key;
+        } else if (key === "d7") {
+          this.jsonFields["D7"] = key;
         } else if (key === "employeeName") {
           this.jsonFields["NAME"] = key;
         } else if (key === "sector") {
@@ -181,7 +184,8 @@ export default {
       sortDesc: false,
       newFields: [
         "sn",
-        "employee_unique_id",
+        "t7",
+        "d7",
         "employeeName",
         "sector",
         "location",
@@ -313,7 +317,12 @@ export default {
                     {{ row.value }}
                   </span>
                 </template>
-                <template #cell(employee_unique_id)="row">
+                <template #cell(t7)="row">
+                  <span>
+                    {{ row.value }}
+                  </span>
+                </template>
+                <template #cell(d7)="row">
                   <span>
                     {{ row.value }}
                   </span>
