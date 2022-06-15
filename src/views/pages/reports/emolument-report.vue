@@ -4,6 +4,7 @@ import PageHeader from "@/components/page-header";
 import appConfig from "@/app.config";
 import JsonExcel from "vue-json-excel";
 import store from "@/state/store";
+import { authComputed } from "@/state/helpers";
 export default {
   beforeRouteEnter(to, from, next) {
     const userType = store.getters["auth/getUser"].user_type;
@@ -13,6 +14,9 @@ export default {
       alert("You are not allowed to access this page. You will be redirected.");
       next("/");
     }
+  },
+  computed: {
+    ...authComputed,
   },
   page: {
     title: "Emolument Report",
@@ -185,6 +189,7 @@ export default {
       newFields: [
         "sn",
         "t7_number",
+        "d7",
         "employeeName",
         "sector",
         "location",
@@ -313,6 +318,9 @@ export default {
                   <span>
                     {{ row.item.employeeUniqueId }}
                   </span>
+                </template>
+                <template #cell(d7)="">
+                  <span> </span>
                 </template>
                 <template #cell(employeeName)="row">
                   <span class="text-nowrap">
