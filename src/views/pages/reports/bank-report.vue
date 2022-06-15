@@ -46,6 +46,7 @@ export default {
             let payOrderObj = {
               sn: ++index,
               employeeUniqueId: payOrder.employeeUniqueId,
+              employeeD7: payOrder.employeeD7,
               employeeName: payOrder.employeeName,
               location: payOrder.locationCode,
               sector: payOrder.sectorCode,
@@ -66,8 +67,10 @@ export default {
           this.newFields.forEach((newField) => {
             if (newField === "sn") {
               this.jsonFields["S/N"] = newField;
-            } else if (newField === "t7_number") {
-              this.jsonFields["T7 NUMBER"] = "employeeUniqueId";
+            } else if (newField === "t7") {
+              this.jsonFields["T7"] = "employeeUniqueId";
+            } else if (newField === "d7") {
+              this.jsonFields["D7"] = "employeeD7";
             } else if (newField === "t6_code") {
               this.jsonFields["LOCATION"] = "location";
             } else if (newField === "t3_code") {
@@ -159,7 +162,8 @@ export default {
       sortDesc: false,
       newFields: [
         "sn",
-        "t7_number",
+        "t7",
+        "d7",
         "t6_code",
         "t3_code",
         "employeeName",
@@ -288,9 +292,14 @@ export default {
                     {{ row.value }}
                   </span>
                 </template>
-                <template #cell(t7_number)="row">
+                <template #cell(t7)="row">
                   <span>
                     {{ row.item.employeeUniqueId }}
+                  </span>
+                </template>
+                <template #cell(d7)="row">
+                  <span>
+                    {{ row.item.employeeD7 }}
                   </span>
                 </template>
                 <template #cell(employeeName)="row">
