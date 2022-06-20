@@ -212,6 +212,11 @@ export default {
                 entryObj.display = "block";
                 calendarApi.addEvent(entryObj);
                 break;
+              case 4: // employee absent
+                entryObj.title = `LEAVE`;
+                entryObj.display = "block";
+                calendarApi.addEvent(entryObj);
+                break;
               case 1: // employee present
                 entryObj.title = `${this.tConvert(
                   entry.ts_start
