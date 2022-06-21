@@ -37,6 +37,7 @@ export default {
         let count = 0;
         const { data, officers } = res.data;
         data.forEach((time) => {
+          console.log({ data });
           let found = false;
           if (this.applications.length === 0) {
             this.applications.push({
@@ -53,7 +54,7 @@ export default {
                 },
               ],
               status: time.ta_status ? time.ta_status : 0,
-              employee: time.Employee,
+              employee: time.employee,
             });
           } else {
             this.applications.every((application) => {
@@ -84,7 +85,7 @@ export default {
                   },
                 ],
                 status: time.ta_status ? time.ta_status : 0,
-                employee: time.Employee,
+                employee: time.employee,
               });
             }
           }

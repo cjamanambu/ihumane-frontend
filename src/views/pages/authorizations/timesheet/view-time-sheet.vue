@@ -490,26 +490,26 @@ export default {
             <div class="d-flex justify-content-between mb-3">
               <span>Employee Name</span>
               <span>
-                {{ this.allocation.Employee.emp_first_name }}
-                {{ this.allocation.Employee.emp_last_name }}
+                {{ this.allocation.employee.emp_first_name }}
+                {{ this.allocation.employee.emp_last_name }}
               </span>
             </div>
             <div class="d-flex justify-content-between mb-3">
               <span>T7 Number</span>
               <span>
-                {{ this.allocation.Employee.emp_unique_id }}
+                {{ this.allocation.employee.emp_unique_id }}
               </span>
             </div>
             <div class="d-flex justify-content-between mb-3">
               <span>Phone No.</span>
               <span>
-                {{ this.allocation.Employee.emp_phone_no }}
+                {{ this.allocation.employee.emp_phone_no }}
               </span>
             </div>
             <div class="d-flex justify-content-between mb-3">
               <span>Office Email</span>
               <span>
-                {{ this.allocation.Employee.emp_office_email }}
+                {{ this.allocation.employee.emp_office_email }}
               </span>
             </div>
             <div class="d-flex justify-content-between mb-3">
