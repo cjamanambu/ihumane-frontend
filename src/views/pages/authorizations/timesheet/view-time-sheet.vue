@@ -71,9 +71,6 @@ export default {
             this.my_status = this.log[i].auth_status;
           }
         }
-        console.log("here");
-        console.log(this.ta_status);
-        console.log(this.my_status);
         this.fetchEmployees();
       });
     },
@@ -181,10 +178,9 @@ export default {
       this.apiGet(this.ROUTES.employee, "Get Employees Error").then((res) => {
         this.officials = [];
         const { data } = res;
-        console.log(data);
         data.forEach((employee) => {
           if (
-            employee.emp_id !== this.allocation.Employee.emp_id &&
+            employee.emp_id !== this.allocation.employee.emp_id &&
             employee.emp_id !== this.getEmployee.emp_id
           ) {
             this.officials.push({

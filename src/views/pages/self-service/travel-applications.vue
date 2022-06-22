@@ -34,6 +34,7 @@ export default {
     refreshTable() {
       const url = `${this.ROUTES.travelApplication}`;
       this.apiGet(url, "Get Travel Applications Error").then((res) => {
+        console.log({ res });
         const { data, officers } = res.data;
         //console.log({ res });
         data.forEach((application, index) => {
@@ -48,6 +49,7 @@ export default {
             }
           });
         });
+        console.log(this.applications);
         this.totalRows = this.applications.length;
       });
     },
