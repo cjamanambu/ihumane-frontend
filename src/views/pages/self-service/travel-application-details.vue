@@ -40,7 +40,7 @@ export default {
   },
   methods: {
     fetchRequest() {
-      let requestID = this.$route.params.travelAppID;
+      let requestID = this.$route.params.id;
       localStorage.setItem("travelId", requestID);
       const url = `${this.ROUTES.travelApplication}/${requestID}`;
       this.apiGet(url, "Get Travel Application").then((res) => {
@@ -106,14 +106,14 @@ export default {
         });
       });
     },
-    reAssignLeaveApplication(){
+    reAssignLeaveApplication() {
       this.submitted = true;
       let requestID = localStorage.getItem("travelId");
       const url = `${this.ROUTES.travelApplication}/re-assign-travel-application/${requestID}`;
       const data = {
         appId: requestID,
         reassignTo: this.reAssignedTo.value,
-        assignedTo:this.assignedTo.value,
+        assignedTo: this.assignedTo.value,
       };
       this.apiPatch(url, data, "Re-assign travel  Error").then();
       this.apiResponseHandler("Change effected", "Travel application updated");
