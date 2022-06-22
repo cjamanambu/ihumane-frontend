@@ -45,8 +45,8 @@ export default {
       let empId = this.$route.params.empId;
       const url = `${this.ROUTES.timesheet}/time-sheet/${month}/${year}/${empId}`;
       this.apiGet(url, "Get Time sheet authorization").then(async (res) => {
-        console.log({ res });
         const { timesheet, timeAllocation, log } = res.data;
+        console.log({ timeAllocation });
         this.timeSheet = timesheet;
         this.numAbsents = 0;
         await this.timeSheet.forEach((timesheet) => {
@@ -55,7 +55,7 @@ export default {
           }
         });
         if (this.numAbsents > 0) {
-          this.currentEmployee = timeAllocation[0].Employee;
+          this.currentEmployee = timeAllocation[0].employee;
           this.defaultCharge =
             (parseInt(this.currentEmployee.emp_gross) / 22) * this.numAbsents;
         }
@@ -63,14 +63,17 @@ export default {
         this.allocation = timeAllocation[0];
         this.log = log;
         this.ref_no = this.allocation.ta_ref_no;
-        this.getLocation(this.allocation.Employee.emp_location_id);
-        this.getSector(this.allocation.Employee.emp_job_role_id);
+        this.getLocation(this.allocation.employee.emp_location_id);
+        this.getSector(this.allocation.employee.emp_job_role_id);
         this.ta_status = this.allocation.ta_status;
         for (let i = 0; i < this.log.length; i++) {
           if (this.log[i].auth_officer_id === this.getEmployee.emp_id) {
             this.my_status = this.log[i].auth_status;
           }
         }
+        console.log("here");
+        console.log(this.ta_status);
+        console.log(this.my_status);
         this.fetchEmployees();
       });
     },
