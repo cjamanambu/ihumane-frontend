@@ -44,9 +44,14 @@ export default {
         const { data } = res;
         const newData = await this.sortArrayOfObjects(data);
         newData.forEach((employee, index) => {
+          console.log({ employee });
           let employeeObj = {
             sn: ++index,
             emp_unique_id: employee.emp_unique_id,
+            d4: employee.emp_d4,
+            d5: employee.emp_d5,
+            d6: employee.emp_d6,
+            d7: employee.emp_d7,
             emp_first_name: employee.emp_first_name,
             emp_other_name: employee.emp_other_name,
             emp_last_name: employee.emp_last_name,
@@ -71,13 +76,15 @@ export default {
               ? `${new Date(employee.emp_contract_end_date).toDateString()}`
               : null,
             stop_date: employee.emp_stop_date
-              ? `${new Date(employee.emp_stop_date)}`
+              ? `${new Date(employee.emp_stop_date).toDateString()}`
               : null,
             employment_date: employee.emp_employment_date
-              ? `${new Date(employee.emp_employment_date)}`
+              ? `${new Date(employee.emp_employment_date).toDateString()}`
               : null,
             suspension_reason: employee.emp_suspension_reason,
-            dob: employee.emp_dob ? `${new Date(employee.emp_dob)}` : null,
+            dob: employee.emp_dob
+              ? `${new Date(employee.emp_dob).toDateString()}`
+              : null,
             sex: employee.emp_sex,
             religion: employee.emp_religion,
             marital_status: employee.emp_marital_status,
@@ -115,7 +122,15 @@ export default {
           if (key === "sn") {
             this.jsonFields["S/N"] = key;
           } else if (key === "emp_unique_id") {
-            this.jsonFields["T7 NUMBER"] = key;
+            this.jsonFields["T7"] = key;
+          } else if (key === "d4") {
+            this.jsonFields["D4"] = key;
+          } else if (key === "d5") {
+            this.jsonFields["D5"] = key;
+          } else if (key === "d6") {
+            this.jsonFields["D6"] = key;
+          } else if (key === "d7") {
+            this.jsonFields["D7"] = key;
           } else if (key === "emp_first_name") {
             this.jsonFields["FIRST NAME"] = key;
           } else if (key === "emp_other_name") {
@@ -248,11 +263,11 @@ export default {
       sortDesc: false,
       fields: [
         { key: "sn", label: "S/n", sortable: true },
-        {
-          key: "emp_unique_id",
-          label: "T7 Number",
-          sortable: true,
-        },
+        { key: "emp_unique_id", label: "T7", sortable: true },
+        { key: "d4", label: "D4", sortable: true },
+        { key: "d5", label: "D5", sortable: true },
+        { key: "d6", label: "D6", sortable: true },
+        { key: "d7", label: "D7", sortable: true },
         { key: "emp_first_name", label: "First Name", sortable: true },
         { key: "emp_office_name", label: "Other Name", sortable: true },
         { key: "emp_last_name", label: "Last Name", sortable: true },
