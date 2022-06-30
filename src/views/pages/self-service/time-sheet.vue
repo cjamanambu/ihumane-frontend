@@ -107,9 +107,10 @@ export default {
       const month = `${row.payroll_month}`;
       const year = `${row.payroll_year}`;
       const empId = row.employee.emp_id;
+      const refNo = row.ref_no;
       this.$router.push({
         name: "manage-time-sheet-details",
-        params: { month, year, empId },
+        params: { month, year, empId, refNo },
       });
     },
   },
