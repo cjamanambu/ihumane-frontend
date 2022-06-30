@@ -42,7 +42,7 @@ export default [
     component: () => import("@/views/pages/authorizations/timesheet/index"),
   },
   {
-    path: "/view-time-sheet-authorization/:month/:year/:empId",
+    path: "/view-time-sheet-authorization/:month/:year/:empId/:refNo",
     name: "view-time-sheet-authorization",
     meta: {
       authRequired: true,
@@ -77,7 +77,7 @@ export default [
       import("@/views/pages/self-service/travel-application-details"),
   },
   {
-    path: "/manage-time-sheet-details/:month/:year/:empId",
+    path: "/manage-time-sheet-details/:month/:year/:empId/:refNo",
     name: "manage-time-sheet-details",
     meta: {
       authRequired: true,

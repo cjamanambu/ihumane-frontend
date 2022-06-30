@@ -111,6 +111,8 @@ export default {
       groupedPublicHolidays: [],
       showModalPH: false,
       phName: "",
+      refNo: null,
+      timesheetApproved: false,
     };
   },
   methods: {
@@ -144,10 +146,17 @@ export default {
       const employeeID = this.getEmployee.emp_id;
       const url = `${this.ROUTES.timeAllocation}/get-time-allocation/${employeeID}/${this.pymFullDate}`;
       this.apiGet(url, "Get Time Allocation Error").then((res) => {
-        const { timeAllocationSum } = res.data;
+        console.log({ res });
+        const { timeAllocationSum, timeAllocationStatus } = res.data;
         if (timeAllocationSum) {
           this.timeAllocated = true;
+        } else if (
+          timeAllocationStatus.length &&
+          timeAllocationStatus[0].ta_status === 1
+        ) {
+          this.timesheetApproved = true;
         } else {
+          // either your timesheet was not filled or it was declined
           this.fetchTimesheetData();
         }
       });
@@ -159,8 +168,11 @@ export default {
       this.apiGet(url, "Get Timesheet Error").then(async (res) => {
         const { data } = res;
         if (!data.length) {
-          this.populateTimesheetData();
+          this.runTimesheetPopulate();
+          // this.populateTimesheetData();
         } else {
+          this.refNo = data[0].ts_ref_no;
+          console.log(this.refNo);
           let calendarApi = this.$refs.fullCalendar.getApi();
           let entryObj = {};
           this.publicHolidays.forEach((publicHoliday) => {
@@ -212,7 +224,7 @@ export default {
                 entryObj.display = "block";
                 calendarApi.addEvent(entryObj);
                 break;
-              case 4: // employee absent
+              case 4: // employee leave
                 entryObj.title = `LEAVE`;
                 entryObj.display = "block";
                 calendarApi.addEvent(entryObj);
@@ -329,21 +341,34 @@ export default {
   <Layout>
     <PageHeader :title="title" :items="items" />
     <div v-if="timeAllocated" class="alert alert-info">
-      Your timesheet allocation for this payroll reporting period is now filled.
+      Your timesheet for this payroll reporting period is now filled and
+      pending.
       <span
         style="cursor: pointer; text-decoration: underline"
         @click="viewTimesheet"
       >
-        View it here
+        View and make updates here.
+      </span>
+    </div>
+    <div v-if="timesheetApproved" class="alert alert-success">
+      Your timesheet for this payroll reporting period has been approved.
+      <span
+        style="cursor: pointer; text-decoration: underline"
+        @click="viewTimesheet"
+      >
+        View it here.
       </span>
     </div>
     <div v-else>
       <scale-loader class="scale-loader" v-if="this.apiBusy" />
       <div v-else>
         <div class="d-flex justify-content-end mb-3">
-          <b-button class="btn btn-success" @click="populateTimesheetData">
+          <b-button
+            class="btn btn-success"
+            @click="$router.push('/timesheets')"
+          >
             <i class="mdi mdi-plus mr-2"></i>
-            Populate Timesheet
+            View Timesheets
           </b-button>
         </div>
         <div>
@@ -351,6 +376,7 @@ export default {
             <div class="col-12">
               <div class="card">
                 <div class="card-body">
+                  <span v-if="populating">Populating... please wait.</span>
                   <div class="app-calendar">
                     <FullCalendar
                       ref="fullCalendar"
@@ -413,6 +439,7 @@ export default {
                   <TimeEffortForm
                     :pmy-month="pymMonth"
                     :pmy-year="pymYear"
+                    :ts-ref-no="refNo"
                     @added-ta="viewTimesheets"
                   />
                 </div>
