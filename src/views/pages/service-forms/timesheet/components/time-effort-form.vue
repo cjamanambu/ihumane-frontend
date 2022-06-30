@@ -22,6 +22,7 @@ export default {
     this.calc();
     this.fetchDonors();
     this.populateFields();
+    console.log(this.$route.name);
   },
   computed: {
     ...authComputed,
@@ -38,6 +39,10 @@ export default {
     breakdown: {
       type: Array,
       required: false,
+    },
+    tsRefNo: {
+      type: String,
+      required: true,
     },
   },
   methods: {
@@ -116,9 +121,10 @@ export default {
     },
     submit() {
       this.confirmTER = false;
-      let ta_ref_no, url, data;
-      if (this.refNo) {
-        ta_ref_no = this.refNo;
+      let ta_ref_no = this.tsRefNo,
+        url,
+        data;
+      if (this.$route.name === "view-timesheet") {
         url = `${this.ROUTES.timeAllocation}/update-time-allocation`;
         data = [];
         this.fields.forEach(async (field) => {
@@ -138,7 +144,6 @@ export default {
           this.apiResponseHandler("Process Complete", "Time Allocation Added");
         });
       } else {
-        ta_ref_no = Math.random().toString(36).slice(2);
         url = `${this.ROUTES.timeAllocation}/add-time-allocation`;
         this.fields.forEach(async (field) => {
           const data = {

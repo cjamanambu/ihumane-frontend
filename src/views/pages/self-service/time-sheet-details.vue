@@ -50,7 +50,8 @@ export default {
       let month = this.$route.params.month;
       let year = this.$route.params.year;
       let empId = this.$route.params.empId;
-      const url = `${this.ROUTES.timesheet}/time-sheet/${month}/${year}/${empId}`;
+      let refNo = this.$route.params.refNo;
+      const url = `${this.ROUTES.timesheet}/time-sheet/${month}/${year}/${empId}/${refNo}`;
 
       this.apiGet(url, "Get Time sheet details").then((res) => {
         const { timesheet, timeAllocation, log } = res.data;

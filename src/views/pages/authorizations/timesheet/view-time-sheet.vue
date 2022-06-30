@@ -43,11 +43,14 @@ export default {
       let month = this.$route.params.month;
       let year = this.$route.params.year;
       let empId = this.$route.params.empId;
-      const url = `${this.ROUTES.timesheet}/time-sheet/${month}/${year}/${empId}`;
+      let refNo = this.$route.params.refNo;
+      const url = `${this.ROUTES.timesheet}/time-sheet/${month}/${year}/${empId}/${refNo}`;
       this.apiGet(url, "Get Time sheet authorization").then(async (res) => {
-        const { timesheet, timeAllocation, log } = res.data;
-        console.log({ timeAllocation });
+        let { timesheet, timeAllocation, log } = res.data;
         this.timeSheet = timesheet;
+        this.ref_no = refNo;
+        console.log({ timesheet, timeAllocation });
+
         this.numAbsents = 0;
         await this.timeSheet.forEach((timesheet) => {
           if (!timesheet.ts_is_present) {
@@ -62,7 +65,6 @@ export default {
         this.breakdown = timeAllocation;
         this.allocation = timeAllocation[0];
         this.log = log;
-        this.ref_no = this.allocation.ta_ref_no;
         this.getLocation(this.allocation.employee.emp_location_id);
         this.getSector(this.allocation.employee.emp_job_role_id);
         this.ta_status = this.allocation.ta_status;

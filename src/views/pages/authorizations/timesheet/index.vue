@@ -37,7 +37,6 @@ export default {
         let count = 0;
         const { data, officers } = res.data;
         data.forEach((time) => {
-          console.log({ data });
           let found = false;
           if (this.applications.length === 0) {
             this.applications.push({
@@ -112,12 +111,19 @@ export default {
     },
     selectRow(row) {
       row = row[0];
+      console.log({ row });
       this.month = row.payroll_month;
       this.year = row.payroll_year;
       this.empId = row.employee.emp_id;
+      this.refNo = row.ref_no;
       this.$router.push({
         name: "view-time-sheet-authorization",
-        params: { month: this.month, year: this.year, empId: this.empId },
+        params: {
+          month: this.month,
+          year: this.year,
+          empId: this.empId,
+          refNo: this.refNo,
+        },
       });
     },
   },
@@ -185,6 +191,7 @@ export default {
       month: null,
       year: null,
       empId: null,
+      refNo: null,
     };
   },
 };
