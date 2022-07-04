@@ -44,7 +44,7 @@ export default {
         const { data } = res;
         const newData = await this.sortArrayOfObjects(data);
         newData.forEach((employee, index) => {
-          console.log({ employee });
+          console.log(employee.emp_religion);
           let employeeObj = {
             sn: ++index,
             emp_unique_id: employee.emp_unique_id,
@@ -91,9 +91,28 @@ export default {
             dob: employee.emp_dob
               ? `${this.getFormattedDate(new Date(employee.emp_dob))}`
               : null,
-            sex: employee.emp_sex,
-            religion: employee.emp_religion,
-            marital_status: employee.emp_marital_status,
+            sex:
+              employee.emp_sex === "1"
+                ? "Male"
+                : employee.emp_sex === "2"
+                ? "Female"
+                : employee.emp_sex,
+            religion:
+              employee.emp_religion === 1
+                ? "Christianity"
+                : employee.emp_religion === 2
+                ? "Islam"
+                : employee.emp_religion === 3
+                ? "Hinduism"
+                : employee.emp_religion === 4
+                ? "Budisim"
+                : employee.emp_religion,
+            marital_status:
+              employee.emp_marital_status === "1"
+                ? "Married"
+                : employee.emp_marital_status === "2"
+                ? "Not Married"
+                : employee.emp_marital_status,
             spouse_name: employee.emp_spouse_name,
             spouse_phone: employee.emp_spouse_phone_no,
             next_of_kin: employee.emp_next_of_kin_name,
