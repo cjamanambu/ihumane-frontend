@@ -48,9 +48,9 @@ export default {
           let employeeObj = {
             sn: ++index,
             emp_unique_id: employee.emp_unique_id,
-            d4: employee.emp_d4,
-            d5: employee.emp_d5,
-            d6: employee.emp_d6,
+            d4: employee.operationUnit?.ou_name,
+            d5: employee.reportingEntity?.re_name,
+            d6: employee.functionalArea?.fa_name,
             d7: employee.emp_d7,
             emp_first_name: employee.emp_first_name,
             emp_other_name: employee.emp_other_name,
@@ -70,20 +70,26 @@ export default {
               ? `${employee.supervisor.emp_first_name} ${employee.supervisor.emp_last_name} - ${employee.supervisor.emp_unique_id}`
               : null,
             start_date: employee.emp_hire_date
-              ? `${new Date(employee.emp_hire_date).toDateString()}`
+              ? `${this.getFormattedDate(new Date(employee.emp_hire_date))}`
               : null,
             end_date: employee.emp_contract_end_date
-              ? `${new Date(employee.emp_contract_end_date).toDateString()}`
+              ? `${this.getFormattedDate(
+                  new Date(employee.emp_contract_end_date)
+                )}`
               : null,
             stop_date: employee.emp_stop_date
-              ? `${new Date(employee.emp_stop_date).toDateString()}`
+              ? `${this.getFormattedDate(new Date(employee.emp_stop_date))}`
               : null,
             employment_date: employee.emp_employment_date
-              ? `${new Date(employee.emp_employment_date).toDateString()}`
+              ? `${this.getFormattedDate(
+                  new Date(employee.emp_employment_date)
+                )}`
               : null,
             suspension_reason: employee.emp_suspension_reason,
+            state: employee.state?.s_name,
+            lga: employee.lga?.lg_name,
             dob: employee.emp_dob
-              ? `${new Date(employee.emp_dob).toDateString()}`
+              ? `${this.getFormattedDate(new Date(employee.emp_dob))}`
               : null,
             sex: employee.emp_sex,
             religion: employee.emp_religion,
@@ -165,6 +171,10 @@ export default {
             this.jsonFields["SUSPENSION REASON"] = key;
           } else if (key === "dob") {
             this.jsonFields["DATE OF BIRTH"] = key;
+          } else if (key === "lga") {
+            this.jsonFields["LGA"] = key;
+          } else if (key === "state") {
+            this.jsonFields["STATE"] = key;
           } else if (key === "sex") {
             this.jsonFields["SEX"] = key;
           } else if (key === "religion") {
@@ -235,6 +245,13 @@ export default {
       this.filtered = filteredItems;
       this.currentPage = 1;
     },
+    getFormattedDate(date) {
+      let year = date.getFullYear();
+      let month = (1 + date.getMonth()).toString().padStart(2, "0");
+      let day = date.getDate().toString().padStart(2, "0");
+
+      return month + "/" + day + "/" + year;
+    },
   },
   data() {
     return {
@@ -288,6 +305,8 @@ export default {
           label: "Suspension Reason",
           sortable: true,
         },
+        { key: "lga", label: "LGA", sortable: true },
+        { key: "state", label: "State", sortable: true },
         { key: "dob", label: "Date of Birth", sortable: true },
         { key: "sex", label: "Sex", sortable: true },
         { key: "religion", label: "Religion", sortable: true },
