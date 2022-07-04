@@ -114,6 +114,7 @@ export default {
       breakdown: [],
       calendarView: false,
       status: null,
+      refNo: null,
     };
   },
   methods: {
@@ -189,6 +190,7 @@ export default {
       this.apiGet(url, "Get Timesheet Error").then(async (res) => {
         const { data } = res;
         if (data.length) {
+          this.refNo = data[0].ts_ref_no;
           let calendarApi = this.$refs.fullCalendar.getApi();
           let entryObj = {};
           this.publicHolidays.forEach((publicHoliday) => {
@@ -315,7 +317,7 @@ export default {
     <div class="alert alert-success" v-if="this.status === 1">
       This timesheet has been approved and cannot be modified further
     </div>
-    <div class="alert alert-warning" v-else-if="this.status === 2">
+    <div class="alert alert-danger" v-else-if="this.status === 2">
       This timesheet has been declined and cannot be modified further
     </div>
     <scale-loader class="scale-loader" v-if="this.apiBusy" />
@@ -411,6 +413,7 @@ export default {
                   :breakdown="breakdown"
                   :pmy-month="pymMonth"
                   :pmy-year="pymYear"
+                  :ts-ref-no="refNo"
                   @added-ta="viewTimesheet"
                   @updated-ta="fetchPayroll"
                 />

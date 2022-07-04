@@ -130,4 +130,13 @@ export default [
     },
     component: () => import("@/views/pages/self-service/query-view"),
   },
+  {
+    path: "/travel-application-details/:id",
+    name: "travel-application-details",
+    meta: {
+      authRequired: true,
+    },
+    component: () =>
+      import("@/views/pages/self-service/travel-application-details"),
+  },
 ];

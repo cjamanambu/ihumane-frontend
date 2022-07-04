@@ -43,11 +43,14 @@ export default {
       let month = this.$route.params.month;
       let year = this.$route.params.year;
       let empId = this.$route.params.empId;
-      const url = `${this.ROUTES.timesheet}/time-sheet/${month}/${year}/${empId}`;
+      let refNo = this.$route.params.refNo;
+      const url = `${this.ROUTES.timesheet}/time-sheet/${month}/${year}/${empId}/${refNo}`;
       this.apiGet(url, "Get Time sheet authorization").then(async (res) => {
-        console.log({ res });
-        const { timesheet, timeAllocation, log } = res.data;
+        let { timesheet, timeAllocation, log } = res.data;
         this.timeSheet = timesheet;
+        this.ref_no = refNo;
+        console.log({ timesheet, timeAllocation });
+
         this.numAbsents = 0;
         await this.timeSheet.forEach((timesheet) => {
           if (!timesheet.ts_is_present) {
@@ -55,16 +58,15 @@ export default {
           }
         });
         if (this.numAbsents > 0) {
-          this.currentEmployee = timeAllocation[0].Employee;
+          this.currentEmployee = timeAllocation[0].employee;
           this.defaultCharge =
             (parseInt(this.currentEmployee.emp_gross) / 22) * this.numAbsents;
         }
         this.breakdown = timeAllocation;
         this.allocation = timeAllocation[0];
         this.log = log;
-        this.ref_no = this.allocation.ta_ref_no;
-        this.getLocation(this.allocation.Employee.emp_location_id);
-        this.getSector(this.allocation.Employee.emp_job_role_id);
+        this.getLocation(this.allocation.employee.emp_location_id);
+        this.getSector(this.allocation.employee.emp_job_role_id);
         this.ta_status = this.allocation.ta_status;
         for (let i = 0; i < this.log.length; i++) {
           if (this.log[i].auth_officer_id === this.getEmployee.emp_id) {
@@ -178,10 +180,9 @@ export default {
       this.apiGet(this.ROUTES.employee, "Get Employees Error").then((res) => {
         this.officials = [];
         const { data } = res;
-        console.log(data);
         data.forEach((employee) => {
           if (
-            employee.emp_id !== this.allocation.Employee.emp_id &&
+            employee.emp_id !== this.allocation.employee.emp_id &&
             employee.emp_id !== this.getEmployee.emp_id
           ) {
             this.officials.push({
@@ -490,26 +491,26 @@ export default {
             <div class="d-flex justify-content-between mb-3">
               <span>Employee Name</span>
               <span>
-                {{ this.allocation.Employee.emp_first_name }}
-                {{ this.allocation.Employee.emp_last_name }}
+                {{ this.allocation.employee.emp_first_name }}
+                {{ this.allocation.employee.emp_last_name }}
               </span>
             </div>
             <div class="d-flex justify-content-between mb-3">
               <span>T7 Number</span>
               <span>
-                {{ this.allocation.Employee.emp_unique_id }}
+                {{ this.allocation.employee.emp_unique_id }}
               </span>
             </div>
             <div class="d-flex justify-content-between mb-3">
               <span>Phone No.</span>
               <span>
-                {{ this.allocation.Employee.emp_phone_no }}
+                {{ this.allocation.employee.emp_phone_no }}
               </span>
             </div>
             <div class="d-flex justify-content-between mb-3">
               <span>Office Email</span>
               <span>
-                {{ this.allocation.Employee.emp_office_email }}
+                {{ this.allocation.employee.emp_office_email }}
               </span>
             </div>
             <div class="d-flex justify-content-between mb-3">

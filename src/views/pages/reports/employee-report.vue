@@ -44,9 +44,14 @@ export default {
         const { data } = res;
         const newData = await this.sortArrayOfObjects(data);
         newData.forEach((employee, index) => {
+          console.log({ employee });
           let employeeObj = {
             sn: ++index,
             emp_unique_id: employee.emp_unique_id,
+            d4: employee.operationUnit?.ou_name,
+            d5: employee.reportingEntity?.re_name,
+            d6: employee.functionalArea?.fa_name,
+            d7: employee.emp_d7,
             emp_first_name: employee.emp_first_name,
             emp_other_name: employee.emp_other_name,
             emp_last_name: employee.emp_last_name,
@@ -65,19 +70,27 @@ export default {
               ? `${employee.supervisor.emp_first_name} ${employee.supervisor.emp_last_name} - ${employee.supervisor.emp_unique_id}`
               : null,
             start_date: employee.emp_hire_date
-              ? `${new Date(employee.emp_hire_date).toDateString()}`
+              ? `${this.getFormattedDate(new Date(employee.emp_hire_date))}`
               : null,
             end_date: employee.emp_contract_end_date
-              ? `${new Date(employee.emp_contract_end_date).toDateString()}`
+              ? `${this.getFormattedDate(
+                  new Date(employee.emp_contract_end_date)
+                )}`
               : null,
             stop_date: employee.emp_stop_date
-              ? `${new Date(employee.emp_stop_date)}`
+              ? `${this.getFormattedDate(new Date(employee.emp_stop_date))}`
               : null,
             employment_date: employee.emp_employment_date
-              ? `${new Date(employee.emp_employment_date)}`
+              ? `${this.getFormattedDate(
+                  new Date(employee.emp_employment_date)
+                )}`
               : null,
             suspension_reason: employee.emp_suspension_reason,
-            dob: employee.emp_dob ? `${new Date(employee.emp_dob)}` : null,
+            state: employee.state?.s_name,
+            lga: employee.lga?.lg_name,
+            dob: employee.emp_dob
+              ? `${this.getFormattedDate(new Date(employee.emp_dob))}`
+              : null,
             sex: employee.emp_sex,
             religion: employee.emp_religion,
             marital_status: employee.emp_marital_status,
@@ -115,7 +128,15 @@ export default {
           if (key === "sn") {
             this.jsonFields["S/N"] = key;
           } else if (key === "emp_unique_id") {
-            this.jsonFields["T7 NUMBER"] = key;
+            this.jsonFields["T7"] = key;
+          } else if (key === "d4") {
+            this.jsonFields["D4"] = key;
+          } else if (key === "d5") {
+            this.jsonFields["D5"] = key;
+          } else if (key === "d6") {
+            this.jsonFields["D6"] = key;
+          } else if (key === "d7") {
+            this.jsonFields["D7"] = key;
           } else if (key === "emp_first_name") {
             this.jsonFields["FIRST NAME"] = key;
           } else if (key === "emp_other_name") {
@@ -150,6 +171,10 @@ export default {
             this.jsonFields["SUSPENSION REASON"] = key;
           } else if (key === "dob") {
             this.jsonFields["DATE OF BIRTH"] = key;
+          } else if (key === "lga") {
+            this.jsonFields["LGA"] = key;
+          } else if (key === "state") {
+            this.jsonFields["STATE"] = key;
           } else if (key === "sex") {
             this.jsonFields["SEX"] = key;
           } else if (key === "religion") {
@@ -220,6 +245,13 @@ export default {
       this.filtered = filteredItems;
       this.currentPage = 1;
     },
+    getFormattedDate(date) {
+      let year = date.getFullYear();
+      let month = (1 + date.getMonth()).toString().padStart(2, "0");
+      let day = date.getDate().toString().padStart(2, "0");
+
+      return month + "/" + day + "/" + year;
+    },
   },
   data() {
     return {
@@ -248,11 +280,11 @@ export default {
       sortDesc: false,
       fields: [
         { key: "sn", label: "S/n", sortable: true },
-        {
-          key: "emp_unique_id",
-          label: "T7 Number",
-          sortable: true,
-        },
+        { key: "emp_unique_id", label: "T7", sortable: true },
+        { key: "d4", label: "D4", sortable: true },
+        { key: "d5", label: "D5", sortable: true },
+        { key: "d6", label: "D6", sortable: true },
+        { key: "d7", label: "D7", sortable: true },
         { key: "emp_first_name", label: "First Name", sortable: true },
         { key: "emp_office_name", label: "Other Name", sortable: true },
         { key: "emp_last_name", label: "Last Name", sortable: true },
@@ -273,6 +305,8 @@ export default {
           label: "Suspension Reason",
           sortable: true,
         },
+        { key: "lga", label: "LGA", sortable: true },
+        { key: "state", label: "State", sortable: true },
         { key: "dob", label: "Date of Birth", sortable: true },
         { key: "sex", label: "Sex", sortable: true },
         { key: "religion", label: "Religion", sortable: true },
