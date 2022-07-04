@@ -59,9 +59,18 @@ export default [
     },
     component: () => import("@/views/pages/service-forms/travel-request/index"),
   },
-  {
+  /*{
     path: "/travel-requests/:travelAppID",
     name: "travel-request",
+    meta: {
+      authRequired: true,
+    },
+    component: () =>
+      import("@/views/pages/service-forms/travel-request/travel-request"),
+  },*/
+  {
+    path: "/travel-requests/:travelAppID",
+    name: "travel-application-details",
     meta: {
       authRequired: true,
     },

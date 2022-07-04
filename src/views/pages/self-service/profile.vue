@@ -4,6 +4,7 @@ import PageHeader from "@/components/page-header";
 import appConfig from "@/app.config";
 import { authComputed } from "@/state/helpers";
 import store from "@/state/store";
+import Multiselect from "vue-multiselect";
 // import axios from "axios";
 
 export default {
@@ -23,14 +24,16 @@ export default {
   components: {
     Layout,
     PageHeader,
+    Multiselect
   },
   computed: {
     ...authComputed,
   },
   async mounted() {
-    await this.getStates();
     await this.fetchEmployee();
+    await this.getStates();
     await this.getBanks();
+    await this.getLocalGovernmentAreas();
   },
 
   data() {
@@ -61,6 +64,7 @@ export default {
       emp_bank_id: null,
       emp_state_id: null,
       emp_lga_id: null,
+      lga_text: null,
       emp_marital_status: null,
       emp_spouse_name: null,
       emp_spouse_phone_no: null,
@@ -80,7 +84,14 @@ export default {
       ],
       banks: [],
       states: [],
+      state: [],
       uploadingPic: false,
+      emp_state_id_val: null,
+      selectedStateId: null,
+      lgas: [],
+      jrs: [],
+      lga: [],
+      stateId: null,
     };
   },
   methods: {
@@ -145,7 +156,15 @@ export default {
       await this.fetchEmployee().then();
       this.submitted = false;
     },
-
+    locationLabel({ text }) {
+      return `${text}`;
+    },
+    stateOfOriginLabel({ text }) {
+      return `${text}`;
+    },
+    lGALabel({ text }) {
+      return `${text}`;
+    },
     async getBanks() {
       const url = `${this.ROUTES.bank}`;
       await this.apiGet(url).then((res) => {
@@ -161,7 +180,73 @@ export default {
       });
     },
 
-    async getStates() {
+    getStates() {
+      const url = `${this.ROUTES.state}`;
+      this.apiGet(url).then((res) => {
+        const { data } = res;
+        this.states = [{ value: null, text: "Please select a State" }];
+        data.forEach(async (datum) => {
+          const dat = {
+            value: datum.s_id,
+            text: datum.s_name,
+          };
+          if (parseInt(datum.s_id) === parseInt(this.emp_state_id)) {
+            const val = {
+              value: datum.s_id,
+              text: datum.s_name,
+            };
+            this.state.push(val);
+          }
+          this.states.push(dat);
+        });
+      });
+    },
+    getLocalGovernmentAreas() {
+      const url = `${this.ROUTES.localGovernment}`;
+      this.apiGet(url).then((res) => {
+        const { data } = res;
+        //console.log(data);
+        this.lgas = [{ value: null, text: "Please select LGA" }];
+        data.forEach((datum) => {
+          const dat = {
+            value: datum.lg_id,
+            text: datum.lg_name,
+          };
+          if (parseInt(datum.lg_id) === parseInt(this.emp_lga_id)) {
+            const val = {
+              value: datum.lg_id,
+              text: datum.lg_name,
+            };
+            this.lga.push(val);
+          }
+          this.lgas.push(dat);
+        });
+      });
+    },
+    getLocalGovernmentAreasByStateId() {
+      let stateId = this.emp_state_id.value;
+      const url = `${this.ROUTES.localGovernment}/${stateId}`;
+      this.apiGet(url).then((res) => {
+        const { data } = res;
+        //console.log(data);
+        this.lgas = [{ value: null, text: "Please select LGA" }];
+        data.forEach((datum) => {
+          const dat = {
+            value: datum.lg_id,
+            text: datum.lg_name,
+          };
+          if (parseInt(datum.lg_id) === parseInt(this.emp_lga_id)) {
+            const val = {
+              value: datum.lg_id,
+              text: datum.lg_name,
+            };
+            this.lga.push(val);
+          }
+          this.lgas.push(dat);
+        });
+      });
+    },
+    /*async getStates() {
       const url = `${this.ROUTES.state}`;
       await this.apiGet(url).then((res) => {
         const { data } = res;
@@ -174,7 +259,7 @@ export default {
           this.states.push(dat);
         });
       });
-    },
+    },*/
     launchFilePicker() {
       this.$refs.file.click();
     },
@@ -323,7 +408,20 @@ export default {
 
                   <div class="form-group">
                     <label>State Of Origin</label>
-                    <b-form-select v-model="emp_state_id" :options="states" />
+                    <multiselect
+                      v-model="state"
+                      :options="states"
+                      :custom-label="stateOfOriginLabel"
+                      @input="getLocalGovernmentAreasByStateId"
+                    ></multiselect>
+                  </div>
+                  <div class="form-group">
+                    <label>LGA</label>
+                    <multiselect
+                      v-model="lga"
+                      :options="lgas"
+                      :custom-label="lGALabel"
+                    ></multiselect>
                   </div>
                   <div class="p-3 bg-light mb-4">
                     <h5 class="font-size-14 mb-0">
