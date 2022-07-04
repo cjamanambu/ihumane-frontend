@@ -49,7 +49,6 @@ export default {
         let { timesheet, timeAllocation, log } = res.data;
         this.timeSheet = timesheet;
         this.ref_no = refNo;
-        console.log({ timesheet, timeAllocation });
 
         this.numAbsents = 0;
         await this.timeSheet.forEach((timesheet) => {

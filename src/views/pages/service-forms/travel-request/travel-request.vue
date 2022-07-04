@@ -33,8 +33,12 @@ export default {
       let requestID = this.$route.params.travelAppID;
       const url = `${this.ROUTES.travelApplication}/${requestID}`;
       this.apiGet(url, "Get Travel Application").then((res) => {
-        console.log({ res });
-        const { application, breakdown, expenses, log } = res.data;
+        let { application, breakdown, expenses, log } = res.data;
+        breakdown = breakdown.sort(
+          (breakdownA, breakdownB) =>
+            new Date(breakdownA.ta_breakdown_date) -
+            new Date(breakdownB.ta_breakdown_date)
+        );
         this.application = application;
         this.breakdowns = breakdown;
         this.expenses = expenses;
