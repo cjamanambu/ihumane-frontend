@@ -8,7 +8,16 @@ export default [
     component: () => import("@/views/pages/service-forms/timesheet/index"),
   },
   {
-    path: "/timesheet",
+    path: "/select-timesheet-period",
+    name: "select-timesheet-period",
+    meta: {
+      authRequired: true,
+    },
+    component: () =>
+      import("@/views/pages/service-forms/timesheet/timesheet-index"),
+  },
+  {
+    path: "/timesheet/:payrollMY",
     name: "timesheet",
     meta: {
       authRequired: true,
