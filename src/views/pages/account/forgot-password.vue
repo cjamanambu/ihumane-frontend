@@ -10,6 +10,7 @@ export default {
       error: null,
       tryingToReset: false,
       isResetError: false,
+      resetting: false,
     };
   },
   validations: {
@@ -22,34 +23,33 @@ export default {
     ...authMethods,
     // Try to register the user in with the email, fullname
     // and password they provided.
-    tryToReset() {
+    async tryToReset() {
       this.submitted = true;
+      this.resetting = true;
       // stop here if form is invalid
       this.$v.$touch();
 
       if (this.$v.$invalid) {
+        this.apiFormHandler("Invalid Reset Password");
+        this.resetting = false;
         return;
       } else {
-        if (process.env.VUE_APP_DEFAULT_AUTH === "firebase") {
-          this.tryingToReset = true;
-          // Reset the authError if it existed.
-          this.error = null;
-          return (
-            this.resetPassword({
-              email: this.email,
-            })
-              // eslint-disable-next-line no-unused-vars
-              .then((token) => {
-                this.tryingToReset = false;
-                this.isResetError = false;
-              })
-              .catch((error) => {
-                this.tryingToReset = false;
-                this.error = error ? error : "";
-                this.isResetError = true;
-              })
-          );
-        }
+        const url = `${this.ROUTES.user}/forgot-password`;
+        const data = {
+          user_username: this.email,
+        };
+        await this.apiPost(url, data, "Reset Password Error")
+          .then((res) => {
+            this.$router.push({ name: "login" }).then(() => {
+              this.apiResponseHandler(
+                `${res.data}`,
+                "Reset Password Successful"
+              );
+            });
+          })
+          .finally(() => {
+            this.resetting = false;
+          });
       }
     },
   },
@@ -130,7 +130,16 @@ export default {
 
                           <div class="mt-4 text-center">
                             <button
-                              class="btn btn-primary w-md waves-effect waves-light"
+                              v-if="this.resetting"
+                              class="btn btn-success w-md waves-effect waves-light"
+                              type="submit"
+                              disabled
+                            >
+                              Resetting...
+                            </button>
+                            <button
+                              v-else
+                              class="btn btn-success w-md waves-effect waves-light"
                               type="submit"
                             >
                               Reset
@@ -149,7 +158,9 @@ export default {
                             >Log in</router-link
                           >
                         </p>
-                        <p class="mt-3">© 2021 IHUMANE</p>
+                        <p class="mt-3">
+                          © {{ new Date().getFullYear() }} IHUMANE
+                        </p>
                         <p>
                           Powered by
                           <a href="https://telecom.connexxiongroup.com">
