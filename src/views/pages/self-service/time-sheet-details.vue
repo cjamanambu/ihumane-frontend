@@ -55,7 +55,18 @@ export default {
 
       this.apiGet(url, "Get Time sheet details").then((res) => {
         const { timesheet, timeAllocation, log } = res.data;
-
+        this.totalDuration = 0;
+        let totalHrs = 0;
+        let totalMins = 0;
+        timesheet.forEach((time) => {
+          let timeSplit = time.ts_duration.toString().split(".");
+          totalHrs += parseFloat(timeSplit[0]);
+          totalMins += parseFloat(timeSplit[1]) || 0;
+        });
+        totalHrs += parseInt(totalMins / 60);
+        // totalHrs = `${totalHrs}.${totalMins % 60}`;
+        this.totalDurationHrs = totalHrs;
+        this.totalDurationMins = totalMins % 60;
         this.timeSheet = timesheet;
         this.allocation = timeAllocation[0];
         this.breakdown = timeAllocation;
@@ -243,6 +254,8 @@ export default {
       breakdown: null,
       t6: null,
       t3: null,
+      totalDurationHrs: 0,
+      totalDurationMins: 0,
     };
   },
 };
@@ -366,7 +379,7 @@ export default {
                         </td>
                         <td>
                           <span v-if="ts.ts_is_present === 1">
-                            {{ tConvert(ts.ts_duration) }} hrs
+                            {{ ts.ts_duration }} hrs
                           </span>
                           <span
                             class="text-primary"
@@ -388,6 +401,16 @@ export default {
                           </span>
                           <span v-else class="text-danger">ABSENT</span>
                         </td>
+                      </tr>
+                      <tr class="m-0 table-light">
+                        <th></th>
+                        <th>Total Duration</th>
+                        <th></th>
+                        <th></th>
+                        <th>
+                          {{ totalDurationHrs }} hrs
+                          {{ totalDurationMins }} mins
+                        </th>
                       </tr>
                     </tbody>
                   </table>

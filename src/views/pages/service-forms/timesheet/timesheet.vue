@@ -129,16 +129,23 @@ export default {
       await this.apiGet(this.ROUTES.publicHolidays).then((res) => {
         this.groupedPublicHolidays = res.data;
       });
-      await this.apiGet(this.ROUTES.payrollMonthYear).then((res) => {
-        if (res.data) {
-          const { pym_year, pym_month } = res.data;
-          this.pymYear = pym_year;
-          this.pymMonth = pym_month;
-          this.pymFullDate = `${pym_year}-${pym_month}-01`;
-          this.fetchTimeAllocations();
-          this.calendarOptions.initialDate = this.pymFullDate;
-        }
-      });
+      // await this.apiGet(this.ROUTES.payrollMonthYear).then((res) => {
+      //   if (res.data) {
+      //     const { pym_year, pym_month } = res.data;
+      //     this.pymYear = pym_year;
+      //     this.pymMonth = pym_month;
+      //     this.pymFullDate = `${pym_year}-${pym_month}-01`;
+      //     this.fetchTimeAllocations();
+      //     this.calendarOptions.initialDate = this.pymFullDate;
+      //   }
+      // });
+      let { payrollMY } = this.$route.params;
+      this.pymFullDate = `${payrollMY}-01`;
+      const dateParts = this.pymFullDate.split("-");
+      this.pymYear = dateParts[0];
+      this.pymMonth = dateParts[1];
+      this.fetchTimeAllocations();
+      this.calendarOptions.initialDate = this.pymFullDate;
     },
     fetchTimeAllocations() {
       // Here, I tried to get the time allocation for the payroll month and year to see if
@@ -146,7 +153,6 @@ export default {
       const employeeID = this.getEmployee.emp_id;
       const url = `${this.ROUTES.timeAllocation}/get-time-allocation/${employeeID}/${this.pymFullDate}`;
       this.apiGet(url, "Get Time Allocation Error").then((res) => {
-        console.log({ res });
         const { timeAllocationSum, timeAllocationStatus } = res.data;
         if (timeAllocationSum) {
           this.timeAllocated = true;
@@ -164,15 +170,19 @@ export default {
     fetchTimesheetData() {
       // Get the timesheet data for an employee for each day of the payroll month.
       const employeeID = this.getEmployee.emp_id;
-      const url = `${this.ROUTES.timesheet}/get-time-sheets/${employeeID}`;
+      const dateParts = this.pymFullDate.split("-");
+      const year = parseInt(dateParts[0]);
+      const month = parseInt(dateParts[1]);
+      console.log({ month, year });
+      const url = `${this.ROUTES.timesheet}/get-time-sheets/${employeeID}/${month}/${year}`;
       this.apiGet(url, "Get Timesheet Error").then(async (res) => {
         const { data } = res;
+        console.log(data);
         if (!data.length) {
           this.runTimesheetPopulate();
           // this.populateTimesheetData();
         } else {
           this.refNo = data[0].ts_ref_no;
-          console.log(this.refNo);
           let calendarApi = this.$refs.fullCalendar.getApi();
           let entryObj = {};
           this.publicHolidays.forEach((publicHoliday) => {
@@ -255,7 +265,10 @@ export default {
     runTimesheetPopulate() {
       this.populating = true;
       const employeeID = this.getEmployee.emp_id;
-      const url = `${this.ROUTES.timesheet}/preload-date/${employeeID}`;
+      const dateParts = this.pymFullDate.split("-");
+      const year = dateParts[0];
+      const month = dateParts[1];
+      const url = `${this.ROUTES.timesheet}/preload-date/${employeeID}/${month}/${year}`;
       this.apiGet(url, "Populate Timesheet Error")
         .then((res) => {
           if (res.data) {
@@ -304,7 +317,8 @@ export default {
       });
     },
     viewTimesheet() {
-      const payrollMY = `${this.pymYear}-${this.pymMonth}`;
+      const { payrollMY } = this.$route.params;
+      // const payrollMY = `${this.pymYear}-${this.pymMonth}`;
       this.$router.push({
         name: "view-timesheet",
         params: { payrollMY },
