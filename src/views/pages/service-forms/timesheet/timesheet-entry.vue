@@ -96,7 +96,7 @@ export default {
             ? (this.isPresent = true)
             : (this.isPresent = false);
           if (day !== 5) {
-            this.breakDuration = 45;
+            this.breakDuration = 30;
           }
           this.getTimeDiff();
         }
@@ -136,7 +136,7 @@ export default {
             }
             this.$v.$reset();
             this.getTimesheetData();
-            this.$router.push({ name: "timesheet" });
+            this.$router.go(-1);
           });
         }
       } else {
@@ -157,7 +157,7 @@ export default {
           }
           this.$v.$reset();
           this.getTimesheetData();
-          this.$router.push({ name: "timesheet" });
+          this.$router.go(-1);
         });
       }
     },
@@ -187,12 +187,9 @@ export default {
   <Layout>
     <PageHeader :title="title" :items="items" />
     <div class="d-flex justify-content-end mb-3">
-      <b-button
-        class="btn btn-success"
-        @click="$router.push({ name: 'timesheet' })"
-      >
-        <i class="mdi mdi-plus mr-2"></i>
-        View Timesheet
+      <b-button class="btn btn-success" @click="$router.go(-1)">
+        <i class="mdi mdi-arrow-left mr-2"></i>
+        Return
       </b-button>
     </div>
     <div class="alert alert-warning" v-if="!isPresent">
