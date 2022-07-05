@@ -158,7 +158,7 @@ export default {
                           Welcome to <strong>IHUMANE</strong>
                         </h4>
                         <p class="text-muted">
-                          To get started, please login with your credentials
+                          To get started, please login with your IRC credentials
                         </p>
                       </div>
                       <div class="p-2 mt-5">
@@ -212,20 +212,6 @@ export default {
                             </div>
                           </div>
 
-                          <div class="custom-control custom-checkbox">
-                            <input
-                              type="checkbox"
-                              class="custom-control-input"
-                              id="customControlInline"
-                            />
-                            <label
-                              class="custom-control-label"
-                              for="customControlInline"
-                            >
-                              Remember me
-                            </label>
-                          </div>
-
                           <div class="mt-4 text-center">
                             <button
                               v-if="this.submitting"
@@ -248,7 +234,7 @@ export default {
                             <router-link
                               tag="a"
                               to="/forgot-password"
-                              class="text-muted"
+                              class="text-muted text-primary"
                             >
                               <i class="mdi mdi-lock mr-1"></i> Forgot your
                               password?
@@ -258,7 +244,7 @@ export default {
                       </div>
 
                       <div class="mt-5 text-center">
-                        <p>© 2021 IHUMANE</p>
+                        <p>© {{ new Date().getFullYear() }} IHUMANE</p>
                         <p>
                           Powered by
                           <a href="https://telecom.connexxiongroup.com">
