@@ -164,7 +164,7 @@ export default {
     <div class="d-flex justify-content-end mb-3">
       <b-button
         class="btn btn-success"
-        @click="$router.push({ name: 'timesheet' })"
+        @click="$router.push({ name: 'select-timesheet-period' })"
       >
         <i class="mdi mdi-plus mr-2"></i>
         Fill Timesheet

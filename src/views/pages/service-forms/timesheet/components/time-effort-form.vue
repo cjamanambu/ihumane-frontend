@@ -22,7 +22,6 @@ export default {
     this.calc();
     this.fetchDonors();
     this.populateFields();
-    console.log(this.$route.name);
   },
   computed: {
     ...authComputed,

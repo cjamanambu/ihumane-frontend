@@ -47,10 +47,21 @@ export default {
       const url = `${this.ROUTES.timesheet}/time-sheet/${month}/${year}/${empId}/${refNo}`;
       this.apiGet(url, "Get Time sheet authorization").then(async (res) => {
         let { timesheet, timeAllocation, log } = res.data;
+        this.totalDurationHrs = 0;
+        this.totalDurationMins = 0;
+        let totalHrs = 0;
+        let totalMins = 0;
+        timesheet.forEach((time) => {
+          let timeSplit = time.ts_duration.toString().split(".");
+          totalHrs += parseFloat(timeSplit[0]);
+          totalMins += parseFloat(timeSplit[1]) || 0;
+        });
+        totalHrs += parseInt(totalMins / 60);
+        // totalHrs = `${totalHrs}.${totalMins % 60}`;
+        this.totalDurationHrs = totalHrs;
+        this.totalDurationMins = totalMins % 60;
         this.timeSheet = timesheet;
         this.ref_no = refNo;
-        console.log({ timesheet, timeAllocation });
-
         this.numAbsents = 0;
         await this.timeSheet.forEach((timesheet) => {
           if (!timesheet.ts_is_present) {
@@ -253,6 +264,8 @@ export default {
       currentEmployee: null,
       numAbsents: 0,
       defaultCharge: 0,
+      totalDurationHrs: 0,
+      totalDurationMins: 0,
     };
   },
 };
@@ -366,6 +379,17 @@ export default {
                           </small>
                           <small class="text-danger" v-else>ABSENT</small>
                         </td>
+                      </tr>
+                      <tr class="m-0 table-light">
+                        <th></th>
+                        <th>Total Duration</th>
+                        <th></th>
+                        <th></th>
+                        <th>
+                          {{ totalDurationHrs }} hrs
+                          {{ totalDurationMins }} mins
+                        </th>
+                        <th></th>
                       </tr>
                     </tbody>
                   </table>

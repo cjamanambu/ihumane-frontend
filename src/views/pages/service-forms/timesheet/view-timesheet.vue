@@ -269,7 +269,8 @@ export default {
       });
     },
     viewTimesheet() {
-      const payrollMY = `${this.pymYear}-${this.pymMonth}`;
+      // const payrollMY = `${this.pymYear}-${this.pymMonth}`;
+      const { payrollMY } = this.$route.params;
       this.$router.push({
         name: "view-timesheet",
         params: { payrollMY },
