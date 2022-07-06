@@ -43,17 +43,18 @@ export default {
       const url = `${this.ROUTES.leaveApplication}/get-leave-applications/0`;
       this.apiGet(url, "Get Leave Applications Error").then((res) => {
         res.data.forEach((leave, index) => {
-          //console.log(leave.leave_authorizer[index].officers?.emp_first_name);
+          console.log(leave);
+          let len = leave.leave_authorizer.length;
           this.leaves[index] = {
-            sn: ++index,
+            sn: index+1,
             leave_employee: `${leave.employee.emp_first_name} ${leave.employee?.emp_last_name} `,
-            current_desk: `${leave.leave_authorizer[index]?.officers.emp_first_name}  ${leave.leave_authorizer[index]?.officers.emp_last_name} (${leave.leave_authorizer[index]?.officers.emp_unique_id} ) `,
+            current_desk: `${leave.leave_authorizer[len - 1 ]?.officers.emp_first_name} ${leave.leave_authorizer[len - 1 ]?.officers.emp_last_name} (${leave.leave_authorizer[len - 1 ]?.officers.emp_unique_id} )   `,
             lea_type: `${leave.leave_type?.leave_name}(${leave.leapp_total_days})`,
             leave_t6: leave.employee.location?.location_name,
             leave_t3: leave.employee.sector?.department_name,
             leave_t7: leave.employee?.emp_unique_id,
             leapp_id: leave.leapp_id,
-            leave_date: new Date(leave.leapp_start_date).toDateString(),
+            leave_date: new Date(leave.createdAt).toDateString(),
             ...leave,
           };
         });
