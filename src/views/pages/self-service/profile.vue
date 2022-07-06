@@ -30,10 +30,10 @@ export default {
     ...authComputed,
   },
   async mounted() {
-    await this.fetchEmployee();
-    await this.getStates();
-    await this.getBanks();
-    await this.getLocalGovernmentAreas();
+    this.fetchEmployee();
+    this.getStates();
+    this.getBanks();
+    this.getLocalGovernmentAreas();
   },
 
   data() {
@@ -99,6 +99,7 @@ export default {
       const url = `${this.ROUTES.employee}/get-employee/${this.getEmployee.emp_id}`;
       this.apiGet(url).then((res) => {
         const { data } = res;
+        //console.log(`State:: ${data.emp_state_id} LGA:: ${data.emp_lga_id}`)
         if (data) {
           this.emp_first_name = data.emp_first_name;
           this.emp_last_name = data.emp_last_name;
@@ -136,8 +137,10 @@ export default {
         emp_qualification: this.emp_qualification,
         emp_account_no: this.emp_account_no,
         emp_bank_id: this.emp_bank_id,
-        emp_state_id: this.emp_state_id,
-        emp_lga_id: this.emp_lga_id,
+
+        emp_state_id: this.state.value,
+        emp_lga_id: this.lga.value,
+
         emp_marital_status: this.emp_marital_status,
         emp_spouse_name: this.emp_spouse_name,
         emp_spouse_phone_no: this.emp_spouse_phone_no,
@@ -149,8 +152,11 @@ export default {
         emp_genotype: this.emp_genotype,
         emp_emergency_name: this.emp_emergency_name,
         emp_emergency_contact: this.emp_emergency_contact,
+       /* emp_state_id: this.state.value,
+        emp_lga_id: this.lga.value,*/
       };
 
+      console.log(data)
       this.apiPatch(url, data, "Update Employee Error").then();
       this.apiResponseHandler("Process Complete", "Employee Update");
       await this.fetchEmployee().then();
@@ -190,11 +196,17 @@ export default {
             value: datum.s_id,
             text: datum.s_name,
           };
+          //console.log('States')
+/*
+          this.emp_state_id = data.emp_state_id;
+          this.emp_lga_id = data.emp_lga_id;
+          */
           if (parseInt(datum.s_id) === parseInt(this.emp_state_id)) {
             const val = {
               value: datum.s_id,
               text: datum.s_name,
             };
+            //console.log('State found!');
             this.state.push(val);
           }
           this.states.push(dat);
@@ -205,7 +217,6 @@ export default {
       const url = `${this.ROUTES.localGovernment}`;
       this.apiGet(url).then((res) => {
         const { data } = res;
-        //console.log(data);
         this.lgas = [{ value: null, text: "Please select LGA" }];
         data.forEach((datum) => {
           const dat = {
