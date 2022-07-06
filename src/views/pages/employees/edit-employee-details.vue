@@ -165,10 +165,10 @@ export default {
         emp_phone_no: this.emp_phone_no,
         emp_account_no: this.emp_account_no,
 
-        emp_bank_id: this.emp_bank_id.value,
         emp_state_id: this.state.value,
-        emp_pension_id: this.pensionProvider.value,
         emp_lga_id: this.lga.value,
+        emp_bank_id: this.emp_bank_id.value,
+        emp_pension_id: this.pensionProvider.value,
         emp_religion: this.religion,
         emp_nhf: this.emp_nhf,
         emp_location_id: this.location.value,
