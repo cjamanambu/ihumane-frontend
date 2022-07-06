@@ -52,7 +52,6 @@ export default {
       let url = `${this.ROUTES.salary}/pull-approved-salary-routine-locations`;
       await this.apiPost(url, data, "Fetch Payroll Routine Error").then(
         (res) => {
-          console.log({ res });
           this.routineRun = true;
           const { data } = res;
           data.forEach((pay, index) => {
@@ -212,6 +211,7 @@ export default {
       pmyYear: null,
       payrollLocations: null,
       payrollLocation: null,
+      period: null,
     };
   },
 };
@@ -222,7 +222,7 @@ export default {
     <PageHeader :title="title" :items="items" />
     <scale-loader v-if="apiBusy" />
     <div v-else>
-      <div v-if="routineRun">
+      <div>
         <div class="row">
           <div class="col-12">
             <div class="card">
@@ -230,7 +230,7 @@ export default {
                 <div class="p-3 bg-light mb-4 d-flex justify-content-between">
                   <h5 class="font-size-14 mb-0">
                     Payroll Summary For Payroll Period:
-                    {{ (parseInt(pmyMonth) - 1) | getMonth }} {{ pmyYear }}
+                    {{ (parseFloat(period[0]) - 1) | getMonth }} {{ period[1] }}
                   </h5>
                 </div>
                 <div class="row mt-4">
@@ -311,7 +311,9 @@ export default {
                   </b-table>
                 </div>
                 <div v-else>
-                  <scale-loader />
+                  <p class="text-center my-5">
+                    Populating report table, please wait...
+                  </p>
                 </div>
                 <div class="row">
                   <div class="col">
@@ -334,82 +336,6 @@ export default {
           </div>
         </div>
       </div>
-
-      <div v-else class="alert alert-info">
-        The payroll routine for this payroll period
-        <b> ({{ (parseInt(pmyMonth) - 1) | getMonth }} {{ pmyYear }})</b> hasn't
-        been run for any location.
-      </div>
     </div>
-
-    <b-modal
-      ref="run-routine"
-      title="Run Payroll Routine"
-      hide-footer
-      centered
-      title-class="font-18"
-      @hidden="resetForm"
-    >
-      <form @submit.prevent="runRoutine">
-        <div class="form-group">
-          <label> Location <span class="text-danger">*</span> </label>
-          <b-select
-            v-model="payrollLocation"
-            :options="payrollLocations"
-          ></b-select>
-        </div>
-
-        <b-button
-          v-if="!submitting"
-          class="btn btn-success btn-block mt-4"
-          type="submit"
-        >
-          Submit
-        </b-button>
-        <b-button
-          v-else
-          disabled
-          class="btn btn-success btn-block mt-4"
-          type="submit"
-        >
-          Submitting...
-        </b-button>
-      </form>
-    </b-modal>
-
-    <b-modal
-      ref="undo-routine"
-      title="Undo Payroll Routine"
-      hide-footer
-      centered
-      title-class="font-18"
-      @hidden="resetForm"
-    >
-      <form @submit.prevent="undoRoutine">
-        <div class="form-group">
-          <label> Location <span class="text-danger">*</span> </label>
-          <b-select
-            v-model="payrollLocation"
-            :options="payrollLocations"
-          ></b-select>
-        </div>
-
-        <b-button
-          v-if="!submitting"
-          class="btn btn-success btn-block mt-4"
-          type="submit"
-        >
-          Submit
-        </b-button>
-        <b-button
-          v-else
-          disabled
-          class="btn btn-success btn-block mt-4"
-          type="submit"
-        >
-          Submitting...
-        </b-button>
-      </form>
-    </b-modal>
   </Layout>
 </template>
