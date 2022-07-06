@@ -183,7 +183,7 @@ export default {
       let month = this.period[0];
 
       this.$router.push({
-        name: "view-payslip",
+        name: "view-approved-salary-routine-payslip",
         params: { empID, month, year },
       });
       this.$refs["emolument-table"].clearSelected();
@@ -242,10 +242,10 @@ export default {
   <Layout>
     <PageHeader :title="title" :items="items" />
     <div class="d-flex justify-content-end mb-3">
-      <!--      <b-button class="btn btn-success" @click="approveRoutine">-->
-      <!--        <i class="mdi mdi-check mr-2"></i>-->
-      <!--        Approve Routine-->
-      <!--      </b-button>-->
+      <b-button class="btn btn-success" @click="$router.go(-1)">
+        <i class="mdi mdi-arrow-left mr-2"></i>
+        Go Back
+      </b-button>
     </div>
     <scale-loader v-if="apiBusy" />
     <div v-else class="row">
@@ -285,7 +285,7 @@ export default {
               </div>
 
               <!-- Search -->
-              <div class="col-sm-12 col-md-3">
+              <div class="col-sm-12 col-md-6">
                 <div
                   id="tickets-table_filter"
                   class="dataTables_filter text-md-right"
