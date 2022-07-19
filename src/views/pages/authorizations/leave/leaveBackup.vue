@@ -36,7 +36,7 @@ export default {
   },
   validations: {
     comment: { required },
-    //official: { required },
+    official: { required },
     roleId: { required },
   },
   methods: {
@@ -150,13 +150,12 @@ export default {
           role: this.roleId.value,
           markAsFinal,
           officer: this.getEmployee.emp_id,
-          contactGroup:this.contactGroup
         };
         type === "approve" || type === "forward"
           ? (data.status = 1)
           : (data.status = 2);
-        !this.final ? (data.nextOfficer = 1/*this.official.value*/) : "";
-        //console.log({data});
+        !this.final ? (data.nextOfficer = this.official.value) : "";
+
         this.apiPost(this.ROUTES.authorization, data)
           .then((res) => {
             this.$router.push({ name: "leave-authorization" }).then(() => {
@@ -209,7 +208,6 @@ export default {
           disabled: true,
         },
       ],
-      contactGroup:0,
       totalRows: 1,
       currentPage: 1,
       perPage: 10,
@@ -549,10 +547,10 @@ export default {
             >
               <span>Status</span>
               <span v-if="reviewStatus === 1" class="text-success"
-                >Approved</span
+              >Approved</span
               >
               <span v-else-if="reviewStatus === 2" class="text-danger"
-                >Declined</span
+              >Declined</span
               >
             </div>
             <div v-else>
@@ -579,7 +577,6 @@ export default {
                 />
               </b-form-group>
               <b-form-group>
-                <label for="">Authorizing As</label>
                 <multiselect
                   v-model="roleId"
                   :options="roles"
@@ -613,15 +610,6 @@ export default {
               </div>
               <div v-else>
                 <b-form-group>
-                  <label for="">Contact Group</label>
-                  <select class="form-control" v-model="contactGroup">
-                    <option value="0" disabled selected>Select Contact Group</option>
-                    <option value="1">HR Focal Point</option>
-                    <option value="2">Supervisor</option>
-                  </select>
-                </b-form-group>
-                <b-form-group v-if="contactGroup === 0">
-                  <label for="">Next Officer</label>
                   <multiselect
                     v-model="official"
                     :options="officials"
