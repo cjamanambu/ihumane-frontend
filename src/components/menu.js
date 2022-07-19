@@ -1,7 +1,7 @@
 import store from "@/state/store";
 
 const permissions = store.getters["auth/permissions"];
-// console.log(permissions);
+console.log(permissions);
 
 const menuItems = [
   {

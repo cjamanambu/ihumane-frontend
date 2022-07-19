@@ -49,7 +49,6 @@ export default {
             }
           });
         });
-        console.log(this.applications);
         this.totalRows = this.applications.length;
       });
     },
@@ -62,7 +61,7 @@ export default {
       row = row[0];
       this.travelAppID = row.travelapp_id;
       this.$router.push({
-        name: "travel-application-details",
+        name: "travel-application-detail",
         params: { id: this.travelAppID },
       });
     },

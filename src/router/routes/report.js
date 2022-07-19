@@ -105,6 +105,17 @@ export default [
     meta: {
       authRequired: true,
     },
-    component: () => import("@/views/pages/reports/view-approved-salary-routine"),
+    component: () =>
+      import("@/views/pages/reports/view-approved-salary-routine"),
+  },
+
+  {
+    path: "/view-approved-salary-routine-payslip/:empID/:month/:year",
+    name: "view-approved-salary-routine-payslip",
+    meta: {
+      authRequired: true,
+    },
+    component: () =>
+      import("@/views/pages/reports/view-approved-salary-routine-payslip"),
   },
 ];
